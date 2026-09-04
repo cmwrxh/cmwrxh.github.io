@@ -29,8 +29,7 @@ export default async function handler(req, res) {
     return res.end(JSON.stringify({ error: 'Contact email is required' }));
   }
 
-  // --- REPLACE THESE TWO VALUES WITH YOUR ACTUAL SUPABASE CREDENTIALS ---
-  const supabaseUrl = "sb_publishable_dGaR1jgofny7tGVWh0TK2w_haSVNyWv".replace(/\/$/, "");
+  const supabaseUrl = "https://uzihwtxffklisczqvurf.supabase.co".replace(/\/$/, "");
   const supabaseServiceKey = "sb_secret_OGF2iS-L7PQJa9Bnjv0b7g_oqDfCfzk";
 
   try {
