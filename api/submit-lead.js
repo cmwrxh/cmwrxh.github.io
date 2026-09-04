@@ -14,26 +14,33 @@ export default async function handler(req, res) {
     return res.end(JSON.stringify({ error: 'Method not allowed' }));
   }
 
-  const {
-    company_name,
-    contact_email,
-    current_latency_ms,
-    target_latency_ms,
-    monthly_requests,
-    estimated_monthly_loss
-  } = req.body || {};
-
-  if (!contact_email) {
-    res.statusCode = 400;
-    res.setHeader('Content-Type', 'application/json');
-    return res.end(JSON.stringify({ error: 'Contact email is required' }));
-  }
-
-  const supabaseUrl = "https://uzihwtxffklisczqvurf.supabase.co".replace(/\/$/, "");
-  const supabaseServiceKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV6aWh3dHhmZmtsaXNjenF2dXJmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4ODUyNjMxMSwiZXhwIjoyMTA0MTAyMzExfQ.ZWh9ONjw2ofNrmfWPZ_46qXlRfa6D3HHikZ_p7v8zw0";
-
   try {
-    const userIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+    // Safely parse body whether Vercel passes it as an object or string
+    let body = req.body;
+    if (typeof body === 'string') {
+      body = JSON.parse(body);
+    }
+    body = body || {};
+
+    const {
+      company_name,
+      contact_email,
+      current_latency_ms,
+      target_latency_ms,
+      monthly_requests,
+      estimated_monthly_loss
+    } = body;
+
+    if (!contact_email) {
+      res.statusCode = 400;
+      res.setHeader('Content-Type', 'application/json');
+      return res.end(JSON.stringify({ error: 'Contact email is required' }));
+    }
+
+    const supabaseUrl = "https://uzihwtxffklisczqvurf.supabase.co".replace(/\/$/, "");
+    const supabaseServiceKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV6aWh3dHhmZmtsaXNjenF2dXJmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4ODUyNjMxMSwiZXhwIjoyMTA0MTAyMzExfQ.ZWh9ONjw2ofNrmfWPZ_46qXlRfa6D3HHikZ_p7v8zw0";
+
+    const userIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'Unknown';
 
     const response = await fetch(`${supabaseUrl}/rest/v1/calculator_leads`, {
       method: 'POST',
@@ -45,12 +52,12 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         company_name: company_name || null,
-        contact_email,
+        contact_email: contact_email,
         user_ip: userIp,
-        current_latency_ms: current_latency_ms || 0,
-        target_latency_ms: target_latency_ms || 0,
-        monthly_requests: monthly_requests || 0,
-        estimated_monthly_loss: estimated_monthly_loss || 0,
+        current_latency_ms: Number(current_latency_ms) || 0,
+        target_latency_ms: Number(target_latency_ms) || 0,
+        monthly_requests: Number(monthly_requests) || 0,
+        estimated_monthly_loss: Number(estimated_monthly_loss) || 0,
         status: 'new'
       })
     });
