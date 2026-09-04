@@ -29,8 +29,8 @@ export default async function handler(req, res) {
     return res.end(JSON.stringify({ error: 'Contact email is required' }));
   }
 
-  // HARDCODED FOR TESTING — Bypasses Vercel env variable blocks entirely
-  const supabaseUrl = "sb_publishable_dGaR1jgofny7tGVWh0TK2w_haSVNyWv";
+  // --- REPLACE THESE TWO VALUES WITH YOUR ACTUAL SUPABASE CREDENTIALS ---
+  const supabaseUrl = "sb_publishable_dGaR1jgofny7tGVWh0TK2w_haSVNyWv".replace(/\/$/, "");
   const supabaseServiceKey = "sb_secret_OGF2iS-L7PQJa9Bnjv0b7g_oqDfCfzk";
 
   try {
@@ -56,28 +56,21 @@ export default async function handler(req, res) {
       })
     });
 
+    const responseText = await response.text();
+
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Supabase insertion error:', errorText);
       res.statusCode = 500;
       res.setHeader('Content-Type', 'application/json');
-      return res.end(JSON.stringify({ success: false, error: 'Failed to save lead record: ' + errorText }));
+      return res.end(JSON.stringify({ success: false, error: `Supabase Error (${response.status}): ${responseText}` }));
     }
-
-    const data = await response.json();
 
     res.statusCode = 200;
     res.setHeader('Content-Type', 'application/json');
-    return res.end(JSON.stringify({
-      success: true,
-      message: 'Lead captured successfully',
-      data: data[0]
-    }));
+    return res.end(JSON.stringify({ success: true, message: 'Lead captured successfully' }));
 
   } catch (err) {
-    console.error('Server error handling lead submission:', err);
     res.statusCode = 500;
     res.setHeader('Content-Type', 'application/json');
-    return res.end(JSON.stringify({ success: false, error: 'Internal server error' }));
+    return res.end(JSON.stringify({ success: false, error: `Catch Error: ${err.message}` }));
   }
 }
