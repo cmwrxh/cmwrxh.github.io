@@ -19,11 +19,11 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'No lead data provided' });
     }
 
-    // Call Resend API directly via native fetch (no npm packages required)
+    // Call Resend API directly via native fetch with your new key
     const resendResponse = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
-        'Authorization': 'Bearer re_atKfZyFd_M7dR1YPcpBzPMjKkkL3xGYZo',
+        'Authorization': 'Bearer re_EjQRv5nd_LEAakGiyrWwLMzYLwJgV7ypW',
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
