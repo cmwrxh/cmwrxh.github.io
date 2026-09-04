@@ -235,6 +235,7 @@ async function runScan() {
   btn.disabled = true;
   btn.textContent = 'Analyzing...';
   output.style.display = 'block';
+  output.classList.add('terminal');
   output.innerHTML = `<div class="terminal-header">
     <div class="terminal-dot red"></div>
     <div class="terminal-dot yellow"></div>
@@ -342,7 +343,7 @@ async function runScan() {
       <div>Total: <span class="highlight">${fmtMs(timings.total)}</span></div>
       ${hopCount ? `<div>Traceroute Hops: <span class="highlight">${hopCount}</span></div>` : ''}
     </div>
-    ${pathSummary ? `<div style="color:var(--text-muted);margin-bottom:1rem;">Path: ${pathSummary}</div>` : ''}
+    ${pathSummary ? `<div style="color:var(--text);opacity:0.85;margin-bottom:1rem;">Path: ${pathSummary}</div>` : ''}
     <div style="color:var(--${verdict.color});margin-bottom:1.5rem;">
       ${
         ttfb == null
@@ -463,4 +464,3 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 });
-                            
