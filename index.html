@@ -29,14 +29,14 @@
   <!-- Hero -->
   <section class="section" style="padding-top: 6rem;">
     <div class="container">
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: center;">
+      <div class="hero-grid">
         <div>
           <div class="label">African Infrastructure Intelligence</div>
-          <h1 style="font-size: clamp(2.2rem, 4vw, 3.2rem); line-height: 1.2; margin-bottom: 1.5rem;">
-            Your API is <span class="highlight-blue">300ms slower</span> in Nairobi than it needs to be.
+          <h1 class="hero-title">
+            Your API is 300ms slower in Nairobi than it needs to be.
           </h1>
-          <p class="subtitle" style="font-size: 1.1rem; max-width: 500px;">
-            African fintechs lose <span class="highlight-blue">40% of users</span> at checkout because DNS resolves in London, TLS handshakes across the Atlantic, and BGP routes through congested peering points. We fix it in <span class="highlight-blue">one week</span>.
+          <p class="subtitle hero-subtitle">
+            African fintechs lose 40% of users at checkout because DNS resolves in London, TLS handshakes across the Atlantic, and BGP routes through congested peering points. We fix it in one week.
           </p>
           <div class="btn-group">
             <a href="scan.html" class="btn btn-primary">Run a free latency scan →</a>
@@ -44,14 +44,14 @@
           </div>
         </div>
 
-        <div class="terminal" style="margin: 0;">
+        <div class="terminal hero-terminal">
           <div class="terminal-header">
             <div class="terminal-dot red"></div>
             <div class="terminal-dot yellow"></div>
             <div class="terminal-dot green"></div>
             <div class="terminal-title">example diagnostic — mtr --report api.fintech.co.ke</div>
           </div>
-          <div class="terminal-body" style="font-size: 0.8rem;">
+          <div class="terminal-body">
             <div><span class="prompt">$</span> <span class="command">mtr --report api.fintech.co.ke</span></div>
             <div class="output" style="margin-top: 1rem;">
 HOST: nairobi&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Loss%&nbsp;&nbsp;Snt&nbsp;&nbsp;&nbsp;Last&nbsp;&nbsp;&nbsp;Avg<br>
@@ -82,19 +82,19 @@ HOST: nairobi&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&
     <div class="container">
       <div class="stats">
         <div class="stat">
-          <span class="stat-value highlight-blue">380→95ms</span>
+          <span class="stat-value">380→95ms</span>
           <div class="stat-label">p99 Latency Reduction</div>
         </div>
         <div class="stat">
-          <span class="stat-value highlight-blue">-75%</span>
+          <span class="stat-value">-75%</span>
           <div class="stat-label">TLS Handshake Time</div>
         </div>
         <div class="stat">
-          <span class="stat-value highlight-blue">-35%</span>
+          <span class="stat-value">-35%</span>
           <div class="stat-label">AWS Infrastructure Cost</div>
         </div>
         <div class="stat">
-          <span class="stat-value highlight-blue">1 Week</span>
+          <span class="stat-value">1 Week</span>
           <div class="stat-label">From Audit to Production</div>
         </div>
       </div>
