@@ -1,72 +1,58 @@
 export default async function handler(req, res) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
   if (req.method !== 'POST') {
-    res.statusCode = 405;
-    res.setHeader('Content-Type', 'application/json');
-    return res.end(JSON.stringify({ error: 'Method not allowed' }));
+    return res.status(405).json({ error: 'Method not allowed' });
   }
 
   try {
-    // Supabase webhook payload structure
-    const payload = req.body;
-    const record = payload.record || payload; // handles direct row or wrapped event
+    const { type, table, record } = req.body || {};
+    const lead = record || req.body;
 
-    const {
-      company_name,
-      contact_email,
-      current_latency_ms,
-      target_latency_ms,
-      monthly_requests,
-      estimated_monthly_loss,
-      user_ip
-    } = record;
-
-    const resendApiKey = "re_atKfZyFd_M7dR1YPcpBzPMjKkkL3xGYZo";
-    const recipientEmail = "Charlie@brilliantunicorn.com";
-
-    if (!contact_email) {
-      throw new Error('Contact email is missing from the record payload');
+    if (!lead || !lead.contact_email) {
+      return res.status(400).json({ error: 'No lead data provided' });
     }
 
-    // Construct email content
-    const emailHtml = `
-      <h2>New Latency Calculator Lead!</h2>
-      <p><strong>Company:</strong> ${company_name || 'N/A'}</p>
-      <p><strong>Contact Email:</strong> ${contact_email}</p>
-      <p><strong>Current Latency:</strong> ${current_latency_ms} ms</p>
-      <p><strong>Target Latency:</strong> ${target_latency_ms} ms</p>
-      <p><strong>Monthly Requests:</strong> ${Number(monthly_requests).toLocaleString()}</p>
-      <p><strong>Est. Monthly Loss:</strong> $${Number(estimated_monthly_loss).toLocaleString()}</p>
-      <p><strong>User IP:</strong> ${user_ip || 'Unknown'}</p>
-    `;
-
-    // Send via Resend API
-    const response = await fetch('https://api.resend.com/emails', {
+    // Call Resend API directly via native fetch (no npm packages required)
+    const resendResponse = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${resendApiKey}`,
+        'Authorization': 'Bearer re_atKfZyFd_M7dR1YPcpBzPMjKkkL3xGYZo',
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        from: 'Africa Latency Alerts <onboarding@resend.dev>',
-        to: [recipientEmail],
-        subject: `New Lead: ${company_name || contact_email} - $${Number(estimated_monthly_loss).toLocaleString()} loss`,
-        html: emailHtml
+        from: 'Acme <onboarding@resend.dev>',
+        to: ['Charlie@brilliantunicorn.com'],
+        subject: `🚀 New Lead: ${lead.company_name || lead.contact_email}`,
+        html: `
+          <h2>New Calculator Lead Captured</h2>
+          <p><strong>Company:</strong> ${lead.company_name || 'N/A'}</p>
+          <p><strong>Email:</strong> ${lead.contact_email}</p>
+          <p><strong>Current Latency:</strong> ${lead.current_latency_ms || 0} ms</p>
+          <p><strong>Target Latency:</strong> ${lead.target_latency_ms || 0} ms</p>
+          <p><strong>Monthly Requests:</strong> ${lead.monthly_requests || 0}</p>
+          <p><strong>Estimated Monthly Loss:</strong> $${lead.estimated_monthly_loss || 0}</p>
+          <p><strong>IP:</strong> ${lead.user_ip || 'N/A'}</p>
+        `
       })
     });
 
-    const data = await response.json();
+    const responseData = await resendResponse.json();
 
-    if (!response.ok) {
-      throw new Error(`Resend API Error: ${JSON.stringify(data)}`);
+    if (!resendResponse.ok) {
+      console.error('Resend API Error:', responseData);
+      return res.status(500).json({ success: false, error: responseData });
     }
 
-    res.statusCode = 200;
-    res.setHeader('Content-Type', 'application/json');
-    return res.end(JSON.stringify({ success: true, message: 'Alert email sent successfully' }));
-
-  } catch (err) {
-    res.statusCode = 500;
-    res.setHeader('Content-Type', 'application/json');
-    return res.end(JSON.stringify({ success: false, error: err.message }));
+    return res.status(200).json({ success: true, data: responseData });
+  } catch (error) {
+    console.error('Server Error:', error.message);
+    return res.status(500).json({ success: false, error: error.message });
   }
 }
