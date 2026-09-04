@@ -429,14 +429,19 @@ a:focus-visible, button:focus-visible, input:focus-visible {
   .footer-links { display: flex; justify-content: center; flex-wrap: wrap; gap: 12px; }
   .footer-links a { margin-left: 0; }
 
-  /* Terminal panel: shrink and enable horizontal scroll for the mtr output
-     instead of letting it get squeezed into a sliver next to the hero text */
   .terminal-body {
     font-size: 0.72rem;
     line-height: 1.6;
     padding: 12px;
+  }
+
+  /* Homepage hero terminal (static mtr output): keep the ASCII table on
+     one line and let it scroll horizontally instead of wrapping into a mess.
+     Scoped to .hero-terminal only — the scan tool's terminal-body contains
+     real form fields and report text that must wrap normally. */
+  .hero-terminal .terminal-body {
     overflow-x: auto;
     white-space: pre;
   }
   .terminal-title { font-size: 0.68rem; }
-      }
+}
