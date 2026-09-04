@@ -121,42 +121,43 @@
         </div>
       </div>
 
-      <!-- Business-Impact Calculator Widget (Integrated cleanly below the lab cards grid) -->
+      <!-- Financial Impact Calculator -->
       <div class="card" style="border-top: 2px solid var(--blue); margin-top: 3.5rem;">
         <div class="label">FINANCIAL IMPACT MODEL</div>
         <h3 style="color: var(--blue);">African Latency Revenue Leakage Calculator</h3>
         <p style="font-size: 1rem; font-weight: 600; color: var(--text); margin-bottom: 0.5rem; margin-top: 0.5rem;">Quantify cross-border routing losses</p>
         <p>Calculate exactly how much revenue your platform loses monthly due to high cross-border network routing delays and mobile connectivity drop-offs.</p>
-        
+
         <form id="impact-calculator-form" style="margin-top: 24px;">
           <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 20px;">
             <div>
-              <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 6px;">Target Domain</label>
-              <input type="text" id="calc-domain" class="form-input" value="api.github.com" required>
-            </div>
-            <div>
               <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 6px;">Current Latency (ms)</label>
-              <input type="number" id="calc-latency" class="form-input" value="280" required>
+              <input type="number" id="calc-current" class="form-input" placeholder="e.g. 450" min="1">
+              <div class="calc-error" id="err-current"></div>
             </div>
             <div>
-              <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 6px;">Monthly African Visitors</label>
-              <input type="number" id="calc-traffic" class="form-input" value="50000" required>
+              <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 6px;">Target Latency (ms)</label>
+              <input type="number" id="calc-target" class="form-input" placeholder="e.g. 95" min="1">
+              <div class="calc-error" id="err-target"></div>
             </div>
             <div>
-              <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 6px;">Avg Order Value ($ AOV)</label>
-              <input type="number" step="0.01" id="calc-aov" class="form-input" value="45.00" required>
+              <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 6px;">Monthly API Requests</label>
+              <input type="number" id="calc-requests" class="form-input" placeholder="e.g. 5000000" min="1">
+              <div class="calc-error" id="err-requests"></div>
             </div>
             <div>
-              <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 6px;">Baseline Conversion (%)</label>
-              <input type="number" step="0.1" id="calc-conversion" class="form-input" value="2.5" required>
+              <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 6px;">Business Email</label>
+              <input type="email" id="calc-email" class="form-input" placeholder="cto@yourcompany.co.ke">
+              <div class="calc-error" id="err-email"></div>
             </div>
             <div>
-              <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 6px;">Work Email (Optional)</label>
-              <input type="email" id="calc-email" class="form-input" placeholder="cto@yourcompany.com">
+              <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 6px;">Company Name</label>
+              <input type="text" id="calc-company" class="form-input" placeholder="Your Company Ltd">
+              <div class="calc-error" id="err-company"></div>
             </div>
           </div>
 
-          <button type="submit" class="btn btn-primary" style="background: var(--blue); color: var(--bg);">Calculate Revenue Leakage</button>
+          <button type="submit" class="btn btn-primary" style="background: var(--blue); color: var(--bg);">Calculate Financial Impact</button>
         </form>
 
         <div id="calculator-results" style="margin-top: 24px; display: none;">
@@ -168,9 +169,11 @@
               <span class="terminal-title">revenue-leakage-analysis.log</span>
             </div>
             <div class="terminal-body">
-              <p><span class="prompt">&gt;</span> Target: <span class="command" id="res-domain">api.github.com</span></p>
-              <p><span class="prompt">&gt;</span> Calculated Monthly Loss: <span class="highlight" id="loss-output" style="color: var(--error);">$0.00</span></p>
-              <p><span class="prompt">&gt;</span> Friction Breakdown: <span class="output" id="breakdown-text">Analyzing network drop-off...</span></p>
+              <p><span class="prompt">&gt;</span> Company: <span class="command" id="res-company"></span></p>
+              <p><span class="prompt">&gt;</span> Current: <span class="command" id="res-current"></span>ms → Target: <span class="command" id="res-target"></span>ms</p>
+              <p><span class="prompt">&gt;</span> Monthly Requests: <span class="command" id="res-requests"></span></p>
+              <p><span class="prompt">&gt;</span> Calculated Monthly Loss: <span class="highlight" id="loss-output" style="color: var(--error); font-weight: 600;"></span></p>
+              <p><span class="prompt">&gt;</span> Wasted Seconds/Month: <span class="output" id="res-wasted"></span></p>
               <p style="margin-top: 8px;"><span class="prompt">&gt;</span> Status: <span class="tag" style="border-color: var(--error); color: var(--error);">Revenue Leak Detected</span></p>
             </div>
           </div>
@@ -195,5 +198,88 @@
 </footer>
 
 <script src="js/main.js"></script>
+<script>
+(function() {
+  const form = document.getElementById('impact-calculator-form');
+  const results = document.getElementById('calculator-results');
+
+  function showErr(id, msg) {
+    const el = document.getElementById(id);
+    el.textContent = msg;
+    el.style.display = 'block';
+  }
+  function hideErr(id) {
+    const el = document.getElementById(id);
+    el.style.display = 'none';
+  }
+  function hideAll() {
+    ['err-current','err-target','err-requests','err-email','err-company'].forEach(hideErr);
+  }
+  function validEmail(v) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+  }
+
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    hideAll();
+    results.style.display = 'none';
+
+    const currentVal = document.getElementById('calc-current').value.trim();
+    const targetVal  = document.getElementById('calc-target').value.trim();
+    const requestsVal = document.getElementById('calc-requests').value.trim();
+    const emailVal   = document.getElementById('calc-email').value.trim();
+    const companyVal = document.getElementById('calc-company').value.trim();
+
+    let bad = false;
+
+    // 1. Non-numeric / empty / impossible
+    if (!currentVal || isNaN(currentVal) || Number(currentVal) <= 0) {
+      showErr('err-current', 'Enter a valid latency in ms (e.g. 450)'); bad = true;
+    }
+    if (!targetVal || isNaN(targetVal) || Number(targetVal) <= 0) {
+      showErr('err-target', 'Enter a valid target in ms (e.g. 95)'); bad = true;
+    }
+    if (!requestsVal || isNaN(requestsVal) || Number(requestsVal) < 1000) {
+      showErr('err-requests', 'Minimum 1,000 requests/month for meaningful analysis'); bad = true;
+    }
+
+    // 2. Target must be lower than current
+    if (!bad && Number(targetVal) >= Number(currentVal)) {
+      showErr('err-target', 'Target latency must be lower than current latency'); bad = true;
+    }
+
+    // 3. Email
+    if (!emailVal) {
+      showErr('err-email', 'Business email is required to view results'); bad = true;
+    } else if (!validEmail(emailVal)) {
+      showErr('err-email', 'Enter a valid email (e.g. cto@company.co.ke)'); bad = true;
+    }
+
+    // 4. Company
+    if (!companyVal || companyVal.length < 2) {
+      showErr('err-company', 'Enter a valid company name'); bad = true;
+    }
+
+    if (bad) return;
+
+    const current = parseFloat(currentVal);
+    const target  = parseFloat(targetVal);
+    const requests = parseFloat(requestsVal);
+    const diff = current - target;
+    const wastedSec = (diff * requests) / 1000;
+    const monthlyLoss = Math.round(wastedSec * 0.003);
+
+    document.getElementById('res-company').textContent = companyVal;
+    document.getElementById('res-current').textContent = current;
+    document.getElementById('res-target').textContent = target;
+    document.getElementById('res-requests').textContent = requests.toLocaleString();
+    document.getElementById('loss-output').textContent = '$' + monthlyLoss.toLocaleString();
+    document.getElementById('res-wasted').textContent = wastedSec.toLocaleString();
+
+    results.style.display = 'block';
+    results.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  });
+})();
+</script>
 </body>
 </html>
