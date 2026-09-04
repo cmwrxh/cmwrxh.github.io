@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Latency Scanner — africalatency.dev</title>
+  <meta name="description" content="Free API latency diagnostic from African networks.">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="nav-brand">africalatency<span>.dev</span></a>
+    <ul class="nav-links">
+      <li><a href="scan.html" class="active">Scan</a></li>
+      <li><a href="work.html">Work</a></li>
+      <li><a href="labs.html">Labs</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+  </div>
+</nav>
+<main>
+  <section class="section" style="padding-top: 6rem;">
+    <div class="container" style="max-width: 800px;">
+      <div class="label">Diagnostic Tool</div>
+      <h1>Test Your API from Africa</h1>
+      <p class="subtitle">
+        Enter your API domain. We simulate a diagnostic from Safaricom 4G in Nairobi to show you what your African users experience.
+      </p>
+
+      <form id="scan-form" style="margin: 2rem 0;">
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+          <input
+            type="text"
+            id="scan-domain"
+            class="form-input"
+            placeholder="api.yourfintech.com"
+            style="flex: 1; min-width: 250px;"
+            required
+          >
+          <button type="submit" class="btn btn-primary" id="scan-btn" style="white-space: nowrap;">
+            Analyze Latency
+          </button>
+        </div>
+      </form>
+
+      <div id="scan-output" style="display: none;"></div>
+
+      <div style="margin-top: 3rem; padding: 1.5rem; border: 1px solid var(--border); border-radius: 8px; background: var(--bg-elevated);">
+        <h3 style="font-size: 1rem; margin-bottom: 1rem; color: var(--text-muted);">What we check</h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; font-size: 0.85rem; color: var(--text-muted);">
+          <div>✓ DNS resolution path</div>
+          <div>✓ TLS handshake version</div>
+          <div>✓ Time to First Byte (TTFB)</div>
+          <div>✓ BGP routing hops</div>
+          <div>✓ CDN edge placement</div>
+          <div>✓ Mobile network peering</div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+<footer>
+  <div class="footer-inner">
+    <div class="footer-left">© 2026 africalatency.dev</div>
+    <div class="footer-links">
+      <a href="https://github.com/cmwrxh" target="_blank">GitHub</a>
+      <a href="https://www.linkedin.com/in/charles-mwaura-bb7814140/" target="_blank">LinkedIn</a>
+    </div>
+  </div>
+</footer>
+<script src="js/main.js"></script>
+<script src="js/scan.js"></script>
+</body>
+</html>
