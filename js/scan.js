@@ -1,34 +1,17 @@
-const scanSteps = [
-  { text: "Resolving DNS from Nairobi (Safaricom 4G)...", delay: 800 },
-  { text: "Testing TLS handshake (TLS 1.2 vs 1.3)...", delay: 600 },
-  { text: "Measuring TTFB (Time to First Byte)...", delay: 700 },
-  { text: "Analyzing BGP path (traceroute)...", delay: 900 },
-  { text: "Checking CDN edge placement...", delay: 500 },
-  { text: "Compiling diagnostic report...", delay: 600 }
-];
+/* ============================================
+   africalatency.dev — scan.js
+   Runs REAL diagnostics via the Globalping API
+   (https://globalping.io) from probes in Kenya/Africa.
+   No backend required — this calls Globalping directly
+   from the browser.
+   ============================================ */
 
-const diagnoses = {
-  slow: {
-    dns: "120ms",
-    tls: "180ms",
-    ttfb: "380ms",
-    hops: "18",
-    path: "SEACOM → London IX → AWS us-east-1",
-    verdict: "CRITICAL",
-    color: "error",
-    message: "Your API is in the 90th percentile for African latency. You are likely losing 30-40% of mobile users at checkout."
-  },
-  medium: {
-    dns: "45ms",
-    tls: "90ms",
-    ttfb: "180ms",
-    hops: "12",
-    path: "WIOCC → Frankfurt → AWS eu-west-1",
-    verdict: "WARNING",
-    color: "warning",
-    message: "Moderate latency issues. DNS is optimized but TLS and routing still add unnecessary overhead."
-  }
-};
+const GP_API_BASE = 'https://api.globalping.io/v1';
+
+// Optional: get a free token from https://dash.globalping.io for higher
+// rate limits (anonymous requests are capped fairly low per hour).
+// Paste it below, e.g. const GP_API_TOKEN = 'gp_xxx...';
+const GP_API_TOKEN = '';
 
 // Strict garbage words rejection list
 const garbageWords = [
@@ -100,13 +83,136 @@ function validateDomainInput(v) {
   return { ok: true, domain: domain };
 }
 
+/* ============================================
+   Globalping API helpers
+   ============================================ */
+
+async function gpFetch(path, options = {}) {
+  const headers = Object.assign(
+    { 'Content-Type': 'application/json', Accept: 'application/json' },
+    options.headers || {}
+  );
+  if (GP_API_TOKEN) headers.Authorization = `Bearer ${GP_API_TOKEN}`;
+  return fetch(GP_API_BASE + path, Object.assign({}, options, { headers }));
+}
+
+async function gpCreateMeasurement(type, target, locations, measurementOptions) {
+  const body = { type, target, locations, limit: 1 };
+  if (measurementOptions) body.measurementOptions = measurementOptions;
+
+  const res = await gpFetch('/measurements', {
+    method: 'POST',
+    body: JSON.stringify(body)
+  });
+
+  if (res.status === 202 || res.status === 200) {
+    const data = await res.json();
+    return data.id;
+  }
+
+  const errData = await res.json().catch(() => ({}));
+  const err = new Error(
+    (errData.error && errData.error.message) || `Could not start measurement (HTTP ${res.status})`
+  );
+  err.status = res.status;
+  err.raw = errData;
+  throw err;
+}
+
+async function gpPollMeasurement(id, { timeoutMs = 25000, intervalMs = 1000 } = {}) {
+  const started = Date.now();
+  while (Date.now() - started < timeoutMs) {
+    const res = await gpFetch(`/measurements/${id}`, { method: 'GET' });
+    if (!res.ok) throw new Error(`Could not fetch measurement result (HTTP ${res.status})`);
+    const data = await res.json();
+    if (data.status && data.status !== 'in-progress') return data;
+    await sleep(intervalMs);
+  }
+  throw new Error('Timed out waiting for the probe to respond.');
+}
+
+// Tries a Kenyan probe first, falls back to any African probe, then worldwide,
+// so the tool still works even if no Kenyan probe happens to be online.
+async function gpRunFromAfrica(type, target, measurementOptions) {
+  const locationAttempts = [
+    [{ country: 'KE', limit: 1 }],
+    [{ magic: 'Africa', limit: 1 }],
+    [{ magic: 'world', limit: 1 }]
+  ];
+  let lastErr;
+  for (const locations of locationAttempts) {
+    try {
+      const id = await gpCreateMeasurement(type, target, locations, measurementOptions);
+      return await gpPollMeasurement(id);
+    } catch (e) {
+      lastErr = e;
+      // Only fall back to a wider location on "no matching probes" type errors.
+      // Real network/timeout errors should surface immediately.
+      if (!(e.status === 400 || e.status === 422)) throw e;
+    }
+  }
+  throw lastErr;
+}
+
+/* ============================================
+   Rendering helpers
+   ============================================ */
+
+function appendLine(body, text, cls) {
+  const div = document.createElement('div');
+  div.innerHTML = `<span class="prompt">$</span> <span class="command${cls ? ' ' + cls : ''}">${text}</span>`;
+  body.appendChild(div);
+  return div;
+}
+
+function appendResultLine(body, text, cls) {
+  const div = document.createElement('div');
+  div.className = cls || 'output';
+  div.textContent = `  → ${text}`;
+  body.appendChild(div);
+  return div;
+}
+
+function fmtMs(v) {
+  if (v === undefined || v === null || v === -1) return 'n/a';
+  return `${Math.round(v)}ms`;
+}
+
+function verdictFor(ttfb) {
+  if (ttfb == null) return { label: 'UNKNOWN', color: 'warning' };
+  if (ttfb >= 300) return { label: 'CRITICAL', color: 'error' };
+  if (ttfb >= 150) return { label: 'WARNING', color: 'warning' };
+  return { label: 'GOOD', color: 'highlight' };
+}
+
+function appendRawToggle(body, label, raw) {
+  const details = document.createElement('details');
+  details.style.marginTop = '1rem';
+  details.style.fontSize = '0.78rem';
+  details.style.color = 'var(--text-muted)';
+  const summary = document.createElement('summary');
+  summary.style.cursor = 'pointer';
+  summary.textContent = `View raw ${label} response`;
+  const pre = document.createElement('pre');
+  pre.style.whiteSpace = 'pre-wrap';
+  pre.style.wordBreak = 'break-all';
+  pre.style.marginTop = '0.5rem';
+  pre.textContent = JSON.stringify(raw, null, 2);
+  details.appendChild(summary);
+  details.appendChild(pre);
+  body.appendChild(details);
+}
+
+/* ============================================
+   Main scan flow
+   ============================================ */
+
 async function runScan() {
   const domainInput = document.getElementById('scan-domain');
   const rawValue = domainInput.value;
-  
+
   hideDomainError();
 
-  // Enforce strict validation before running anything
   const validation = validateDomainInput(rawValue);
   if (!validation.ok) {
     showDomainError(validation.msg);
@@ -128,19 +234,83 @@ async function runScan() {
   </div><div class="terminal-body" id="scan-body"></div>`;
 
   const body = document.getElementById('scan-body');
+  let ttfb = null;
+  let probeLocation = 'unknown';
 
-  for (const step of scanSteps) {
-    const line = document.createElement('div');
-    line.innerHTML = `<span class="prompt">$</span> <span class="command">${step.text}</span>`;
-    body.appendChild(line);
-    await sleep(step.delay);
+  // --- Step 1: HTTP measurement (DNS + TCP + TLS + TTFB) ---
+  appendLine(body, 'Requesting a live probe near Nairobi (Globalping network)...');
+  let httpMeasurement;
+  try {
+    httpMeasurement = await gpRunFromAfrica('http', domain, { request: { method: 'GET' } });
+  } catch (e) {
+    appendResultLine(body, e.message || 'Could not reach the Globalping API.', 'error');
+    btn.disabled = false;
+    btn.textContent = 'Analyze Another Domain';
+    return;
   }
 
-  const hash = domain.split('').reduce((a, b) => a + b.charCodeAt(0), 0);
-  const result = hash % 3 === 0 ? diagnoses.medium : diagnoses.slow;
-  const parsedLatency = parseInt(result.ttfb, 10) || 380;
+  const httpProbeResult = httpMeasurement.results && httpMeasurement.results[0];
+  if (!httpProbeResult || !httpProbeResult.result || httpProbeResult.result.status !== 'finished') {
+    const reason =
+      (httpProbeResult && httpProbeResult.result && (httpProbeResult.result.rawOutput || httpProbeResult.result.status)) ||
+      'the target did not respond to the probe';
+    appendResultLine(body, `Diagnostic incomplete: ${reason}`, 'error');
+    appendRawToggle(body, 'http', httpMeasurement);
+    btn.disabled = false;
+    btn.textContent = 'Analyze Another Domain';
+    return;
+  }
 
-  await sleep(400);
+  const probe = httpProbeResult.probe || {};
+  const r = httpProbeResult.result;
+  const timings = r.timings || {};
+  probeLocation = [probe.city, probe.country].filter(Boolean).join(', ') || 'unknown location';
+  ttfb = timings.firstByte;
+
+  appendResultLine(body, `Probe assigned: ${probeLocation}${probe.network ? ' — ' + probe.network : ''}`);
+
+  await sleep(300);
+  appendLine(body, 'Resolving DNS...');
+  appendResultLine(body, `${r.resolvedAddress || 'unresolved'}  (${fmtMs(timings.dns)})`);
+
+  await sleep(300);
+  appendLine(body, 'Testing TLS handshake...');
+  const tlsProtocol = (r.tls && (r.tls.protocol || r.tls.version)) || 'n/a (not HTTPS or handshake failed)';
+  appendResultLine(body, `${tlsProtocol}  (${fmtMs(timings.tls)})`);
+
+  await sleep(300);
+  appendLine(body, 'Measuring TTFB (Time to First Byte)...');
+  appendResultLine(body, `HTTP ${r.statusCode ?? '?'}  (${fmtMs(timings.firstByte)})`);
+
+  // --- Step 2: Traceroute (best-effort — don't fail the whole scan on this) ---
+  await sleep(300);
+  appendLine(body, 'Analyzing BGP path (traceroute)...');
+  let hopCount = null;
+  let pathSummary = null;
+  let traceMeasurement = null;
+  try {
+    traceMeasurement = await gpRunFromAfrica('traceroute', domain, { protocol: 'ICMP' });
+    const traceProbeResult = traceMeasurement.results && traceMeasurement.results[0];
+    const hops = traceProbeResult && traceProbeResult.result && traceProbeResult.result.hops;
+    if (hops && hops.length) {
+      hopCount = hops.length;
+      const named = hops.map(h => h.resolvedHostname || h.resolvedAddress).filter(Boolean);
+      pathSummary = named.length
+        ? `${named[0]} → … → ${named[named.length - 1]}`
+        : `${hopCount} hops (unnamed)`;
+      appendResultLine(body, `${hopCount} hops — ${pathSummary}`);
+    } else {
+      appendResultLine(body, 'Traceroute did not complete (target may block ICMP).', 'warning');
+    }
+  } catch (e) {
+    appendResultLine(body, `Traceroute unavailable: ${e.message}`, 'warning');
+  }
+
+  await sleep(300);
+  appendLine(body, 'Compiling diagnostic report...');
+  await sleep(300);
+
+  const verdict = verdictFor(ttfb);
 
   const report = document.createElement('div');
   report.style.marginTop = '1.5rem';
@@ -148,23 +318,33 @@ async function runScan() {
   report.style.borderTop = '1px solid var(--border)';
   report.innerHTML = `
     <div style="margin-bottom:1rem;">
-      <span style="color:var(--${result.color});font-weight:600;font-size:1.1rem;">
-        ${result.verdict}
+      <span style="color:var(--${verdict.color});font-weight:600;font-size:1.1rem;">
+        ${verdict.label}
+      </span>
+      <span style="color:var(--text-muted);font-size:0.8rem;margin-left:0.5rem;">
+        measured live from ${probeLocation}
       </span>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">
-      <div>DNS Resolution: <span class="highlight">${result.dns}</span></div>
-      <div>TLS Handshake: <span class="highlight">${result.tls}</span></div>
-      <div>TTFB: <span class="highlight">${result.ttfb}</span></div>
-      <div>BGP Hops: <span class="highlight">${result.hops}</span></div>
+      <div>DNS Resolution: <span class="highlight">${fmtMs(timings.dns)}</span></div>
+      <div>TLS Handshake: <span class="highlight">${fmtMs(timings.tls)}</span></div>
+      <div>TTFB: <span class="highlight">${fmtMs(timings.firstByte)}</span></div>
+      <div>Total: <span class="highlight">${fmtMs(timings.total)}</span></div>
+      ${hopCount ? `<div>Traceroute Hops: <span class="highlight">${hopCount}</span></div>` : ''}
     </div>
-    <div style="color:var(--text-muted);margin-bottom:1rem;">
-      Path: ${result.path}
+    ${pathSummary ? `<div style="color:var(--text-muted);margin-bottom:1rem;">Path: ${pathSummary}</div>` : ''}
+    <div style="color:var(--${verdict.color});margin-bottom:1.5rem;">
+      ${
+        ttfb == null
+          ? 'Could not measure a full response — the target may be blocking automated requests or timed out.'
+          : ttfb >= 300
+          ? 'This TTFB is in a range where African mobile users commonly experience checkout drop-off from perceived slowness.'
+          : ttfb >= 150
+          ? 'Usable, but there is real headroom to reduce latency for African users.'
+          : 'This is a solid response time for African network conditions.'
+      }
     </div>
-    <div style="color:var(--${result.color});margin-bottom:1.5rem;">
-      ${result.message}
-    </div>
-    
+
     <div style="padding:1.25rem;background:var(--bg);border-radius:6px;border:1px solid var(--border);">
       <div style="font-size:0.9rem;font-weight:600;color:var(--text);margin-bottom:0.3rem;">
         Unlock Full Optimization Report & Remediation Plan
@@ -172,20 +352,20 @@ async function runScan() {
       <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:1rem;">
         Enter your details to log this scan and receive a direct infrastructure review.
       </div>
-      
+
       <form id="lead-capture-form" style="display:flex;flex-direction:column;gap:0.75rem;">
-        <input 
-          type="text" 
-          id="lead-company" 
-          placeholder="Company Name" 
-          required 
+        <input
+          type="text"
+          id="lead-company"
+          placeholder="Company Name"
+          required
           style="padding:0.6rem;background:var(--bg-elevated);border:1px solid var(--border);color:var(--text);border-radius:4px;font-size:0.9rem;"
         >
-        <input 
-          type="email" 
-          id="lead-email" 
-          placeholder="Work Email (e.g. you@fintech.co.ke)" 
-          required 
+        <input
+          type="email"
+          id="lead-email"
+          placeholder="Work Email (e.g. you@fintech.co.ke)"
+          required
           style="padding:0.6rem;background:var(--bg-elevated);border:1px solid var(--border);color:var(--text);border-radius:4px;font-size:0.9rem;"
         >
         <button type="submit" class="btn btn-primary" id="lead-submit-btn" style="align-self:flex-start;margin-top:0.25rem;">
@@ -197,6 +377,10 @@ async function runScan() {
   `;
 
   body.appendChild(report);
+
+  appendRawToggle(body, 'http', httpMeasurement);
+  if (traceMeasurement) appendRawToggle(body, 'traceroute', traceMeasurement);
+
   btn.disabled = false;
   btn.textContent = 'Analyze Another Domain';
 
@@ -230,10 +414,10 @@ async function runScan() {
         body: JSON.stringify({
           company_name: companyName,
           contact_email: contactEmail,
-          current_latency_ms: parsedLatency,
+          current_latency_ms: ttfb != null ? Math.round(ttfb) : null,
           target_latency_ms: 65,
           monthly_requests: 1000000,
-          estimated_monthly_loss: parsedLatency * 30
+          estimated_monthly_loss: ttfb != null ? Math.round(ttfb) * 30 : null
         })
       });
 
