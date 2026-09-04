@@ -30,7 +30,7 @@ export default async function handler(req, res) {
   }
 
   const supabaseUrl = "https://uzihwtxffklisczqvurf.supabase.co".replace(/\/$/, "");
-  const supabaseServiceKey = "sb_secret_OGF2iS-L7PQJa9Bnjv0b7g_oqDfCfzk";
+  const supabaseServiceKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV6aWh3dHhmZmtsaXNjenF2dXJmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4ODUyNjMxMSwiZXhwIjoyMTA0MTAyMzExfQ.ZWh9ONjw2ofNrmfWPZ_46qXlRfa6D3HHikZ_p7v8zw0";
 
   try {
     const userIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
@@ -39,6 +39,7 @@ export default async function handler(req, res) {
       method: 'POST',
       headers: {
         'apikey': supabaseServiceKey,
+        'Authorization': `Bearer ${supabaseServiceKey}`,
         'Content-Type': 'application/json',
         'Prefer': 'return=representation'
       },
