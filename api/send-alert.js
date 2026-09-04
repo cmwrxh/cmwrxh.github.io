@@ -19,10 +19,21 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'No lead data provided' });
     }
 
-    // Clean and trim the API key to prevent hidden whitespace 401 errors
-    const apiKey = 're_EjQRv5nd_LEAakGiyrWwLMzYLwJgV7ypW'.trim();
-    
-    console.log('Using Resend Key starting with:', apiKey.substring(0, 7));
+    // Get the Resend API key securely from Vercel environment variables
+    const apiKey = process.env.RESEND_API_KEY?.trim();
+
+    if (!apiKey) {
+      console.error('RESEND_API_KEY is not configured');
+      return res.status(500).json({
+        success: false,
+        error: 'Server misconfigured: RESEND_API_KEY not set in Vercel environment variables.'
+      });
+    }
+
+    console.log(
+      'Using Resend Key starting with:',
+      apiKey.substring(0, 7)
+    );
 
     const resendResponse = await fetch('https://api.resend.com/emails', {
       method: 'POST',
@@ -51,12 +62,24 @@ export default async function handler(req, res) {
 
     if (!resendResponse.ok) {
       console.error('Resend API Error Details:', responseData);
-      return res.status(500).json({ success: false, error: responseData });
+
+      return res.status(500).json({
+        success: false,
+        error: responseData
+      });
     }
 
-    return res.status(200).json({ success: true, data: responseData });
+    return res.status(200).json({
+      success: true,
+      data: responseData
+    });
+
   } catch (error) {
     console.error('Server Error:', error.message);
-    return res.status(500).json({ success: false, error: error.message });
+
+    return res.status(500).json({
+      success: false,
+      error: error.message
+    });
   }
 }
