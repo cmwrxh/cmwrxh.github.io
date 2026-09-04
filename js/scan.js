@@ -35,7 +35,8 @@ function sleep(ms) {
 }
 
 async function runScan() {
-  const domain = document.getElementById('scan-domain').value.trim();
+  const domainInput = document.getElementById('scan-domain');
+  const domain = domainInput.value.trim();
   if (!domain) return;
 
   const output = document.getElementById('scan-output');
@@ -62,6 +63,7 @@ async function runScan() {
 
   const hash = domain.split('').reduce((a, b) => a + b.charCodeAt(0), 0);
   const result = hash % 3 === 0 ? diagnoses.medium : diagnoses.slow;
+  const parsedLatency = parseInt(result.ttfb, 10) || 380;
 
   await sleep(400);
 
@@ -87,19 +89,92 @@ async function runScan() {
     <div style="color:var(--${result.color});margin-bottom:1.5rem;">
       ${result.message}
     </div>
-    <div style="padding:1rem;background:var(--bg);border-radius:6px;border:1px solid var(--border);">
-      <div style="font-size:0.85rem;color:var(--text-muted);margin-bottom:0.5rem;">
-        This is a simulated analysis based on typical African network patterns.
+    
+    <div style="padding:1.25rem;background:var(--bg);border-radius:6px;border:1px solid var(--border);">
+      <div style="font-size:0.9rem;font-weight:600;color:var(--text);margin-bottom:0.3rem;">
+        Unlock Full Optimization Report & Remediation Plan
       </div>
-      <a href="/contact.html" class="btn btn-primary" style="margin-top:0.5rem;">
-        Book a $2,500 audit →
-      </a>
+      <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:1rem;">
+        Enter your details to log this scan and receive a direct infrastructure review.
+      </div>
+      
+      <form id="lead-capture-form" style="display:flex;flex-direction:column;gap:0.75rem;">
+        <input 
+          type="text" 
+          id="lead-company" 
+          placeholder="Company Name" 
+          required 
+          style="padding:0.6rem;background:var(--bg-elevated);border:1px solid var(--border);color:var(--text);border-radius:4px;font-size:0.9rem;"
+        >
+        <input 
+          type="email" 
+          id="lead-email" 
+          placeholder="Work Email (e.g. you@fintech.co.ke)" 
+          required 
+          style="padding:0.6rem;background:var(--bg-elevated);border:1px solid var(--border);color:var(--text);border-radius:4px;font-size:0.9rem;"
+        >
+        <button type="submit" class="btn btn-primary" id="lead-submit-btn" style="align-self:flex-start;margin-top:0.25rem;">
+          Save Lead & Get Audit →
+        </button>
+      </form>
+      <div id="lead-feedback" style="font-size:0.85rem;margin-top:0.75rem;"></div>
     </div>
   `;
 
   body.appendChild(report);
   btn.disabled = false;
   btn.textContent = 'Analyze Another Domain';
+
+  // Attach submission listener for the newly generated lead form
+  const leadForm = document.getElementById('lead-capture-form');
+  leadForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const companyName = document.getElementById('lead-company').value.trim();
+    const contactEmail = document.getElementById('lead-email').value.trim();
+    const leadSubmitBtn = document.getElementById('lead-submit-btn');
+    const feedback = document.getElementById('lead-feedback');
+
+    leadSubmitBtn.disabled = true;
+    leadSubmitBtn.textContent = 'Submitting...';
+    feedback.style.color = 'var(--text-muted)';
+    feedback.textContent = 'Securing record to database...';
+
+    try {
+      const response = await fetch('/api/submit-lead', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          company_name: companyName,
+          contact_email: contactEmail,
+          current_latency_ms: parsedLatency,
+          target_latency_ms: 65,
+          monthly_requests: 1000000,
+          estimated_monthly_loss: parsedLatency * 30
+        })
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        feedback.style.color = 'var(--accent, #4ade80)';
+        feedback.textContent = '✓ Success! Lead captured in Supabase. We will be in touch shortly.';
+        leadForm.reset();
+        leadSubmitBtn.textContent = 'Submitted Successfully';
+      } else {
+        feedback.style.color = 'var(--error, #ef4444)';
+        feedback.textContent = `Error: ${data.error || 'Failed to record lead.'}`;
+        leadSubmitBtn.disabled = false;
+        leadSubmitBtn.textContent = 'Retry Submission';
+      }
+    } catch (err) {
+      console.error(err);
+      feedback.style.color = 'var(--error, #ef4444)';
+      feedback.textContent = 'Network error. Please check connection and try again.';
+      leadSubmitBtn.disabled = false;
+      leadSubmitBtn.textContent = 'Retry Submission';
+    }
+  });
 }
 
 document.addEventListener('DOMContentLoaded', () => {
