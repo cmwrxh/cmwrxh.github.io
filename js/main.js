@@ -1,45 +1,30 @@
-// Typewriter effect for terminal
-function typewriter(element, text, speed = 30) {
-  let i = 0;
-  element.textContent = '';
-
-  function type() {
-    if (i < text.length) {
-      element.textContent += text.charAt(i);
-      i++;
-      setTimeout(type, speed);
-    }
-  }
-
-  type();
-}
-
-// Animate elements on scroll
-const observerOptions = {
-  threshold: 0.1,
-  rootMargin: '0px 0px -50px 0px'
-};
-
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      entry.target.classList.add('fade-in');
-      observer.unobserve(entry.target);
-    }
-  });
-}, observerOptions);
-
+// Business-Impact Calculator Logic
 document.addEventListener('DOMContentLoaded', () => {
-  document.querySelectorAll('.card, .stat, .terminal').forEach(el => {
-    el.style.opacity = '0';
-    observer.observe(el);
-  });
+  const calcForm = document.getElementById('impact-calculator-form');
+  if (!calcForm) return;
 
-  // Active nav link
-  const currentPage = window.location.pathname.split('/').pop() || 'index.html';
-  document.querySelectorAll('.nav-links a').forEach(link => {
-    if (link.getAttribute('href') === currentPage) {
-      link.classList.add('active');
-    }
+  calcForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    const domain = document.getElementById('calc-domain').value;
+    const latency = parseFloat(document.getElementById('calc-latency').value);
+    const traffic = parseInt(document.getElementById('calc-traffic').value);
+    const aov = parseFloat(document.getElementById('calc-aov').value);
+    const baseConversion = parseFloat(document.getElementById('calc-conversion').value) / 100;
+
+    const latencyPenaltyMs = Math.max(0, latency - 150);
+    const penaltyFactor = (latencyPenaltyMs / 100) * 0.035;
+    
+    const normalTransactions = traffic * baseConversion;
+    const degradedConversion = Math.max(0, baseConversion * (1 - penaltyFactor));
+    const actualTransactions = traffic * degradedConversion;
+    const lostTransactions = normalTransactions - actualTransactions;
+    const estimatedMonthlyLoss = lostTransactions * aov;
+
+    document.getElementById('res-domain').textContent = domain;
+    document.getElementById('loss-output').textContent = `$${estimatedMonthlyLoss.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} lost / month`;
+    document.getElementById('breakdown-text').innerHTML = `With <span class="command">${latency}ms</span> latency from Nairobi, conversion suffers a <span class="command">${(penaltyFactor * 100).toFixed(1)}%</span> friction penalty (~${Math.round(lostTransactions)} dropped orders/mo).`;
+
+    document.getElementById('calculator-results').style.display = 'block';
   });
 });
