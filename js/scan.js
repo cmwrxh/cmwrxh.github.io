@@ -30,15 +30,90 @@ const diagnoses = {
   }
 };
 
+// Strict garbage words rejection list
+const garbageWords = [
+  'hello','test','foo','bar','baz','abc','xyz','qwerty','asdf','farah',
+  'example','demo','sample','trial','temp','fake','mock','dummy',
+  'api','domain','website','url','link','site','page','server',
+  'localhost','127.0.0.1','0.0.0.0','192.168','10.0.0'
+];
+
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+function showDomainError(msg) {
+  let errEl = document.getElementById('err-domain');
+  if (!errEl) {
+    const input = document.getElementById('scan-domain');
+    if (input && input.parentNode) {
+      errEl = document.createElement('div');
+      errEl.id = 'err-domain';
+      errEl.className = 'calc-error';
+      errEl.style.color = 'var(--error, #ef4444)';
+      errEl.style.fontSize = '0.85rem';
+      errEl.style.marginTop = '0.4rem';
+      input.parentNode.appendChild(errEl);
+    }
+  }
+  if (errEl) {
+    errEl.textContent = msg;
+    errEl.style.display = 'block';
+  }
+}
+
+function hideDomainError() {
+  const errEl = document.getElementById('err-domain');
+  if (errEl) {
+    errEl.style.display = 'none';
+    errEl.textContent = '';
+  }
+}
+
+function looksLikeDomain(v) {
+  if (!v.includes('.')) return false;
+  if (/^[.-]|[.-]$/.test(v)) return false;
+  const labels = v.split('.');
+  for (const label of labels) {
+    if (!label || label.length > 63 || !/^[a-zA-Z0-9-]+$/.test(label)) return false;
+  }
+  const tld = labels[labels.length - 1];
+  if (tld.length < 2) return false;
+  return true;
+}
+
+function validateDomainInput(v) {
+  const raw = v.trim().toLowerCase();
+  if (!raw) return { ok: false, msg: 'Enter a domain (e.g. api.yourfintech.co.ke)' };
+
+  // Strip protocol, path, and port automatically
+  let domain = raw.replace(/^https?:\/\//, '');
+  domain = domain.split('/')[0];
+  domain = domain.split(':')[0];
+
+  if (garbageWords.includes(domain) || garbageWords.some(w => domain === w)) {
+    return { ok: false, msg: `\u201c${domain}\u201d is not a real domain. Enter your actual API endpoint.` };
+  }
+  if (!looksLikeDomain(domain)) {
+    return { ok: false, msg: 'Enter a valid domain like api.yourcompany.co.ke or yourapp.com' };
+  }
+  return { ok: true, domain: domain };
+}
+
 async function runScan() {
   const domainInput = document.getElementById('scan-domain');
-  const domain = domainInput.value.trim();
-  if (!domain) return;
+  const rawValue = domainInput.value;
+  
+  hideDomainError();
 
+  // Enforce strict validation before running anything
+  const validation = validateDomainInput(rawValue);
+  if (!validation.ok) {
+    showDomainError(validation.msg);
+    return;
+  }
+
+  const domain = validation.domain;
   const output = document.getElementById('scan-output');
   const btn = document.getElementById('scan-btn');
 
@@ -125,7 +200,7 @@ async function runScan() {
   btn.disabled = false;
   btn.textContent = 'Analyze Another Domain';
 
-  // Attach submission listener for the newly generated lead form
+  // Attach submission listener with strict email format verification
   const leadForm = document.getElementById('lead-capture-form');
   leadForm.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -134,6 +209,14 @@ async function runScan() {
     const contactEmail = document.getElementById('lead-email').value.trim();
     const leadSubmitBtn = document.getElementById('lead-submit-btn');
     const feedback = document.getElementById('lead-feedback');
+
+    // Strict email format check
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(contactEmail)) {
+      feedback.style.color = 'var(--error, #ef4444)';
+      feedback.textContent = 'Please enter a valid work email address.';
+      return;
+    }
 
     leadSubmitBtn.disabled = true;
     leadSubmitBtn.textContent = 'Submitting...';
