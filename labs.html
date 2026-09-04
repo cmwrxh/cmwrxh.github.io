@@ -1,57 +1,112 @@
-<!-- Business-Impact Calculator Widget -->
-<div class="card card-accent-blue" style="margin-top: 2.5rem; margin-bottom: 3rem;">
-  <div class="label">FINANCIAL IMPACT MODEL</div>
-  <h3>African Latency Revenue Leakage Calculator</h3>
-  <p class="subtitle">Quantify exactly how much revenue your platform loses every month due to high cross-border network routing delays.</p>
+   <h1>Software Labs</h1>
+      <p class="subtitle">Production-ready tools. Public benchmarks. Real configurations.</p>
+
+      <div class="grid" style="margin-top: 3rem;">
+      <!-- Interactive Diagnostic Tool Widget -->
+      <div class="card" style="border-top: 2px solid var(--orange); margin-top: 2.5rem; margin-bottom: 3rem;">
+        <div class="label">INTERACTIVE BENCHMARK</div>
+        <h3 style="color: var(--orange);">Test Your API from Africa</h3>
+        <p style="font-size: 1rem; font-weight: 600; color: var(--text); margin-bottom: 0.5rem;">Safaricom 4G (Nairobi, KE) simulation node</p>
+        <p>Enter your API domain. We simulate a diagnostic from Nairobi to show you what your African users experience.</p>
+        
+        <form id="latency-test-form" class="btn-group" style="margin-top: 16px;">
+          <input type="text" id="api-domain" class="form-input" placeholder="api.yourdomain.com" required style="flex: 1; min-width: 260px;">
+          <button type="submit" class="btn btn-primary">Run Diagnostic</button>
+        </form>
+
+        <div id="test-results" style="margin-top: 20px; display: none;">
+          <!-- Results will output here dynamically -->
+        </div>
+      </div>
+
+      <div class="grid">
+        <!-- AlphaCore -->
+        <div class="card" style="border-top: 2px solid var(--accent);">
+          <h3 style="color: var(--accent);">AlphaCore Framework</h3>
+@@ -135,5 +152,86 @@ <h3 style="color: var(--text-muted);">Distributed Lab</h3>
+</footer>
+
+<script src="js/main.js"></script>
+<script>
+document.getElementById('latency-test-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
   
-  <form id="impact-calculator-form" style="margin-top: 24px;">
-    <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 20px;">
-      <div>
-        <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 6px;">Target Domain / App Name</label>
-        <input type="text" id="calc-domain" class="form-input" value="api.github.com" required>
-      </div>
-      <div>
-        <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 6px;">Current Latency (ms)</label>
-        <input type="number" id="calc-latency" class="form-input" value="280" required>
-      </div>
-      <div>
-        <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 6px;">Monthly African Visitors</label>
-        <input type="number" id="calc-traffic" class="form-input" value="50000" required>
-      </div>
-      <div>
-        <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 6px;">Avg Order / Value ($ AOV)</label>
-        <input type="number" step="0.01" id="calc-aov" class="form-input" value="45.00" required>
-      </div>
-      <div>
-        <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 6px;">Baseline Conversion Rate (%)</label>
-        <input type="number" step="0.1" id="calc-conversion" class="form-input" value="2.5" required>
-      </div>
-      <div>
-        <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 6px;">Your Work Email (Optional)</label>
-        <input type="email" id="calc-email" class="form-input" placeholder="cto@yourcompany.com">
-      </div>
-    </div>
-
-    <button type="submit" class="btn btn-primary" style="background: var(--blue); color: var(--bg);">Calculate Revenue Leakage</button>
-  </form>
-
-  <div id="calculator-results" style="margin-top: 24px; display: none;">
+  const domainInput = document.getElementById('api-domain').value;
+  const resultsDiv = document.getElementById('test-results');
+  
+  resultsDiv.style.display = 'block';
+  resultsDiv.innerHTML = `
     <div class="terminal">
       <div class="terminal-header">
         <span class="terminal-dot red"></span>
         <span class="terminal-dot yellow"></span>
         <span class="terminal-dot green"></span>
-        <span class="terminal-title">revenue-leakage-analysis.log</span>
+        <span class="terminal-title">diagnostic-nairobi.log</span>
       </div>
       <div class="terminal-body">
-        <p><span class="prompt">&gt;</span> Target: <span class="command" id="res-domain">api.github.com</span></p>
-        <p><span class="prompt">&gt;</span> Calculated Monthly Loss: <span class="highlight" id="loss-output" style="color: var(--error);">$0.00</span></p>
-        <p><span class="prompt">&gt;</span> Friction Breakdown: <span class="output" id="breakdown-text">Analyzing network drop-off...</span></p>
-        <p style="margin-top: 8px;"><span class="prompt">&gt;</span> Status: <span class="tag" style="border-color: var(--error); color: var(--error);">Revenue Leak Detected</span></p>
+        <p><span class="prompt">$</span> initializing traceroute from Safaricom 4G node...</p>
+        <p><span class="prompt">$</span> targeting <span class="command">${domainInput}</span>...</p>
       </div>
     </div>
-    <div style="margin-top: 16px;">
-      <a href="contact.html" class="card-link">Fix This Latency in 1 Wire →</a>
-    </div>
-  </div>
-</div>
+  `;
+
+  try {
+    const response = await fetch('/api/test-latency', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ domain: domainInput })
+    });
+    
+    const data = await response.json();
+    
+    if (data.success) {
+      resultsDiv.innerHTML = `
+        <div class="terminal">
+          <div class="terminal-header">
+            <span class="terminal-dot red"></span>
+            <span class="terminal-dot yellow"></span>
+            <span class="terminal-dot green"></span>
+            <span class="terminal-title">diagnostic-output.log</span>
+          </div>
+          <div class="terminal-body">
+            <p><span class="prompt">></span> Target Endpoint: <span class="command">${data.domain}</span></p>
+            <p><span class="prompt">></span> Simulation Node: <span class="highlight">${data.simulatedNode}</span></p>
+            <p><span class="prompt">></span> Round-Trip Latency: <span class="highlight">${data.latencyMs} ms</span></p>
+            <p><span class="prompt">></span> Performance Status: <span class="tag tag-green">${data.status}</span></p>
+          </div>
+        </div>
+      `;
+    } else {
+      resultsDiv.innerHTML = `
+        <div class="terminal">
+          <div class="terminal-header">
+            <span class="terminal-dot red"></span>
+            <span class="terminal-dot yellow"></span>
+            <span class="terminal-dot green"></span>
+            <span class="terminal-title">error.log</span>
+          </div>
+          <div class="terminal-body">
+            <p class="error">> Error: ${data.error}</p>
+          </div>
+        </div>
+      `;
+    }
+  } catch (err) {
+    resultsDiv.innerHTML = `
+      <div class="terminal">
+        <div class="terminal-header">
+          <span class="terminal-dot red"></span>
+          <span class="terminal-dot yellow"></span>
+          <span class="terminal-dot green"></span>
+          <span class="terminal-title">error.log</span>
+        </div>
+        <div class="terminal-body">
+          <p class="error">> Network error occurred while trying to reach the diagnostic route.</p>
+        </div>
+      </div>
+    `;
+  }
+});
+</script>
+</body>
+</html>
