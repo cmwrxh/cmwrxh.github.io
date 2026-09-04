@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Case Studies — africalatency.dev</title>
+  <meta name="description" content="Production-ready infrastructure optimizations. Real benchmarks.">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="nav-brand">africalatency<span>.dev</span></a>
+    <ul class="nav-links">
+      <li><a href="scan.html">Scan</a></li>
+      <li><a href="work.html" class="active">Work</a></li>
+      <li><a href="labs.html">Labs</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+  </div>
+</nav>
+
+<main>
+  <section class="section" style="padding-top: 6rem;">
+    <div class="container">
+      <div class="label">Proof of Work</div>
+      <h1>Case Studies</h1>
+      <p class="subtitle">Real infrastructure. Real networks. Real results.</p>
+
+      <!-- Case Study 1 -->
+      <div style="margin-top: 3rem; padding: 2.5rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; border-left: 3px solid var(--accent);">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem;">
+          <div>
+            <h2 style="font-size: 1.4rem; margin-bottom: 0.25rem;">African Fintech Checkout Latency</h2>
+            <div style="color: var(--text-muted); font-size: 0.85rem;">Payment platform • Kenya & Nigeria • 2026</div>
+          </div>
+          <div style="text-align: right;">
+            <div style="font-size: 1.5rem; font-weight: 600; color: var(--accent);">380ms → 95ms</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">p99 latency reduction</div>
+          </div>
+        </div>
+
+        <p style="color: var(--text-muted); margin-bottom: 1.5rem;">
+          A payment platform serving Kenya and Nigeria saw 40% drop-off at checkout during peak traffic. Their API averaged 380ms TTFB from Nairobi. Users on 3G simply timed out.
+        </p>
+
+        <h3 style="font-size: 0.9rem; color: var(--accent); margin-bottom: 0.75rem;">Diagnosis</h3>
+        <ul style="color: var(--text-muted); margin-bottom: 1.5rem; padding-left: 1.5rem;">
+          <li>DNS resolving through Google DNS London, then to authoritative NS in Virginia</li>
+          <li>TLS 1.2 full handshake requiring two round-trips across the Atlantic</li>
+          <li>No CDN edge caching for API responses; every request hit origin in us-east-1</li>
+          <li>BGP path: Safaricom → SEACOM → London IX → AWS (18 hops, congested)</li>
+        </ul>
+
+        <h3 style="font-size: 0.9rem; color: var(--accent); margin-bottom: 0.75rem;">Fix</h3>
+        <div class="terminal" style="margin: 1rem 0;">
+          <div class="terminal-header">
+            <div class="terminal-dot red"></div>
+            <div class="terminal-dot yellow"></div>
+            <div class="terminal-dot green"></div>
+            <div class="terminal-title">nginx.conf — TLS 1.3 + 0-RTT</div>
+          </div>
+          <div class="terminal-body" style="font-size: 0.8rem;">
+ssl_protocols TLSv1.3;<br>
+ssl_early_data on;<br>
+ssl_ciphers TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256;<br>
+resolver 1.1.1.1 1.0.0.1 valid=300s;<br>
+add_header Alt-Svc 'h3=":443"; ma=86400';
+          </div>
+        </div>
+
+        <h3 style="font-size: 0.9rem; color: var(--accent); margin-bottom: 0.75rem;">Result</h3>
+        <table style="margin: 1rem 0;">
+          <tr>
+            <th>Metric</th>
+            <th>Before</th>
+            <th>After</th>
+            <th>Change</th>
+          </tr>
+          <tr>
+            <td>DNS Resolution</td>
+            <td>120ms</td>
+            <td>15ms</td>
+            <td style="color: var(--accent);">-87%</td>
+          </tr>
+          <tr>
+            <td>TLS Handshake</td>
+            <td>180ms</td>
+            <td>45ms</td>
+            <td style="color: var(--accent);">-75%</td>
+          </tr>
+          <tr>
+            <td>TTFB</td>
+            <td>380ms</td>
+            <td>95ms</td>
+            <td style="color: var(--accent);">-75%</td>
+          </tr>
+          <tr>
+            <td>p99 Latency</td>
+            <td>420ms</td>
+            <td>110ms</td>
+            <td style="color: var(--accent);">-74%</td>
+          </tr>
+        </table>
+
+        <div style="padding: 1rem; background: var(--bg); border-radius: 6px; border-left: 2px solid var(--accent); margin-top: 1.5rem;">
+          <p style="font-style: italic; color: var(--text-muted); font-size: 0.9rem;">
+            "Charles identified routing issues we did not know existed. His configs were production-ready within 48 hours."
+          </p>
+          <p style="color: var(--text-dim); font-size: 0.8rem; margin-top: 0.5rem;">— CTO, African payment platform (name withheld)</p>
+        </div>
+
+        <div style="margin-top: 1.5rem;">
+          <a href="https://github.com/cmwrxh/internet-under-the-hood" target="_blank" class="card-link">View open-source configs →</a>
+        </div>
+      </div>
+
+      <!-- Case Study 2 -->
+      <div style="margin-top: 2rem; padding: 2.5rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; border-left: 3px solid var(--orange);">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem;">
+          <div>
+            <h2 style="font-size: 1.4rem; margin-bottom: 0.25rem;">AWS Infrastructure Cost Optimization</h2>
+            <div style="color: var(--text-muted); font-size: 0.85rem;">Series A fintech • East Africa • 2026</div>
+          </div>
+          <div style="text-align: right;">
+            <div style="font-size: 1.5rem; font-weight: 600; color: var(--orange);">-35%</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">Monthly cloud spend</div>
+          </div>
+        </div>
+
+        <p style="color: var(--text-muted); margin-bottom: 1.5rem;">
+          A scaling fintech was burning $18,000/month on AWS with no reserved instance strategy, oversized EC2 instances, and unoptimized S3 storage tiers. Their engineering team was too busy shipping features to audit infrastructure.
+        </p>
+
+        <h3 style="font-size: 0.9rem; color: var(--orange); margin-bottom: 0.75rem;">Fix</h3>
+        <ul style="color: var(--text-muted); margin-bottom: 1.5rem; padding-left: 1.5rem;">
+          <li>Right-sized EC2 instances (m5.2xlarge → m5.xlarge with auto-scaling)</li>
+          <li>3-year reserved instances for baseline compute (40% savings)</li>
+          <li>S3 Intelligent-Tiering for log storage (60% storage cost reduction)</li>
+          <li>CloudFront caching layer to reduce origin load</li>
+        </ul>
+
+        <div style="padding: 1rem; background: var(--bg); border-radius: 6px; border-left: 2px solid var(--orange); margin-top: 1.5rem;">
+          <p style="font-style: italic; color: var(--text-muted); font-size: 0.9rem;">
+            "The audit paid for itself in the first month. We reinvested the savings into engineering hires."
+          </p>
+        </div>
+      </div>
+
+      <!-- Case Study 3 -->
+      <div style="margin-top: 2rem; padding: 2.5rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; border-left: 3px solid var(--blue);">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem;">
+          <div>
+            <h2 style="font-size: 1.4rem; margin-bottom: 0.25rem;">Kudu Stack: Conservation Edge Node</h2>
+            <div style="color: var(--text-muted); font-size: 0.85rem;">East African conservancy • 2026</div>
+          </div>
+          <div style="text-align: right;">
+            <div style="font-size: 1.5rem; font-weight: 600; color: var(--blue);">24/7</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">Uptime on unreliable networks</div>
+          </div>
+        </div>
+
+        <p style="color: var(--text-muted); margin-bottom: 1.5rem;">
+          Deployed AlphaCore-powered edge nodes for wildlife telemetry in a conservancy with intermittent fiber and solar-only power. The system processes camera trap and acoustic data locally, syncs when connectivity returns, and survives multi-day outages.
+        </p>
+
+        <div style="margin-top: 1.5rem;">
+          <a href="labs.html" class="card-link" style="color: var(--blue);">Explore Kudu Stack →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-left">© 2026 africalatency.dev</div>
+    <div class="footer-links">
+      <a href="https://github.com/cmwrxh" target="_blank">GitHub</a>
+      <a href="https://www.linkedin.com/in/charles-mwaura-bb7814140/" target="_blank">LinkedIn</a>
+    </div>
+  </div>
+</footer>
+
+<script src="js/main.js"></script>
+</body>
+</html>
