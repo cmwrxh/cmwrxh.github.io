@@ -30,8 +30,8 @@ export default async function handler(req, res) {
   }
 
   // HARDCODED FOR TESTING — Bypasses Vercel env variable blocks entirely
-  const supabaseUrl = "https://YOUR-PROJECT-ID.supabase.co";
-  const supabaseServiceKey = "sb_secret_YOUR_ACTUAL_SECRET_KEY";
+  const supabaseUrl = "sb_publishable_dGaR1jgofny7tGVWh0TK2w_haSVNyWv";
+  const supabaseServiceKey = "sb_secret_OGF2iS-L7PQJa9Bnjv0b7g_oqDfCfzk";
 
   try {
     const userIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
