@@ -97,7 +97,10 @@ async function gpFetch(path, options = {}) {
 }
 
 async function gpCreateMeasurement(type, target, locations, measurementOptions) {
-  const body = { type, target, locations, limit: 1 };
+  // Note: we intentionally omit a top-level "limit" field — each location
+  // already carries its own "limit", and sending both appears to trip
+  // Globalping's validator.
+  const body = { type, target, locations };
   if (measurementOptions) body.measurementOptions = measurementOptions;
 
   const res = await gpFetch('/measurements', {
@@ -111,9 +114,15 @@ async function gpCreateMeasurement(type, target, locations, measurementOptions) 
   }
 
   const errData = await res.json().catch(() => ({}));
-  const err = new Error(
-    (errData.error && errData.error.message) || `Could not start measurement (HTTP ${res.status})`
-  );
+  let message = (errData.error && errData.error.message) || `Could not start measurement (HTTP ${res.status})`;
+  // Globalping puts the actually-useful detail in error.params, keyed by field name.
+  if (errData.error && errData.error.params) {
+    const detail = Object.entries(errData.error.params)
+      .map(([field, msg]) => `${field}: ${msg}`)
+      .join('; ');
+    if (detail) message += ` — ${detail}`;
+  }
+  const err = new Error(message);
   err.status = res.status;
   err.raw = errData;
   throw err;
@@ -241,9 +250,10 @@ async function runScan() {
   appendLine(body, 'Requesting a live probe near Nairobi (Globalping network)...');
   let httpMeasurement;
   try {
-    httpMeasurement = await gpRunFromAfrica('http', domain, { request: { method: 'GET' } });
+    httpMeasurement = await gpRunFromAfrica('http', domain, null);
   } catch (e) {
     appendResultLine(body, e.message || 'Could not reach the Globalping API.', 'error');
+    if (e.raw) appendRawToggle(body, 'error', e.raw);
     btn.disabled = false;
     btn.textContent = 'Analyze Another Domain';
     return;
@@ -289,7 +299,7 @@ async function runScan() {
   let pathSummary = null;
   let traceMeasurement = null;
   try {
-    traceMeasurement = await gpRunFromAfrica('traceroute', domain, { protocol: 'ICMP' });
+    traceMeasurement = await gpRunFromAfrica('traceroute', domain, null);
     const traceProbeResult = traceMeasurement.results && traceMeasurement.results[0];
     const hops = traceProbeResult && traceProbeResult.result && traceProbeResult.result.hops;
     if (hops && hops.length) {
@@ -453,3 +463,4 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 });
+                            
