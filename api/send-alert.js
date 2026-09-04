@@ -19,11 +19,15 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'No lead data provided' });
     }
 
-    // Call Resend API directly via native fetch with your new key
+    // Clean and trim the API key to prevent hidden whitespace 401 errors
+    const apiKey = 're_EjQRv5nd_LEAakGiyrWwLMzYLwJgV7ypW'.trim();
+    
+    console.log('Using Resend Key starting with:', apiKey.substring(0, 7));
+
     const resendResponse = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
-        'Authorization': 'Bearer re_EjQRv5nd_LEAakGiyrWwLMzYLwJgV7ypW',
+        'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
@@ -46,7 +50,7 @@ export default async function handler(req, res) {
     const responseData = await resendResponse.json();
 
     if (!resendResponse.ok) {
-      console.error('Resend API Error:', responseData);
+      console.error('Resend API Error Details:', responseData);
       return res.status(500).json({ success: false, error: responseData });
     }
 
