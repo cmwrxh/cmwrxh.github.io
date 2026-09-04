@@ -21,7 +21,7 @@ export default async function handler(req, res) {
     } = record;
 
     const resendApiKey = "re_atKfZyFd_M7dR1YPcpBzPMjKkkL3xGYZo";
-    const recipientEmail = process.env.NOTIFICATION_EMAIL || contact_email; // Fallbacks to contact_email if env var isn't set
+    const recipientEmail = "Charlie@brilliantunicorn.com";
 
     if (!contact_email) {
       throw new Error('Contact email is missing from the record payload');
