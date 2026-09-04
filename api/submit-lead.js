@@ -1,5 +1,4 @@
 export default async function handler(req, res) {
-  // Enable CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -30,15 +29,9 @@ export default async function handler(req, res) {
     return res.end(JSON.stringify({ error: 'Contact email is required' }));
   }
 
-  // Fallback checks across multiple common naming conventions
-  const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.PUBLIC_SUPABASE_URL;
-  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_KEY || process.env.SUPABASE_SECRET_KEY;
-
-  if (!supabaseUrl || !supabaseServiceKey) {
-    res.statusCode = 500;
-    res.setHeader('Content-Type', 'application/json');
-    return res.end(JSON.stringify({ error: 'Server configuration error: Missing database credentials.' }));
-  }
+  // HARDCODED FOR TESTING — Bypasses Vercel env variable blocks entirely
+  const supabaseUrl = "https://YOUR-PROJECT-ID.supabase.co";
+  const supabaseServiceKey = "sb_secret_YOUR_ACTUAL_SECRET_KEY";
 
   try {
     const userIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
@@ -68,7 +61,7 @@ export default async function handler(req, res) {
       console.error('Supabase insertion error:', errorText);
       res.statusCode = 500;
       res.setHeader('Content-Type', 'application/json');
-      return res.end(JSON.stringify({ success: false, error: 'Failed to save lead record.' }));
+      return res.end(JSON.stringify({ success: false, error: 'Failed to save lead record: ' + errorText }));
     }
 
     const data = await response.json();
