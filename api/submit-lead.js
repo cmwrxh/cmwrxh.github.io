@@ -1,68 +1,85 @@
 // api/submit-lead.js
 //
-// Calculator lead endpoint
-// Flow: scan.js → submit-lead.js → Supabase + Resend
-//
-// Required Vercel environment variables:
+// Environment variables required in Vercel:
 // SUPABASE_URL
 // SUPABASE_SERVICE_KEY
 // RESEND_API_KEY
 // NOTIFY_EMAIL
 // RESEND_FROM_EMAIL
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   // CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-  // Handle browser preflight
+  // Handle CORS preflight
   if (req.method === 'OPTIONS') {
-    return res.status(200).end();
+    res.statusCode = 200;
+    return res.end();
   }
 
-  // Only POST is allowed
+  // Only allow POST
   if (req.method !== 'POST') {
-    return res.status(405).json({
-      success: false,
-      error: 'Method not allowed'
-    });
+    res.statusCode = 405;
+    res.setHeader('Content-Type', 'application/json');
+
+    return res.end(
+      JSON.stringify({
+        success: false,
+        error: 'Method not allowed'
+      })
+    );
   }
 
-  // --------------------------------------------------
-  // Environment variables
-  // --------------------------------------------------
-
-  const supabaseUrl = process.env.SUPABASE_URL?.trim();
-  const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY?.trim();
-  const resendApiKey = process.env.RESEND_API_KEY?.trim();
-  const notifyEmail = process.env.NOTIFY_EMAIL?.trim();
+  // Read environment variables
+  const supabaseUrl = process.env.SUPABASE_URL;
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY;
+  const resendApiKey = process.env.RESEND_API_KEY;
+  const notifyEmail = process.env.NOTIFY_EMAIL;
   const fromEmail =
-    process.env.RESEND_FROM_EMAIL?.trim() ||
+    process.env.RESEND_FROM_EMAIL ||
     'Brilliant Unicorn <charlie@brilliantunicorn.com>';
 
+  // Check Supabase configuration
   if (!supabaseUrl || !supabaseServiceKey) {
     console.error('Missing Supabase environment variables');
 
-    return res.status(500).json({
-      success: false,
-      error: 'Server misconfigured: Supabase environment variables are missing.'
-    });
+    res.statusCode = 500;
+    res.setHeader('Content-Type', 'application/json');
+
+    return res.end(
+      JSON.stringify({
+        success: false,
+        error:
+          'Server misconfigured: SUPABASE_URL or SUPABASE_SERVICE_KEY is missing.'
+      })
+    );
   }
 
   try {
-    // --------------------------------------------------
-    // Read request body
-    // --------------------------------------------------
-
+    // Parse request body
     let body = req.body;
 
     if (typeof body === 'string') {
-      body = JSON.parse(body);
+      try {
+        body = JSON.parse(body);
+      } catch (parseError) {
+        res.statusCode = 400;
+        res.setHeader('Content-Type', 'application/json');
+
+        return res.end(
+          JSON.stringify({
+            success: false,
+            error: 'Invalid JSON request body.'
+          })
+        );
+      }
     }
 
     body = body || {};
 
+    // Extract lead information
     const {
       company_name,
       contact_email,
@@ -72,51 +89,212 @@ export default async function handler(req, res) {
       estimated_monthly_loss
     } = body;
 
-    // --------------------------------------------------
-    // Validate lead
-    // --------------------------------------------------
+    // Validate email
+    if (!contact_email || typeof contact_email !== 'string') {
+      res.statusCode = 400;
+      res.setHeader('Content-Type', 'application/json');
 
-    if (!contact_email) {
-      return res.status(400).json({
-        success: false,
-        error: 'Contact email is required.'
-      });
+      return res.end(
+        JSON.stringify({
+          success: false,
+          error: 'Contact email is required.'
+        })
+      );
     }
 
     // Basic email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    if (!emailRegex.test(contact_email)) {
-      return res.status(400).json({
-        success: false,
-        error: 'Please provide a valid email address.'
-      });
+    if (!emailPattern.test(contact_email.trim())) {
+      res.statusCode = 400;
+      res.setHeader('Content-Type', 'application/json');
+
+      return res.end(
+        JSON.stringify({
+          success: false,
+          error: 'Please provide a valid email address.'
+        })
+      );
     }
 
-    // --------------------------------------------------
-    // Capture IP
-    // --------------------------------------------------
-
+    // Get visitor IP
     const forwardedFor = req.headers['x-forwarded-for'];
 
-    const userIp = forwardedFor
-      ? String(forwardedFor).split(',')[0].trim()
-      : req.socket?.remoteAddress || 'Unknown';
+    const userIp =
+      forwardedFor ||
+      req.headers['x-real-ip'] ||
+      (req.socket && req.socket.remoteAddress) ||
+      'Unknown';
 
-    // --------------------------------------------------
-    // Prepare database record
-    // --------------------------------------------------
-
+    // Prepare Supabase record
     const leadPayload = {
-      company_name: company_name?.trim() || null,
+      company_name: company_name ? String(company_name).trim() : null,
       contact_email: contact_email.trim(),
       user_ip: userIp,
       current_latency_ms: Number(current_latency_ms) || 0,
       target_latency_ms: Number(target_latency_ms) || 0,
       monthly_requests: Number(monthly_requests) || 0,
-      estimated_monthly_loss: Number(estimated_monthly_loss) || 0,
+      estimated_monthly_loss:
+        Number(estimated_monthly_loss) || 0,
       status: 'new'
     };
 
     // --------------------------------------------------
-   
+    // 1. SAVE LEAD TO SUPABASE
+    // --------------------------------------------------
+
+    const supabaseEndpoint =
+      `${supabaseUrl.replace(/\/$/, '')}/rest/v1/calculator_leads`;
+
+    const dbResponse = await fetch(supabaseEndpoint, {
+      method: 'POST',
+      headers: {
+        apikey: supabaseServiceKey,
+        Authorization: `Bearer ${supabaseServiceKey}`,
+        'Content-Type': 'application/json',
+        Prefer: 'return=representation'
+      },
+      body: JSON.stringify(leadPayload)
+    });
+
+    const dbResponseText = await dbResponse.text();
+
+    if (!dbResponse.ok) {
+      console.error(
+        'Supabase error:',
+        dbResponse.status,
+        dbResponseText
+      );
+
+      res.statusCode = 500;
+      res.setHeader('Content-Type', 'application/json');
+
+      return res.end(
+        JSON.stringify({
+          success: false,
+          error: `Supabase Error (${dbResponse.status}): ${dbResponseText}`
+        })
+      );
+    }
+
+    // --------------------------------------------------
+    // 2. SEND EMAIL NOTIFICATION VIA RESEND
+    // --------------------------------------------------
+
+    let emailWarning = null;
+
+    if (resendApiKey && notifyEmail) {
+      try {
+        const emailResponse = await fetch(
+          'https://api.resend.com/emails',
+          {
+            method: 'POST',
+            headers: {
+              Authorization: `Bearer ${resendApiKey}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              from: fromEmail,
+              to: [notifyEmail],
+              subject: `New scan lead: ${
+                leadPayload.company_name ||
+                leadPayload.contact_email
+              }`,
+              html: `
+                <h2>New Africa Latency Lead</h2>
+
+                <p>
+                  <strong>Company:</strong>
+                  ${leadPayload.company_name || 'N/A'}
+                </p>
+
+                <p>
+                  <strong>Email:</strong>
+                  ${leadPayload.contact_email}
+                </p>
+
+                <p>
+                  <strong>Current latency:</strong>
+                  ${leadPayload.current_latency_ms} ms
+                </p>
+
+                <p>
+                  <strong>Target latency:</strong>
+                  ${leadPayload.target_latency_ms} ms
+                </p>
+
+                <p>
+                  <strong>Monthly requests:</strong>
+                  ${leadPayload.monthly_requests}
+                </p>
+
+                <p>
+                  <strong>Estimated monthly loss:</strong>
+                  ${leadPayload.estimated_monthly_loss}
+                </p>
+
+                <p>
+                  <strong>IP address:</strong>
+                  ${userIp}
+                </p>
+
+                <hr>
+
+                <p>
+                  <strong>Source:</strong>
+                  africalatency.dev
+                </p>
+              `
+            })
+          }
+        );
+
+        if (!emailResponse.ok) {
+          const emailErrorText = await emailResponse.text();
+
+          emailWarning =
+            `Email not sent (HTTP ${emailResponse.status}): ${emailErrorText}`;
+
+          console.error('Resend error:', emailWarning);
+        }
+      } catch (emailError) {
+        emailWarning =
+          `Email not sent: ${emailError.message}`;
+
+        console.error('Resend exception:', emailError);
+      }
+    } else {
+      emailWarning =
+        'Email not sent: RESEND_API_KEY or NOTIFY_EMAIL is not configured.';
+    }
+
+    // --------------------------------------------------
+    // 3. SUCCESS RESPONSE
+    // --------------------------------------------------
+
+    res.statusCode = 200;
+    res.setHeader('Content-Type', 'application/json');
+
+    return res.end(
+      JSON.stringify({
+        success: true,
+        message: 'Lead captured successfully',
+        emailWarning: emailWarning || undefined
+      })
+    );
+
+  } catch (error) {
+    // Unexpected server error
+    console.error('submit-lead unexpected error:', error);
+
+    res.statusCode = 500;
+    res.setHeader('Content-Type', 'application/json');
+
+    return res.end(
+      JSON.stringify({
+        success: false,
+        error: `Server Error: ${error.message}`
+      })
+    );
+  }
+};
