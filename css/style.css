@@ -7,9 +7,9 @@
   --bg-elevated: #111214;
   --bg-card: #141517;
   --border: #262829;
-  --text: #e8e8f0;
-  --text-muted: #b8b8c8;
-  --text-dim: #888899;
+  --text: #e0e0e0;
+  --text-muted: #999;
+  --text-dim: #666;
 
   --accent: #00ff88;
   --orange: #ff9d3d;
@@ -51,10 +51,10 @@ body::before {
   height: 100%;
   background: linear-gradient(
     180deg,
-    rgba(10, 10, 10, 0.78) 0%,
-    rgba(10, 10, 10, 0.88) 35%,
-    rgba(10, 10, 10, 0.88) 65%,
-    rgba(10, 10, 10, 0.78) 100%
+    rgba(10, 10, 10, 0.25) 0%,
+    rgba(10, 10, 10, 0.40) 35%,
+    rgba(10, 10, 10, 0.40) 65%,
+    rgba(10, 10, 10, 0.25) 100%
   );
   z-index: -1;
 }
@@ -133,6 +133,38 @@ h1, h2, h3 { color: var(--text); font-weight: 600; margin: 0; }
   margin-top: 12px;
   max-width: 620px;
   font-size: 0.95rem;
+}
+
+.hero-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  align-items: center;
+}
+
+.hero-title {
+  font-size: clamp(2.2rem, 4vw, 3.2rem);
+  line-height: 1.2;
+  margin-bottom: 1.5rem;
+}
+
+.hero-subtitle {
+  font-size: 1.1rem;
+  max-width: 500px;
+}
+
+.hero-terminal {
+  margin: 0;
+}
+
+@media (max-width: 900px) {
+  .hero-grid {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+  .hero-terminal {
+    margin-top: 0.5rem;
+  }
 }
 
 .btn-group {
@@ -221,7 +253,7 @@ h1, h2, h3 { color: var(--text); font-weight: 600; margin: 0; }
 }
 
 .stat-label {
-  color: var(--text-muted);
+  color: var(--text);
   font-size: 0.8rem;
   margin-top: 6px;
 }
@@ -271,19 +303,6 @@ h1, h2, h3 { color: var(--text); font-weight: 600; margin: 0; }
 .error { color: var(--error); }
 .warning { color: var(--warning); }
 
-/* ============================================
-   BLUE HIGHLIGHT — specific words only
-   ============================================ */
-.highlight-blue {
-  color: var(--blue);
-  background: rgba(77, 184, 255, 0.10);
-  padding: 0.12em 0.3em;
-  border-radius: 4px;
-  font-weight: 600;
-  text-shadow: 0 0 10px rgba(77, 184, 255, 0.20);
-  white-space: nowrap;
-}
-
 .tag {
   display: inline-block;
   border: 1px solid var(--border);
@@ -311,14 +330,6 @@ h1, h2, h3 { color: var(--text); font-weight: 600; margin: 0; }
   border-color: var(--accent);
 }
 .form-input::placeholder { color: var(--text-dim); }
-
-/* Calculator error messages */
-.calc-error {
-  color: var(--error);
-  font-size: 0.78rem;
-  margin-top: 4px;
-  display: none;
-}
 
 table {
   width: 100%;
@@ -365,6 +376,7 @@ footer {
   color: var(--text);
 }
 
+/* Highlight footer text and links with blue accent */
 .footer-inner .footer-left {
   color: var(--blue);
 }
@@ -397,14 +409,30 @@ a:focus-visible, button:focus-visible, input:focus-visible {
 
 /* Mobile Adjustments to Prevent Crowding */
 @media (max-width: 640px) {
+  /* background-attachment: fixed causes jank/rendering issues on many mobile browsers */
+  body { background-attachment: scroll; }
+
   .container { padding: 0 16px; }
   .nav-inner { padding: 12px 16px; }
   .nav-links { gap: 12px; font-size: 0.75rem; }
   h1 { font-size: 1.5rem; line-height: 1.3; }
+  .hero-title { font-size: 1.7rem; line-height: 1.3; margin-bottom: 1rem; }
+  .hero-subtitle { font-size: 1rem; max-width: 100%; }
   .section { padding: 36px 0; }
   .card { padding: 20px; margin-bottom: 16px; }
   .btn-group { flex-direction: column; align-items: stretch; }
   .footer-inner { flex-direction: column; text-align: center; gap: 12px; }
   .footer-links { display: flex; justify-content: center; flex-wrap: wrap; gap: 12px; }
   .footer-links a { margin-left: 0; }
+
+  /* Terminal panel: shrink and enable horizontal scroll for the mtr output
+     instead of letting it get squeezed into a sliver next to the hero text */
+  .terminal-body {
+    font-size: 0.72rem;
+    line-height: 1.6;
+    padding: 12px;
+    overflow-x: auto;
+    white-space: pre;
+  }
+  .terminal-title { font-size: 0.68rem; }
 }
