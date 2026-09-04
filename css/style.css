@@ -7,9 +7,9 @@
   --bg-elevated: #111214;
   --bg-card: #141517;
   --border: #262829;
-  --text: #e0e0e0;
-  --text-muted: #999;
-  --text-dim: #666;
+  --text: #e8e8f0;
+  --text-muted: #b8b8c8;
+  --text-dim: #888899;
 
   --accent: #00ff88;
   --orange: #ff9d3d;
@@ -51,10 +51,10 @@ body::before {
   height: 100%;
   background: linear-gradient(
     180deg,
-    rgba(10, 10, 10, 0.25) 0%,
-    rgba(10, 10, 10, 0.40) 35%,
-    rgba(10, 10, 10, 0.40) 65%,
-    rgba(10, 10, 10, 0.25) 100%
+    rgba(10, 10, 10, 0.78) 0%,
+    rgba(10, 10, 10, 0.88) 35%,
+    rgba(10, 10, 10, 0.88) 65%,
+    rgba(10, 10, 10, 0.78) 100%
   );
   z-index: -1;
 }
@@ -221,7 +221,7 @@ h1, h2, h3 { color: var(--text); font-weight: 600; margin: 0; }
 }
 
 .stat-label {
-  color: var(--text);
+  color: var(--text-muted);
   font-size: 0.8rem;
   margin-top: 6px;
 }
@@ -271,6 +271,19 @@ h1, h2, h3 { color: var(--text); font-weight: 600; margin: 0; }
 .error { color: var(--error); }
 .warning { color: var(--warning); }
 
+/* ============================================
+   BLUE HIGHLIGHT — specific words only
+   ============================================ */
+.highlight-blue {
+  color: var(--blue);
+  background: rgba(77, 184, 255, 0.10);
+  padding: 0.12em 0.3em;
+  border-radius: 4px;
+  font-weight: 600;
+  text-shadow: 0 0 10px rgba(77, 184, 255, 0.20);
+  white-space: nowrap;
+}
+
 .tag {
   display: inline-block;
   border: 1px solid var(--border);
@@ -298,6 +311,14 @@ h1, h2, h3 { color: var(--text); font-weight: 600; margin: 0; }
   border-color: var(--accent);
 }
 .form-input::placeholder { color: var(--text-dim); }
+
+/* Calculator error messages */
+.calc-error {
+  color: var(--error);
+  font-size: 0.78rem;
+  margin-top: 4px;
+  display: none;
+}
 
 table {
   width: 100%;
@@ -344,7 +365,6 @@ footer {
   color: var(--text);
 }
 
-/* Highlight footer text and links with blue accent */
 .footer-inner .footer-left {
   color: var(--blue);
 }
