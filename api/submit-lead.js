@@ -24,16 +24,15 @@ export default async function handler(req, res) {
     estimated_monthly_loss
   } = req.body || {};
 
-  // Basic validation
   if (!contact_email) {
     res.statusCode = 400;
     res.setHeader('Content-Type', 'application/json');
     return res.end(JSON.stringify({ error: 'Contact email is required' }));
   }
 
-  // Grab environment variables securely from Vercel
-  const supabaseUrl = process.env.SUPABASE_URL;
-  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  // Fallback checks across multiple common naming conventions
+  const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.PUBLIC_SUPABASE_URL;
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_KEY || process.env.SUPABASE_SECRET_KEY;
 
   if (!supabaseUrl || !supabaseServiceKey) {
     res.statusCode = 500;
@@ -42,10 +41,8 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Extract user IP from Vercel headers for regional telemetry attribution
     const userIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
 
-    // Send data directly to Supabase via its REST API
     const response = await fetch(`${supabaseUrl}/rest/v1/calculator_leads`, {
       method: 'POST',
       headers: {
