@@ -240,6 +240,95 @@ module.exports = async function handler(req, res) {
     }
 
     // --------------------------------------------------
+    // IP RATE LIMIT PROTECTION
+    // --------------------------------------------------
+    //
+    // Maximum 5 submissions from the same IP
+    // within a 60-minute window.
+    //
+
+    const rateLimitEndpoint =
+      `${supabaseUrl.replace(/\/$/, '')}/rest/v1/rpc/check_ip_rate_limit`;
+
+    const rateLimitResponse = await fetch(
+      rateLimitEndpoint,
+      {
+        method: 'POST',
+        headers: {
+          apikey: supabaseServiceKey,
+          Authorization: `Bearer ${supabaseServiceKey}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          p_ip_address: userIp,
+          p_endpoint: 'submit-lead',
+          p_max_requests: 5,
+          p_window_minutes: 60
+        })
+      }
+    );
+
+    const rateLimitResponseText =
+      await rateLimitResponse.text();
+
+    if (!rateLimitResponse.ok) {
+      console.error(
+        'Rate limit check error:',
+        rateLimitResponse.status,
+        rateLimitResponseText
+      );
+
+      res.statusCode = 500;
+      res.setHeader('Content-Type', 'application/json');
+
+      return res.end(
+        JSON.stringify({
+          success: false,
+          error: 'Unable to verify submission.'
+        })
+      );
+    }
+
+    let rateLimitAllowed = false;
+
+    try {
+      rateLimitAllowed =
+        JSON.parse(rateLimitResponseText);
+    } catch (error) {
+      console.error(
+        'Rate limit JSON error:',
+        error
+      );
+
+      res.statusCode = 500;
+      res.setHeader('Content-Type', 'application/json');
+
+      return res.end(
+        JSON.stringify({
+          success: false,
+          error: 'Unable to verify submission.'
+        })
+      );
+    }
+
+    if (rateLimitAllowed !== true) {
+      res.statusCode = 429;
+      res.setHeader('Content-Type', 'application/json');
+      res.setHeader(
+        'Retry-After',
+        String(60 * 60)
+      );
+
+      return res.end(
+        JSON.stringify({
+          success: false,
+          error:
+            'Too many submissions from this network. Please try again later.'
+        })
+      );
+    }
+
+    // --------------------------------------------------
     // DUPLICATE SUBMISSION PROTECTION
     // --------------------------------------------------
     //
@@ -395,7 +484,6 @@ module.exports = async function handler(req, res) {
 
     if (resendApiKey && notifyEmail) {
       try {
-        // Escape values before inserting them into HTML.
         const escapeHtml = (value) =>
           String(value)
             .replace(/&/g, '&amp;')
