@@ -1,7 +1,7 @@
 /* ============================================
    africalatency.dev — scan.js
    Runs REAL diagnostics via the Globalping API
-   from probes in Kenya/Africa.
+   from live probes, targeting Nairobi first.
 
    Lead capture:
    - Sends leads to Vercel /api/submit-lead
@@ -225,13 +225,14 @@ async function gpPollMeasurement(
   );
 }
 
-// Tries Kenya first, then Africa, then worldwide.
+// Tries Nairobi first, then Kenya, then Africa, then worldwide.
 async function gpRunFromAfrica(
   type,
   target,
   measurementOptions
 ) {
   const locationAttempts = [
+    [{ city: 'Nairobi', limit: 1 }],
     [{ country: 'KE', limit: 1 }],
     [{ magic: 'Africa', limit: 1 }],
     [{ magic: 'world', limit: 1 }]
@@ -293,40 +294,153 @@ function fmtMs(v) {
   if (
     v === undefined ||
     v === null ||
-    v === -1
+    v === -1 ||
+    !Number.isFinite(Number(v))
   ) {
     return 'n/a';
   }
 
-  return `${Math.round(v)}ms`;
+  return `${Math.round(Number(v))}ms`;
 }
 
-function verdictFor(ttfb) {
-  if (ttfb == null) {
+/* ============================================
+   Metric scoring
+   ============================================
+
+   These are operational diagnostic thresholds,
+   not universal internet standards.
+
+   DNS:
+   GOOD             <= 50ms
+   NEEDS ATTENTION  <= 150ms
+   POOR             > 150ms
+
+   TLS:
+   GOOD             <= 100ms
+   NEEDS ATTENTION  <= 250ms
+   POOR             > 250ms
+
+   TTFB:
+   GOOD             <= 150ms
+   NEEDS ATTENTION  <= 300ms
+   POOR             > 300ms
+
+   TOTAL:
+   GOOD             <= 500ms
+   NEEDS ATTENTION  <= 1000ms
+   POOR             > 1000ms
+   ============================================ */
+
+function metricVerdict(value, goodMax, warningMax) {
+  if (
+    value === undefined ||
+    value === null ||
+    value === -1 ||
+    !Number.isFinite(Number(value))
+  ) {
+    return {
+      label: 'N/A',
+      color: 'warning',
+      symbol: '⚪'
+    };
+  }
+
+  const numericValue = Number(value);
+
+  if (numericValue <= goodMax) {
+    return {
+      label: 'GOOD',
+      color: 'highlight',
+      symbol: '🟢'
+    };
+  }
+
+  if (numericValue <= warningMax) {
+    return {
+      label: 'NEEDS ATTENTION',
+      color: 'warning',
+      symbol: '🟡'
+    };
+  }
+
+  return {
+    label: 'POOR',
+    color: 'error',
+    symbol: '🔴'
+  };
+}
+
+function overallVerdict(metrics) {
+  const measured = metrics.filter(
+    metric => metric && metric.label !== 'N/A'
+  );
+
+  if (!measured.length) {
     return {
       label: 'UNKNOWN',
-      color: 'warning'
+      color: 'warning',
+      symbol: '⚪'
     };
   }
 
-  if (ttfb >= 300) {
+  if (
+    measured.some(
+      metric => metric.label === 'POOR'
+    )
+  ) {
     return {
       label: 'CRITICAL',
-      color: 'error'
+      color: 'error',
+      symbol: '🔴'
     };
   }
 
-  if (ttfb >= 150) {
+  if (
+    measured.some(
+      metric => metric.label === 'NEEDS ATTENTION'
+    )
+  ) {
     return {
       label: 'WARNING',
-      color: 'warning'
+      color: 'warning',
+      symbol: '🟡'
     };
   }
 
   return {
     label: 'GOOD',
-    color: 'highlight'
+    color: 'highlight',
+    symbol: '🟢'
   };
+}
+
+function metricDisplay(verdict, value) {
+  return `
+    <span
+      style="
+        color:var(--${verdict.color});
+        font-weight:600;
+        margin-right:0.35rem;
+      "
+      title="${verdict.label}"
+    >
+      ${verdict.symbol}
+    </span>
+
+    <span class="highlight">
+      ${fmtMs(value)}
+    </span>
+
+    <span
+      style="
+        color:var(--${verdict.color});
+        font-size:0.72rem;
+        margin-left:0.35rem;
+      "
+    >
+      ${verdict.label}
+    </span>
+  `;
 }
 
 function appendRawToggle(body, label, raw) {
@@ -415,7 +529,7 @@ async function runScan() {
 
   appendLine(
     body,
-    'Requesting a live probe near Nairobi (Globalping network)...'
+    'Running a live HTTP diagnostic from a Globalping probe in Nairobi...'
   );
 
   let httpMeasurement;
@@ -509,7 +623,7 @@ async function runScan() {
 
   appendResultLine(
     body,
-    `Probe assigned: ${probeLocation}${
+    `Live probe: ${probeLocation}${
       probe.network
         ? ' — ' + probe.network
         : ''
@@ -641,8 +755,49 @@ async function runScan() {
 
   await sleep(300);
 
+  /* --------------------------------------------
+     Step 3: Score individual metrics
+     -------------------------------------------- */
+
+  const dnsVerdict =
+    metricVerdict(
+      timings.dns,
+      50,
+      150
+    );
+
+  const tlsVerdict =
+    metricVerdict(
+      timings.tls,
+      100,
+      250
+    );
+
+  const ttfbVerdict =
+    metricVerdict(
+      timings.firstByte,
+      150,
+      300
+    );
+
+  const totalVerdict =
+    metricVerdict(
+      timings.total,
+      500,
+      1000
+    );
+
+  /* --------------------------------------------
+     Step 4: Calculate overall verdict
+     -------------------------------------------- */
+
   const verdict =
-    verdictFor(ttfb);
+    overallVerdict([
+      dnsVerdict,
+      tlsVerdict,
+      ttfbVerdict,
+      totalVerdict
+    ]);
 
   const report =
     document.createElement('div');
@@ -659,7 +814,7 @@ async function runScan() {
         font-weight:600;
         font-size:1.1rem;
       ">
-        ${verdict.label}
+        ${verdict.symbol} ${verdict.label}
       </span>
 
       <span style="
@@ -677,32 +832,37 @@ async function runScan() {
       gap:1rem;
       margin-bottom:1rem;
     ">
+
       <div>
         DNS Resolution:
-        <span class="highlight">
-          ${fmtMs(timings.dns)}
-        </span>
+        ${metricDisplay(
+          dnsVerdict,
+          timings.dns
+        )}
       </div>
 
       <div>
         TLS Handshake:
-        <span class="highlight">
-          ${fmtMs(timings.tls)}
-        </span>
+        ${metricDisplay(
+          tlsVerdict,
+          timings.tls
+        )}
       </div>
 
       <div>
         TTFB:
-        <span class="highlight">
-          ${fmtMs(timings.firstByte)}
-        </span>
+        ${metricDisplay(
+          ttfbVerdict,
+          timings.firstByte
+        )}
       </div>
 
       <div>
         Total:
-        <span class="highlight">
-          ${fmtMs(timings.total)}
-        </span>
+        ${metricDisplay(
+          totalVerdict,
+          timings.total
+        )}
       </div>
 
       ${
@@ -717,6 +877,7 @@ async function runScan() {
           `
           : ''
       }
+
     </div>
 
     ${
@@ -738,13 +899,13 @@ async function runScan() {
       margin-bottom:1.5rem;
     ">
       ${
-        ttfb == null
-          ? 'Could not measure a full response — the target may be blocking automated requests or timed out.'
-          : ttfb >= 300
-          ? 'This TTFB is in a range where African mobile users commonly experience checkout drop-off from perceived slowness.'
-          : ttfb >= 150
-          ? 'Usable, but there is real headroom to reduce latency for African users.'
-          : 'This is a solid response time for African network conditions.'
+        verdict.label === 'CRITICAL'
+          ? 'One or more measured latency components are significantly elevated and may create a poor experience for African users.'
+          : verdict.label === 'WARNING'
+          ? 'The endpoint is responding, but one or more latency components have meaningful room for improvement for African users.'
+          : verdict.label === 'GOOD'
+          ? 'The measured latency profile is currently healthy across the available diagnostic metrics.'
+          : 'The diagnostic did not return enough usable measurements to determine an overall latency status.'
       }
     </div>
 
