@@ -1,16 +1,16 @@
 /* ============================================
    africalatency.dev — scan.js
    Runs REAL diagnostics via the Globalping API
-   (https://globalping.io) from probes in Kenya/Africa.
-   No backend required — this calls Globalping directly
-   from the browser.
+   from probes in Kenya/Africa.
+
+   Lead capture:
+   - Sends leads to Vercel /api/submit-lead
+   - Includes invisible honeypot anti-bot field
    ============================================ */
 
 const GP_API_BASE = 'https://api.globalping.io/v1';
 
-// Optional: get a free token from https://dash.globalping.io for higher
-// rate limits (anonymous requests are capped fairly low per hour).
-// Paste it below, e.g. const GP_API_TOKEN = 'gp_xxx...';
+// Optional Globalping token for higher rate limits.
 const GP_API_TOKEN = '';
 
 // Strict garbage words rejection list
@@ -27,8 +27,10 @@ function sleep(ms) {
 
 function showDomainError(msg) {
   let errEl = document.getElementById('err-domain');
+
   if (!errEl) {
     const input = document.getElementById('scan-domain');
+
     if (input && input.parentNode) {
       errEl = document.createElement('div');
       errEl.id = 'err-domain';
@@ -39,6 +41,7 @@ function showDomainError(msg) {
       input.parentNode.appendChild(errEl);
     }
   }
+
   if (errEl) {
     errEl.textContent = msg;
     errEl.style.display = 'block';
@@ -47,6 +50,7 @@ function showDomainError(msg) {
 
 function hideDomainError() {
   const errEl = document.getElementById('err-domain');
+
   if (errEl) {
     errEl.style.display = 'none';
     errEl.textContent = '';
@@ -56,31 +60,62 @@ function hideDomainError() {
 function looksLikeDomain(v) {
   if (!v.includes('.')) return false;
   if (/^[.-]|[.-]$/.test(v)) return false;
+
   const labels = v.split('.');
+
   for (const label of labels) {
-    if (!label || label.length > 63 || !/^[a-zA-Z0-9-]+$/.test(label)) return false;
+    if (
+      !label ||
+      label.length > 63 ||
+      !/^[a-zA-Z0-9-]+$/.test(label)
+    ) {
+      return false;
+    }
   }
+
   const tld = labels[labels.length - 1];
+
   if (tld.length < 2) return false;
+
   return true;
 }
 
 function validateDomainInput(v) {
   const raw = v.trim().toLowerCase();
-  if (!raw) return { ok: false, msg: 'Enter a domain (e.g. api.yourfintech.co.ke)' };
+
+  if (!raw) {
+    return {
+      ok: false,
+      msg: 'Enter a domain (e.g. api.yourfintech.co.ke)'
+    };
+  }
 
   // Strip protocol, path, and port automatically
   let domain = raw.replace(/^https?:\/\//, '');
   domain = domain.split('/')[0];
   domain = domain.split(':')[0];
 
-  if (garbageWords.includes(domain) || garbageWords.some(w => domain === w)) {
-    return { ok: false, msg: `\u201c${domain}\u201d is not a real domain. Enter your actual API endpoint.` };
+  if (
+    garbageWords.includes(domain) ||
+    garbageWords.some(w => domain === w)
+  ) {
+    return {
+      ok: false,
+      msg: `“${domain}” is not a real domain. Enter your actual API endpoint.`
+    };
   }
+
   if (!looksLikeDomain(domain)) {
-    return { ok: false, msg: 'Enter a valid domain like api.yourcompany.co.ke or yourapp.com' };
+    return {
+      ok: false,
+      msg: 'Enter a valid domain like api.yourcompany.co.ke or yourapp.com'
+    };
   }
-  return { ok: true, domain: domain };
+
+  return {
+    ok: true,
+    domain: domain
+  };
 }
 
 /* ============================================
@@ -89,19 +124,38 @@ function validateDomainInput(v) {
 
 async function gpFetch(path, options = {}) {
   const headers = Object.assign(
-    { 'Content-Type': 'application/json', Accept: 'application/json' },
+    {
+      'Content-Type': 'application/json',
+      Accept: 'application/json'
+    },
     options.headers || {}
   );
-  if (GP_API_TOKEN) headers.Authorization = `Bearer ${GP_API_TOKEN}`;
-  return fetch(GP_API_BASE + path, Object.assign({}, options, { headers }));
+
+  if (GP_API_TOKEN) {
+    headers.Authorization = `Bearer ${GP_API_TOKEN}`;
+  }
+
+  return fetch(
+    GP_API_BASE + path,
+    Object.assign({}, options, { headers })
+  );
 }
 
-async function gpCreateMeasurement(type, target, locations, measurementOptions) {
-  // Note: we intentionally omit a top-level "limit" field — each location
-  // already carries its own "limit", and sending both appears to trip
-  // Globalping's validator.
-  const body = { type, target, locations };
-  if (measurementOptions) body.measurementOptions = measurementOptions;
+async function gpCreateMeasurement(
+  type,
+  target,
+  locations,
+  measurementOptions
+) {
+  const body = {
+    type,
+    target,
+    locations
+  };
+
+  if (measurementOptions) {
+    body.measurementOptions = measurementOptions;
+  }
 
   const res = await gpFetch('/measurements', {
     method: 'POST',
@@ -114,52 +168,97 @@ async function gpCreateMeasurement(type, target, locations, measurementOptions) 
   }
 
   const errData = await res.json().catch(() => ({}));
-  let message = (errData.error && errData.error.message) || `Could not start measurement (HTTP ${res.status})`;
-  // Globalping puts the actually-useful detail in error.params, keyed by field name.
+
+  let message =
+    (errData.error && errData.error.message) ||
+    `Could not start measurement (HTTP ${res.status})`;
+
   if (errData.error && errData.error.params) {
     const detail = Object.entries(errData.error.params)
       .map(([field, msg]) => `${field}: ${msg}`)
       .join('; ');
-    if (detail) message += ` — ${detail}`;
+
+    if (detail) {
+      message += ` — ${detail}`;
+    }
   }
+
   const err = new Error(message);
   err.status = res.status;
   err.raw = errData;
+
   throw err;
 }
 
-async function gpPollMeasurement(id, { timeoutMs = 25000, intervalMs = 1000 } = {}) {
+async function gpPollMeasurement(
+  id,
+  { timeoutMs = 25000, intervalMs = 1000 } = {}
+) {
   const started = Date.now();
+
   while (Date.now() - started < timeoutMs) {
-    const res = await gpFetch(`/measurements/${id}`, { method: 'GET' });
-    if (!res.ok) throw new Error(`Could not fetch measurement result (HTTP ${res.status})`);
+    const res = await gpFetch(
+      `/measurements/${id}`,
+      { method: 'GET' }
+    );
+
+    if (!res.ok) {
+      throw new Error(
+        `Could not fetch measurement result (HTTP ${res.status})`
+      );
+    }
+
     const data = await res.json();
-    if (data.status && data.status !== 'in-progress') return data;
+
+    if (
+      data.status &&
+      data.status !== 'in-progress'
+    ) {
+      return data;
+    }
+
     await sleep(intervalMs);
   }
-  throw new Error('Timed out waiting for the probe to respond.');
+
+  throw new Error(
+    'Timed out waiting for the probe to respond.'
+  );
 }
 
-// Tries a Kenyan probe first, falls back to any African probe, then worldwide,
-// so the tool still works even if no Kenyan probe happens to be online.
-async function gpRunFromAfrica(type, target, measurementOptions) {
+// Tries Kenya first, then Africa, then worldwide.
+async function gpRunFromAfrica(
+  type,
+  target,
+  measurementOptions
+) {
   const locationAttempts = [
     [{ country: 'KE', limit: 1 }],
     [{ magic: 'Africa', limit: 1 }],
     [{ magic: 'world', limit: 1 }]
   ];
+
   let lastErr;
+
   for (const locations of locationAttempts) {
     try {
-      const id = await gpCreateMeasurement(type, target, locations, measurementOptions);
+      const id = await gpCreateMeasurement(
+        type,
+        target,
+        locations,
+        measurementOptions
+      );
+
       return await gpPollMeasurement(id);
+
     } catch (e) {
       lastErr = e;
-      // Only fall back to a wider location on "no matching probes" type errors.
-      // Real network/timeout errors should surface immediately.
-      if (!(e.status === 400 || e.status === 422)) throw e;
+
+      if (!(e.status === 400 || e.status === 422)) {
+        throw e;
+      }
     }
   }
+
   throw lastErr;
 }
 
@@ -169,46 +268,91 @@ async function gpRunFromAfrica(type, target, measurementOptions) {
 
 function appendLine(body, text, cls) {
   const div = document.createElement('div');
-  div.innerHTML = `<span class="prompt">$</span> <span class="command${cls ? ' ' + cls : ''}">${text}</span>`;
+
+  div.innerHTML =
+    `<span class="prompt">$</span> ` +
+    `<span class="command${cls ? ' ' + cls : ''}">${text}</span>`;
+
   body.appendChild(div);
+
   return div;
 }
 
 function appendResultLine(body, text, cls) {
   const div = document.createElement('div');
+
   div.className = cls || 'output';
   div.textContent = `  → ${text}`;
+
   body.appendChild(div);
+
   return div;
 }
 
 function fmtMs(v) {
-  if (v === undefined || v === null || v === -1) return 'n/a';
+  if (
+    v === undefined ||
+    v === null ||
+    v === -1
+  ) {
+    return 'n/a';
+  }
+
   return `${Math.round(v)}ms`;
 }
 
 function verdictFor(ttfb) {
-  if (ttfb == null) return { label: 'UNKNOWN', color: 'warning' };
-  if (ttfb >= 300) return { label: 'CRITICAL', color: 'error' };
-  if (ttfb >= 150) return { label: 'WARNING', color: 'warning' };
-  return { label: 'GOOD', color: 'highlight' };
+  if (ttfb == null) {
+    return {
+      label: 'UNKNOWN',
+      color: 'warning'
+    };
+  }
+
+  if (ttfb >= 300) {
+    return {
+      label: 'CRITICAL',
+      color: 'error'
+    };
+  }
+
+  if (ttfb >= 150) {
+    return {
+      label: 'WARNING',
+      color: 'warning'
+    };
+  }
+
+  return {
+    label: 'GOOD',
+    color: 'highlight'
+  };
 }
 
 function appendRawToggle(body, label, raw) {
   const details = document.createElement('details');
+
   details.style.marginTop = '1rem';
   details.style.fontSize = '0.78rem';
   details.style.color = 'var(--text-muted)';
+
   const summary = document.createElement('summary');
+
   summary.style.cursor = 'pointer';
-  summary.textContent = `View raw ${label} response`;
+  summary.textContent =
+    `View raw ${label} response`;
+
   const pre = document.createElement('pre');
+
   pre.style.whiteSpace = 'pre-wrap';
   pre.style.wordBreak = 'break-all';
   pre.style.marginTop = '0.5rem';
-  pre.textContent = JSON.stringify(raw, null, 2);
+  pre.textContent =
+    JSON.stringify(raw, null, 2);
+
   details.appendChild(summary);
   details.appendChild(pre);
+
   body.appendChild(details);
 }
 
@@ -217,134 +361,382 @@ function appendRawToggle(body, label, raw) {
    ============================================ */
 
 async function runScan() {
-  const domainInput = document.getElementById('scan-domain');
+  const domainInput =
+    document.getElementById('scan-domain');
+
   const rawValue = domainInput.value;
 
   hideDomainError();
 
-  const validation = validateDomainInput(rawValue);
+  const validation =
+    validateDomainInput(rawValue);
+
   if (!validation.ok) {
     showDomainError(validation.msg);
     return;
   }
 
   const domain = validation.domain;
-  const output = document.getElementById('scan-output');
-  const btn = document.getElementById('scan-btn');
+
+  const output =
+    document.getElementById('scan-output');
+
+  const btn =
+    document.getElementById('scan-btn');
 
   btn.disabled = true;
   btn.textContent = 'Analyzing...';
+
   output.style.display = 'block';
   output.classList.add('terminal');
-  output.innerHTML = `<div class="terminal-header">
-    <div class="terminal-dot red"></div>
-    <div class="terminal-dot yellow"></div>
-    <div class="terminal-dot green"></div>
-    <div class="terminal-title">africalatency-scan ~ ${domain}</div>
-  </div><div class="terminal-body" id="scan-body"></div>`;
 
-  const body = document.getElementById('scan-body');
+  output.innerHTML = `
+    <div class="terminal-header">
+      <div class="terminal-dot red"></div>
+      <div class="terminal-dot yellow"></div>
+      <div class="terminal-dot green"></div>
+      <div class="terminal-title">
+        africalatency-scan ~ ${domain}
+      </div>
+    </div>
+
+    <div class="terminal-body" id="scan-body"></div>
+  `;
+
+  const body =
+    document.getElementById('scan-body');
+
   let ttfb = null;
   let probeLocation = 'unknown';
 
-  // --- Step 1: HTTP measurement (DNS + TCP + TLS + TTFB) ---
-  appendLine(body, 'Requesting a live probe near Nairobi (Globalping network)...');
+  /* --------------------------------------------
+     Step 1: HTTP measurement
+     -------------------------------------------- */
+
+  appendLine(
+    body,
+    'Requesting a live probe near Nairobi (Globalping network)...'
+  );
+
   let httpMeasurement;
+
   try {
-    httpMeasurement = await gpRunFromAfrica('http', domain, null);
+    httpMeasurement =
+      await gpRunFromAfrica(
+        'http',
+        domain,
+        null
+      );
+
   } catch (e) {
-    appendResultLine(body, e.message || 'Could not reach the Globalping API.', 'error');
-    if (e.raw) appendRawToggle(body, 'error', e.raw);
+    appendResultLine(
+      body,
+      e.message ||
+        'Could not reach the Globalping API.',
+      'error'
+    );
+
+    if (e.raw) {
+      appendRawToggle(
+        body,
+        'error',
+        e.raw
+      );
+    }
+
     btn.disabled = false;
-    btn.textContent = 'Analyze Another Domain';
+    btn.textContent =
+      'Analyze Another Domain';
+
     return;
   }
 
-  const httpProbeResult = httpMeasurement.results && httpMeasurement.results[0];
-  if (!httpProbeResult || !httpProbeResult.result || httpProbeResult.result.status !== 'finished') {
+  const httpProbeResult =
+    httpMeasurement.results &&
+    httpMeasurement.results[0];
+
+  if (
+    !httpProbeResult ||
+    !httpProbeResult.result ||
+    httpProbeResult.result.status !== 'finished'
+  ) {
     const reason =
-      (httpProbeResult && httpProbeResult.result && (httpProbeResult.result.rawOutput || httpProbeResult.result.status)) ||
+      (
+        httpProbeResult &&
+        httpProbeResult.result &&
+        (
+          httpProbeResult.result.rawOutput ||
+          httpProbeResult.result.status
+        )
+      ) ||
       'the target did not respond to the probe';
-    appendResultLine(body, `Diagnostic incomplete: ${reason}`, 'error');
-    appendRawToggle(body, 'http', httpMeasurement);
+
+    appendResultLine(
+      body,
+      `Diagnostic incomplete: ${reason}`,
+      'error'
+    );
+
+    appendRawToggle(
+      body,
+      'http',
+      httpMeasurement
+    );
+
     btn.disabled = false;
-    btn.textContent = 'Analyze Another Domain';
+    btn.textContent =
+      'Analyze Another Domain';
+
     return;
   }
 
-  const probe = httpProbeResult.probe || {};
-  const r = httpProbeResult.result;
-  const timings = r.timings || {};
-  probeLocation = [probe.city, probe.country].filter(Boolean).join(', ') || 'unknown location';
+  const probe =
+    httpProbeResult.probe || {};
+
+  const r =
+    httpProbeResult.result;
+
+  const timings =
+    r.timings || {};
+
+  probeLocation =
+    [probe.city, probe.country]
+      .filter(Boolean)
+      .join(', ') ||
+    'unknown location';
+
   ttfb = timings.firstByte;
 
-  appendResultLine(body, `Probe assigned: ${probeLocation}${probe.network ? ' — ' + probe.network : ''}`);
+  appendResultLine(
+    body,
+    `Probe assigned: ${probeLocation}${
+      probe.network
+        ? ' — ' + probe.network
+        : ''
+    }`
+  );
 
   await sleep(300);
-  appendLine(body, 'Resolving DNS...');
-  appendResultLine(body, `${r.resolvedAddress || 'unresolved'}  (${fmtMs(timings.dns)})`);
+
+  appendLine(
+    body,
+    'Resolving DNS...'
+  );
+
+  appendResultLine(
+    body,
+    `${r.resolvedAddress || 'unresolved'} (${fmtMs(timings.dns)})`
+  );
 
   await sleep(300);
-  appendLine(body, 'Testing TLS handshake...');
-  const tlsProtocol = (r.tls && (r.tls.protocol || r.tls.version)) || 'n/a (not HTTPS or handshake failed)';
-  appendResultLine(body, `${tlsProtocol}  (${fmtMs(timings.tls)})`);
+
+  appendLine(
+    body,
+    'Testing TLS handshake...'
+  );
+
+  const tlsProtocol =
+    (
+      r.tls &&
+      (
+        r.tls.protocol ||
+        r.tls.version
+      )
+    ) ||
+    'n/a (not HTTPS or handshake failed)';
+
+  appendResultLine(
+    body,
+    `${tlsProtocol} (${fmtMs(timings.tls)})`
+  );
 
   await sleep(300);
-  appendLine(body, 'Measuring TTFB (Time to First Byte)...');
-  appendResultLine(body, `HTTP ${r.statusCode ?? '?'}  (${fmtMs(timings.firstByte)})`);
 
-  // --- Step 2: Traceroute (best-effort — don't fail the whole scan on this) ---
+  appendLine(
+    body,
+    'Measuring TTFB (Time to First Byte)...'
+  );
+
+  appendResultLine(
+    body,
+    `HTTP ${r.statusCode ?? '?'} (${fmtMs(timings.firstByte)})`
+  );
+
+  /* --------------------------------------------
+     Step 2: Traceroute
+     -------------------------------------------- */
+
   await sleep(300);
-  appendLine(body, 'Analyzing BGP path (traceroute)...');
+
+  appendLine(
+    body,
+    'Analyzing BGP path (traceroute)...'
+  );
+
   let hopCount = null;
   let pathSummary = null;
   let traceMeasurement = null;
+
   try {
-    traceMeasurement = await gpRunFromAfrica('traceroute', domain, null);
-    const traceProbeResult = traceMeasurement.results && traceMeasurement.results[0];
-    const hops = traceProbeResult && traceProbeResult.result && traceProbeResult.result.hops;
+    traceMeasurement =
+      await gpRunFromAfrica(
+        'traceroute',
+        domain,
+        null
+      );
+
+    const traceProbeResult =
+      traceMeasurement.results &&
+      traceMeasurement.results[0];
+
+    const hops =
+      traceProbeResult &&
+      traceProbeResult.result &&
+      traceProbeResult.result.hops;
+
     if (hops && hops.length) {
       hopCount = hops.length;
-      const named = hops.map(h => h.resolvedHostname || h.resolvedAddress).filter(Boolean);
-      pathSummary = named.length
-        ? `${named[0]} → … → ${named[named.length - 1]}`
-        : `${hopCount} hops (unnamed)`;
-      appendResultLine(body, `${hopCount} hops — ${pathSummary}`);
+
+      const named =
+        hops
+          .map(
+            h =>
+              h.resolvedHostname ||
+              h.resolvedAddress
+          )
+          .filter(Boolean);
+
+      pathSummary =
+        named.length
+          ? `${named[0]} → … → ${named[named.length - 1]}`
+          : `${hopCount} hops (unnamed)`;
+
+      appendResultLine(
+        body,
+        `${hopCount} hops — ${pathSummary}`
+      );
+
     } else {
-      appendResultLine(body, 'Traceroute did not complete (target may block ICMP).', 'warning');
+      appendResultLine(
+        body,
+        'Traceroute did not complete (target may block ICMP).',
+        'warning'
+      );
     }
+
   } catch (e) {
-    appendResultLine(body, `Traceroute unavailable: ${e.message}`, 'warning');
+    appendResultLine(
+      body,
+      `Traceroute unavailable: ${e.message}`,
+      'warning'
+    );
   }
 
   await sleep(300);
-  appendLine(body, 'Compiling diagnostic report...');
+
+  appendLine(
+    body,
+    'Compiling diagnostic report...'
+  );
+
   await sleep(300);
 
-  const verdict = verdictFor(ttfb);
+  const verdict =
+    verdictFor(ttfb);
 
-  const report = document.createElement('div');
+  const report =
+    document.createElement('div');
+
   report.style.marginTop = '1.5rem';
   report.style.paddingTop = '1.5rem';
-  report.style.borderTop = '1px solid var(--border)';
+  report.style.borderTop =
+    '1px solid var(--border)';
+
   report.innerHTML = `
     <div style="margin-bottom:1rem;">
-      <span style="color:var(--${verdict.color});font-weight:600;font-size:1.1rem;">
+      <span style="
+        color:var(--${verdict.color});
+        font-weight:600;
+        font-size:1.1rem;
+      ">
         ${verdict.label}
       </span>
-      <span style="color:var(--text-muted);font-size:0.8rem;margin-left:0.5rem;">
+
+      <span style="
+        color:var(--text-muted);
+        font-size:0.8rem;
+        margin-left:0.5rem;
+      ">
         measured live from ${probeLocation}
       </span>
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">
-      <div>DNS Resolution: <span class="highlight">${fmtMs(timings.dns)}</span></div>
-      <div>TLS Handshake: <span class="highlight">${fmtMs(timings.tls)}</span></div>
-      <div>TTFB: <span class="highlight">${fmtMs(timings.firstByte)}</span></div>
-      <div>Total: <span class="highlight">${fmtMs(timings.total)}</span></div>
-      ${hopCount ? `<div>Traceroute Hops: <span class="highlight">${hopCount}</span></div>` : ''}
+
+    <div style="
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:1rem;
+      margin-bottom:1rem;
+    ">
+      <div>
+        DNS Resolution:
+        <span class="highlight">
+          ${fmtMs(timings.dns)}
+        </span>
+      </div>
+
+      <div>
+        TLS Handshake:
+        <span class="highlight">
+          ${fmtMs(timings.tls)}
+        </span>
+      </div>
+
+      <div>
+        TTFB:
+        <span class="highlight">
+          ${fmtMs(timings.firstByte)}
+        </span>
+      </div>
+
+      <div>
+        Total:
+        <span class="highlight">
+          ${fmtMs(timings.total)}
+        </span>
+      </div>
+
+      ${
+        hopCount
+          ? `
+            <div>
+              Traceroute Hops:
+              <span class="highlight">
+                ${hopCount}
+              </span>
+            </div>
+          `
+          : ''
+      }
     </div>
-    ${pathSummary ? `<div style="color:var(--text);opacity:0.85;margin-bottom:1rem;">Path: ${pathSummary}</div>` : ''}
-    <div style="color:var(--${verdict.color});margin-bottom:1.5rem;">
+
+    ${
+      pathSummary
+        ? `
+          <div style="
+            color:var(--text);
+            opacity:0.85;
+            margin-bottom:1rem;
+          ">
+            Path: ${pathSummary}
+          </div>
+        `
+        : ''
+    }
+
+    <div style="
+      color:var(--${verdict.color});
+      margin-bottom:1.5rem;
+    ">
       ${
         ttfb == null
           ? 'Could not measure a full response — the target may be blocking automated requests or timed out.'
@@ -356,111 +748,347 @@ async function runScan() {
       }
     </div>
 
-    <div style="padding:1.25rem;background:var(--bg);border-radius:6px;border:1px solid var(--border);">
-      <div style="font-size:0.9rem;font-weight:600;color:var(--text);margin-bottom:0.3rem;">
+    <div style="
+      padding:1.25rem;
+      background:var(--bg);
+      border-radius:6px;
+      border:1px solid var(--border);
+    ">
+
+      <div style="
+        font-size:0.9rem;
+        font-weight:600;
+        color:var(--text);
+        margin-bottom:0.3rem;
+      ">
         Unlock Full Optimization Report & Remediation Plan
       </div>
-      <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:1rem;">
+
+      <div style="
+        font-size:0.8rem;
+        color:var(--text-muted);
+        margin-bottom:1rem;
+      ">
         Enter your details to log this scan and receive a direct infrastructure review.
       </div>
 
-      <form id="lead-capture-form" style="display:flex;flex-direction:column;gap:0.75rem;">
+      <form
+        id="lead-capture-form"
+        style="
+          display:flex;
+          flex-direction:column;
+          gap:0.75rem;
+        "
+      >
+
         <input
           type="text"
           id="lead-company"
           placeholder="Company Name"
+          maxlength="150"
           required
-          style="padding:0.6rem;background:var(--bg-elevated);border:1px solid var(--border);color:var(--text);border-radius:4px;font-size:0.9rem;"
+          style="
+            padding:0.6rem;
+            background:var(--bg-elevated);
+            border:1px solid var(--border);
+            color:var(--text);
+            border-radius:4px;
+            font-size:0.9rem;
+          "
         >
+
         <input
           type="email"
           id="lead-email"
           placeholder="Work Email (e.g. you@fintech.co.ke)"
+          maxlength="254"
           required
-          style="padding:0.6rem;background:var(--bg-elevated);border:1px solid var(--border);color:var(--text);border-radius:4px;font-size:0.9rem;"
+          style="
+            padding:0.6rem;
+            background:var(--bg-elevated);
+            border:1px solid var(--border);
+            color:var(--text);
+            border-radius:4px;
+            font-size:0.9rem;
+          "
         >
-        <button type="submit" class="btn btn-primary" id="lead-submit-btn" style="align-self:flex-start;margin-top:0.25rem;">
+
+        <!-- Honeypot anti-spam field.
+             Real visitors never see or fill this. -->
+        <div
+          aria-hidden="true"
+          style="
+            position:absolute;
+            left:-9999px;
+            width:1px;
+            height:1px;
+            overflow:hidden;
+          "
+        >
+          <label for="lead-website">
+            Website
+          </label>
+
+          <input
+            type="text"
+            id="lead-website"
+            name="website"
+            tabindex="-1"
+            autocomplete="off"
+          >
+        </div>
+
+        <button
+          type="submit"
+          class="btn btn-primary"
+          id="lead-submit-btn"
+          style="
+            align-self:flex-start;
+            margin-top:0.25rem;
+          "
+        >
           Save Lead & Get Audit →
         </button>
+
       </form>
-      <div id="lead-feedback" style="font-size:0.85rem;margin-top:0.75rem;"></div>
+
+      <div
+        id="lead-feedback"
+        style="
+          font-size:0.85rem;
+          margin-top:0.75rem;
+        "
+      ></div>
+
     </div>
   `;
 
   body.appendChild(report);
 
-  appendRawToggle(body, 'http', httpMeasurement);
-  if (traceMeasurement) appendRawToggle(body, 'traceroute', traceMeasurement);
+  appendRawToggle(
+    body,
+    'http',
+    httpMeasurement
+  );
+
+  if (traceMeasurement) {
+    appendRawToggle(
+      body,
+      'traceroute',
+      traceMeasurement
+    );
+  }
 
   btn.disabled = false;
-  btn.textContent = 'Analyze Another Domain';
+  btn.textContent =
+    'Analyze Another Domain';
 
-  // Attach submission listener with strict email format verification
-  const leadForm = document.getElementById('lead-capture-form');
-  leadForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
+  /* --------------------------------------------
+     Lead submission
+     -------------------------------------------- */
 
-    const companyName = document.getElementById('lead-company').value.trim();
-    const contactEmail = document.getElementById('lead-email').value.trim();
-    const leadSubmitBtn = document.getElementById('lead-submit-btn');
-    const feedback = document.getElementById('lead-feedback');
+  const leadForm =
+    document.getElementById(
+      'lead-capture-form'
+    );
 
-    // Strict email format check
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(contactEmail)) {
-      feedback.style.color = 'var(--error, #ef4444)';
-      feedback.textContent = 'Please enter a valid work email address.';
-      return;
-    }
+  leadForm.addEventListener(
+    'submit',
+    async (e) => {
+      e.preventDefault();
 
-    leadSubmitBtn.disabled = true;
-    leadSubmitBtn.textContent = 'Submitting...';
-    feedback.style.color = 'var(--text-muted)';
-    feedback.textContent = 'Securing record to database...';
+      const companyName =
+        document
+          .getElementById('lead-company')
+          .value
+          .trim();
 
-    try {
-      const response = await fetch('/api/submit-lead', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          company_name: companyName,
-          contact_email: contactEmail,
-          current_latency_ms: ttfb != null ? Math.round(ttfb) : null,
-          target_latency_ms: 65,
-          monthly_requests: 1000000,
-          estimated_monthly_loss: ttfb != null ? Math.round(ttfb) * 30 : null
-        })
-      });
+      const contactEmail =
+        document
+          .getElementById('lead-email')
+          .value
+          .trim();
 
-      const data = await response.json();
+      const honeypot =
+        document
+          .getElementById('lead-website')
+          .value
+          .trim();
 
-      if (response.ok && data.success) {
-        feedback.style.color = 'var(--accent, #4ade80)';
-        feedback.textContent = '✓ Success! Lead captured in Supabase. We will be in touch shortly.';
-        leadForm.reset();
-        leadSubmitBtn.textContent = 'Submitted Successfully';
-      } else {
-        feedback.style.color = 'var(--error, #ef4444)';
-        feedback.textContent = `Error: ${data.error || 'Failed to record lead.'}`;
-        leadSubmitBtn.disabled = false;
-        leadSubmitBtn.textContent = 'Retry Submission';
+      const leadSubmitBtn =
+        document.getElementById(
+          'lead-submit-btn'
+        );
+
+      const feedback =
+        document.getElementById(
+          'lead-feedback'
+        );
+
+      // ------------------------------------------
+      // Frontend validation
+      // ------------------------------------------
+
+      if (companyName.length > 150) {
+        feedback.style.color =
+          'var(--error, #ef4444)';
+
+        feedback.textContent =
+          'Company name is too long.';
+
+        return;
       }
-    } catch (err) {
-      console.error(err);
-      feedback.style.color = 'var(--error, #ef4444)';
-      feedback.textContent = 'Network error. Please check connection and try again.';
-      leadSubmitBtn.disabled = false;
-      leadSubmitBtn.textContent = 'Retry Submission';
+
+      const emailRegex =
+        /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+      if (
+        !emailRegex.test(contactEmail)
+      ) {
+        feedback.style.color =
+          'var(--error, #ef4444)';
+
+        feedback.textContent =
+          'Please enter a valid work email address.';
+
+        return;
+      }
+
+      if (contactEmail.length > 254) {
+        feedback.style.color =
+          'var(--error, #ef4444)';
+
+        feedback.textContent =
+          'Email address is too long.';
+
+        return;
+      }
+
+      leadSubmitBtn.disabled = true;
+      leadSubmitBtn.textContent =
+        'Submitting...';
+
+      feedback.style.color =
+        'var(--text-muted)';
+
+      feedback.textContent =
+        'Securing record to database...';
+
+      try {
+        const response =
+          await fetch(
+            '/api/submit-lead',
+            {
+              method: 'POST',
+              headers: {
+                'Content-Type':
+                  'application/json'
+              },
+
+              body: JSON.stringify({
+                company_name:
+                  companyName,
+
+                contact_email:
+                  contactEmail,
+
+                // Honeypot value
+                website:
+                  honeypot,
+
+                current_latency_ms:
+                  ttfb != null
+                    ? Math.round(ttfb)
+                    : null,
+
+                target_latency_ms:
+                  65,
+
+                monthly_requests:
+                  1000000,
+
+                estimated_monthly_loss:
+                  ttfb != null
+                    ? Math.round(ttfb) * 30
+                    : null
+              })
+            }
+          );
+
+        const data =
+          await response.json();
+
+        if (
+          response.ok &&
+          data.success
+        ) {
+          feedback.style.color =
+            'var(--accent, #4ade80)';
+
+          feedback.textContent =
+            '✓ Success! Lead captured in Supabase. We will be in touch shortly.';
+
+          leadForm.reset();
+
+          leadSubmitBtn.textContent =
+            'Submitted Successfully';
+
+        } else {
+          feedback.style.color =
+            'var(--error, #ef4444)';
+
+          feedback.textContent =
+            `Error: ${
+              data.error ||
+              'Failed to record lead.'
+            }`;
+
+          leadSubmitBtn.disabled =
+            false;
+
+          leadSubmitBtn.textContent =
+            'Retry Submission';
+        }
+
+      } catch (err) {
+        console.error(err);
+
+        feedback.style.color =
+          'var(--error, #ef4444)';
+
+        feedback.textContent =
+          'Network error. Please check connection and try again.';
+
+        leadSubmitBtn.disabled =
+          false;
+
+        leadSubmitBtn.textContent =
+          'Retry Submission';
+      }
     }
-  });
+  );
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  const form = document.getElementById('scan-form');
-  if (form) {
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      runScan();
-    });
+/* ============================================
+   Initial page setup
+   ============================================ */
+
+document.addEventListener(
+  'DOMContentLoaded',
+  () => {
+    const form =
+      document.getElementById(
+        'scan-form'
+      );
+
+    if (form) {
+      form.addEventListener(
+        'submit',
+        (e) => {
+          e.preventDefault();
+          runScan();
+        }
+      );
+    }
   }
-});
+);
