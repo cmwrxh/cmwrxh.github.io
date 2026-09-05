@@ -1,5 +1,3 @@
-const crypto = require('crypto');
-
 module.exports = async function handler(req, res) {
   // --------------------------------------------------
   // CORS
@@ -63,7 +61,6 @@ module.exports = async function handler(req, res) {
 
     const contentLength = Number(req.headers['content-length'] || 0);
 
-    // Reject requests larger than 20 KB.
     if (contentLength > 20 * 1024) {
       res.statusCode = 413;
       res.setHeader('Content-Type', 'application/json');
@@ -103,10 +100,6 @@ module.exports = async function handler(req, res) {
     // --------------------------------------------------
     // HONEYPOT BOT CHECK
     // --------------------------------------------------
-    //
-    // If a future frontend sends "website" and a bot fills it,
-    // reject the submission silently.
-    //
 
     if (body.website) {
       res.statusCode = 400;
@@ -244,6 +237,101 @@ module.exports = async function handler(req, res) {
       userIp = String(req.headers['x-real-ip']).trim();
     } else if (req.socket && req.socket.remoteAddress) {
       userIp = req.socket.remoteAddress;
+    }
+
+    // --------------------------------------------------
+    // DUPLICATE SUBMISSION PROTECTION
+    // --------------------------------------------------
+    //
+    // Prevent the same email from submitting another lead
+    // within 30 minutes.
+    //
+
+    const cooldownMinutes = 30;
+
+    const cutoffTime =
+      new Date(
+        Date.now() - cooldownMinutes * 60 * 1000
+      ).toISOString();
+
+    const duplicateCheckEndpoint =
+      `${supabaseUrl.replace(/\/$/, '')}/rest/v1/calculator_leads` +
+      `?contact_email=eq.${encodeURIComponent(email)}` +
+      `&created_at=gte.${encodeURIComponent(cutoffTime)}` +
+      `&select=id` +
+      `&limit=1`;
+
+    const duplicateResponse = await fetch(
+      duplicateCheckEndpoint,
+      {
+        method: 'GET',
+        headers: {
+          apikey: supabaseServiceKey,
+          Authorization: `Bearer ${supabaseServiceKey}`
+        }
+      }
+    );
+
+    const duplicateResponseText =
+      await duplicateResponse.text();
+
+    if (!duplicateResponse.ok) {
+      console.error(
+        'Duplicate check error:',
+        duplicateResponse.status,
+        duplicateResponseText
+      );
+
+      res.statusCode = 500;
+      res.setHeader('Content-Type', 'application/json');
+
+      return res.end(
+        JSON.stringify({
+          success: false,
+          error: 'Unable to verify submission.'
+        })
+      );
+    }
+
+    let recentLeads = [];
+
+    try {
+      recentLeads =
+        duplicateResponseText
+          ? JSON.parse(duplicateResponseText)
+          : [];
+    } catch (error) {
+      console.error(
+        'Duplicate check JSON error:',
+        error
+      );
+
+      res.statusCode = 500;
+      res.setHeader('Content-Type', 'application/json');
+
+      return res.end(
+        JSON.stringify({
+          success: false,
+          error: 'Unable to verify submission.'
+        })
+      );
+    }
+
+    if (Array.isArray(recentLeads) && recentLeads.length > 0) {
+      res.statusCode = 429;
+      res.setHeader('Content-Type', 'application/json');
+      res.setHeader(
+        'Retry-After',
+        String(cooldownMinutes * 60)
+      );
+
+      return res.end(
+        JSON.stringify({
+          success: false,
+          error:
+            'A submission from this email was already received recently. Please try again later.'
+        })
+      );
     }
 
     // --------------------------------------------------
