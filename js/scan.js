@@ -1,7 +1,8 @@
 /* ============================================
    africalatency.dev — scan.js
    Runs REAL diagnostics via the Globalping API
-   from live probes, targeting Nairobi first.
+   from live probes in Nairobi, Lagos,
+   Johannesburg, and Cairo.
 
    Lead capture:
    - Sends leads to Vercel /api/submit-lead
@@ -19,6 +20,16 @@ const garbageWords = [
   'example','demo','sample','trial','temp','fake','mock','dummy',
   'api','domain','website','url','link','site','page','server',
   'localhost','127.0.0.1','0.0.0.0','192.168','10.0.0'
+];
+
+// The African cities we test from. Each has its own peering,
+// IXP, and undersea cable landing situation — a result from
+// one city is NOT representative of the others.
+const AFRICA_PROBE_CITIES = [
+  { city: 'Nairobi',      country: 'KE', label: 'Nairobi, KE',      flag: '🇰🇪' },
+  { city: 'Lagos',        country: 'NG', label: 'Lagos, NG',        flag: '🇳🇬' },
+  { city: 'Johannesburg', country: 'ZA', label: 'Johannesburg, ZA', flag: '🇿🇦' },
+  { city: 'Cairo',        country: 'EG', label: 'Cairo, EG',        flag: '🇪🇬' }
 ];
 
 function sleep(ms) {
@@ -101,7 +112,7 @@ function validateDomainInput(v) {
   ) {
     return {
       ok: false,
-      msg: `“${domain}” is not a real domain. Enter your actual API endpoint.`
+      msg: `"${domain}" is not a real domain. Enter your actual API endpoint.`
     };
   }
 
@@ -225,7 +236,9 @@ async function gpPollMeasurement(
   );
 }
 
-// Tries Nairobi first, then Kenya, then Africa, then worldwide.
+// LEGACY: single-probe fallback chain (Nairobi -> KE -> Africa -> world).
+// No longer called from runScan() now that we test 4 named cities
+// independently, but kept in case it's useful elsewhere / for reference.
 async function gpRunFromAfrica(
   type,
   target,
@@ -261,6 +274,44 @@ async function gpRunFromAfrica(
   }
 
   throw lastErr;
+}
+
+// Runs a measurement scoped to ONE named city. Falls back only to
+// that city's country (never to "Africa" or "world" magic) so a
+// result is never silently mislabeled as coming from a different
+// place than the one requested.
+//
+// Returns the measurement object, or null if no probe was
+// available at all for this city (caller must show that honestly,
+// not substitute a different city's result).
+async function gpRunCity(type, target, cityConfig, measurementOptions) {
+  const attempts = [
+    [{ city: cityConfig.city, limit: 1 }],
+    [{ country: cityConfig.country, limit: 1 }]
+  ];
+
+  for (const locations of attempts) {
+    try {
+      const id = await gpCreateMeasurement(
+        type,
+        target,
+        locations,
+        measurementOptions
+      );
+
+      return await gpPollMeasurement(id);
+
+    } catch (e) {
+      if (!(e.status === 400 || e.status === 422)) {
+        // Not a "no matching probe" error (e.g. network/timeout) —
+        // no point trying the narrower fallback either.
+        return null;
+      }
+      // else: no probe matched, try the next (broader) attempt
+    }
+  }
+
+  return null;
 }
 
 /* ============================================
@@ -304,31 +355,15 @@ function fmtMs(v) {
 }
 
 /* ============================================
-   Metric scoring
-   ============================================
+   Metric scoring — UNCHANGED thresholds.
 
    These are operational diagnostic thresholds,
    not universal internet standards.
 
-   DNS:
-   GOOD             <= 50ms
-   NEEDS ATTENTION  <= 150ms
-   POOR             > 150ms
-
-   TLS:
-   GOOD             <= 100ms
-   NEEDS ATTENTION  <= 250ms
-   POOR             > 250ms
-
-   TTFB:
-   GOOD             <= 150ms
-   NEEDS ATTENTION  <= 300ms
-   POOR             > 300ms
-
-   TOTAL:
-   GOOD             <= 500ms
-   NEEDS ATTENTION  <= 1000ms
-   POOR             > 1000ms
+   DNS:   GOOD <=50ms   ATTENTION <=150ms   POOR >150ms
+   TLS:   GOOD <=100ms  ATTENTION <=250ms   POOR >250ms
+   TTFB:  GOOD <=150ms  ATTENTION <=300ms   POOR >300ms
+   TOTAL: GOOD <=500ms  ATTENTION <=1000ms  POOR >1000ms
    ============================================ */
 
 function metricVerdict(value, goodMax, warningMax) {
@@ -414,6 +449,32 @@ function overallVerdict(metrics) {
   };
 }
 
+// Severity ranking used to pick the "worst" city across the four
+// tested — this drives both the page-level overall verdict and
+// what gets sent to lead capture.
+const VERDICT_SEVERITY = { CRITICAL: 3, WARNING: 2, GOOD: 1, UNKNOWN: 0 };
+
+function pickWorstCity(cityResults) {
+  const available = cityResults.filter(c => c.available);
+
+  if (!available.length) return null;
+
+  return available.reduce((worst, c) => {
+    const worstSeverity = VERDICT_SEVERITY[worst.overall.label] || 0;
+    const citySeverity = VERDICT_SEVERITY[c.overall.label] || 0;
+
+    if (citySeverity > worstSeverity) return c;
+
+    if (citySeverity === worstSeverity) {
+      const worstTotal = (worst.timings && worst.timings.total) || 0;
+      const cityTotal = (c.timings && c.timings.total) || 0;
+      return cityTotal > worstTotal ? c : worst;
+    }
+
+    return worst;
+  });
+}
+
 function metricDisplay(verdict, value) {
   return `
     <span
@@ -471,6 +532,217 @@ function appendRawToggle(body, label, raw) {
 }
 
 /* ============================================
+   Per-city diagnostic
+   ============================================ */
+
+async function runCityDiagnostic(cityConfig, domain) {
+  let httpMeasurement = null;
+  let traceMeasurement = null;
+
+  try {
+    // Run HTTP + traceroute concurrently for this city.
+    [httpMeasurement, traceMeasurement] = await Promise.all([
+      gpRunCity('http', domain, cityConfig, null),
+      gpRunCity('traceroute', domain, cityConfig, null)
+    ]);
+  } catch (e) {
+    return {
+      city: cityConfig,
+      label: cityConfig.label,
+      flag: cityConfig.flag,
+      available: false,
+      reason: e.message || 'Diagnostic failed'
+    };
+  }
+
+  if (!httpMeasurement) {
+    return {
+      city: cityConfig,
+      label: cityConfig.label,
+      flag: cityConfig.flag,
+      available: false,
+      reason: 'No probe currently available'
+    };
+  }
+
+  const httpProbeResult =
+    httpMeasurement.results && httpMeasurement.results[0];
+
+  if (
+    !httpProbeResult ||
+    !httpProbeResult.result ||
+    httpProbeResult.result.status !== 'finished'
+  ) {
+    return {
+      city: cityConfig,
+      label: cityConfig.label,
+      flag: cityConfig.flag,
+      available: false,
+      reason: 'Diagnostic incomplete'
+    };
+  }
+
+  const probe = httpProbeResult.probe || {};
+  const r = httpProbeResult.result;
+  const timings = r.timings || {};
+
+  const probeLocation =
+    [probe.city, probe.country].filter(Boolean).join(', ') ||
+    cityConfig.label;
+
+  let hopCount = null;
+  let pathSummary = null;
+
+  if (traceMeasurement) {
+    const traceProbeResult =
+      traceMeasurement.results && traceMeasurement.results[0];
+
+    const hops =
+      traceProbeResult &&
+      traceProbeResult.result &&
+      traceProbeResult.result.hops;
+
+    if (hops && hops.length) {
+      hopCount = hops.length;
+
+      const named = hops
+        .map(h => h.resolvedHostname || h.resolvedAddress)
+        .filter(Boolean);
+
+      pathSummary = named.length
+        ? `${named[0]} → … → ${named[named.length - 1]}`
+        : `${hopCount} hops (unnamed)`;
+    }
+  }
+
+  const dnsVerdict = metricVerdict(timings.dns, 50, 150);
+  const tlsVerdict = metricVerdict(timings.tls, 100, 250);
+  const ttfbVerdict = metricVerdict(timings.firstByte, 150, 300);
+  const totalVerdict = metricVerdict(timings.total, 500, 1000);
+
+  const overall = overallVerdict([
+    dnsVerdict,
+    tlsVerdict,
+    ttfbVerdict,
+    totalVerdict
+  ]);
+
+  return {
+    city: cityConfig,
+    label: cityConfig.label,
+    flag: cityConfig.flag,
+    available: true,
+    probeLocation,
+    probeNetwork: probe.network,
+    resolvedAddress: r.resolvedAddress,
+    statusCode: r.statusCode,
+    tlsProtocol:
+      (r.tls && (r.tls.protocol || r.tls.version)) ||
+      'n/a (not HTTPS or handshake failed)',
+    timings,
+    hopCount,
+    pathSummary,
+    dnsVerdict,
+    tlsVerdict,
+    ttfbVerdict,
+    totalVerdict,
+    overall,
+    httpMeasurement,
+    traceMeasurement
+  };
+}
+
+function renderCityBlock(c) {
+  if (!c.available) {
+    return `
+      <div style="
+        padding:1rem;
+        border:1px solid var(--border);
+        border-radius:6px;
+        margin-bottom:1rem;
+        opacity:0.7;
+      ">
+        <div style="font-weight:600; margin-bottom:0.3rem;">
+          ${c.flag} ${c.label}
+        </div>
+        <div style="color:var(--text-muted); font-size:0.85rem;">
+          ⚪ No probe currently available for this location.
+        </div>
+      </div>
+    `;
+  }
+
+  return `
+    <div style="
+      padding:1rem;
+      border:1px solid var(--border);
+      border-radius:6px;
+      margin-bottom:1rem;
+    ">
+      <div style="
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        margin-bottom:0.75rem;
+        flex-wrap:wrap;
+        gap:0.5rem;
+      ">
+        <div style="font-weight:600;">
+          ${c.flag} ${c.label}
+        </div>
+        <div style="
+          color:var(--${c.overall.color});
+          font-weight:600;
+          font-size:0.9rem;
+        ">
+          ${c.overall.symbol} ${c.overall.label}
+        </div>
+      </div>
+
+      <div style="
+        font-size:0.75rem;
+        color:var(--text-muted);
+        margin-bottom:0.75rem;
+      ">
+        Probe: ${c.probeLocation}${c.probeNetwork ? ' — ' + c.probeNetwork : ''}
+      </div>
+
+      <div style="
+        display:grid;
+        grid-template-columns:1fr 1fr;
+        gap:0.75rem;
+        font-size:0.9rem;
+      ">
+        <div>DNS: ${metricDisplay(c.dnsVerdict, c.timings.dns)}</div>
+        <div>TLS: ${metricDisplay(c.tlsVerdict, c.timings.tls)}</div>
+        <div>TTFB: ${metricDisplay(c.ttfbVerdict, c.timings.firstByte)}</div>
+        <div>Total: ${metricDisplay(c.totalVerdict, c.timings.total)}</div>
+        ${
+          c.hopCount
+            ? `<div>Hops: <span class="highlight">${c.hopCount}</span></div>`
+            : ''
+        }
+      </div>
+
+      ${
+        c.pathSummary
+          ? `
+            <div style="
+              margin-top:0.5rem;
+              font-size:0.78rem;
+              color:var(--text);
+              opacity:0.85;
+            ">
+              Path: ${c.pathSummary}
+            </div>
+          `
+          : ''
+      }
+    </div>
+  `;
+}
+
+/* ============================================
    Main scan flow
    ============================================ */
 
@@ -520,284 +792,52 @@ async function runScan() {
   const body =
     document.getElementById('scan-body');
 
-  let ttfb = null;
-  let probeLocation = 'unknown';
-
-  /* --------------------------------------------
-     Step 1: HTTP measurement
-     -------------------------------------------- */
-
   appendLine(
     body,
-    'Running a live HTTP diagnostic from a Globalping probe in Nairobi...'
-  );
-
-  let httpMeasurement;
-
-  try {
-    httpMeasurement =
-      await gpRunFromAfrica(
-        'http',
-        domain,
-        null
-      );
-
-  } catch (e) {
-    appendResultLine(
-      body,
-      e.message ||
-        'Could not reach the Globalping API.',
-      'error'
-    );
-
-    if (e.raw) {
-      appendRawToggle(
-        body,
-        'error',
-        e.raw
-      );
-    }
-
-    btn.disabled = false;
-    btn.textContent =
-      'Analyze Another Domain';
-
-    return;
-  }
-
-  const httpProbeResult =
-    httpMeasurement.results &&
-    httpMeasurement.results[0];
-
-  if (
-    !httpProbeResult ||
-    !httpProbeResult.result ||
-    httpProbeResult.result.status !== 'finished'
-  ) {
-    const reason =
-      (
-        httpProbeResult &&
-        httpProbeResult.result &&
-        (
-          httpProbeResult.result.rawOutput ||
-          httpProbeResult.result.status
-        )
-      ) ||
-      'the target did not respond to the probe';
-
-    appendResultLine(
-      body,
-      `Diagnostic incomplete: ${reason}`,
-      'error'
-    );
-
-    appendRawToggle(
-      body,
-      'http',
-      httpMeasurement
-    );
-
-    btn.disabled = false;
-    btn.textContent =
-      'Analyze Another Domain';
-
-    return;
-  }
-
-  const probe =
-    httpProbeResult.probe || {};
-
-  const r =
-    httpProbeResult.result;
-
-  const timings =
-    r.timings || {};
-
-  probeLocation =
-    [probe.city, probe.country]
-      .filter(Boolean)
-      .join(', ') ||
-    'unknown location';
-
-  ttfb = timings.firstByte;
-
-  appendResultLine(
-    body,
-    `Live probe: ${probeLocation}${
-      probe.network
-        ? ' — ' + probe.network
-        : ''
-    }`
-  );
-
-  await sleep(300);
-
-  appendLine(
-    body,
-    'Resolving DNS...'
-  );
-
-  appendResultLine(
-    body,
-    `${r.resolvedAddress || 'unresolved'} (${fmtMs(timings.dns)})`
-  );
-
-  await sleep(300);
-
-  appendLine(
-    body,
-    'Testing TLS handshake...'
-  );
-
-  const tlsProtocol =
-    (
-      r.tls &&
-      (
-        r.tls.protocol ||
-        r.tls.version
-      )
-    ) ||
-    'n/a (not HTTPS or handshake failed)';
-
-  appendResultLine(
-    body,
-    `${tlsProtocol} (${fmtMs(timings.tls)})`
-  );
-
-  await sleep(300);
-
-  appendLine(
-    body,
-    'Measuring TTFB (Time to First Byte)...'
-  );
-
-  appendResultLine(
-    body,
-    `HTTP ${r.statusCode ?? '?'} (${fmtMs(timings.firstByte)})`
+    `Running live diagnostics for ${domain} from 4 African cities via Globalping...`
   );
 
   /* --------------------------------------------
-     Step 2: Traceroute
+     Run all 4 cities. Each appends its own
+     result line as soon as it finishes, so the
+     terminal fills in progressively rather than
+     waiting for the slowest city.
      -------------------------------------------- */
+
+  const cityResults = await Promise.all(
+    AFRICA_PROBE_CITIES.map(cityConfig =>
+      runCityDiagnostic(cityConfig, domain).then(result => {
+        const statusText = result.available
+          ? `${result.overall.symbol} ${result.overall.label}`
+          : `⚪ No probe currently available`;
+
+        appendResultLine(
+          body,
+          `${cityConfig.flag} ${cityConfig.label}: ${statusText}`
+        );
+
+        return result;
+      })
+    )
+  );
 
   await sleep(300);
 
   appendLine(
     body,
-    'Analyzing BGP path (traceroute)...'
-  );
-
-  let hopCount = null;
-  let pathSummary = null;
-  let traceMeasurement = null;
-
-  try {
-    traceMeasurement =
-      await gpRunFromAfrica(
-        'traceroute',
-        domain,
-        null
-      );
-
-    const traceProbeResult =
-      traceMeasurement.results &&
-      traceMeasurement.results[0];
-
-    const hops =
-      traceProbeResult &&
-      traceProbeResult.result &&
-      traceProbeResult.result.hops;
-
-    if (hops && hops.length) {
-      hopCount = hops.length;
-
-      const named =
-        hops
-          .map(
-            h =>
-              h.resolvedHostname ||
-              h.resolvedAddress
-          )
-          .filter(Boolean);
-
-      pathSummary =
-        named.length
-          ? `${named[0]} → … → ${named[named.length - 1]}`
-          : `${hopCount} hops (unnamed)`;
-
-      appendResultLine(
-        body,
-        `${hopCount} hops — ${pathSummary}`
-      );
-
-    } else {
-      appendResultLine(
-        body,
-        'Traceroute did not complete (target may block ICMP).',
-        'warning'
-      );
-    }
-
-  } catch (e) {
-    appendResultLine(
-      body,
-      `Traceroute unavailable: ${e.message}`,
-      'warning'
-    );
-  }
-
-  await sleep(300);
-
-  appendLine(
-    body,
-    'Compiling diagnostic report...'
+    'Compiling multi-city diagnostic report...'
   );
 
   await sleep(300);
 
-  /* --------------------------------------------
-     Step 3: Score individual metrics
-     -------------------------------------------- */
+  const worstCity = pickWorstCity(cityResults);
 
-  const dnsVerdict =
-    metricVerdict(
-      timings.dns,
-      50,
-      150
-    );
+  const pageVerdict = worstCity
+    ? worstCity.overall
+    : { label: 'UNKNOWN', color: 'warning', symbol: '⚪' };
 
-  const tlsVerdict =
-    metricVerdict(
-      timings.tls,
-      100,
-      250
-    );
-
-  const ttfbVerdict =
-    metricVerdict(
-      timings.firstByte,
-      150,
-      300
-    );
-
-  const totalVerdict =
-    metricVerdict(
-      timings.total,
-      500,
-      1000
-    );
-
-  /* --------------------------------------------
-     Step 4: Calculate overall verdict
-     -------------------------------------------- */
-
-  const verdict =
-    overallVerdict([
-      dnsVerdict,
-      tlsVerdict,
-      ttfbVerdict,
-      totalVerdict
-    ]);
+  const availableCount =
+    cityResults.filter(c => c.available).length;
 
   const report =
     document.createElement('div');
@@ -808,13 +848,13 @@ async function runScan() {
     '1px solid var(--border)';
 
   report.innerHTML = `
-    <div style="margin-bottom:1rem;">
+    <div style="margin-bottom:0.5rem;">
       <span style="
-        color:var(--${verdict.color});
+        color:var(--${pageVerdict.color});
         font-weight:600;
         font-size:1.1rem;
       ">
-        ${verdict.symbol} ${verdict.label}
+        ${pageVerdict.symbol} ${pageVerdict.label}
       </span>
 
       <span style="
@@ -822,98 +862,29 @@ async function runScan() {
         font-size:0.8rem;
         margin-left:0.5rem;
       ">
-        measured live from ${probeLocation}
+        worst result across ${availableCount} of ${AFRICA_PROBE_CITIES.length} tested African cities
       </span>
     </div>
 
     <div style="
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:1rem;
-      margin-bottom:1rem;
+      margin-bottom:1.25rem;
+      color:var(--text-muted);
+      font-size:0.85rem;
     ">
-
-      <div>
-        DNS Resolution:
-        ${metricDisplay(
-          dnsVerdict,
-          timings.dns
-        )}
-      </div>
-
-      <div>
-        TLS Handshake:
-        ${metricDisplay(
-          tlsVerdict,
-          timings.tls
-        )}
-      </div>
-
-      <div>
-        TTFB:
-        ${metricDisplay(
-          ttfbVerdict,
-          timings.firstByte
-        )}
-      </div>
-
-      <div>
-        Total:
-        ${metricDisplay(
-          totalVerdict,
-          timings.total
-        )}
-      </div>
-
-      ${
-        hopCount
-          ? `
-            <div>
-              Traceroute Hops:
-              <span class="highlight">
-                ${hopCount}
-              </span>
-            </div>
-          `
-          : ''
-      }
-
+      Live measurements from Nairobi, Lagos, Johannesburg, and Cairo.
+      Each city has its own routing, peering, and IXP situation, so
+      results can vary significantly by region — this is not a
+      single-point estimate for "Africa."
     </div>
 
-    ${
-      pathSummary
-        ? `
-          <div style="
-            color:var(--text);
-            opacity:0.85;
-            margin-bottom:1rem;
-          ">
-            Path: ${pathSummary}
-          </div>
-        `
-        : ''
-    }
-
-    <div style="
-      color:var(--${verdict.color});
-      margin-bottom:1.5rem;
-    ">
-      ${
-        verdict.label === 'CRITICAL'
-          ? 'One or more measured latency components are significantly elevated and may create a poor experience for African users.'
-          : verdict.label === 'WARNING'
-          ? 'The endpoint is responding, but one or more latency components have meaningful room for improvement for African users.'
-          : verdict.label === 'GOOD'
-          ? 'The measured latency profile is currently healthy across the available diagnostic metrics.'
-          : 'The diagnostic did not return enough usable measurements to determine an overall latency status.'
-      }
-    </div>
+    ${cityResults.map(c => renderCityBlock(c)).join('')}
 
     <div style="
       padding:1.25rem;
       background:var(--bg);
       border-radius:6px;
       border:1px solid var(--border);
+      margin-top:1rem;
     ">
 
       <div style="
@@ -1026,19 +997,16 @@ async function runScan() {
 
   body.appendChild(report);
 
-  appendRawToggle(
-    body,
-    'http',
-    httpMeasurement
-  );
-
-  if (traceMeasurement) {
-    appendRawToggle(
-      body,
-      'traceroute',
-      traceMeasurement
-    );
-  }
+  cityResults.forEach(c => {
+    if (c.available) {
+      if (c.httpMeasurement) {
+        appendRawToggle(body, `${c.label} HTTP`, c.httpMeasurement);
+      }
+      if (c.traceMeasurement) {
+        appendRawToggle(body, `${c.label} traceroute`, c.traceMeasurement);
+      }
+    }
+  });
 
   btn.disabled = false;
   btn.textContent =
@@ -1046,6 +1014,17 @@ async function runScan() {
 
   /* --------------------------------------------
      Lead submission
+
+     NOTE: current_latency_ms / estimated_monthly_loss
+     below are still using the same placeholder logic
+     as before (target_latency_ms=65, monthly_requests=
+     1,000,000, loss = ttfb*30) — intentionally left
+     unchanged per "keep the existing lead capture
+     workflow intact." current_latency_ms now reflects
+     the WORST of the 4 cities rather than only Nairobi,
+     which is a real improvement, but the target/
+     monthly_requests/loss fields are still placeholders,
+     same as flagged previously.
      -------------------------------------------- */
 
   const leadForm =
@@ -1085,10 +1064,6 @@ async function runScan() {
         document.getElementById(
           'lead-feedback'
         );
-
-      // ------------------------------------------
-      // Frontend validation
-      // ------------------------------------------
 
       if (companyName.length > 150) {
         feedback.style.color =
@@ -1135,6 +1110,11 @@ async function runScan() {
       feedback.textContent =
         'Securing record to database...';
 
+      const worstTtfb =
+        worstCity && worstCity.timings
+          ? worstCity.timings.firstByte
+          : null;
+
       try {
         const response =
           await fetch(
@@ -1153,13 +1133,12 @@ async function runScan() {
                 contact_email:
                   contactEmail,
 
-                // Honeypot value
                 website:
                   honeypot,
 
                 current_latency_ms:
-                  ttfb != null
-                    ? Math.round(ttfb)
+                  worstTtfb != null
+                    ? Math.round(worstTtfb)
                     : null,
 
                 target_latency_ms:
@@ -1169,8 +1148,8 @@ async function runScan() {
                   1000000,
 
                 estimated_monthly_loss:
-                  ttfb != null
-                    ? Math.round(ttfb) * 30
+                  worstTtfb != null
+                    ? Math.round(worstTtfb) * 30
                     : null
               })
             }
