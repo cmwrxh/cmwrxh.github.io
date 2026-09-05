@@ -482,6 +482,21 @@ module.exports = async function handler(req, res) {
 
     let emailWarning = null;
 
+    // --------------------------------------------------
+    // LEAD PRIORITY
+    // --------------------------------------------------
+
+    let priority = 'Good';
+    let priorityEmoji = '🟢';
+
+    if (latency >= 200) {
+      priority = 'High Latency';
+      priorityEmoji = '🔴';
+    } else if (latency >= 100) {
+      priority = 'Needs Attention';
+      priorityEmoji = '🟡';
+    }
+
     if (resendApiKey && notifyEmail) {
       try {
         const escapeHtml = (value) =>
@@ -517,6 +532,11 @@ module.exports = async function handler(req, res) {
               }`,
               html: `
                 <h2>New Africa Latency Lead</h2>
+
+                <p style="font-size: 18px;">
+                  <strong>Priority:</strong>
+                  ${priorityEmoji} ${priority}
+                </p>
 
                 <p>
                   <strong>Company:</strong>
