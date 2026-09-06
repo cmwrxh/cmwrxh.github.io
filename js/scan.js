@@ -1,18 +1,14 @@
 /* ============================================
    africalatency.dev — scan.js
-   Runs REAL diagnostics via the Globalping API
-   from live probes in Nairobi, Lagos,
-   Johannesburg, and Cairo.
+   Runs REAL diagnostics via the /api/run-diagnostic
+   proxy (which calls Globalping server-side) from
+   live probes in Nairobi, Lagos, Johannesburg,
+   and Cairo.
 
    Lead capture:
    - Sends leads to Vercel /api/submit-lead
    - Includes invisible honeypot anti-bot field
    ============================================ */
-
-const GP_API_BASE = 'https://api.globalping.io/v1';
-
-// Optional Globalping token for higher rate limits.
-const GP_API_TOKEN = '';
 
 // Strict garbage words rejection list
 const garbageWords = [
@@ -130,160 +126,19 @@ function validateDomainInput(v) {
 }
 
 /* ============================================
-   Globalping API helpers
+   Diagnostic proxy call
+
+   Calls our own /api/run-diagnostic endpoint,
+   which holds the Globalping token server-side.
+   Falls back only from city -> that city's
+   country (never to a different city or "world"),
+   so a result is never mislabeled as coming from
+   a place other than the one requested.
+
+   Returns the measurement object, or null if no
+   probe was available at all for this city.
    ============================================ */
 
-async function gpFetch(path, options = {}) {
-  const headers = Object.assign(
-    {
-      'Content-Type': 'application/json',
-      Accept: 'application/json'
-    },
-    options.headers || {}
-  );
-
-  if (GP_API_TOKEN) {
-    headers.Authorization = `Bearer ${GP_API_TOKEN}`;
-  }
-
-  return fetch(
-    GP_API_BASE + path,
-    Object.assign({}, options, { headers })
-  );
-}
-
-async function gpCreateMeasurement(
-  type,
-  target,
-  locations,
-  measurementOptions
-) {
-  const body = {
-    type,
-    target,
-    locations
-  };
-
-  if (measurementOptions) {
-    body.measurementOptions = measurementOptions;
-  }
-
-  const res = await gpFetch('/measurements', {
-    method: 'POST',
-    body: JSON.stringify(body)
-  });
-
-  if (res.status === 202 || res.status === 200) {
-    const data = await res.json();
-    return data.id;
-  }
-
-  const errData = await res.json().catch(() => ({}));
-
-  let message =
-    (errData.error && errData.error.message) ||
-    `Could not start measurement (HTTP ${res.status})`;
-
-  if (errData.error && errData.error.params) {
-    const detail = Object.entries(errData.error.params)
-      .map(([field, msg]) => `${field}: ${msg}`)
-      .join('; ');
-
-    if (detail) {
-      message += ` — ${detail}`;
-    }
-  }
-
-  const err = new Error(message);
-  err.status = res.status;
-  err.raw = errData;
-
-  throw err;
-}
-
-async function gpPollMeasurement(
-  id,
-  { timeoutMs = 25000, intervalMs = 1000 } = {}
-) {
-  const started = Date.now();
-
-  while (Date.now() - started < timeoutMs) {
-    const res = await gpFetch(
-      `/measurements/${id}`,
-      { method: 'GET' }
-    );
-
-    if (!res.ok) {
-      throw new Error(
-        `Could not fetch measurement result (HTTP ${res.status})`
-      );
-    }
-
-    const data = await res.json();
-
-    if (
-      data.status &&
-      data.status !== 'in-progress'
-    ) {
-      return data;
-    }
-
-    await sleep(intervalMs);
-  }
-
-  throw new Error(
-    'Timed out waiting for the probe to respond.'
-  );
-}
-
-// LEGACY: single-probe fallback chain (Nairobi -> KE -> Africa -> world).
-// No longer called from runScan() now that we test 4 named cities
-// independently, but kept in case it's useful elsewhere / for reference.
-async function gpRunFromAfrica(
-  type,
-  target,
-  measurementOptions
-) {
-  const locationAttempts = [
-    [{ city: 'Nairobi', limit: 1 }],
-    [{ country: 'KE', limit: 1 }],
-    [{ magic: 'Africa', limit: 1 }],
-    [{ magic: 'world', limit: 1 }]
-  ];
-
-  let lastErr;
-
-  for (const locations of locationAttempts) {
-    try {
-      const id = await gpCreateMeasurement(
-        type,
-        target,
-        locations,
-        measurementOptions
-      );
-
-      return await gpPollMeasurement(id);
-
-    } catch (e) {
-      lastErr = e;
-
-      if (!(e.status === 400 || e.status === 422)) {
-        throw e;
-      }
-    }
-  }
-
-  throw lastErr;
-}
-
-// Runs a measurement scoped to ONE named city. Falls back only to
-// that city's country (never to "Africa" or "world" magic) so a
-// result is never silently mislabeled as coming from a different
-// place than the one requested.
-//
-// Returns the measurement object, or null if no probe was
-// available at all for this city (caller must show that honestly,
-// not substitute a different city's result).
 async function gpRunCity(type, target, cityConfig, measurementOptions) {
   const attempts = [
     [{ city: cityConfig.city, limit: 1 }],
@@ -292,22 +147,27 @@ async function gpRunCity(type, target, cityConfig, measurementOptions) {
 
   for (const locations of attempts) {
     try {
-      const id = await gpCreateMeasurement(
-        type,
-        target,
-        locations,
-        measurementOptions
-      );
+      const res = await fetch('/api/run-diagnostic', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type, target, locations })
+      });
 
-      return await gpPollMeasurement(id);
+      if (res.ok) {
+        return await res.json();
+      }
 
-    } catch (e) {
-      if (!(e.status === 400 || e.status === 422)) {
-        // Not a "no matching probe" error (e.g. network/timeout) —
-        // no point trying the narrower fallback either.
+      if (res.status !== 400 && res.status !== 422) {
+        // Real failure (server misconfigured, network issue,
+        // timeout, etc.) — no point trying the narrower
+        // fallback either.
         return null;
       }
-      // else: no probe matched, try the next (broader) attempt
+      // else: no probe matched this attempt, try the next
+      // (country-level) fallback
+
+    } catch (e) {
+      return null;
     }
   }
 
@@ -1020,8 +880,8 @@ async function runScan() {
      as before (target_latency_ms=65, monthly_requests=
      1,000,000, loss = ttfb*30) — intentionally left
      unchanged per "keep the existing lead capture
-     workflow intact." current_latency_ms now reflects
-     the WORST of the 4 cities rather than only Nairobi,
+     workflow intact." current_latency_ms reflects the
+     WORST of the 4 cities rather than only Nairobi,
      which is a real improvement, but the target/
      monthly_requests/loss fields are still placeholders,
      same as flagged previously.
