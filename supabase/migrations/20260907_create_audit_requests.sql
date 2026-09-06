@@ -14,7 +14,7 @@ create table if not exists public.audit_requests (
   architecture text,
   symptoms text,
   timeline text,
-  authorization text,
+  "authorization" text,
   status text not null default 'new',
   user_ip text,
   source text not null default 'audit-intake'
