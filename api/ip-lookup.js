@@ -6,7 +6,6 @@ const supabase = createClient(
 );
 
 module.exports = async (req, res) => {
-  // CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -29,30 +28,12 @@ module.exports = async (req, res) => {
     });
   }
 
-  const { data, error } = await supabase
-    .from('ip_ranges')
-    .select(`
-      prefix,
-      asn,
-      network_name,
-      is_mobile,
-      confidence,
-      carriers (
-        name,
-        mcc,
-        mnc
-      ),
-      countries (
-        name,
-        country_code
-      )
-    `)
-    .filter('prefix', 'cs', ip)
-    .order('prefix', { ascending: false })
-    .limit(1);
+  const { data, error } = await supabase.rpc('lookup_ip', {
+    ip_address: ip
+  });
 
   if (error) {
-    console.error(error);
+    console.error('Supabase lookup error:', error);
 
     return res.status(500).json({
       error: 'Database lookup failed'
@@ -62,8 +43,8 @@ module.exports = async (req, res) => {
   if (!data || data.length === 0) {
     return res.status(404).json({
       ip,
-      is_mobile: false,
-      found: false
+      found: false,
+      is_mobile: false
     });
   }
 
@@ -73,14 +54,14 @@ module.exports = async (req, res) => {
     ip,
     mobile: result.is_mobile
       ? {
-          name: result.carriers?.name || null,
-          mcc: result.carriers?.mcc || null,
-          mnc: result.carriers?.mnc || null
+          name: result.carrier_name,
+          mcc: result.mcc,
+          mnc: result.mnc
         }
       : null,
     is_mobile: result.is_mobile,
-    country: result.countries?.name || null,
-    country_code: result.countries?.country_code || null,
+    country: result.country_name,
+    country_code: result.country_code,
     asn: result.asn,
     network: result.network_name,
     confidence: result.confidence
