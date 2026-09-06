@@ -60,6 +60,36 @@ module.exports = async (req, res) => {
     });
   }
 
+  // Rate limit this API endpoint
+  const clientIP =
+    req.headers['x-forwarded-for']?.split(',')[0].trim() ||
+    req.headers['x-real-ip'] ||
+    'unknown';
+
+  const { data: allowed, error: rateLimitError } = await supabase.rpc(
+    'check_rate_limit',
+    {
+      client_ip: clientIP,
+      client_endpoint: '/api/ip-lookup',
+      max_requests: 60
+    }
+  );
+
+  if (rateLimitError) {
+    console.error('Rate limit error:', rateLimitError);
+
+    return res.status(500).json({
+      error: 'Rate limit check failed'
+    });
+  }
+
+  if (!allowed) {
+    return res.status(429).json({
+      error: 'Too many requests',
+      message: 'Rate limit exceeded. Please try again later.'
+    });
+  }
+
   const { data, error } = await supabase.rpc('lookup_ip', {
     ip_address: ip
   });
