@@ -5,6 +5,32 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
+function isValidIPv4(ip) {
+  const parts = ip.split('.');
+
+  if (parts.length !== 4) {
+    return false;
+  }
+
+  return parts.every(part => {
+    if (!/^\d+$/.test(part)) {
+      return false;
+    }
+
+    const number = Number(part);
+
+    return number >= 0 && number <= 255;
+  });
+}
+
+function isValidIPv6(ip) {
+  return /^[0-9a-fA-F:]+$/.test(ip) && ip.includes(':');
+}
+
+function isValidIP(ip) {
+  return isValidIPv4(ip) || isValidIPv6(ip);
+}
+
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
@@ -22,9 +48,15 @@ module.exports = async (req, res) => {
 
   const ip = req.query.ip;
 
-  if (!ip) {
+  if (!ip || typeof ip !== 'string') {
     return res.status(400).json({
       error: 'Missing IP address'
+    });
+  }
+
+  if (!isValidIP(ip)) {
+    return res.status(400).json({
+      error: 'Invalid IP address'
     });
   }
 
@@ -44,6 +76,7 @@ module.exports = async (req, res) => {
     return res.status(404).json({
       ip,
       found: false,
+      mobile: null,
       is_mobile: false
     });
   }
@@ -52,6 +85,7 @@ module.exports = async (req, res) => {
 
   return res.status(200).json({
     ip,
+    found: true,
     mobile: result.is_mobile
       ? {
           name: result.carrier_name,
