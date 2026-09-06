@@ -3,22 +3,22 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>africalatency.dev — Infrastructure Intelligence for Africa</title>
-  <meta name="description" content="African fintech infrastructure optimization. DNS, CDN, BGP, TLS tuning. Reduce API latency by 60-75%.">
-  <meta property="og:title" content="africalatency.dev">
-  <meta property="og:description" content="Infrastructure intelligence for African fintech.">
+  <title>AfricaLatency.dev — Infrastructure Performance & Latency Intelligence for Africa</title>
+  <meta name="description" content="AfricaLatency measures application, API and infrastructure performance across African networks and provides evidence-backed latency remediation plans.">
+  <meta property="og:title" content="AfricaLatency.dev">
+  <meta property="og:description" content="Infrastructure Performance & Latency Intelligence for Africa.">
   <meta property="og:type" content="website">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-
 <nav>
   <div class="nav-inner">
     <a href="index.html" class="nav-brand">africalatency<span>.dev</span></a>
     <ul class="nav-links">
+      <li><a href="services.html">Services</a></li>
       <li><a href="scan.html">Scan</a></li>
+      <li><a href="methodology.html">Methodology</a></li>
       <li><a href="work.html">Work</a></li>
-      <li><a href="labs.html">Labs</a></li>
       <li><a href="about.html">About</a></li>
       <li><a href="contact.html">Contact</a></li>
     </ul>
@@ -26,22 +26,20 @@
 </nav>
 
 <main>
-  <!-- Hero -->
-  <section class="section" style="padding-top: 6rem;">
+  <section class="section hero-section">
     <div class="container">
       <div class="hero-grid">
         <div>
-          <div class="label">African Infrastructure Intelligence</div>
-          <h1 class="hero-title">
-            Your API is 300ms slower in Nairobi than it needs to be.
-          </h1>
+          <div class="label">Infrastructure Performance &amp; Latency Intelligence for Africa</div>
+          <h1 class="hero-title">Is your application actually fast for users in Africa?</h1>
           <p class="subtitle hero-subtitle">
-            African fintechs lose 40% of users at checkout because DNS resolves in London, TLS handshakes across the Atlantic, and BGP routes through congested peering points. We fix it in one week.
+            AfricaLatency measures the real-world performance of your applications, APIs and infrastructure across African networks — so you know exactly where latency comes from and what to fix.
           </p>
           <div class="btn-group">
             <a href="scan.html" class="btn btn-primary">Run a free latency scan →</a>
-            <a href="work.html" class="btn btn-secondary">View benchmarks →</a>
+            <a href="services.html" class="btn btn-secondary">Explore the audit →</a>
           </div>
+          <div class="hero-note">Network · Infrastructure · Application · Database · Edge</div>
         </div>
 
         <div class="terminal hero-terminal">
@@ -49,104 +47,121 @@
             <div class="terminal-dot red"></div>
             <div class="terminal-dot yellow"></div>
             <div class="terminal-dot green"></div>
-            <div class="terminal-title">example diagnostic — mtr --report api.fintech.co.ke</div>
+            <div class="terminal-title">africalatency diagnostic</div>
           </div>
           <div class="terminal-body">
-            <div><span class="prompt">$</span> <span class="command">mtr --report api.fintech.co.ke</span></div>
+            <div><span class="prompt">$</span> <span class="command">africalatency scan api.yourcompany.co.ke</span></div>
             <div class="output" style="margin-top: 1rem;">
-HOST: nairobi&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Loss%&nbsp;&nbsp;Snt&nbsp;&nbsp;&nbsp;Last&nbsp;&nbsp;&nbsp;Avg<br>
-&nbsp;&nbsp;1. 192.168.1.1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0.0%&nbsp;&nbsp;&nbsp;10&nbsp;&nbsp;&nbsp;&nbsp;2.1&nbsp;&nbsp;&nbsp;&nbsp;2.3<br>
-&nbsp;&nbsp;2. 172.29.254.1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0.0%&nbsp;&nbsp;&nbsp;10&nbsp;&nbsp;&nbsp;12.1&nbsp;&nbsp;&nbsp;14.3<br>
-&nbsp;&nbsp;3. 41.222.13.1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0.0%&nbsp;&nbsp;&nbsp;10&nbsp;&nbsp;&nbsp;18.2&nbsp;&nbsp;&nbsp;19.1<br>
-&nbsp;&nbsp;4. 196.223.21.1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0.0%&nbsp;&nbsp;&nbsp;10&nbsp;&nbsp;145.3&nbsp;&nbsp;148.2<br>
-&nbsp;&nbsp;5. 195.66.225.1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0.0%&nbsp;&nbsp;&nbsp;10&nbsp;&nbsp;298.4&nbsp;&nbsp;301.2<br>
-&nbsp;&nbsp;6. 52.93.1.1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0.0%&nbsp;&nbsp;&nbsp;10&nbsp;&nbsp;372.1&nbsp;&nbsp;375.4<br>
-&nbsp;&nbsp;7. origin-us.example.com&nbsp;&nbsp;0.0%&nbsp;&nbsp;&nbsp;10&nbsp;&nbsp;378.2&nbsp;&nbsp;380.1<br>
+Africa probe set<br>
+&nbsp;&nbsp;🇰🇪 Nairobi<br>
+&nbsp;&nbsp;🇳🇬 Lagos<br>
+&nbsp;&nbsp;🇿🇦 Johannesburg<br>
+&nbsp;&nbsp;🇪🇬 Cairo<br>
 <br>
-<span class="error">Average TTFB: 380ms — 90th percentile for African mobile</span><br>
-<br>
-<span class="prompt">$</span> <span class="command">africalatency optimize --target nairobi</span><br>
-<span class="highlight">✓ DNS geo-steering enabled (NBO edge)</span><br>
-<span class="highlight">✓ TLS 1.3 + 0-RTT activated</span><br>
-<span class="highlight">✓ Cloudflare Argo routing configured</span><br>
-<span class="highlight">✓ p99 latency: 380ms → 95ms (-74%)</span>
+Measure → compare → diagnose → recommend → validate
             </div>
+            <div style="margin-top: 1rem;"><span class="highlight">✓ DNS / TCP / TLS / TTFB / total response</span></div>
+            <div><span class="highlight">✓ Country and network comparison</span></div>
+            <div><span class="highlight">✓ Routing and infrastructure review</span></div>
+            <div><span class="highlight">✓ Prioritized remediation roadmap</span></div>
           </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Stats -->
   <section class="section" style="background: var(--bg-elevated);">
     <div class="container">
       <div class="stats">
-        <div class="stat">
-          <span class="stat-value">380→95ms</span>
-          <div class="stat-label">p99 Latency Reduction</div>
-        </div>
-        <div class="stat">
-          <span class="stat-value">-75%</span>
-          <div class="stat-label">TLS Handshake Time</div>
-        </div>
-        <div class="stat">
-          <span class="stat-value">-35%</span>
-          <div class="stat-label">AWS Infrastructure Cost</div>
-        </div>
-        <div class="stat">
-          <span class="stat-value">1 Week</span>
-          <div class="stat-label">From Audit to Production</div>
-        </div>
+        <div class="stat"><span class="stat-value">01</span><div class="stat-label">Measure from Africa</div></div>
+        <div class="stat"><span class="stat-value">02</span><div class="stat-label">Find the bottleneck</div></div>
+        <div class="stat"><span class="stat-value">03</span><div class="stat-label">Prioritize the fix</div></div>
+        <div class="stat"><span class="stat-value">04</span><div class="stat-label">Validate the result</div></div>
       </div>
     </div>
   </section>
 
-  <!-- Three Verticals -->
   <section class="section">
     <div class="container">
-      <h2 style="text-align: center; margin-bottom: 0.5rem;">One Builder, Three Infrastructure Layers</h2>
-      <p style="text-align: center; color: var(--text-muted); max-width: 600px; margin: 0 auto 3rem;">
-        Digital, physical, and ecological infrastructure across East Africa. africalatency.dev is the primary focus — see the full story on the About page.
-      </p>
-
+      <div class="section-heading">
+        <div class="label">What We Audit</div>
+        <h2>We find where your milliseconds are going.</h2>
+        <p class="section-lead">Your users experience the entire path between their device and your infrastructure. We investigate the layers that contribute to that experience.</p>
+      </div>
       <div class="grid">
-        <div class="card card-accent-green">
-          <h3 style="color: var(--accent);">Digital</h3>
-          <p style="font-size: 1.1rem; font-weight: 600; color: var(--text); margin-bottom: 0.5rem;">africalatency.dev</p>
-          <p>DNS, CDN, BGP, and TLS optimization for African fintech APIs. Reduce latency. Cut cloud costs. Keep systems online when the network does not cooperate.</p>
-          <div class="card-meta">Latency audits • Cost optimization • Incident response</div>
-          <a href="work.html" class="card-link">View case studies →</a>
-        </div>
+        <div class="card card-accent-green"><h3>Network Performance</h3><p>Latency, packet loss, jitter, DNS, TCP/TLS timing, routing and connectivity.</p></div>
+        <div class="card card-accent-green"><h3>Infrastructure</h3><p>Cloud regions, compute, storage, load balancers, containers and autoscaling.</p></div>
+        <div class="card card-accent-green"><h3>Application / API</h3><p>API response time, backend processing, concurrency, errors and external calls.</p></div>
+        <div class="card card-accent-blue"><h3>Database</h3><p>Query latency, connections, indexing, replication and read/write distribution.</p></div>
+        <div class="card card-accent-blue"><h3>Edge / CDN</h3><p>DNS, caching, CDN configuration, edge placement and cache behavior.</p></div>
+        <div class="card card-accent-blue"><h3>Africa Readiness</h3><p>Whether your architecture is appropriate for the countries and networks you actually serve.</p></div>
+      </div>
+    </div>
+  </section>
 
-        <div class="card card-accent-orange">
-          <h3 style="color: var(--orange);">Physical</h3>
-          <p style="font-size: 1.1rem; font-weight: 600; color: var(--text); margin-bottom: 0.5rem;">Brilliant Unicorn</p>
-          <p>Qualified solar lead matching for Kenyan businesses. We verify bills, roof size, and intent before an installer ever calls. EPCs pay only for installed systems.</p>
-          <div class="card-meta">Solar matching • Vetted EPCs • Commercial & residential</div>
-          <a href="https://solar.brilliantunicorn.com" class="card-link" style="color: var(--orange);" target="_blank">Visit solar site →</a>
+  <section class="section" style="background: var(--bg-elevated);">
+    <div class="container">
+      <div class="section-heading">
+        <div class="label">Flagship Service</div>
+        <h2>Africa Latency Audit™</h2>
+        <p class="section-lead">Know exactly how your infrastructure performs across Africa.</p>
+      </div>
+      <div class="feature-grid">
+        <div>
+          <p class="large-copy">We test your application from relevant African locations and networks, identify the infrastructure, network or application bottlenecks affecting performance, and give your engineering team a clear plan to fix them.</p>
+          <a href="services.html" class="card-link">See the complete audit scope →</a>
         </div>
-
-        <div class="card card-accent-blue">
-          <h3 style="color: var(--blue);">Ecological</h3>
-          <p style="font-size: 1.1rem; font-weight: 600; color: var(--text); margin-bottom: 0.5rem;">Kudu Stack</p>
-          <p>Edge-AI wildlife telemetry, water scarcity prediction, and immutable carbon compliance ledgers for East African conservancies.</p>
-          <div class="card-meta">Bio-Leap • AquaSense • AlphaCore engine</div>
-          <a href="labs.html" class="card-link" style="color: var(--blue);">Explore Kudu Stack →</a>
+        <div class="card">
+          <h3>You'll receive</h3>
+          <ul class="clean-list">
+            <li>Performance baseline</li>
+            <li>Africa latency map</li>
+            <li>Country / network comparison</li>
+            <li>Root-cause analysis</li>
+            <li>Infrastructure architecture review</li>
+            <li>Prioritized remediation roadmap</li>
+            <li>Post-remediation validation option</li>
+          </ul>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- CTA -->
-  <section class="section" style="text-align: center; background: var(--bg-elevated);">
+  <section class="section">
     <div class="container">
-      <h2 style="margin-bottom: 1rem;">Ready to fix your African latency?</h2>
-      <p style="color: var(--text-muted); max-width: 500px; margin: 0 auto 2rem;">
-        Book a free 15-minute diagnostic call. We will analyze your API's performance from Nairobi, Lagos, and Accra.
-      </p>
-      <div class="btn-group" style="justify-content: center;">
-        <a href="contact.html" class="btn btn-primary">Book a call →</a>
-        <a href="scan.html" class="btn btn-secondary">Try the scanner →</a>
+      <div class="section-heading">
+        <div class="label">The Path We Investigate</div>
+        <h2>Your infrastructure is a chain.</h2>
+      </div>
+      <div class="path-diagram">
+        <span>User</span><b>→</b><span>ISP</span><b>→</b><span>Network</span><b>→</b><span>Routing</span><b>→</b><span>CDN / Edge</span><b>→</b><span>Load Balancer</span><b>→</b><span>Application</span><b>→</b><span>API</span><b>→</b><span>Database</span><b>→</b><span>Third Party</span>
+      </div>
+      <p class="center-note">We do not assume where the problem is. We measure first.</p>
+    </div>
+  </section>
+
+  <section class="section" style="background: var(--bg-elevated);">
+    <div class="container narrow">
+      <div class="section-heading center">
+        <div class="label">Built for Africa</div>
+        <h2>Africa is not one network.</h2>
+        <p class="section-lead">Performance can differ by country, ISP, routing path, cloud region, CDN footprint and infrastructure. Generic global monitoring is not always enough to answer an Africa-specific infrastructure question.</p>
+      </div>
+      <div class="btn-group center-buttons">
+        <a href="methodology.html" class="btn btn-secondary">Read our methodology →</a>
+        <a href="work.html" class="btn btn-secondary">See the report format →</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section cta-section">
+    <div class="container narrow center">
+      <div class="label">Start with evidence</div>
+      <h2>Find out how your application really performs across Africa.</h2>
+      <p class="section-lead">Run the free scanner first. If the results show a meaningful performance problem, turn the evidence into a full Africa Latency Audit™.</p>
+      <div class="btn-group center-buttons">
+        <a href="scan.html" class="btn btn-primary">Try the scanner →</a>
+        <a href="contact.html" class="btn btn-secondary">Request an audit →</a>
       </div>
     </div>
   </section>
@@ -154,17 +169,13 @@ HOST: nairobi&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&
 
 <footer>
   <div class="footer-inner">
-    <div class="footer-left">
-      © 2026 africalatency.dev — Built in Karen, Nairobi
-    </div>
+    <div class="footer-left">© 2026 AfricaLatency.dev — Nairobi, Kenya</div>
     <div class="footer-links">
-      <a href="https://github.com/cmwrxh" target="_blank">GitHub</a>
-      <a href="https://www.linkedin.com/in/charles-mwaura-bb7814140/" target="_blank">LinkedIn</a>
-      <a href="https://brilliantunicorn.com" target="_blank">Brilliant Unicorn</a>
+      <a href="https://github.com/cmwrxh/cmwrxh.github.io" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://www.linkedin.com/in/charles-mwaura-bb7814140/" target="_blank" rel="noopener">LinkedIn</a>
     </div>
   </div>
 </footer>
-
 <script src="js/main.js"></script>
 </body>
 </html>
