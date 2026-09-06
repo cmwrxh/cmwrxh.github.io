@@ -7,7 +7,7 @@ module.exports = async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ success: false, error: 'Method not allowed' });
 
   const supabaseUrl = process.env.SUPABASE_URL;
-  const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY;
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
   const resendApiKey = process.env.RESEND_API_KEY;
   const notifyEmail = process.env.NOTIFY_EMAIL;
   const fromEmail = process.env.RESEND_FROM_EMAIL || 'AfricaLatency.dev <charlie@africalatency.dev>';
@@ -79,7 +79,7 @@ module.exports = async function handler(req, res) {
   if (!dbResponse.ok) return res.status(500).json({ success: false, error: 'Unable to save audit request.' });
 
   if (resendApiKey && notifyEmail) {
-    const esc = value => String(value || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+    const esc = value => String(value || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\"/g, '&quot;').replace(/'/g, '&#039;');
     await fetch('https://api.resend.com/emails', {
       method: 'POST', headers: { Authorization: `Bearer ${resendApiKey}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({ from: fromEmail, to: [notifyEmail], subject: `New audit request: ${company}`, html: `<h2>New AfricaLatency audit request</h2><p><strong>Company:</strong> ${esc(company)}</p><p><strong>Name:</strong> ${esc(name)}</p><p><strong>Email:</strong> ${esc(email)}</p><p><strong>Package:</strong> ${esc(packageName || 'Not specified')}</p><p><strong>Markets:</strong> ${esc(markets)}</p><p><strong>Domain:</strong> ${esc(domain)}</p><p><strong>Timeline:</strong> ${esc(timeline || 'Not specified')}</p><p><strong>Authorization:</strong> ${esc(authorization || 'Not specified')}</p><p><strong>Symptoms:</strong> ${esc(symptoms || 'Not provided')}</p>` })
