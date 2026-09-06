@@ -1,1 +1,205 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Methodology — AfricaLatency.dev</title><meta name="description" content="How AfricaLatency measures network, infrastructure, application, database and edge performance."><link rel="stylesheet" href="css/style.css"></head><body><nav><div class="nav-inner"><a href="index.html" class="nav-brand">africalatency<span>.dev</span></a><ul class="nav-links"><li><a href="services.html">Services</a></li><li><a href="scan.html">Scan</a></li><li><a class="active" href="methodology.html">Methodology</a></li><li><a href="work.html">Work</a></li><li><a href="about.html">About</a></li><li><a href="contact.html">Contact</a></li></ul></div></nav><main><section class="section hero-section"><div class="container narrow"><div class="label">Methodology</div><h1>We do not assume where the problem is. We measure first.</h1><p class="hero-subtitle">A repeatable framework for understanding how applications and infrastructure perform across African networks.</p></div></section><section class="section"><div class="container"><div class="grid"><div class="card"><h3>01 — Discover</h3><p>Understand users, target markets, architecture, endpoints, cloud provider, dependencies and performance objectives.</p></div><div class="card"><h3>02 — Measure</h3><p>Run controlled HTTP/API and network measurements from relevant African vantage points.</p></div><div class="card"><h3>03 — Compare</h3><p>Compare countries, networks, endpoints, regions and time windows.</p></div><div class="card"><h3>04 — Diagnose</h3><p>Correlate measurements with architecture and configuration to identify evidence-backed findings.</p></div><div class="card"><h3>05 — Recommend</h3><p>Prioritize fixes by likely impact, effort, dependencies and risk.</p></div><div class="card"><h3>06 — Validate</h3><p>Repeat the relevant tests after remediation and document the before/after result.</p></div></div></div></section><section class="section" style="background:var(--bg-elevated)"><div class="container narrow"><div class="section-heading"><div class="label">Measurement layers</div><h2>From the user to the database.</h2></div><div class="path-diagram"><span>User</span><b>→</b><span>ISP</span><b>→</b><span>Routing</span><b>→</b><span>CDN / Edge</span><b>→</b><span>Application</span><b>→</b><span>API</span><b>→</b><span>Database</span></div><p class="section-lead" style="margin-top:30px">Depending on the engagement, we examine latency, packet loss, jitter, DNS, TCP/TLS timing, TTFB, total response time, routing, CDN behavior, infrastructure placement, application processing, database performance and third-party dependencies.</p></div></section><section class="section"><div class="container narrow"><h2>How we report results</h2><p class="large-copy">Every audit separates measured facts from hypotheses and recommendations. We document endpoints, test conditions, sampling and limitations so that important findings can be reproduced.</p><div class="card"><h3>Example finding</h3><p><strong style="color:var(--error)">Critical</strong></p><p>A synchronous backend dependency contributes a substantial portion of end-to-end response time for a target market.</p><p><strong>Recommendation:</strong> evaluate caching, asynchronous processing, regional service placement or an alternative dependency architecture.</p><p><strong>Validation:</strong> repeat the same test suite after remediation.</p></div></div></section><section class="section cta-section"><div class="container narrow center"><h2>Start with evidence.</h2><p class="section-lead">Run the free scanner, then request a full Africa Latency Audit™ when you need deeper diagnosis.</p><div class="btn-group center-buttons"><a class="btn btn-primary" href="scan.html">Run the scanner →</a><a class="btn btn-secondary" href="contact.html">Request an audit →</a></div></div></section></main><footer><div class="footer-inner"><div>© 2026 AfricaLatency.dev — Nairobi, Kenya</div><div class="footer-links"><a href="https://github.com/cmwrxh/cmwrxh.github.io" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/charles-mwaura-bb7814140/" target="_blank" rel="noopener">LinkedIn</a></div></div></footer><script src="js/main.js"></script></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Methodology — AfricaLatency.dev</title>
+  <meta name="description" content="How AfricaLatency designs, measures, diagnoses and validates infrastructure performance across African networks.">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="nav-brand">africalatency<span>.dev</span></a>
+    <ul class="nav-links">
+      <li><a href="services.html">Services</a></li>
+      <li><a href="scan.html">Scan</a></li>
+      <li><a class="active" href="methodology.html">Methodology</a></li>
+      <li><a href="work.html">Work</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+  </div>
+</nav>
+
+<main>
+  <section class="section hero-section">
+    <div class="container narrow">
+      <div class="label">Audit Methodology</div>
+      <h1>We do not assume where the problem is. We measure first.</h1>
+      <p class="hero-subtitle">A repeatable, evidence-first framework for understanding how applications, APIs and infrastructure actually perform across African networks.</p>
+      <div class="btn-group">
+        <a class="btn btn-primary" href="scan.html">Run the free scanner →</a>
+        <a class="btn btn-secondary" href="contact.html?service=latency-audit">Request an audit →</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-heading">
+        <div class="label">The framework</div>
+        <h2>Six steps from observation to proof.</h2>
+        <p class="section-lead">Every engagement follows the same core sequence, while the measurements and depth are adapted to the customer's architecture, target markets and performance question.</p>
+      </div>
+      <div class="grid">
+        <div class="card"><h3>01 — Discover</h3><p>Define the business question, target countries, user journeys, critical endpoints, architecture, cloud provider, dependencies and known performance objectives.</p></div>
+        <div class="card"><h3>02 — Measure</h3><p>Run controlled HTTP/API and network measurements from relevant African vantage points. Capture timing, reachability and route evidence under documented conditions.</p></div>
+        <div class="card"><h3>03 — Compare</h3><p>Compare markets, networks, endpoints, infrastructure locations and test windows. Look for meaningful differences rather than assuming geographic proximity equals better performance.</p></div>
+        <div class="card"><h3>04 — Diagnose</h3><p>Connect observed behavior to the architecture. Separate network delay from server processing, database work, third-party dependencies and edge behavior.</p></div>
+        <div class="card"><h3>05 — Recommend</h3><p>Turn findings into a prioritized remediation plan based on likely impact, implementation effort, dependencies, risk and confidence in the evidence.</p></div>
+        <div class="card"><h3>06 — Validate</h3><p>Repeat the relevant measurements after remediation using comparable conditions. Document what changed and whether the measured outcome improved.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" style="background:var(--bg-elevated)">
+    <div class="container">
+      <div class="section-heading">
+        <div class="label">Measurement layers</div>
+        <h2>Trace the path from the user to the dependency.</h2>
+      </div>
+      <div class="path-diagram">
+        <span>User</span><b>→</b><span>ISP</span><b>→</b><span>Network</span><b>→</b><span>Routing</span><b>→</b><span>CDN / Edge</span><b>→</b><span>Load Balancer</span><b>→</b><span>Application</span><b>→</b><span>API</span><b>→</b><span>Database</span><b>→</b><span>Third Party</span>
+      </div>
+      <div class="grid" style="margin-top:40px">
+        <div class="card"><h3>Network</h3><p>Round-trip latency, packet loss, jitter where measurable, route behavior, hop-level RTT and inter-country path differences.</p></div>
+        <div class="card"><h3>Edge</h3><p>CDN behavior, edge coverage, cache behavior and whether requests are reaching an appropriate point of presence.</p></div>
+        <div class="card"><h3>Infrastructure</h3><p>Cloud region, compute placement, load balancing, capacity signals and infrastructure configuration relevant to response time.</p></div>
+        <div class="card"><h3>Application</h3><p>DNS, TCP/TLS timing, TTFB, total response time, API behavior and server-side processing.</p></div>
+        <div class="card"><h3>Database</h3><p>Query latency, connection behavior, data locality and database dependencies when sufficient application evidence is available.</p></div>
+        <div class="card"><h3>Dependencies</h3><p>Third-party APIs, authentication services, payment services and other synchronous dependencies that can add remote round trips.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container narrow">
+      <div class="section-heading">
+        <div class="label">What we measure</div>
+        <h2>Timing is only useful when we know what it represents.</h2>
+      </div>
+      <div class="card">
+        <ul class="clean-list">
+          <li><strong>DNS:</strong> time required to resolve the target when the test exposes DNS timing.</li>
+          <li><strong>TCP / TLS:</strong> connection and secure-handshake timing where available.</li>
+          <li><strong>TTFB:</strong> time until the first response byte, helping separate network and server-side delay from the rest of the transfer.</li>
+          <li><strong>Total response time:</strong> end-to-end HTTP timing observed by the measurement probe.</li>
+          <li><strong>HTTP status and reachability:</strong> whether the endpoint responds successfully and consistently under the test conditions.</li>
+          <li><strong>Route evidence:</strong> traceroute or related path information used to investigate routing and path inflation.</li>
+          <li><strong>Architecture evidence:</strong> customer-provided configuration, logs, traces and diagrams used to connect measurements to root causes.</li>
+        </ul>
+      </div>
+      <p class="section-lead" style="margin-top:24px">No single metric proves a root cause. A finding becomes stronger when independent measurements and architecture evidence point to the same explanation.</p>
+    </div>
+  </section>
+
+  <section class="section" style="background:var(--bg-elevated)">
+    <div class="container">
+      <div class="section-heading">
+        <div class="label">Sampling &amp; interpretation</div>
+        <h2>We distinguish a measurement from a benchmark.</h2>
+      </div>
+      <div class="grid">
+        <div class="card"><h3>Point-in-time observations</h3><p>A single scan is a snapshot. It can show that Nairobi was faster than Lagos during the observation, but it is not a population-wide benchmark or a P50/P95 claim.</p></div>
+        <div class="card"><h3>Repeated measurements</h3><p>For audits that require distributional analysis, measurements are repeated across an agreed window. P50, P95 or P99 are used only when the sample size and test design support those statistics.</p></div>
+        <div class="card"><h3>Conditions matter</h3><p>We record target, probe location, protocol, timestamp, test type and relevant configuration so that results can be interpreted and reproduced.</p></div>
+        <div class="card"><h3>Comparisons need context</h3><p>Country, ISP, cloud region, CDN and time-of-day differences can all change the result. We avoid turning one measurement into a universal statement about a market.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container narrow">
+      <div class="section-heading">
+        <div class="label">Root-cause discipline</div>
+        <h2>Measure the layer before prescribing the fix.</h2>
+      </div>
+      <div class="card">
+        <h3>Example diagnostic chain</h3>
+        <p><strong>Observation:</strong> an African market has materially higher TTFB than another tested market.</p>
+        <p><strong>Next question:</strong> is the additional time coming from the network path, TLS/connection setup, the application, a database operation, or a synchronous third-party dependency?</p>
+        <p><strong>Evidence:</strong> compare network timing, route behavior, response timing and available application traces or logs.</p>
+        <p><strong>Recommendation:</strong> address the highest-confidence bottleneck first — for example, service placement, caching, connection reuse, asynchronous processing or dependency architecture.</p>
+        <p><strong>Validation:</strong> repeat the same relevant test after remediation and compare like with like.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-heading">
+        <div class="label">Africa-specific lens</div>
+        <h2>Africa is not one network.</h2>
+        <p class="section-lead">A deployment that looks fast from one African market can behave very differently elsewhere because of routing, peering, submarine and terrestrial paths, mobile-network conditions, cloud-region placement and CDN reach.</p>
+      </div>
+      <div class="grid">
+        <div class="card card-accent-green"><h3>Inter-country routing</h3><p>Investigate whether traffic takes an unexpectedly long or indirect path between African markets and the service.</p></div>
+        <div class="card card-accent-blue"><h3>Edge &amp; CDN performance</h3><p>Assess whether users are reaching an appropriate edge location and whether caching or routing policy is helping or hurting response time.</p></div>
+        <div class="card card-accent-orange"><h3>Mobile-first reality</h3><p>Where the available measurement environment supports it, consider mobile-network performance separately from fixed or datacenter-based observations.</p></div>
+      </div>
+      <p class="section-lead" style="margin-top:28px">These are investigation lenses, not assumptions. The audit tests them against observed evidence.</p>
+    </div>
+  </section>
+
+  <section class="section" style="background:var(--bg-elevated)">
+    <div class="container narrow">
+      <div class="section-heading">
+        <div class="label">Evidence standards</div>
+        <h2>What we will not claim.</h2>
+      </div>
+      <div class="card">
+        <ul class="clean-list">
+          <li>We do not manufacture measurements when a location or test is unavailable.</li>
+          <li>We do not label a single observation as a P50, P95 or P99 benchmark.</li>
+          <li>We do not claim a particular architecture is faster before measuring the relevant workload and markets.</li>
+          <li>We do not turn an illustrative estimate into a customer result.</li>
+          <li>We do not perform load or stress testing without explicit authorization and an agreed test window.</li>
+          <li>We do not expose customer credentials, private architecture or sensitive measurement data in public reports.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container narrow">
+      <div class="section-heading">
+        <div class="label">Deliverable</div>
+        <h2>From raw measurements to a decision.</h2>
+      </div>
+      <div class="card">
+        <p>The final audit is designed to answer four practical questions:</p>
+        <ol class="clean-list">
+          <li><strong>What is slow?</strong> The measured baseline and market differences.</li>
+          <li><strong>Why is it slow?</strong> Evidence-backed root-cause analysis, with uncertainty called out.</li>
+          <li><strong>What should we fix first?</strong> A prioritized remediation roadmap tied to impact, effort and risk.</li>
+          <li><strong>Did the fix work?</strong> A validation plan and, where commissioned, before/after measurements.</li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <section class="section cta-section">
+    <div class="container narrow center">
+      <h2>Start with evidence.</h2>
+      <p class="section-lead">Use the free scanner for a quick snapshot. When you need deeper diagnosis across your architecture and target markets, request an Africa Latency Audit™.</p>
+      <div class="btn-group center-buttons">
+        <a class="btn btn-primary" href="scan.html">Run the scanner →</a>
+        <a class="btn btn-secondary" href="contact.html?service=latency-audit">Request an audit →</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="footer-inner">
+    <div>© 2026 AfricaLatency.dev — Nairobi, Kenya</div>
+    <div class="footer-links">
+      <a href="https://github.com/cmwrxh/cmwrxh.github.io" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://www.linkedin.com/in/charles-mwaura-bb7814140/" target="_blank" rel="noopener">LinkedIn</a>
+    </div>
+  </div>
+</footer>
+<script src="js/main.js"></script>
+</body>
+</html>
