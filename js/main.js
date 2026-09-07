@@ -1,8 +1,6 @@
 // Shared site interactions
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Keep the menu completely outside normal document flow and make the closed
-  // state non-interactive. These rules also protect pages using older markup.
   const menuStyle = document.createElement('style');
   menuStyle.textContent = `
     .site-menu { position: fixed !important; inset: 0 !important; z-index: 99999 !important; display: block !important; opacity: 0 !important; visibility: hidden !important; pointer-events: none !important; background: #050609 !important; }
@@ -29,10 +27,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const navLinks = nav?.querySelector('.nav-links');
 
     if (nav && navLinks) {
-      const links = Array.from(navLinks.querySelectorAll('a')).map((a) => ({
-        href: a.getAttribute('href'),
-        text: a.textContent.trim()
-      }));
+      const links = [
+        ['/services', 'Services'],
+        ['/scan', 'Scan'],
+        ['/methodology', 'Methodology'],
+        ['/work', 'Work'],
+        ['/about', 'About'],
+        ['/contact', 'Contact'],
+        ['/login', 'Login']
+      ];
 
       const toggle = document.createElement('button');
       toggle.id = 'menu-toggle';
@@ -77,7 +80,7 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>`;
 
       const linkContainer = menu.querySelector('.legacy-menu-links');
-      links.forEach(({ href, text }) => {
+      links.forEach(([href, text]) => {
         const a = document.createElement('a');
         a.href = href;
         a.innerHTML = `<strong>${text}</strong>`;
@@ -95,17 +98,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const close = menu.querySelector('#menu-close');
     if (!close) return;
 
-    const setMenu = (open) => {
-      menu.classList.toggle('open', open);
-      menu.setAttribute('aria-hidden', String(!open));
-      toggle.setAttribute('aria-expanded', String(open));
-      toggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
-      document.body.classList.toggle('menu-open', open);
+    let isOpen = false;
+    const setMenu = (next) => {
+      isOpen = Boolean(next);
+      menu.classList.toggle('open', isOpen);
+      menu.setAttribute('aria-hidden', String(!isOpen));
+      toggle.setAttribute('aria-expanded', String(isOpen));
+      toggle.setAttribute('aria-label', isOpen ? 'Close menu' : 'Open menu');
+      document.body.classList.toggle('menu-open', isOpen);
     };
 
     toggle.addEventListener('click', (event) => {
       event.preventDefault();
-      setMenu(!menu.classList.contains('open'));
+      setMenu(!isOpen);
     });
     close.addEventListener('click', () => setMenu(false));
     menu.addEventListener('click', (event) => {
@@ -119,18 +124,15 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Business-Impact Calculator Logic
   const calcForm = document.getElementById('impact-calculator-form');
   if (calcForm) {
     calcForm.addEventListener('submit', (e) => {
       e.preventDefault();
-
       const domain = document.getElementById('calc-domain').value;
       const latency = parseFloat(document.getElementById('calc-latency').value);
       const traffic = parseInt(document.getElementById('calc-traffic').value);
       const aov = parseFloat(document.getElementById('calc-aov').value);
       const baseConversion = parseFloat(document.getElementById('calc-conversion').value) / 100;
-
       const latencyPenaltyMs = Math.max(0, latency - 150);
       const penaltyFactor = (latencyPenaltyMs / 100) * 0.035;
       const normalTransactions = traffic * baseConversion;
@@ -138,7 +140,6 @@ document.addEventListener('DOMContentLoaded', () => {
       const actualTransactions = traffic * degradedConversion;
       const lostTransactions = normalTransactions - actualTransactions;
       const estimatedMonthlyLoss = lostTransactions * aov;
-
       document.getElementById('res-domain').textContent = domain;
       document.getElementById('loss-output').textContent = `$${estimatedMonthlyLoss.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} lost / month`;
       document.getElementById('breakdown-text').innerHTML = `With <span class="command">${latency}ms</span> latency from Nairobi, conversion suffers a <span class="command">${(penaltyFactor * 100).toFixed(1)}%</span> friction penalty (~${Math.round(lostTransactions)} dropped orders/mo).`;
