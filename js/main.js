@@ -1,6 +1,27 @@
 // Shared site interactions
 
 document.addEventListener('DOMContentLoaded', () => {
+  // Keep the menu completely outside normal document flow and make the closed
+  // state non-interactive. These rules also protect pages using older markup.
+  const menuStyle = document.createElement('style');
+  menuStyle.textContent = `
+    .site-menu { position: fixed !important; inset: 0 !important; z-index: 99999 !important; display: block !important; opacity: 0 !important; visibility: hidden !important; pointer-events: none !important; background: #050609 !important; }
+    .site-menu.open { opacity: 1 !important; visibility: visible !important; pointer-events: auto !important; }
+    .site-menu-inner { position: absolute !important; inset: 0 !important; display: flex !important; flex-direction: column !important; max-width: 100% !important; }
+    .menu-grid { flex: 1 !important; display: flex !important; flex-direction: column !important; justify-content: center !important; align-items: center !important; gap: 8px !important; min-height: 0 !important; overflow-y: auto !important; }
+    .menu-column { width: min(760px, 100%); text-align: center; }
+    .menu-column > a { text-align: center; }
+    .legacy-menu-grid { justify-content: center !important; }
+    .legacy-menu-links { display: flex; flex-direction: column; justify-content: center; align-items: center; }
+    .legacy-menu-links > a { width: 100%; }
+    .legacy-menu-bottom { margin-top: 18px; text-align: center; }
+    .legacy-menu-bottom .menu-label { margin-top: 0; }
+    .site-menu .social-icons { margin-top: 8px; }
+    .site-menu .menu-footer { flex-shrink: 0; }
+    body.menu-open { overflow: hidden !important; }
+  `;
+  document.head.appendChild(menuStyle);
+
   // Legacy pages have an inline nav-links list but no menu button. Convert that
   // navigation into the same full-screen overlay used by the homepage.
   if (!document.getElementById('site-menu')) {
@@ -64,28 +85,44 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       document.body.appendChild(menu);
-
-      const close = menu.querySelector('#menu-close');
-      const setMenu = (open) => {
-        menu.classList.toggle('open', open);
-        menu.setAttribute('aria-hidden', String(!open));
-        toggle.setAttribute('aria-expanded', String(open));
-        toggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
-        document.body.classList.toggle('menu-open', open);
-      };
-
-      toggle.addEventListener('click', () => setMenu(true));
-      close.addEventListener('click', () => setMenu(false));
-      menu.addEventListener('click', (event) => {
-        if (event.target === menu) setMenu(false);
-      });
-      menu.querySelectorAll('a').forEach((a) => {
-        a.addEventListener('click', () => setMenu(false));
-      });
-      document.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape') setMenu(false);
-      });
+      wireMenu(menu, toggle);
     }
+  } else {
+    // Homepage already contains the menu markup; wire it through the same
+    // single toggle function so every page follows identical behavior.
+    const menu = document.getElementById('site-menu');
+    const toggle = document.getElementById('menu-toggle');
+    if (menu && toggle && !toggle.dataset.menuWired) wireMenu(menu, toggle);
+  }
+
+  function wireMenu(menu, toggle) {
+    if (toggle.dataset.menuWired) return;
+    toggle.dataset.menuWired = 'true';
+    const close = menu.querySelector('#menu-close');
+    if (!close) return;
+
+    const setMenu = (open) => {
+      menu.classList.toggle('open', open);
+      menu.setAttribute('aria-hidden', String(!open));
+      toggle.setAttribute('aria-expanded', String(open));
+      toggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+      document.body.classList.toggle('menu-open', open);
+    };
+
+    toggle.addEventListener('click', (event) => {
+      event.preventDefault();
+      setMenu(!menu.classList.contains('open'));
+    });
+    close.addEventListener('click', () => setMenu(false));
+    menu.addEventListener('click', (event) => {
+      if (event.target === menu) setMenu(false);
+    });
+    menu.querySelectorAll('a').forEach((a) => {
+      a.addEventListener('click', () => setMenu(false));
+    });
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') setMenu(false);
+    });
   }
 
   // Business-Impact Calculator Logic
