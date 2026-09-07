@@ -11,12 +11,15 @@ document.addEventListener('DOMContentLoaded', () => {
     .menu-column > a { text-align: center; }
     .legacy-menu-grid { justify-content: center !important; }
     .legacy-menu-links { display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 0 !important; }
-    .legacy-menu-links > a { width: 100%; padding: 0 !important; color: #fff !important; font: 500 1.18rem/1.25 Inter, sans-serif !important; letter-spacing: 0 !important; }
+    .legacy-menu-links > a { width: 100%; padding: 0 0 1.3rem !important; color: #fff !important; font: 500 1.18rem/1.25 Inter, sans-serif !important; letter-spacing: 0 !important; }
+    .legacy-menu-links > a:last-child { padding-bottom: 0 !important; }
     .legacy-menu-links > a strong { font: inherit !important; font-weight: 500 !important; }
     .legacy-menu-bottom { margin-top: 18px; text-align: center; }
     .legacy-menu-bottom .menu-label { margin-top: 0; }
     .site-menu .social-icons { margin-top: 8px; }
     .site-menu .menu-footer { flex-shrink: 0; }
+    .site-menu .menu-footer .btn-primary { order: 1; }
+    .site-menu .menu-footer .btn-secondary { order: 2; }
     body.menu-open { overflow: hidden !important; }
   `;
   document.head.appendChild(menuStyle);
@@ -77,8 +80,8 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
           </div>
           <div class="menu-footer">
-            <a class="btn btn-secondary" href="/login">Log in</a>
-            <a class="btn btn-primary" href="/contact">Contact us</a>
+            <a class="btn btn-primary" href="/scan">Run a free scan</a>
+            <a class="btn btn-secondary" href="/contact">Contact Us</a>
           </div>
         </div>`;
 
