@@ -1,8 +1,7 @@
 {
   "build": {
     "env": {
-      "SUPABASE_URL": "sb_publishable_dGaR1jgofny7tGVWh0TK2w_haSVNyWv",
-      "SUPABASE_SERVICE_ROLE_KEY": ""
+      "SUPABASE_URL": "sb_publishable_dGaR1jgofny7tGVWh0TK2w_haSVNyWv"
     }
   }
 }
