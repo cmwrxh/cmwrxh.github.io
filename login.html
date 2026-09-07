@@ -1,273 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Login | AfricaLatency</title>
-
-    <meta
-        name="description"
-        content="Sign in to your AfricaLatency infrastructure performance dashboard."
-    >
-
-    <style>
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            margin: 0;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 24px;
-            background: #f6f8fb;
-            color: #172033;
-            font-family:
-                Inter,
-                -apple-system,
-                BlinkMacSystemFont,
-                "Segoe UI",
-                sans-serif;
-        }
-
-        .login-container {
-            width: 100%;
-            max-width: 420px;
-        }
-
-        .brand {
-            text-align: center;
-            margin-bottom: 28px;
-        }
-
-        .brand h1 {
-            margin: 0;
-            font-size: 30px;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-        }
-
-        .brand p {
-            margin: 8px 0 0;
-            color: #667085;
-            font-size: 15px;
-        }
-
-        .card {
-            background: #ffffff;
-            border: 1px solid #e4e7ec;
-            border-radius: 14px;
-            padding: 32px;
-            box-shadow: 0 8px 30px rgba(16, 24, 40, 0.06);
-        }
-
-        .card h2 {
-            margin: 0 0 6px;
-            font-size: 22px;
-        }
-
-        .card-description {
-            margin: 0 0 24px;
-            color: #667085;
-            font-size: 14px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 7px;
-            font-size: 14px;
-            font-weight: 600;
-        }
-
-        input {
-            width: 100%;
-            padding: 12px 13px;
-            border: 1px solid #d0d5dd;
-            border-radius: 8px;
-            font-size: 15px;
-            outline: none;
-            transition: border-color 0.15s, box-shadow 0.15s;
-        }
-
-        input:focus {
-            border-color: #667085;
-            box-shadow: 0 0 0 3px rgba(102, 112, 133, 0.12);
-        }
-
-        .field {
-            margin-bottom: 18px;
-        }
-
-        button {
-            width: 100%;
-            border: 0;
-            border-radius: 8px;
-            padding: 13px 16px;
-            background: #172033;
-            color: #ffffff;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        button:hover {
-            opacity: 0.92;
-        }
-
-        button:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        .message {
-            display: none;
-            margin-top: 16px;
-            padding: 11px 13px;
-            border-radius: 8px;
-            font-size: 14px;
-            line-height: 1.4;
-        }
-
-        .message.error {
-            display: block;
-            background: #fef3f2;
-            color: #b42318;
-            border: 1px solid #fecdca;
-        }
-
-        .message.success {
-            display: block;
-            background: #ecfdf3;
-            color: #027a48;
-            border: 1px solid #abefc6;
-        }
-
-        .footer {
-            text-align: center;
-            margin-top: 18px;
-            color: #98a2b3;
-            font-size: 12px;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Client Login — AfricaLatency.dev</title>
+<meta name="description" content="Sign in to your AfricaLatency infrastructure performance dashboard.">
+<link rel="stylesheet" href="css/style.css">
 </head>
-
 <body>
-
-<div class="login-container">
-
-    <div class="brand">
-        <h1>AfricaLatency</h1>
-        <p>Infrastructure Performance Intelligence</p>
-    </div>
-
-    <div class="card">
-
-        <h2>Sign in</h2>
-
-        <p class="card-description">
-            Access your infrastructure performance dashboard.
-        </p>
-
-        <form id="login-form">
-
-            <div class="field">
-                <label for="email">Email</label>
-
-                <input
-                    id="email"
-                    name="email"
-                    type="email"
-                    autocomplete="email"
-                    required
-                >
-            </div>
-
-            <div class="field">
-                <label for="password">Password</label>
-
-                <input
-                    id="password"
-                    name="password"
-                    type="password"
-                    autocomplete="current-password"
-                    required
-                >
-            </div>
-
-            <button id="login-button" type="submit">
-                Sign in
-            </button>
-
-        </form>
-
-        <div id="message" class="message"></div>
-
-    </div>
-
-    <div class="footer">
-        © AfricaLatency
-    </div>
-
-</div>
-
+<nav><div class="nav-inner"><a href="index.html" class="nav-brand">africalatency<span>.dev</span></a><ul class="nav-links"><li><a href="services.html">Services</a></li><li><a href="scan.html">Scan</a></li><li><a href="methodology.html">Methodology</a></li><li><a href="work.html">Work</a></li><li><a href="about.html">About</a></li><li><a href="contact.html">Contact</a></li><li class="nav-login"><a class="active" href="login.html">Client Login</a></li></ul></div></nav>
+<main>
+<section class="section hero-section compact-hero"><div class="container narrow"><div class="label">Customer access</div><div class="card" style="max-width:520px;margin:0 auto;padding:30px;">
+<h1 style="font-size:2rem;letter-spacing:-.03em;">Client Login</h1>
+<p class="hero-subtitle" style="margin:12px 0 24px;">Sign in to access your AfricaLatency performance dashboard.</p>
+<form id="login-form">
+<label class="label" for="email">Email</label>
+<input class="form-input" id="email" type="email" autocomplete="email" required>
+<label class="label" for="password" style="display:block;margin-top:16px;">Password</label>
+<input class="form-input" id="password" type="password" autocomplete="current-password" required>
+<button class="btn btn-primary" type="submit" style="width:100%;margin-top:20px;">Sign in →</button>
+<div id="login-status" role="status" aria-live="polite" style="margin-top:14px;color:var(--text-muted);font-size:.78rem;"></div>
+</form>
+<div style="margin-top:22px;padding-top:18px;border-top:1px solid var(--border);font-size:.75rem;color:var(--text-dim);">Need access? <a href="contact.html">Contact us</a> to discuss an audit or customer account.</div>
+</div></div></section>
+</main>
+<footer><div class="footer-inner"><div>© 2026 AfricaLatency.dev — Nairobi, Kenya</div><div class="footer-links"><a href="https://github.com/cmwrxh/cmwrxh.github.io" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/charles-mwaura-bb7814140/" target="_blank" rel="noopener">LinkedIn</a></div></div></footer>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <script>
-    const SUPABASE_URL = 'https://uzihwtxffklisczqvurf.supabase.co';
-    const SUPABASE_ANON_KEY = 'sb_publishable_dGaR1jgofny7tGVWh0TK2w_haSVNyWv';
-
-    const { createClient } = supabase;
-
-    const client = createClient(
-        SUPABASE_URL,
-        SUPABASE_ANON_KEY
-    );
-
-    const form = document.getElementById('login-form');
-    const button = document.getElementById('login-button');
-    const message = document.getElementById('message');
-
-    function showMessage(text, type) {
-        message.textContent = text;
-        message.className = 'message ' + type;
-    }
-
-    form.addEventListener('submit', async function (event) {
-        event.preventDefault();
-
-        const email = document.getElementById('email').value.trim();
-        const password = document.getElementById('password').value;
-
-        button.disabled = true;
-        button.textContent = 'Signing in...';
-        message.className = 'message';
-
-        const { error } = await client.auth.signInWithPassword({
-            email,
-            password
-        });
-
-        if (error) {
-            console.error('[login]', error);
-
-            showMessage(
-                'Unable to sign in. Please check your email and password.',
-                'error'
-            );
-
-            button.disabled = false;
-            button.textContent = 'Sign in';
-            return;
-        }
-
-        showMessage('Signed in successfully. Redirecting...', 'success');
-
-        window.location.href = '/dashboard.html';
-    });
+const SUPABASE_URL='https://uzihwtxffklisczqvurf.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY='sb_publishable_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx';
+const supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
+const form=document.getElementById('login-form');
+const status=document.getElementById('login-status');
+form.addEventListener('submit',async(e)=>{e.preventDefault();status.textContent='Signing in…';const email=document.getElementById('email').value.trim();const password=document.getElementById('password').value;const{error}=await supabaseClient.auth.signInWithPassword({email,password});if(error){status.textContent=error.message;return}window.location.href='dashboard.html';});
 </script>
-
 </body>
 </html>
