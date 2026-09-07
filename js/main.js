@@ -10,8 +10,9 @@ document.addEventListener('DOMContentLoaded', () => {
     .menu-column { width: min(760px, 100%); text-align: center; }
     .menu-column > a { text-align: center; }
     .legacy-menu-grid { justify-content: center !important; }
-    .legacy-menu-links { display: flex; flex-direction: column; justify-content: center; align-items: center; }
-    .legacy-menu-links > a { width: 100%; }
+    .legacy-menu-links { display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 0 !important; }
+    .legacy-menu-links > a { width: 100%; padding: 0 !important; color: #fff !important; font: 500 1.18rem/1.25 Inter, sans-serif !important; letter-spacing: 0 !important; }
+    .legacy-menu-links > a strong { font: inherit !important; font-weight: 500 !important; }
     .legacy-menu-bottom { margin-top: 18px; text-align: center; }
     .legacy-menu-bottom .menu-label { margin-top: 0; }
     .site-menu .social-icons { margin-top: 8px; }
@@ -29,11 +30,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (nav && navLinks) {
       const links = [
         ['/services', 'Services'],
-        ['/scan', 'Scan'],
+        ['/scan', 'Free Scan'],
         ['/methodology', 'Methodology'],
-        ['/work', 'Work'],
-        ['/about', 'About'],
-        ['/contact', 'Contact'],
+        ['/cases', 'Cases'],
+        ['/about', 'About us'],
+        ['/blog', 'Blog'],
+        ['/help-centre', 'Help centre'],
+        ['/contact', 'Contact Us'],
         ['/login', 'Login']
       ];
 
@@ -83,7 +86,7 @@ document.addEventListener('DOMContentLoaded', () => {
       links.forEach(([href, text]) => {
         const a = document.createElement('a');
         a.href = href;
-        a.innerHTML = `<strong>${text}</strong>`;
+        a.textContent = text;
         linkContainer.appendChild(a);
       });
 
