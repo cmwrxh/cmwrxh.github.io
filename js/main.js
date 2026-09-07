@@ -87,12 +87,6 @@ document.addEventListener('DOMContentLoaded', () => {
       document.body.appendChild(menu);
       wireMenu(menu, toggle);
     }
-  } else {
-    // Homepage already contains the menu markup; wire it through the same
-    // single toggle function so every page follows identical behavior.
-    const menu = document.getElementById('site-menu');
-    const toggle = document.getElementById('menu-toggle');
-    if (menu && toggle && !toggle.dataset.menuWired) wireMenu(menu, toggle);
   }
 
   function wireMenu(menu, toggle) {
