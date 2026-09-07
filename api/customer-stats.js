@@ -20,8 +20,8 @@ function percentile(values, p) {
   }
 
   const sorted = [...values].sort((a, b) => a - b);
-
   const index = (sorted.length - 1) * p;
+
   const lower = Math.floor(index);
   const upper = Math.ceil(index);
 
@@ -62,8 +62,15 @@ function groupValue(row, group) {
     case 'country':
       return row.country || 'Unknown';
 
+    /*
+     * rum_events does not contain a "network" column.
+     *
+     * For the customer dashboard, ISP/provider is
+     * currently the closest available network-level
+     * grouping in the stored RUM event.
+     */
     case 'network':
-      return row.network || 'Unknown';
+      return row.isp || 'Unknown';
 
     case 'isp':
       return row.isp || 'Unknown';
@@ -84,6 +91,9 @@ function groupValue(row, group) {
 
 module.exports = async function handler(req, res) {
   try {
+    /*
+     * Verify server configuration.
+     */
     if (!supabaseUrl || !supabaseSecretKey) {
       console.error(
         '[customer-stats] Missing Supabase environment variables'
@@ -94,6 +104,9 @@ module.exports = async function handler(req, res) {
       });
     }
 
+    /*
+     * Only GET is supported.
+     */
     if (req.method !== 'GET') {
       res.setHeader('Allow', 'GET');
 
@@ -102,6 +115,9 @@ module.exports = async function handler(req, res) {
       });
     }
 
+    /*
+     * Read customer access token.
+     */
     const authHeader =
       typeof req.headers.authorization === 'string'
         ? req.headers.authorization
@@ -113,9 +129,8 @@ module.exports = async function handler(req, res) {
       });
     }
 
-    const accessToken = authHeader
-      .slice(7)
-      .trim();
+    const accessToken =
+      authHeader.slice(7).trim();
 
     if (!accessToken) {
       return res.status(401).json({
@@ -123,6 +138,12 @@ module.exports = async function handler(req, res) {
       });
     }
 
+    /*
+     * Create trusted server-side Supabase client.
+     *
+     * The secret/service-role key never reaches
+     * the customer's browser.
+     */
     const supabase = createClient(
       supabaseUrl,
       supabaseSecretKey,
@@ -135,7 +156,7 @@ module.exports = async function handler(req, res) {
     );
 
     /*
-     * Verify the customer's Supabase access token.
+     * Verify the customer's Supabase Auth token.
      */
     const {
       data: userData,
@@ -157,9 +178,11 @@ module.exports = async function handler(req, res) {
 
     const userId = userData.user.id;
 
-    const siteKey = queryValue(
-      req.query.site
-    ).trim();
+    /*
+     * Read site key.
+     */
+    const siteKey =
+      queryValue(req.query.site).trim();
 
     if (
       siteKey.length < 8 ||
@@ -170,6 +193,9 @@ module.exports = async function handler(req, res) {
       });
     }
 
+    /*
+     * Read statistics period.
+     */
     const rawDays = Number.parseInt(
       queryValue(req.query.days),
       10
@@ -179,6 +205,9 @@ module.exports = async function handler(req, res) {
       ? Math.min(90, Math.max(1, rawDays))
       : 7;
 
+    /*
+     * Approved grouping dimensions.
+     */
     const allowedGroups = [
       'country',
       'network',
@@ -197,7 +226,8 @@ module.exports = async function handler(req, res) {
         : 'country';
 
     /*
-     * Verify ownership using the server-side client.
+     * Verify that the authenticated customer
+     * owns the requested monitoring site.
      */
     const {
       data: site,
@@ -227,16 +257,23 @@ module.exports = async function handler(req, res) {
     }
 
     /*
-     * Query the events directly.
-     *
-     * We deliberately do NOT call rum_stats().
+     * Calculate the beginning of the requested
+     * statistics period.
      */
     const since =
       new Date(
         Date.now() -
-        days * 24 * 60 * 60 * 1000
+          days * 24 * 60 * 60 * 1000
       ).toISOString();
 
+    /*
+     * Read only columns that actually exist
+     * in rum_events.
+     *
+     * IMPORTANT:
+     * There is intentionally NO "network"
+     * column here.
+     */
     const {
       data: events,
       error: eventsError
@@ -245,7 +282,6 @@ module.exports = async function handler(req, res) {
       .select(
         [
           'country',
-          'network',
           'isp',
           'page_url',
           'device_type',
@@ -300,7 +336,7 @@ module.exports = async function handler(req, res) {
     }
 
     /*
-     * Build segment statistics.
+     * Build statistics for each segment.
      */
     const segments = [];
 
@@ -384,6 +420,10 @@ module.exports = async function handler(req, res) {
       (a, b) => b.n - a.n
     );
 
+    /*
+     * Return the exact structure expected
+     * by dashboard.html.
+     */
     return res.status(200).json({
       site: site.name,
       days,
