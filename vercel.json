@@ -10,7 +10,12 @@
     { "source": "/audit-report.html", "destination": "/audit-report", "permanent": true },
     { "source": "/labs.html", "destination": "/labs", "permanent": true },
     { "source": "/login.html", "destination": "/login", "permanent": true },
-    { "source": "/dashboard.html", "destination": "/dashboard", "permanent": true }
+    { "source": "/dashboard.html", "destination": "/dashboard", "permanent": true },
+    { "source": "/cases.html", "destination": "/cases", "permanent": true },
+    { "source": "/terms-of-service.html", "destination": "/terms-of-service", "permanent": true },
+    { "source": "/service-level-agreement.html", "destination": "/service-level-agreement", "permanent": true },
+    { "source": "/acceptable-use-policy.html", "destination": "/acceptable-use-policy", "permanent": true },
+    { "source": "/refund-policy.html", "destination": "/refund-policy", "permanent": true }
   ],
   "rewrites": [
     { "source": "/about", "destination": "/about.html" },
@@ -23,6 +28,11 @@
     { "source": "/audit-report", "destination": "/audit-report.html" },
     { "source": "/labs", "destination": "/labs.html" },
     { "source": "/login", "destination": "/login.html" },
-    { "source": "/dashboard", "destination": "/dashboard.html" }
+    { "source": "/dashboard", "destination": "/dashboard.html" },
+    { "source": "/cases", "destination": "/cases.html" },
+    { "source": "/terms-of-service", "destination": "/terms-of-service.html" },
+    { "source": "/service-level-agreement", "destination": "/service-level-agreement.html" },
+    { "source": "/acceptable-use-policy", "destination": "/acceptable-use-policy.html" },
+    { "source": "/refund-policy", "destination": "/refund-policy.html" }
   ]
 }
