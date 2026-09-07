@@ -120,7 +120,9 @@ document.addEventListener('DOMContentLoaded', () => {
       if (event.target === menu) setMenu(false);
     });
     menu.querySelectorAll('a').forEach((a) => {
-      a.addEventListener('click', () => setMenu(false));
+      a.addEventListener('click', () => {
+        setTimeout(() => setMenu(false), 0);
+      });
     });
     document.addEventListener('keydown', (event) => {
       if (event.key === 'Escape') setMenu(false);
