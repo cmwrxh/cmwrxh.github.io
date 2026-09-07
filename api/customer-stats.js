@@ -1,21 +1,5 @@
 ```js
-// /api/customer-stats.js
-// AfricaLatency customer-authenticated RUM statistics endpoint.
-//
-// Customer authentication:
-//   Authorization: Bearer <Supabase access token>
-//
-// Security model:
-//   1. Verify the Supabase Auth access token.
-//   2. Verify the authenticated user owns the requested site.
-//   3. Call the protected rum_stats() RPC using the server-side secret key.
-//
-// Required Vercel environment variables:
-//   SUPABASE_URL
-//   SUPABASE_SECRET_KEY
-//   OR SUPABASE_SERVICE_ROLE_KEY
-
-const { createClient } = require('@supabase/supabase-js');
+import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = process.env.SUPABASE_URL;
 
@@ -23,24 +7,46 @@ const supabaseSecretKey =
   process.env.SUPABASE_SECRET_KEY ||
   process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-if (!supabaseUrl || !supabaseSecretKey) {
-  throw new Error(
-    'Missing required Supabase server environment variables.'
-  );
+function getQueryValue(value) {
+  if (Array.isArray(value)) {
+    return value[0] || '';
+  }
+
+  return typeof value === 'string'
+    ? value
+    : '';
 }
 
-const supabase = createClient(
-  supabaseUrl,
-  supabaseSecretKey,
-  {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false
-    }
-  }
-);
+export default async function handler(req, res) {
+  /*
+   * Verify server configuration.
+   */
+  if (!supabaseUrl || !supabaseSecretKey) {
+    console.error(
+      '[customer-stats] Missing Supabase server environment variables.'
+    );
 
-module.exports = async (req, res) => {
+    return res.status(500).json({
+      error: 'Server configuration error'
+    });
+  }
+
+  /*
+   * Create the trusted server-side Supabase client.
+   *
+   * This key must never be exposed to the browser.
+   */
+  const supabase = createClient(
+    supabaseUrl,
+    supabaseSecretKey,
+    {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false
+      }
+    }
+  );
+
   /*
    * Only GET requests are supported.
    */
@@ -66,7 +72,9 @@ module.exports = async (req, res) => {
     });
   }
 
-  const accessToken = authHeader.slice(7).trim();
+  const accessToken = authHeader
+    .slice(7)
+    .trim();
 
   if (!accessToken) {
     return res.status(401).json({
@@ -75,7 +83,7 @@ module.exports = async (req, res) => {
   }
 
   /*
-   * Verify the access token with Supabase Auth.
+   * Verify the Supabase Auth access token.
    */
   const {
     data: { user },
@@ -96,10 +104,9 @@ module.exports = async (req, res) => {
   /*
    * Read and validate the requested site key.
    */
-  const siteKey =
-    typeof req.query.site === 'string'
-      ? req.query.site.trim()
-      : '';
+  const siteKey = getQueryValue(
+    req.query.site
+  ).trim();
 
   if (siteKey.length < 8 || siteKey.length > 128) {
     return res.status(400).json({
@@ -110,17 +117,18 @@ module.exports = async (req, res) => {
   /*
    * Read and constrain the requested time period.
    */
-  const rawDays =
-    typeof req.query.days === 'string'
-      ? Number.parseInt(req.query.days, 10)
-      : 7;
+  const rawDays = Number.parseInt(
+    getQueryValue(req.query.days),
+    10
+  );
 
   const days = Number.isFinite(rawDays)
     ? Math.min(90, Math.max(1, rawDays))
     : 7;
 
   /*
-   * Only these aggregation dimensions are permitted.
+   * Only approved aggregation dimensions
+   * may be passed to rum_stats().
    */
   const allowedGroups = [
     'country',
@@ -132,19 +140,17 @@ module.exports = async (req, res) => {
   ];
 
   const requestedGroup =
-    typeof req.query.group === 'string'
-      ? req.query.group
-      : 'country';
+    getQueryValue(req.query.group);
 
-  const group = allowedGroups.includes(requestedGroup)
+  const group = allowedGroups.includes(
+    requestedGroup
+  )
     ? requestedGroup
     : 'country';
 
   /*
-   * Verify that this authenticated customer owns the requested site.
-   *
-   * The server-side Supabase client uses the secret/service-role key,
-   * so this ownership check is enforced explicitly here.
+   * Verify that the authenticated customer
+   * owns the requested monitoring site.
    */
   const {
     data: site,
@@ -176,9 +182,8 @@ module.exports = async (req, res) => {
   /*
    * Call the protected RUM statistics RPC.
    *
-   * rum_stats() is restricted to trusted server-side roles.
-   * Customers never receive the secret key and never call this RPC
-   * directly from the browser.
+   * The RPC is restricted to trusted server-side
+   * roles, so customers cannot call it directly.
    */
   const {
     data,
@@ -208,8 +213,8 @@ module.exports = async (req, res) => {
     : [];
 
   /*
-   * Calculate the total number of events represented by the
-   * returned segments.
+   * Calculate the number of events represented
+   * by the returned segments.
    */
   const totalEvents = rows.reduce(
     (total, row) =>
@@ -218,7 +223,7 @@ module.exports = async (req, res) => {
   );
 
   /*
-   * Return only customer-safe aggregated statistics.
+   * Return customer-safe aggregated statistics.
    */
   return res.status(200).json({
     site: site.name,
@@ -227,5 +232,5 @@ module.exports = async (req, res) => {
     total_events: totalEvents,
     segments: rows
   });
-};
+}
 ```
