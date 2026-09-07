@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Dashboard | AfricaLatency</title>
+
+    <meta
+        name="description"
+        content="AfricaLatency infrastructure performance dashboard."
+    >
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #f6f8fb;
+            --card: #ffffff;
+            --border: #e4e7ec;
+            --text: #172033;
+            --muted: #667085;
+            --soft: #f9fafb;
+            --success: #027a48;
+            --success-bg: #ecfdf3;
+            --danger: #b42318;
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--text);
+            font-family:
+                Inter,
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                sans-serif;
+        }
+
+        header {
+            background: #ffffff;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .header-inner {
+            width: min(1180px, calc(100% - 40px));
+            margin: 0 auto;
+            min-height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .brand {
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        #user-email {
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        #logout-button {
+            border: 1px solid var(--border);
+            background: #ffffff;
+            color: var(--text);
+            border-radius: 8px;
+            padding: 9px 13px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        #logout-button:hover {
+            background: var(--soft);
+        }
+
+        main {
+            width: min(1180px, calc(100% - 40px));
+            margin: 0 auto;
+            padding: 40px 0 60px;
+        }
+
+        .page-heading {
+            margin-bottom: 28px;
+        }
+
+        .page-heading h1 {
+            margin: 0;
+            font-size: 30px;
+            letter-spacing: -0.6px;
+        }
+
+        .page-heading p {
+            margin: 8px 0 0;
+            color: var(--muted);
+            font-size: 15px;
+        }
+
+        .toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 22px;
+        }
+
+        .toolbar-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        select,
+        button {
+            font: inherit;
+        }
+
+        select {
+            border: 1px solid var(--border);
+            background: #ffffff;
+            color: var(--text);
+            border-radius: 8px;
+            padding: 9px 12px;
+            font-size: 14px;
+        }
+
+        .site-name {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .status {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            color: var(--success);
+            background: var(--success-bg);
+            border-radius: 999px;
+            padding: 6px 10px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 16px;
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 22px;
+        }
+
+        .metric-label {
+            color: var(--muted);
+            font-size: 13px;
+            margin-bottom: 10px;
+        }
+
+        .metric-value {
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .metric-unit {
+            color: var(--muted);
+            font-size: 13px;
+            margin-left: 4px;
+            font-weight: 400;
+        }
+
+        .section {
+            margin-top: 26px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .section-header h2 {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 760px;
+        }
+
+        th,
+        td {
+            padding: 13px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+            font-size: 13px;
+        }
+
+        th {
+            background: var(--soft);
+            color: var(--muted);
+            font-weight: 600;
+        }
+
+        tr:last-child td {
+            border-bottom: 0;
+        }
+
+        td {
+            color: var(--text);
+        }
+
+        .empty,
+        .loading,
+        .error {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 28px;
+            text-align: center;
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        .error {
+            color: var(--danger);
+            background: #fef3f2;
+            border-color: #fecdca;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        footer {
+            width: min(1180px, calc(100% - 40px));
+            margin: 0 auto;
+            padding: 0 0 30px;
+            color: #98a2b3;
+            font-size: 12px;
+        }
+
+        @media (max-width: 850px) {
+            .grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .header-inner {
+                width: min(100% - 28px, 1180px);
+            }
+
+            main,
+            footer {
+                width: min(100% - 28px, 1180px);
+            }
+
+            #user-email {
+                display: none;
+            }
+        }
+
+        @media (max-width: 520px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .toolbar {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .page-heading h1 {
+                font-size: 26px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <div class="header-inner">
+
+        <div class="brand">
+            AfricaLatency
+        </div>
+
+        <div class="header-right">
+            <span id="user-email"></span>
+
+            <button id="logout-button" type="button">
+                Sign out
+            </button>
+        </div>
+
+    </div>
+</header>
+
+<main>
+
+    <div class="page-heading">
+        <h1>Performance Dashboard</h1>
+
+        <p>
+            Monitor real-world infrastructure performance from your users.
+        </p>
+    </div>
+
+    <div id="loading" class="loading">
+        Loading your monitoring data...
+    </div>
+
+    <div id="error" class="error hidden"></div>
+
+    <section id="dashboard-content" class="hidden">
+
+        <div class="toolbar">
+
+            <div class="toolbar-left">
+                <span class="site-name" id="site-name">
+                    —
+                </span>
+
+                <select id="days-select" aria-label="Time period">
+                    <option value="1">Last 24 hours</option>
+                    <option value="7" selected>Last 7 days</option>
+                    <option value="30">Last 30 days</option>
+                    <option value="90">Last 90 days</option>
+                </select>
+
+                <select id="group-select" aria-label="Group results by">
+                    <option value="country" selected>Country</option>
+                    <option value="network">Network</option>
+                    <option value="isp">ISP</option>
+                    <option value="page_url">Page</option>
+                    <option value="device_type">Device</option>
+                    <option value="connection_type">Connection</option>
+                </select>
+            </div>
+
+            <div class="status">
+                <span class="status-dot"></span>
+                Monitoring active
+            </div>
+
+        </div>
+
+        <div class="grid">
+
+            <div class="card">
+                <div class="metric-label">
+                    RUM Events
+                </div>
+
+                <div class="metric-value" id="total-events">
+                    —
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="metric-label">
+                    TTFB P50
+                </div>
+
+                <div class="metric-value">
+                    <span id="ttfb-p50">—</span>
+                    <span class="metric-unit">ms</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="metric-label">
+                    LCP P50
+                </div>
+
+                <div class="metric-value">
+                    <span id="lcp-p50">—</span>
+                    <span class="metric-unit">ms</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="metric-label">
+                    INP P50
+                </div>
+
+                <div class="metric-value">
+                    <span id="inp-p50">—</span>
+                    <span class="metric-unit">ms</span>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="section">
+
+            <div class="section-header">
+                <h2>Performance by segment</h2>
+            </div>
+
+            <div class="table-wrapper">
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th id="segment-heading">
+                                Country
+                            </th>
+                            <th>Events</th>
+                            <th>TTFB P50</th>
+                            <th>TTFB P95</th>
+                            <th>LCP P50</th>
+                            <th>INP P50</th>
+                            <th>CLS Avg</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="segments-body"></tbody>
+                </table>
+
+            </div>
+
+            <div id="no-data" class="empty hidden">
+                No RUM data is available for this period yet.
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+<footer>
+    © AfricaLatency
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+    const SUPABASE_URL = 'YOUR_ACTUAL_SUPABASE_URL';
+    const SUPABASE_ANON_KEY = 'YOUR_ACTUAL_PUBLISHABLE_OR_ANON_KEY';
+
+    const { createClient } = supabase;
+
+    const client = createClient(
+        SUPABASE_URL,
+        SUPABASE_ANON_KEY
+    );
+
+    const loading = document.getElementById('loading');
+    const errorBox = document.getElementById('error');
+    const dashboardContent = document.getElementById('dashboard-content');
+
+    const siteName = document.getElementById('site-name');
+    const userEmail = document.getElementById('user-email');
+
+    const totalEvents = document.getElementById('total-events');
+    const ttfbP50 = document.getElementById('ttfb-p50');
+    const lcpP50 = document.getElementById('lcp-p50');
+    const inpP50 = document.getElementById('inp-p50');
+
+    const segmentsBody = document.getElementById('segments-body');
+    const noData = document.getElementById('no-data');
+
+    const daysSelect = document.getElementById('days-select');
+    const groupSelect = document.getElementById('group-select');
+
+    const segmentHeading = document.getElementById('segment-heading');
+    const logoutButton = document.getElementById('logout-button');
+
+    let currentSiteKey = null;
+
+    function showError(message) {
+        loading.classList.add('hidden');
+        dashboardContent.classList.add('hidden');
+
+        errorBox.textContent = message;
+        errorBox.classList.remove('hidden');
+    }
+
+    function formatNumber(value, decimals = 0) {
+        if (value === null || value === undefined || !Number.isFinite(Number(value))) {
+            return '—';
+        }
+
+        return Number(value).toFixed(decimals);
+    }
+
+    function updateSegmentHeading(group) {
+        const labels = {
+            country: 'Country',
+            network: 'Network',
+            isp: 'ISP',
+            page_url: 'Page',
+            device_type: 'Device',
+            connection_type: 'Connection'
+        };
+
+        segmentHeading.textContent = labels[group] || 'Segment';
+    }
+
+    function getOverallMetric(rows, metric) {
+        const values = [];
+
+        for (const row of rows) {
+            const value = Number(row[metric]);
+
+            if (Number.isFinite(value)) {
+                values.push({
+                    value,
+                    n: Number(row.n || 0)
+                });
+            }
+        }
+
+        if (values.length === 0) {
+            return null;
+        }
+
+        /*
+         * The RPC returns segment-level percentiles rather than a global
+         * percentile. Therefore, for the dashboard summary we display
+         * the largest segment by event volume as the representative value.
+         */
+        values.sort((a, b) => b.n - a.n);
+
+        return values[0].value;
+    }
+
+    async function loadSites(user) {
+        const { data, error } = await client
+            .from('rum_sites')
+            .select('id, site_key, name')
+            .eq('owner_id', user.id)
+            .order('created_at', { ascending: true });
+
+        if (error) {
+            console.error('[dashboard] site lookup failed:', error);
+            throw new Error('Unable to load your monitoring sites.');
+        }
+
+        if (!data || data.length === 0) {
+            throw new Error(
+                'No monitoring site is associated with this account yet.'
+            );
+        }
+
+        return data;
+    }
+
+    async function loadStats() {
+        if (!currentSiteKey) {
+            return;
+        }
+
+        const days = daysSelect.value;
+        const group = groupSelect.value;
+
+        segmentsBody.innerHTML = '';
+        noData.classList.add('hidden');
+
+        try {
+            const {
+                data: { session },
+                error: sessionError
+            } = await client.auth.getSession();
+
+            if (sessionError || !session) {
+                window.location.href = '/login.html';
+                return;
+            }
+
+            const response = await fetch(
+                '/api/customer-stats' +
+                '?site=' + encodeURIComponent(currentSiteKey) +
+                '&days=' + encodeURIComponent(days) +
+                '&group=' + encodeURIComponent(group),
+                {
+                    method: 'GET',
+                    headers: {
+                        Authorization:
+                            'Bearer ' + session.access_token
+                    }
+                }
+            );
+
+            if (response.status === 401) {
+                await client.auth.signOut();
+                window.location.href = '/login.html';
+                return;
+            }
+
+            if (response.status === 404) {
+                throw new Error(
+                    'This monitoring site is not available to your account.'
+                );
+            }
+
+            if (!response.ok) {
+                throw new Error(
+                    'Unable to load performance statistics.'
+                );
+            }
+
+            const result = await response.json();
+
+            const rows = Array.isArray(result.segments)
+                ? result.segments
+                : [];
+
+            totalEvents.textContent =
+                Number(result.total_events || 0).toLocaleString();
+
+            ttfbP50.textContent =
+                formatNumber(getOverallMetric(rows, 'ttfb_p50'));
+
+            lcpP50.textContent =
+                formatNumber(getOverallMetric(rows, 'lcp_p50'));
+
+            inpP50.textContent =
+                formatNumber(getOverallMetric(rows, 'inp_p50'));
+
+            updateSegmentHeading(group);
+
+            if (rows.length === 0) {
+                noData.classList.remove('hidden');
+                return;
+            }
+
+            for (const row of rows) {
+                const tr = document.createElement('tr');
+
+                const values = [
+                    row.label || 'Unknown',
+                    Number(row.n || 0).toLocaleString(),
+                    formatNumber(row.ttfb_p50) + ' ms',
+                    formatNumber(row.ttfb_p95) + ' ms',
+                    formatNumber(row.lcp_p50) + ' ms',
+                    formatNumber(row.inp_p50) + ' ms',
+                    formatNumber(row.cls_avg, 3)
+                ];
+
+                for (const value of values) {
+                    const td = document.createElement('td');
+                    td.textContent = value;
+                    tr.appendChild(td);
+                }
+
+                segmentsBody.appendChild(tr);
+            }
+
+        } catch (error) {
+            console.error('[dashboard] stats error:', error);
+
+            segmentsBody.innerHTML = '';
+
+            showError(
+                error.message ||
+                'Unable to load dashboard data.'
+            );
+        }
+    }
+
+    async function initialiseDashboard() {
+        try {
+            const {
+                data: { session },
+                error: sessionError
+            } = await client.auth.getSession();
+
+            if (sessionError || !session) {
+                window.location.href = '/login.html';
+                return;
+            }
+
+            userEmail.textContent =
+                session.user.email || '';
+
+            const sites = await loadSites(session.user);
+
+            /*
+             * First dashboard version supports the first site associated
+             * with the account. Multi-site switching can be added later.
+             */
+            const site = sites[0];
+
+            currentSiteKey = site.site_key;
+            siteName.textContent = site.name;
+
+            loading.classList.add('hidden');
+            dashboardContent.classList.remove('hidden');
+
+            await loadStats();
+
+        } catch (error) {
+            console.error('[dashboard] initialization error:', error);
+
+            showError(
+                error.message ||
+                'Unable to load your dashboard.'
+            );
+        }
+    }
+
+    daysSelect.addEventListener('change', loadStats);
+    groupSelect.addEventListener('change', loadStats);
+
+    logoutButton.addEventListener('click', async function () {
+        logoutButton.disabled = true;
+        logoutButton.textContent = 'Signing out...';
+
+        const { error } = await client.auth.signOut();
+
+        if (error) {
+            console.error('[dashboard] logout failed:', error);
+
+            logoutButton.disabled = false;
+            logoutButton.textContent = 'Sign out';
+
+            showError('Unable to sign out. Please try again.');
+            return;
+        }
+
+        window.location.href = '/login.html';
+    });
+
+    initialiseDashboard();
+</script>
+
+</body>
+</html>
