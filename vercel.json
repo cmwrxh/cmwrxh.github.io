@@ -1,7 +1,0 @@
-{
-  "build": {
-    "env": {
-      "SUPABASE_URL": "sb_publishable_dGaR1jgofny7tGVWh0TK2w_haSVNyWv"
-    }
-  }
-}

@@ -1,31 +1,23 @@
-/* ============================================
-   africalatency.dev — scan.js
-   Runs REAL diagnostics via the /api/run-diagnostic
-   proxy (which calls Globalping server-side) from
-   live probes in Nairobi, Lagos, Johannesburg,
-   and Cairo.
+/* AfricaLatency Scanner — Block 2
+ * Live diagnostics via /api/run-diagnostic.
+ * The scanner is intentionally a point-in-time snapshot: it does not
+ * claim P50/P95 from a single observation and never invents missing data.
+ */
 
-   Lead capture:
-   - Sends leads to Vercel /api/submit-lead
-   - Includes invisible honeypot anti-bot field
-   ============================================ */
+const AFRICA_PROBE_CITIES = [
+  { city: 'Nairobi', country: 'KE', label: 'Nairobi, KE', flag: '🇰🇪' },
+  { city: 'Lagos', country: 'NG', label: 'Lagos, NG', flag: '🇳🇬' },
+  { city: 'Johannesburg', country: 'ZA', label: 'Johannesburg, ZA', flag: '🇿🇦' },
+  { city: 'Cairo', country: 'EG', label: 'Cairo, EG', flag: '🇪🇬' }
+];
 
-// Strict garbage words rejection list
+const VERDICT_SEVERITY = { CRITICAL: 3, WARNING: 2, GOOD: 1, UNKNOWN: 0 };
+
 const garbageWords = [
-  'hello','test','foo','bar','baz','abc','xyz','qwerty','asdf','farah',
+  'hello','test','foo','bar','baz','abc','xyz','qwerty','asdf',
   'example','demo','sample','trial','temp','fake','mock','dummy',
   'api','domain','website','url','link','site','page','server',
   'localhost','127.0.0.1','0.0.0.0','192.168','10.0.0'
-];
-
-// The African cities we test from. Each has its own peering,
-// IXP, and undersea cable landing situation — a result from
-// one city is NOT representative of the others.
-const AFRICA_PROBE_CITIES = [
-  { city: 'Nairobi',      country: 'KE', label: 'Nairobi, KE',      flag: '🇰🇪' },
-  { city: 'Lagos',        country: 'NG', label: 'Lagos, NG',        flag: '🇳🇬' },
-  { city: 'Johannesburg', country: 'ZA', label: 'Johannesburg, ZA', flag: '🇿🇦' },
-  { city: 'Cairo',        country: 'EG', label: 'Cairo, EG',        flag: '🇪🇬' }
 ];
 
 function sleep(ms) {
@@ -33,113 +25,45 @@ function sleep(ms) {
 }
 
 function showDomainError(msg) {
-  let errEl = document.getElementById('err-domain');
-
-  if (!errEl) {
-    const input = document.getElementById('scan-domain');
-
-    if (input && input.parentNode) {
-      errEl = document.createElement('div');
-      errEl.id = 'err-domain';
-      errEl.className = 'calc-error';
-      errEl.style.color = 'var(--error, #ef4444)';
-      errEl.style.fontSize = '0.85rem';
-      errEl.style.marginTop = '0.4rem';
-      input.parentNode.appendChild(errEl);
-    }
-  }
-
-  if (errEl) {
-    errEl.textContent = msg;
-    errEl.style.display = 'block';
-  }
+  const el = document.getElementById('err-domain');
+  if (!el) return;
+  el.textContent = msg;
+  el.style.display = 'block';
 }
 
 function hideDomainError() {
-  const errEl = document.getElementById('err-domain');
-
-  if (errEl) {
-    errEl.style.display = 'none';
-    errEl.textContent = '';
-  }
+  const el = document.getElementById('err-domain');
+  if (!el) return;
+  el.textContent = '';
+  el.style.display = 'none';
 }
 
-function looksLikeDomain(v) {
-  if (!v.includes('.')) return false;
-  if (/^[.-]|[.-]$/.test(v)) return false;
-
-  const labels = v.split('.');
-
-  for (const label of labels) {
-    if (
-      !label ||
-      label.length > 63 ||
-      !/^[a-zA-Z0-9-]+$/.test(label)
-    ) {
-      return false;
-    }
-  }
-
-  const tld = labels[labels.length - 1];
-
-  if (tld.length < 2) return false;
-
-  return true;
+function looksLikeDomain(value) {
+  if (!value.includes('.') || /^[.-]|[.-]$/.test(value)) return false;
+  const labels = value.split('.');
+  return labels.every(label =>
+    label && label.length <= 63 && /^[a-zA-Z0-9-]+$/.test(label)
+  ) && labels[labels.length - 1].length >= 2;
 }
 
-function validateDomainInput(v) {
-  const raw = v.trim().toLowerCase();
+function validateDomainInput(value) {
+  const raw = value.trim().toLowerCase();
+  if (!raw) return { ok: false, msg: 'Enter a public domain, e.g. api.yourcompany.com' };
 
-  if (!raw) {
-    return {
-      ok: false,
-      msg: 'Enter a domain (e.g. api.yourfintech.co.ke)'
-    };
-  }
+  let domain = raw.replace(/^https?:\/\//, '').split('/')[0].split(':')[0];
 
-  // Strip protocol, path, and port automatically
-  let domain = raw.replace(/^https?:\/\//, '');
-  domain = domain.split('/')[0];
-  domain = domain.split(':')[0];
-
-  if (
-    garbageWords.includes(domain) ||
-    garbageWords.some(w => domain === w)
-  ) {
-    return {
-      ok: false,
-      msg: `"${domain}" is not a real domain. Enter your actual API endpoint.`
-    };
+  if (garbageWords.includes(domain)) {
+    return { ok: false, msg: `"${domain}" is not a valid target. Enter your actual public domain.` };
   }
 
   if (!looksLikeDomain(domain)) {
-    return {
-      ok: false,
-      msg: 'Enter a valid domain like api.yourcompany.co.ke or yourapp.com'
-    };
+    return { ok: false, msg: 'Enter a valid public domain like api.yourcompany.co.ke or yourapp.com' };
   }
 
-  return {
-    ok: true,
-    domain: domain
-  };
+  return { ok: true, domain };
 }
 
-/* ============================================
-   Diagnostic proxy call
-
-   Calls our own /api/run-diagnostic endpoint,
-   which holds the Globalping token server-side.
-   Falls back only from city -> that city's
-   country (never to a different city or "world"),
-   so a result is never mislabeled as coming from
-   a place other than the one requested.
-
-   Returns the measurement object, or null if no
-   probe was available at all for this city.
-   ============================================ */
-
-async function gpRunCity(type, target, cityConfig, measurementOptions) {
+async function gpRunCity(type, target, cityConfig) {
   const attempts = [
     [{ city: cityConfig.city, limit: 1 }],
     [{ country: cityConfig.country, limit: 1 }]
@@ -147,26 +71,18 @@ async function gpRunCity(type, target, cityConfig, measurementOptions) {
 
   for (const locations of attempts) {
     try {
-      const res = await fetch('/api/run-diagnostic', {
+      const response = await fetch('/api/run-diagnostic', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ type, target, locations })
       });
 
-      if (res.ok) {
-        return await res.json();
-      }
+      if (response.ok) return await response.json();
 
-      if (res.status !== 400 && res.status !== 422) {
-        // Real failure (server misconfigured, network issue,
-        // timeout, etc.) — no point trying the narrower
-        // fallback either.
-        return null;
-      }
-      // else: no probe matched this attempt, try the next
-      // (country-level) fallback
-
-    } catch (e) {
+      // A 400/422 can mean the requested city has no suitable probe;
+      // retry at country level. Other errors should not be hidden.
+      if (response.status !== 400 && response.status !== 422) return null;
+    } catch (_) {
       return null;
     }
   }
@@ -174,331 +90,91 @@ async function gpRunCity(type, target, cityConfig, measurementOptions) {
   return null;
 }
 
-/* ============================================
-   Rendering helpers
-   ============================================ */
-
-function appendLine(body, text, cls) {
-  const div = document.createElement('div');
-
-  div.innerHTML =
-    `<span class="prompt">$</span> ` +
-    `<span class="command${cls ? ' ' + cls : ''}">${text}</span>`;
-
-  body.appendChild(div);
-
-  return div;
+function validNumber(value) {
+  return value !== undefined && value !== null && value !== -1 && Number.isFinite(Number(value));
 }
 
-function appendResultLine(body, text, cls) {
-  const div = document.createElement('div');
-
-  div.className = cls || 'output';
-  div.textContent = `  → ${text}`;
-
-  body.appendChild(div);
-
-  return div;
+function fmtMs(value) {
+  return validNumber(value) ? `${Math.round(Number(value))}ms` : 'n/a';
 }
-
-function fmtMs(v) {
-  if (
-    v === undefined ||
-    v === null ||
-    v === -1 ||
-    !Number.isFinite(Number(v))
-  ) {
-    return 'n/a';
-  }
-
-  return `${Math.round(Number(v))}ms`;
-}
-
-/* ============================================
-   Metric scoring — UNCHANGED thresholds.
-
-   These are operational diagnostic thresholds,
-   not universal internet standards.
-
-   DNS:   GOOD <=50ms   ATTENTION <=150ms   POOR >150ms
-   TLS:   GOOD <=100ms  ATTENTION <=250ms   POOR >250ms
-   TTFB:  GOOD <=150ms  ATTENTION <=300ms   POOR >300ms
-   TOTAL: GOOD <=500ms  ATTENTION <=1000ms  POOR >1000ms
-   ============================================ */
 
 function metricVerdict(value, goodMax, warningMax) {
-  if (
-    value === undefined ||
-    value === null ||
-    value === -1 ||
-    !Number.isFinite(Number(value))
-  ) {
-    return {
-      label: 'N/A',
-      color: 'warning',
-      symbol: '⚪'
-    };
-  }
-
-  const numericValue = Number(value);
-
-  if (numericValue <= goodMax) {
-    return {
-      label: 'GOOD',
-      color: 'highlight',
-      symbol: '🟢'
-    };
-  }
-
-  if (numericValue <= warningMax) {
-    return {
-      label: 'NEEDS ATTENTION',
-      color: 'warning',
-      symbol: '🟡'
-    };
-  }
-
-  return {
-    label: 'POOR',
-    color: 'error',
-    symbol: '🔴'
-  };
+  if (!validNumber(value)) return { label: 'N/A', color: 'warning', symbol: '⚪' };
+  const n = Number(value);
+  if (n <= goodMax) return { label: 'GOOD', color: 'highlight', symbol: '🟢' };
+  if (n <= warningMax) return { label: 'NEEDS ATTENTION', color: 'warning', symbol: '🟡' };
+  return { label: 'POOR', color: 'error', symbol: '🔴' };
 }
 
 function overallVerdict(metrics) {
-  const measured = metrics.filter(
-    metric => metric && metric.label !== 'N/A'
-  );
-
-  if (!measured.length) {
-    return {
-      label: 'UNKNOWN',
-      color: 'warning',
-      symbol: '⚪'
-    };
-  }
-
-  if (
-    measured.some(
-      metric => metric.label === 'POOR'
-    )
-  ) {
-    return {
-      label: 'CRITICAL',
-      color: 'error',
-      symbol: '🔴'
-    };
-  }
-
-  if (
-    measured.some(
-      metric => metric.label === 'NEEDS ATTENTION'
-    )
-  ) {
-    return {
-      label: 'WARNING',
-      color: 'warning',
-      symbol: '🟡'
-    };
-  }
-
-  return {
-    label: 'GOOD',
-    color: 'highlight',
-    symbol: '🟢'
-  };
+  const measured = metrics.filter(m => m && m.label !== 'N/A');
+  if (!measured.length) return { label: 'UNKNOWN', color: 'warning', symbol: '⚪' };
+  if (measured.some(m => m.label === 'POOR')) return { label: 'CRITICAL', color: 'error', symbol: '🔴' };
+  if (measured.some(m => m.label === 'NEEDS ATTENTION')) return { label: 'WARNING', color: 'warning', symbol: '🟡' };
+  return { label: 'GOOD', color: 'highlight', symbol: '🟢' };
 }
 
-// Severity ranking used to pick the "worst" city across the four
-// tested — this drives both the page-level overall verdict and
-// what gets sent to lead capture.
-const VERDICT_SEVERITY = { CRITICAL: 3, WARNING: 2, GOOD: 1, UNKNOWN: 0 };
-
-function pickWorstCity(cityResults) {
-  const available = cityResults.filter(c => c.available);
-
+function pickWorstCity(results) {
+  const available = results.filter(r => r.available);
   if (!available.length) return null;
-
-  return available.reduce((worst, c) => {
-    const worstSeverity = VERDICT_SEVERITY[worst.overall.label] || 0;
-    const citySeverity = VERDICT_SEVERITY[c.overall.label] || 0;
-
-    if (citySeverity > worstSeverity) return c;
-
-    if (citySeverity === worstSeverity) {
-      const worstTotal = (worst.timings && worst.timings.total) || 0;
-      const cityTotal = (c.timings && c.timings.total) || 0;
-      return cityTotal > worstTotal ? c : worst;
-    }
-
+  return available.reduce((worst, current) => {
+    const a = VERDICT_SEVERITY[worst.overall.label] || 0;
+    const b = VERDICT_SEVERITY[current.overall.label] || 0;
+    if (b > a) return current;
+    if (b === a && Number(current.timings.total || 0) > Number(worst.timings.total || 0)) return current;
     return worst;
   });
 }
 
 function metricDisplay(verdict, value) {
-  return `
-    <span
-      style="
-        color:var(--${verdict.color});
-        font-weight:600;
-        margin-right:0.35rem;
-      "
-      title="${verdict.label}"
-    >
-      ${verdict.symbol}
-    </span>
-
-    <span class="highlight">
-      ${fmtMs(value)}
-    </span>
-
-    <span
-      style="
-        color:var(--${verdict.color});
-        font-size:0.72rem;
-        margin-left:0.35rem;
-      "
-    >
-      ${verdict.label}
-    </span>
-  `;
+  return `<span style="color:var(--${verdict.color});font-weight:600;">${verdict.symbol}</span> <span class="highlight">${fmtMs(value)}</span> <span style="color:var(--${verdict.color});font-size:.72rem;">${verdict.label}</span>`;
 }
-
-function appendRawToggle(body, label, raw) {
-  const details = document.createElement('details');
-
-  details.style.marginTop = '1rem';
-  details.style.fontSize = '0.78rem';
-  details.style.color = 'var(--text-muted)';
-
-  const summary = document.createElement('summary');
-
-  summary.style.cursor = 'pointer';
-  summary.textContent =
-    `View raw ${label} response`;
-
-  const pre = document.createElement('pre');
-
-  pre.style.whiteSpace = 'pre-wrap';
-  pre.style.wordBreak = 'break-all';
-  pre.style.marginTop = '0.5rem';
-  pre.textContent =
-    JSON.stringify(raw, null, 2);
-
-  details.appendChild(summary);
-  details.appendChild(pre);
-
-  body.appendChild(details);
-}
-
-/* ============================================
-   Per-city diagnostic
-   ============================================ */
 
 async function runCityDiagnostic(cityConfig, domain) {
-  let httpMeasurement = null;
-  let traceMeasurement = null;
-
-  try {
-    // Run HTTP + traceroute concurrently for this city.
-    [httpMeasurement, traceMeasurement] = await Promise.all([
-      gpRunCity('http', domain, cityConfig, null),
-      gpRunCity('traceroute', domain, cityConfig, null)
-    ]);
-  } catch (e) {
-    return {
-      city: cityConfig,
-      label: cityConfig.label,
-      flag: cityConfig.flag,
-      available: false,
-      reason: e.message || 'Diagnostic failed'
-    };
-  }
+  const [httpMeasurement, traceMeasurement] = await Promise.all([
+    gpRunCity('http', domain, cityConfig),
+    gpRunCity('traceroute', domain, cityConfig)
+  ]);
 
   if (!httpMeasurement) {
-    return {
-      city: cityConfig,
-      label: cityConfig.label,
-      flag: cityConfig.flag,
-      available: false,
-      reason: 'No probe currently available'
-    };
+    return { city: cityConfig, label: cityConfig.label, flag: cityConfig.flag, available: false, reason: 'No probe currently available' };
   }
 
-  const httpProbeResult =
-    httpMeasurement.results && httpMeasurement.results[0];
-
-  if (
-    !httpProbeResult ||
-    !httpProbeResult.result ||
-    httpProbeResult.result.status !== 'finished'
-  ) {
-    return {
-      city: cityConfig,
-      label: cityConfig.label,
-      flag: cityConfig.flag,
-      available: false,
-      reason: 'Diagnostic incomplete'
-    };
+  const httpResult = httpMeasurement.results && httpMeasurement.results[0];
+  if (!httpResult || !httpResult.result || httpResult.result.status !== 'finished') {
+    return { city: cityConfig, label: cityConfig.label, flag: cityConfig.flag, available: false, reason: 'Diagnostic incomplete' };
   }
 
-  const probe = httpProbeResult.probe || {};
-  const r = httpProbeResult.result;
-  const timings = r.timings || {};
+  const probe = httpResult.probe || {};
+  const result = httpResult.result;
+  const timings = result.timings || {};
+  const traceResult = traceMeasurement && traceMeasurement.results && traceMeasurement.results[0];
+  const hops = traceResult && traceResult.result && traceResult.result.hops;
+  const hopCount = Array.isArray(hops) && hops.length ? hops.length : null;
 
-  const probeLocation =
-    [probe.city, probe.country].filter(Boolean).join(', ') ||
-    cityConfig.label;
+  const pathNames = Array.isArray(hops)
+    ? hops.map(h => h.resolvedHostname || h.resolvedAddress).filter(Boolean)
+    : [];
 
-  let hopCount = null;
-  let pathSummary = null;
-
-  if (traceMeasurement) {
-    const traceProbeResult =
-      traceMeasurement.results && traceMeasurement.results[0];
-
-    const hops =
-      traceProbeResult &&
-      traceProbeResult.result &&
-      traceProbeResult.result.hops;
-
-    if (hops && hops.length) {
-      hopCount = hops.length;
-
-      const named = hops
-        .map(h => h.resolvedHostname || h.resolvedAddress)
-        .filter(Boolean);
-
-      pathSummary = named.length
-        ? `${named[0]} → … → ${named[named.length - 1]}`
-        : `${hopCount} hops (unnamed)`;
-    }
-  }
+  const pathSummary = pathNames.length
+    ? `${pathNames[0]} → … → ${pathNames[pathNames.length - 1]}`
+    : null;
 
   const dnsVerdict = metricVerdict(timings.dns, 50, 150);
   const tlsVerdict = metricVerdict(timings.tls, 100, 250);
   const ttfbVerdict = metricVerdict(timings.firstByte, 150, 300);
   const totalVerdict = metricVerdict(timings.total, 500, 1000);
 
-  const overall = overallVerdict([
-    dnsVerdict,
-    tlsVerdict,
-    ttfbVerdict,
-    totalVerdict
-  ]);
-
   return {
     city: cityConfig,
     label: cityConfig.label,
     flag: cityConfig.flag,
     available: true,
-    probeLocation,
-    probeNetwork: probe.network,
-    resolvedAddress: r.resolvedAddress,
-    statusCode: r.statusCode,
-    tlsProtocol:
-      (r.tls && (r.tls.protocol || r.tls.version)) ||
-      'n/a (not HTTPS or handshake failed)',
+    probeLocation: [probe.city, probe.country].filter(Boolean).join(', ') || cityConfig.label,
+    probeNetwork: probe.network || null,
+    resolvedAddress: result.resolvedAddress || null,
+    statusCode: result.statusCode || null,
+    tlsProtocol: (result.tls && (result.tls.protocol || result.tls.version)) || null,
     timings,
     hopCount,
     pathSummary,
@@ -506,7 +182,7 @@ async function runCityDiagnostic(cityConfig, domain) {
     tlsVerdict,
     ttfbVerdict,
     totalVerdict,
-    overall,
+    overall: overallVerdict([dnsVerdict, tlsVerdict, ttfbVerdict, totalVerdict]),
     httpMeasurement,
     traceMeasurement
   };
@@ -514,581 +190,153 @@ async function runCityDiagnostic(cityConfig, domain) {
 
 function renderCityBlock(c) {
   if (!c.available) {
-    return `
-      <div style="
-        padding:1rem;
-        border:1px solid var(--border);
-        border-radius:6px;
-        margin-bottom:1rem;
-        opacity:0.7;
-      ">
-        <div style="font-weight:600; margin-bottom:0.3rem;">
-          ${c.flag} ${c.label}
-        </div>
-        <div style="color:var(--text-muted); font-size:0.85rem;">
-          ⚪ No probe currently available for this location.
-        </div>
-      </div>
-    `;
+    return `<div style="padding:1rem;border:1px solid var(--border);border-radius:6px;margin-bottom:1rem;opacity:.7;"><div style="font-weight:600;margin-bottom:.3rem;">${c.flag} ${c.label}</div><div style="color:var(--text-muted);font-size:.85rem;">⚪ ${c.reason || 'No measurement available.'}</div></div>`;
   }
 
-  return `
-    <div style="
-      padding:1rem;
-      border:1px solid var(--border);
-      border-radius:6px;
-      margin-bottom:1rem;
-    ">
-      <div style="
-        display:flex;
-        justify-content:space-between;
-        align-items:center;
-        margin-bottom:0.75rem;
-        flex-wrap:wrap;
-        gap:0.5rem;
-      ">
-        <div style="font-weight:600;">
-          ${c.flag} ${c.label}
-        </div>
-        <div style="
-          color:var(--${c.overall.color});
-          font-weight:600;
-          font-size:0.9rem;
-        ">
-          ${c.overall.symbol} ${c.overall.label}
-        </div>
-      </div>
-
-      <div style="
-        font-size:0.75rem;
-        color:var(--text-muted);
-        margin-bottom:0.75rem;
-      ">
-        Probe: ${c.probeLocation}${c.probeNetwork ? ' — ' + c.probeNetwork : ''}
-      </div>
-
-      <div style="
-        display:grid;
-        grid-template-columns:1fr 1fr;
-        gap:0.75rem;
-        font-size:0.9rem;
-      ">
-        <div>DNS: ${metricDisplay(c.dnsVerdict, c.timings.dns)}</div>
-        <div>TLS: ${metricDisplay(c.tlsVerdict, c.timings.tls)}</div>
-        <div>TTFB: ${metricDisplay(c.ttfbVerdict, c.timings.firstByte)}</div>
-        <div>Total: ${metricDisplay(c.totalVerdict, c.timings.total)}</div>
-        ${
-          c.hopCount
-            ? `<div>Hops: <span class="highlight">${c.hopCount}</span></div>`
-            : ''
-        }
-      </div>
-
-      ${
-        c.pathSummary
-          ? `
-            <div style="
-              margin-top:0.5rem;
-              font-size:0.78rem;
-              color:var(--text);
-              opacity:0.85;
-            ">
-              Path: ${c.pathSummary}
-            </div>
-          `
-          : ''
-      }
+  return `<div style="padding:1rem;border:1px solid var(--border);border-radius:6px;margin-bottom:1rem;">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem;margin-bottom:.65rem;">
+      <div style="font-weight:600;">${c.flag} ${c.label}</div>
+      <div style="color:var(--${c.overall.color});font-weight:600;font-size:.9rem;">${c.overall.symbol} ${c.overall.label}</div>
     </div>
-  `;
+    <div style="font-size:.75rem;color:var(--text-muted);margin-bottom:.75rem;">Probe: ${c.probeLocation}${c.probeNetwork ? ` — ${c.probeNetwork}` : ''}</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;font-size:.9rem;">
+      <div>DNS: ${metricDisplay(c.dnsVerdict, c.timings.dns)}</div>
+      <div>TLS: ${metricDisplay(c.tlsVerdict, c.timings.tls)}</div>
+      <div>TTFB: ${metricDisplay(c.ttfbVerdict, c.timings.firstByte)}</div>
+      <div>Total: ${metricDisplay(c.totalVerdict, c.timings.total)}</div>
+      ${c.hopCount ? `<div>Route hops: <span class="highlight">${c.hopCount}</span></div>` : ''}
+      ${c.statusCode ? `<div>HTTP: <span class="highlight">${c.statusCode}</span></div>` : ''}
+    </div>
+    ${c.pathSummary ? `<div style="margin-top:.6rem;font-size:.78rem;color:var(--text);opacity:.85;word-break:break-word;">Path: ${c.pathSummary}</div>` : ''}
+  </div>`;
 }
 
-/* ============================================
-   Main scan flow
-   ============================================ */
+function appendRawToggle(body, label, raw) {
+  if (!raw) return;
+  const details = document.createElement('details');
+  details.style.cssText = 'margin-top:1rem;font-size:.78rem;color:var(--text-muted);';
+  const summary = document.createElement('summary');
+  summary.textContent = `View raw ${label} response`;
+  summary.style.cursor = 'pointer';
+  const pre = document.createElement('pre');
+  pre.style.cssText = 'white-space:pre-wrap;word-break:break-all;margin-top:.5rem;';
+  pre.textContent = JSON.stringify(raw, null, 2);
+  details.append(summary, pre);
+  body.appendChild(details);
+}
+
+function appendResultLine(body, text) {
+  const div = document.createElement('div');
+  div.className = 'output';
+  div.textContent = `  → ${text}`;
+  body.appendChild(div);
+}
+
+function appendLine(body, text) {
+  const div = document.createElement('div');
+  div.innerHTML = `<span class="prompt">$</span> <span class="command">${text}</span>`;
+  body.appendChild(div);
+}
+
+function buildSummary(results, timestamp) {
+  const available = results.filter(r => r.available);
+  const totals = available.map(r => Number(r.timings.total)).filter(Number.isFinite);
+  const ttfbs = available.map(r => Number(r.timings.firstByte)).filter(Number.isFinite);
+  const fastest = totals.length ? available.find(r => Number(r.timings.total) === Math.min(...totals)) : null;
+  const slowest = totals.length ? available.find(r => Number(r.timings.total) === Math.max(...totals)) : null;
+
+  return `<div style="padding:1.25rem;border:1px solid var(--border);border-radius:6px;margin-bottom:1rem;background:var(--bg-elevated);">
+    <div style="font-weight:600;margin-bottom:.5rem;">Performance Summary</div>
+    <div style="font-size:.85rem;color:var(--text-muted);line-height:1.7;">
+      ${fastest ? `Fastest observed total: <strong>${fastest.label}</strong> at <strong>${fmtMs(fastest.timings.total)}</strong>.<br>` : ''}
+      ${slowest ? `Slowest observed total: <strong>${slowest.label}</strong> at <strong>${fmtMs(slowest.timings.total)}</strong>.<br>` : ''}
+      ${totals.length > 1 ? `Observed spread: <strong>${fmtMs(Math.max(...totals) - Math.min(...totals))}</strong> between the fastest and slowest available locations.<br>` : ''}
+      ${ttfbs.length ? `Observed TTFB range: <strong>${fmtMs(Math.min(...ttfbs))}</strong>–<strong>${fmtMs(Math.max(...ttfbs))}</strong>.<br>` : ''}
+      <span>These are single-scan observations, not P50/P95 benchmarks.</span>
+    </div>
+  </div>`;
+}
 
 async function runScan() {
-  const domainInput =
-    document.getElementById('scan-domain');
-
-  const rawValue = domainInput.value;
-
+  const input = document.getElementById('scan-domain');
+  const validation = validateDomainInput(input.value);
   hideDomainError();
-
-  const validation =
-    validateDomainInput(rawValue);
-
-  if (!validation.ok) {
-    showDomainError(validation.msg);
-    return;
-  }
+  if (!validation.ok) return showDomainError(validation.msg);
 
   const domain = validation.domain;
+  const output = document.getElementById('scan-output');
+  const status = document.getElementById('scan-status');
+  const button = document.getElementById('scan-btn');
+  const startedAt = new Date();
 
-  const output =
-    document.getElementById('scan-output');
-
-  const btn =
-    document.getElementById('scan-btn');
-
-  btn.disabled = true;
-  btn.textContent = 'Analyzing...';
+  button.disabled = true;
+  button.textContent = 'Scanning...';
+  status.style.display = 'block';
+  status.style.margin = '1rem 0';
+  status.style.color = 'var(--text-muted)';
+  status.textContent = 'Running live measurements from selected African vantage points…';
 
   output.style.display = 'block';
   output.classList.add('terminal');
+  output.innerHTML = `<div class="terminal-header"><div class="terminal-dot red"></div><div class="terminal-dot yellow"></div><div class="terminal-dot green"></div><div class="terminal-title">africalatency-scan ~ ${domain}</div></div><div class="terminal-body" id="scan-body"></div>`;
 
-  output.innerHTML = `
-    <div class="terminal-header">
-      <div class="terminal-dot red"></div>
-      <div class="terminal-dot yellow"></div>
-      <div class="terminal-dot green"></div>
-      <div class="terminal-title">
-        africalatency-scan ~ ${domain}
-      </div>
-    </div>
+  const body = document.getElementById('scan-body');
+  appendLine(body, `Starting live Africa scan for ${domain}…`);
+  appendLine(body, 'HTTP response + traceroute diagnostics from 4 selected African locations.');
 
-    <div class="terminal-body" id="scan-body"></div>
-  `;
+  const results = await Promise.all(AFRICA_PROBE_CITIES.map(city =>
+    runCityDiagnostic(city, domain).then(result => {
+      appendResultLine(body, `${city.flag} ${city.label}: ${result.available ? `${result.overall.symbol} ${result.overall.label}` : '⚪ unavailable'}`);
+      return result;
+    })
+  ));
 
-  const body =
-    document.getElementById('scan-body');
+  const completedAt = new Date();
+  const worst = pickWorstCity(results);
+  const availableCount = results.filter(r => r.available).length;
+  const verdict = worst ? worst.overall : { label: 'UNKNOWN', color: 'warning', symbol: '⚪' };
 
-  appendLine(
-    body,
-    `Running live diagnostics for ${domain} from 4 African cities via Globalping...`
-  );
+  await sleep(200);
+  appendLine(body, 'Compiling measured results…');
+  await sleep(200);
 
-  /* --------------------------------------------
-     Run all 4 cities. Each appends its own
-     result line as soon as it finishes, so the
-     terminal fills in progressively rather than
-     waiting for the slowest city.
-     -------------------------------------------- */
-
-  const cityResults = await Promise.all(
-    AFRICA_PROBE_CITIES.map(cityConfig =>
-      runCityDiagnostic(cityConfig, domain).then(result => {
-        const statusText = result.available
-          ? `${result.overall.symbol} ${result.overall.label}`
-          : `⚪ No probe currently available`;
-
-        appendResultLine(
-          body,
-          `${cityConfig.flag} ${cityConfig.label}: ${statusText}`
-        );
-
-        return result;
-      })
-    )
-  );
-
-  await sleep(300);
-
-  appendLine(
-    body,
-    'Compiling multi-city diagnostic report...'
-  );
-
-  await sleep(300);
-
-  const worstCity = pickWorstCity(cityResults);
-
-  const pageVerdict = worstCity
-    ? worstCity.overall
-    : { label: 'UNKNOWN', color: 'warning', symbol: '⚪' };
-
-  const availableCount =
-    cityResults.filter(c => c.available).length;
-
-  const report =
-    document.createElement('div');
-
-  report.style.marginTop = '1.5rem';
-  report.style.paddingTop = '1.5rem';
-  report.style.borderTop =
-    '1px solid var(--border)';
+  const report = document.createElement('div');
+  report.style.marginTop = '1.25rem';
+  report.style.paddingTop = '1.25rem';
+  report.style.borderTop = '1px solid var(--border)';
 
   report.innerHTML = `
-    <div style="margin-bottom:0.5rem;">
-      <span style="
-        color:var(--${pageVerdict.color});
-        font-weight:600;
-        font-size:1.1rem;
-      ">
-        ${pageVerdict.symbol} ${pageVerdict.label}
-      </span>
-
-      <span style="
-        color:var(--text-muted);
-        font-size:0.8rem;
-        margin-left:0.5rem;
-      ">
-        worst result across ${availableCount} of ${AFRICA_PROBE_CITIES.length} tested African cities
-      </span>
+    <div style="display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;align-items:center;margin-bottom:1rem;">
+      <div><span style="color:var(--${verdict.color});font-weight:600;font-size:1.1rem;">${verdict.symbol} ${verdict.label}</span><div style="color:var(--text-muted);font-size:.78rem;margin-top:.25rem;">Observed worst result across ${availableCount} of ${AFRICA_PROBE_CITIES.length} available locations.</div></div>
+      <div style="color:var(--text-muted);font-size:.75rem;text-align:right;">Started ${startedAt.toLocaleString()}<br>Completed ${completedAt.toLocaleString()}</div>
     </div>
-
-    <div style="
-      margin-bottom:1.25rem;
-      color:var(--text-muted);
-      font-size:0.85rem;
-    ">
-      Live measurements from Nairobi, Lagos, Johannesburg, and Cairo.
-      Each city has its own routing, peering, and IXP situation, so
-      results can vary significantly by region — this is not a
-      single-point estimate for "Africa."
-    </div>
-
-    ${cityResults.map(c => renderCityBlock(c)).join('')}
-
-    <div style="
-      padding:1.25rem;
-      background:var(--bg);
-      border-radius:6px;
-      border:1px solid var(--border);
-      margin-top:1rem;
-    ">
-
-      <div style="
-        font-size:0.9rem;
-        font-weight:600;
-        color:var(--text);
-        margin-bottom:0.3rem;
-      ">
-        Unlock Full Optimization Report & Remediation Plan
+    ${buildSummary(results, completedAt)}
+    <div style="color:var(--text-muted);font-size:.8rem;line-height:1.6;margin-bottom:1rem;">Africa is not one network. Each result is tied to the actual probe location and network available for this scan. A country fallback may be used when the requested city has no suitable probe.</div>
+    ${results.map(renderCityBlock).join('')}
+    <div style="padding:1.25rem;background:var(--bg);border-radius:6px;border:1px solid var(--border);margin-top:1rem;">
+      <div style="font-size:.95rem;font-weight:600;margin-bottom:.35rem;">Want to know why the results look this way?</div>
+      <div style="font-size:.8rem;color:var(--text-muted);margin-bottom:1rem;line-height:1.6;">The free scanner shows what we observed. The Africa Latency Audit™ investigates routing, CDN/edge placement, infrastructure, application/API behavior and other dependencies to identify the likely bottleneck and prioritize fixes.</div>
+      <div style="display:flex;gap:.75rem;flex-wrap:wrap;align-items:center;">
+        <a class="btn btn-primary" href="contact.html?service=latency-audit">Request Africa Latency Audit™ →</a>
+        <a href="methodology.html" style="font-size:.82rem;color:var(--text-muted);">View methodology</a>
       </div>
-
-      <div style="
-        font-size:0.8rem;
-        color:var(--text-muted);
-        margin-bottom:1rem;
-      ">
-        Enter your details to log this scan and receive a direct infrastructure review.
-      </div>
-
-      <form
-        id="lead-capture-form"
-        style="
-          display:flex;
-          flex-direction:column;
-          gap:0.75rem;
-        "
-      >
-
-        <input
-          type="text"
-          id="lead-company"
-          placeholder="Company Name"
-          maxlength="150"
-          required
-          style="
-            padding:0.6rem;
-            background:var(--bg-elevated);
-            border:1px solid var(--border);
-            color:var(--text);
-            border-radius:4px;
-            font-size:0.9rem;
-          "
-        >
-
-        <input
-          type="email"
-          id="lead-email"
-          placeholder="Work Email (e.g. you@fintech.co.ke)"
-          maxlength="254"
-          required
-          style="
-            padding:0.6rem;
-            background:var(--bg-elevated);
-            border:1px solid var(--border);
-            color:var(--text);
-            border-radius:4px;
-            font-size:0.9rem;
-          "
-        >
-
-        <!-- Honeypot anti-spam field.
-             Real visitors never see or fill this. -->
-        <div
-          aria-hidden="true"
-          style="
-            position:absolute;
-            left:-9999px;
-            width:1px;
-            height:1px;
-            overflow:hidden;
-          "
-        >
-          <label for="lead-website">
-            Website
-          </label>
-
-          <input
-            type="text"
-            id="lead-website"
-            name="website"
-            tabindex="-1"
-            autocomplete="off"
-          >
-        </div>
-
-        <button
-          type="submit"
-          class="btn btn-primary"
-          id="lead-submit-btn"
-          style="
-            align-self:flex-start;
-            margin-top:0.25rem;
-          "
-        >
-          Save Lead & Get Audit →
-        </button>
-
-      </form>
-
-      <div
-        id="lead-feedback"
-        style="
-          font-size:0.85rem;
-          margin-top:0.75rem;
-        "
-      ></div>
-
     </div>
   `;
 
   body.appendChild(report);
 
-  cityResults.forEach(c => {
-    if (c.available) {
-      if (c.httpMeasurement) {
-        appendRawToggle(body, `${c.label} HTTP`, c.httpMeasurement);
-      }
-      if (c.traceMeasurement) {
-        appendRawToggle(body, `${c.label} traceroute`, c.traceMeasurement);
-      }
-    }
+  results.forEach(result => {
+    if (!result.available) return;
+    appendRawToggle(body, `${result.label} HTTP`, result.httpMeasurement);
+    appendRawToggle(body, `${result.label} traceroute`, result.traceMeasurement);
   });
 
-  btn.disabled = false;
-  btn.textContent =
-    'Analyze Another Domain';
-
-  /* --------------------------------------------
-     Lead submission
-
-     NOTE: current_latency_ms / estimated_monthly_loss
-     below are still using the same placeholder logic
-     as before (target_latency_ms=65, monthly_requests=
-     1,000,000, loss = ttfb*30) — intentionally left
-     unchanged per "keep the existing lead capture
-     workflow intact." current_latency_ms reflects the
-     WORST of the 4 cities rather than only Nairobi,
-     which is a real improvement, but the target/
-     monthly_requests/loss fields are still placeholders,
-     same as flagged previously.
-     -------------------------------------------- */
-
-  const leadForm =
-    document.getElementById(
-      'lead-capture-form'
-    );
-
-  leadForm.addEventListener(
-    'submit',
-    async (e) => {
-      e.preventDefault();
-
-      const companyName =
-        document
-          .getElementById('lead-company')
-          .value
-          .trim();
-
-      const contactEmail =
-        document
-          .getElementById('lead-email')
-          .value
-          .trim();
-
-      const honeypot =
-        document
-          .getElementById('lead-website')
-          .value
-          .trim();
-
-      const leadSubmitBtn =
-        document.getElementById(
-          'lead-submit-btn'
-        );
-
-      const feedback =
-        document.getElementById(
-          'lead-feedback'
-        );
-
-      if (companyName.length > 150) {
-        feedback.style.color =
-          'var(--error, #ef4444)';
-
-        feedback.textContent =
-          'Company name is too long.';
-
-        return;
-      }
-
-      const emailRegex =
-        /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-      if (
-        !emailRegex.test(contactEmail)
-      ) {
-        feedback.style.color =
-          'var(--error, #ef4444)';
-
-        feedback.textContent =
-          'Please enter a valid work email address.';
-
-        return;
-      }
-
-      if (contactEmail.length > 254) {
-        feedback.style.color =
-          'var(--error, #ef4444)';
-
-        feedback.textContent =
-          'Email address is too long.';
-
-        return;
-      }
-
-      leadSubmitBtn.disabled = true;
-      leadSubmitBtn.textContent =
-        'Submitting...';
-
-      feedback.style.color =
-        'var(--text-muted)';
-
-      feedback.textContent =
-        'Securing record to database...';
-
-      const worstTtfb =
-        worstCity && worstCity.timings
-          ? worstCity.timings.firstByte
-          : null;
-
-      try {
-        const response =
-          await fetch(
-            '/api/submit-lead',
-            {
-              method: 'POST',
-              headers: {
-                'Content-Type':
-                  'application/json'
-              },
-
-              body: JSON.stringify({
-                company_name:
-                  companyName,
-
-                contact_email:
-                  contactEmail,
-
-                website:
-                  honeypot,
-
-                current_latency_ms:
-                  worstTtfb != null
-                    ? Math.round(worstTtfb)
-                    : null,
-
-                target_latency_ms:
-                  65,
-
-                monthly_requests:
-                  1000000,
-
-                estimated_monthly_loss:
-                  worstTtfb != null
-                    ? Math.round(worstTtfb) * 30
-                    : null
-              })
-            }
-          );
-
-        const data =
-          await response.json();
-
-        if (
-          response.ok &&
-          data.success
-        ) {
-          feedback.style.color =
-            'var(--accent, #4ade80)';
-
-          feedback.textContent =
-            '✓ Success! Lead captured in Supabase. We will be in touch shortly.';
-
-          leadForm.reset();
-
-          leadSubmitBtn.textContent =
-            'Submitted Successfully';
-
-        } else {
-          feedback.style.color =
-            'var(--error, #ef4444)';
-
-          feedback.textContent =
-            `Error: ${
-              data.error ||
-              'Failed to record lead.'
-            }`;
-
-          leadSubmitBtn.disabled =
-            false;
-
-          leadSubmitBtn.textContent =
-            'Retry Submission';
-        }
-
-      } catch (err) {
-        console.error(err);
-
-        feedback.style.color =
-          'var(--error, #ef4444)';
-
-        feedback.textContent =
-          'Network error. Please check connection and try again.';
-
-        leadSubmitBtn.disabled =
-          false;
-
-        leadSubmitBtn.textContent =
-          'Retry Submission';
-      }
-    }
-  );
+  status.textContent = `Scan completed at ${completedAt.toLocaleTimeString()}. Measurements shown above are the observations returned by the live probes.`;
+  button.disabled = false;
+  button.textContent = 'Analyze Another Domain';
 }
 
-/* ============================================
-   Initial page setup
-   ============================================ */
-
-document.addEventListener(
-  'DOMContentLoaded',
-  () => {
-    const form =
-      document.getElementById(
-        'scan-form'
-      );
-
-    if (form) {
-      form.addEventListener(
-        'submit',
-        (e) => {
-          e.preventDefault();
-          runScan();
-        }
-      );
-    }
-  }
-);
+document.addEventListener('DOMContentLoaded', () => {
+  const form = document.getElementById('scan-form');
+  if (form) form.addEventListener('submit', event => { event.preventDefault(); runScan(); });
+});
