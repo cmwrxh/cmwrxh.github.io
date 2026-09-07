@@ -1,5 +1,5 @@
 ```js
-import { createClient } from '@supabase/supabase-js';
+const { createClient } = require('@supabase/supabase-js');
 
 const supabaseUrl = process.env.SUPABASE_URL;
 
@@ -12,18 +12,21 @@ function getQueryValue(value) {
     return value[0] || '';
   }
 
-  return typeof value === 'string'
-    ? value
-    : '';
+  if (typeof value === 'string') {
+    return value;
+  }
+
+  return '';
 }
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   /*
-   * Verify server configuration.
+   * Verify that the required server-side
+   * Supabase configuration exists.
    */
   if (!supabaseUrl || !supabaseSecretKey) {
     console.error(
-      '[customer-stats] Missing Supabase server environment variables.'
+      '[customer-stats] Missing required Supabase server environment variables.'
     );
 
     return res.status(500).json({
@@ -34,7 +37,8 @@ export default async function handler(req, res) {
   /*
    * Create the trusted server-side Supabase client.
    *
-   * This key must never be exposed to the browser.
+   * The secret/service-role key is NEVER sent
+   * to the customer's browser.
    */
   const supabase = createClient(
     supabaseUrl,
@@ -59,7 +63,7 @@ export default async function handler(req, res) {
   }
 
   /*
-   * Read the customer's Supabase Auth access token.
+   * Read the customer's Supabase access token.
    */
   const authHeader =
     typeof req.headers.authorization === 'string'
@@ -72,9 +76,8 @@ export default async function handler(req, res) {
     });
   }
 
-  const accessToken = authHeader
-    .slice(7)
-    .trim();
+  const accessToken =
+    authHeader.slice(7).trim();
 
   if (!accessToken) {
     return res.status(401).json({
@@ -83,7 +86,7 @@ export default async function handler(req, res) {
   }
 
   /*
-   * Verify the Supabase Auth access token.
+   * Verify the customer's Supabase Auth session.
    */
   const {
     data: { user },
@@ -93,7 +96,9 @@ export default async function handler(req, res) {
   if (userError || !user) {
     console.error(
       '[customer-stats] authentication failed:',
-      userError?.message || 'No authenticated user'
+      userError
+        ? userError.message
+        : 'No authenticated user'
     );
 
     return res.status(401).json({
@@ -102,11 +107,10 @@ export default async function handler(req, res) {
   }
 
   /*
-   * Read and validate the requested site key.
+   * Read the requested site key.
    */
-  const siteKey = getQueryValue(
-    req.query.site
-  ).trim();
+  const siteKey =
+    getQueryValue(req.query.site).trim();
 
   if (siteKey.length < 8 || siteKey.length > 128) {
     return res.status(400).json({
@@ -115,7 +119,8 @@ export default async function handler(req, res) {
   }
 
   /*
-   * Read and constrain the requested time period.
+   * Read and constrain the requested
+   * statistics period.
    */
   const rawDays = Number.parseInt(
     getQueryValue(req.query.days),
@@ -127,8 +132,8 @@ export default async function handler(req, res) {
     : 7;
 
   /*
-   * Only approved aggregation dimensions
-   * may be passed to rum_stats().
+   * Only approved grouping dimensions
+   * can be passed to the statistics RPC.
    */
   const allowedGroups = [
     'country',
@@ -142,15 +147,14 @@ export default async function handler(req, res) {
   const requestedGroup =
     getQueryValue(req.query.group);
 
-  const group = allowedGroups.includes(
-    requestedGroup
-  )
-    ? requestedGroup
-    : 'country';
+  const group =
+    allowedGroups.includes(requestedGroup)
+      ? requestedGroup
+      : 'country';
 
   /*
-   * Verify that the authenticated customer
-   * owns the requested monitoring site.
+   * Verify that this authenticated user owns
+   * the requested monitoring site.
    */
   const {
     data: site,
@@ -182,8 +186,8 @@ export default async function handler(req, res) {
   /*
    * Call the protected RUM statistics RPC.
    *
-   * The RPC is restricted to trusted server-side
-   * roles, so customers cannot call it directly.
+   * The customer does not call this RPC directly.
+   * The trusted server-side client does it instead.
    */
   const {
     data,
@@ -213,17 +217,18 @@ export default async function handler(req, res) {
     : [];
 
   /*
-   * Calculate the number of events represented
+   * Calculate total events represented
    * by the returned segments.
    */
   const totalEvents = rows.reduce(
-    (total, row) =>
-      total + Number(row.n || 0),
+    (total, row) => {
+      return total + Number(row.n || 0);
+    },
     0
   );
 
   /*
-   * Return customer-safe aggregated statistics.
+   * Return only customer-safe statistics.
    */
   return res.status(200).json({
     site: site.name,
@@ -232,5 +237,5 @@ export default async function handler(req, res) {
     total_events: totalEvents,
     segments: rows
   });
-}
+};
 ```
