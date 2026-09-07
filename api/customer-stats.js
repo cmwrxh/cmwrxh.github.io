@@ -1,5 +1,4 @@
 const { createClient } = require('@supabase/supabase-js');
-const url = require('url');
 
 const supabaseUrl = process.env.SUPABASE_URL;
 
@@ -86,7 +85,9 @@ function groupValue(row, group) {
 module.exports = async function handler(req, res) {
   try {
     /*
-     * Verify server configuration.
+     * ---------------------------------------------------------
+     * 1. Verify server configuration
+     * ---------------------------------------------------------
      */
     if (!supabaseUrl || !supabaseSecretKey) {
       console.error(
@@ -99,7 +100,9 @@ module.exports = async function handler(req, res) {
     }
 
     /*
-     * Only GET is supported.
+     * ---------------------------------------------------------
+     * 2. Only GET is supported
+     * ---------------------------------------------------------
      */
     if (req.method !== 'GET') {
       res.setHeader('Allow', 'GET');
@@ -110,15 +113,9 @@ module.exports = async function handler(req, res) {
     }
 
     /*
-     * Safely parse query parameters with a fallback.
-     */
-    const queryParams =
-      req.query ||
-      url.parse(req.url, true).query ||
-      {};
-
-    /*
-     * Read customer access token.
+     * ---------------------------------------------------------
+     * 3. Require Supabase Auth bearer token
+     * ---------------------------------------------------------
      */
     const authHeader =
       typeof req.headers.authorization === 'string'
@@ -141,7 +138,9 @@ module.exports = async function handler(req, res) {
     }
 
     /*
-     * Create trusted server-side Supabase client.
+     * ---------------------------------------------------------
+     * 4. Create trusted server-side Supabase client
+     * ---------------------------------------------------------
      */
     const supabase = createClient(
       supabaseUrl,
@@ -155,7 +154,9 @@ module.exports = async function handler(req, res) {
     );
 
     /*
-     * Verify the customer's Supabase Auth token.
+     * ---------------------------------------------------------
+     * 5. Verify the customer's access token
+     * ---------------------------------------------------------
      */
     const {
       data: userData,
@@ -178,10 +179,12 @@ module.exports = async function handler(req, res) {
     const userId = userData.user.id;
 
     /*
-     * Read site key.
+     * ---------------------------------------------------------
+     * 6. Read and validate site key
+     * ---------------------------------------------------------
      */
     const siteKey =
-      queryValue(queryParams.site).trim();
+      queryValue(req.query.site).trim();
 
     if (
       siteKey.length < 8 ||
@@ -193,10 +196,12 @@ module.exports = async function handler(req, res) {
     }
 
     /*
-     * Read statistics period.
+     * ---------------------------------------------------------
+     * 7. Read statistics period
+     * ---------------------------------------------------------
      */
     const rawDays = Number.parseInt(
-      queryValue(queryParams.days),
+      queryValue(req.query.days),
       10
     );
 
@@ -205,7 +210,9 @@ module.exports = async function handler(req, res) {
       : 7;
 
     /*
-     * Approved grouping dimensions.
+     * ---------------------------------------------------------
+     * 8. Validate grouping dimension
+     * ---------------------------------------------------------
      */
     const allowedGroups = [
       'country',
@@ -217,7 +224,7 @@ module.exports = async function handler(req, res) {
     ];
 
     const requestedGroup =
-      queryValue(queryParams.group);
+      queryValue(req.query.group);
 
     const group =
       allowedGroups.includes(requestedGroup)
@@ -225,8 +232,9 @@ module.exports = async function handler(req, res) {
         : 'country';
 
     /*
-     * Verify that the authenticated customer
-     * owns the requested monitoring site.
+     * ---------------------------------------------------------
+     * 9. Verify customer owns this site
+     * ---------------------------------------------------------
      */
     const {
       data: site,
@@ -256,8 +264,11 @@ module.exports = async function handler(req, res) {
     }
 
     /*
-     * Calculate the beginning of the requested
-     * statistics period.
+     * ---------------------------------------------------------
+     * 10. Calculate time window
+     *
+     * rum_events uses received_at, NOT created_at.
+     * ---------------------------------------------------------
      */
     const since =
       new Date(
@@ -266,7 +277,9 @@ module.exports = async function handler(req, res) {
       ).toISOString();
 
     /*
-     * Read events from rum_events.
+     * ---------------------------------------------------------
+     * 11. Read only real rum_events columns
+     * ---------------------------------------------------------
      */
     const {
       data: events,
@@ -286,12 +299,12 @@ module.exports = async function handler(req, res) {
           'inp_ms',
           'cls',
           'load_ms',
-          'created_at'
+          'received_at'
         ].join(',')
       )
       .eq('site_id', site.id)
-      .gte('created_at', since)
-      .order('created_at', {
+      .gte('received_at', since)
+      .order('received_at', {
         ascending: false
       })
       .limit(10000);
@@ -312,7 +325,9 @@ module.exports = async function handler(req, res) {
       : [];
 
     /*
-     * Group events.
+     * ---------------------------------------------------------
+     * 12. Group events
+     * ---------------------------------------------------------
      */
     const groups = new Map();
 
@@ -330,7 +345,9 @@ module.exports = async function handler(req, res) {
     }
 
     /*
-     * Build statistics for each segment.
+     * ---------------------------------------------------------
+     * 13. Calculate statistics per segment
+     * ---------------------------------------------------------
      */
     const segments = [];
 
@@ -408,15 +425,18 @@ module.exports = async function handler(req, res) {
     }
 
     /*
-     * Largest segments first.
+     * ---------------------------------------------------------
+     * 14. Largest segments first
+     * ---------------------------------------------------------
      */
     segments.sort(
       (a, b) => b.n - a.n
     );
 
     /*
-     * Return the exact structure expected
-     * by dashboard.html.
+     * ---------------------------------------------------------
+     * 15. Return dashboard-compatible response
+     * ---------------------------------------------------------
      */
     return res.status(200).json({
       site: site.name,
