@@ -1,4 +1,5 @@
 const { createClient } = require('@supabase/supabase-js');
+const url = require('url');
 
 const supabaseUrl = process.env.SUPABASE_URL;
 
@@ -62,13 +63,6 @@ function groupValue(row, group) {
     case 'country':
       return row.country || 'Unknown';
 
-    /*
-     * rum_events does not contain a "network" column.
-     *
-     * For the customer dashboard, ISP/provider is
-     * currently the closest available network-level
-     * grouping in the stored RUM event.
-     */
     case 'network':
       return row.isp || 'Unknown';
 
@@ -116,6 +110,14 @@ module.exports = async function handler(req, res) {
     }
 
     /*
+     * Safely parse query parameters with a fallback.
+     */
+    const queryParams =
+      req.query ||
+      url.parse(req.url, true).query ||
+      {};
+
+    /*
      * Read customer access token.
      */
     const authHeader =
@@ -140,9 +142,6 @@ module.exports = async function handler(req, res) {
 
     /*
      * Create trusted server-side Supabase client.
-     *
-     * The secret/service-role key never reaches
-     * the customer's browser.
      */
     const supabase = createClient(
       supabaseUrl,
@@ -182,7 +181,7 @@ module.exports = async function handler(req, res) {
      * Read site key.
      */
     const siteKey =
-      queryValue(req.query.site).trim();
+      queryValue(queryParams.site).trim();
 
     if (
       siteKey.length < 8 ||
@@ -197,7 +196,7 @@ module.exports = async function handler(req, res) {
      * Read statistics period.
      */
     const rawDays = Number.parseInt(
-      queryValue(req.query.days),
+      queryValue(queryParams.days),
       10
     );
 
@@ -218,7 +217,7 @@ module.exports = async function handler(req, res) {
     ];
 
     const requestedGroup =
-      queryValue(req.query.group);
+      queryValue(queryParams.group);
 
     const group =
       allowedGroups.includes(requestedGroup)
@@ -267,12 +266,7 @@ module.exports = async function handler(req, res) {
       ).toISOString();
 
     /*
-     * Read only columns that actually exist
-     * in rum_events.
-     *
-     * IMPORTANT:
-     * There is intentionally NO "network"
-     * column here.
+     * Read events from rum_events.
      */
     const {
       data: events,
