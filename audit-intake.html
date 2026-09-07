@@ -12,7 +12,7 @@
 <main>
 <section class="section hero-section"><div class="container narrow"><div class="label">Paid audit intake</div><h1>Give us the context before we measure.</h1><p class="hero-subtitle">This intake helps us scope the right audit, identify the relevant African markets and understand the performance question. Do not submit passwords, API keys, private certificates or other credentials.</p></div></section>
 <section class="section"><div class="container narrow">
-<form id="audit-intake-form" action="/api/submit-audit" method="post" novalidate>
+<form id="audit-intake-form" novalidate>
 <div class="card">
 <div class="label">Contact</div>
 <label class="label" for="name">Name</label><input class="form-input" id="name" name="Name" autocomplete="name" required>
@@ -25,7 +25,7 @@
 <label class="label" for="package">Preferred package</label>
 <select class="form-input" id="package" name="Package"><option value="Latency Snapshot">Latency Snapshot — $199–$299</option><option value="Africa Latency Audit">Africa Latency Audit™ — $500–$900</option><option value="Infrastructure Performance Assessment">Infrastructure Performance Assessment — $1,500–$5,000+</option><option value="Not sure">Not sure — help me choose</option></select>
 <label class="label" for="markets" style="display:block;margin-top:18px">Target African markets</label><input class="form-input" id="markets" name="Markets" placeholder="e.g. Kenya, Nigeria, Ghana, South Africa" required>
-<label class="label" for="domain" style="display:block;margin-top:18px">Public application / API domain</label><input class="form-input" id="domain" name="Domain" type="url" placeholder="https://api.example.com" required>
+<label class="label" for="domain" style="display:block;margin-top:18px">Public application / API domain</label><input class="form-input" id="domain" name="Domain" type="text" inputmode="url" autocomplete="url" placeholder="https://api.example.com" required><p class="muted" style="margin-top:8px">Use the full public URL, including https:// (for example, https://api.example.com).</p>
 <label class="label" for="endpoints" style="display:block;margin-top:18px">Business-critical endpoints</label><textarea class="form-input" id="endpoints" name="Endpoints" rows="4" placeholder="List public endpoints or flows that matter most."></textarea>
 <label class="label" for="architecture" style="display:block;margin-top:18px">Architecture / infrastructure context</label><textarea class="form-input" id="architecture" name="Architecture" rows="5" placeholder="Cloud/provider, region(s), CDN/edge, API stack, database, relevant third parties, or anything you already know."></textarea>
 </div>
@@ -58,6 +58,7 @@
 
   form.addEventListener('submit', async function (event) {
     event.preventDefault();
+    event.stopPropagation();
     status.textContent = '';
 
     if (!form.checkValidity()) {
