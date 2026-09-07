@@ -15,7 +15,9 @@
     { "source": "/terms-of-service.html", "destination": "/terms-of-service", "permanent": true },
     { "source": "/service-level-agreement.html", "destination": "/service-level-agreement", "permanent": true },
     { "source": "/acceptable-use-policy.html", "destination": "/acceptable-use-policy", "permanent": true },
-    { "source": "/refund-policy.html", "destination": "/refund-policy", "permanent": true }
+    { "source": "/refund-policy.html", "destination": "/refund-policy", "permanent": true },
+    { "source": "/help-centre.html", "destination": "/help-centre", "permanent": true },
+    { "source": "/blog.html", "destination": "/blog", "permanent": true }
   ],
   "rewrites": [
     { "source": "/about", "destination": "/about.html" },
@@ -33,6 +35,8 @@
     { "source": "/terms-of-service", "destination": "/terms-of-service.html" },
     { "source": "/service-level-agreement", "destination": "/service-level-agreement.html" },
     { "source": "/acceptable-use-policy", "destination": "/acceptable-use-policy.html" },
-    { "source": "/refund-policy", "destination": "/refund-policy.html" }
+    { "source": "/refund-policy", "destination": "/refund-policy.html" },
+    { "source": "/help-centre", "destination": "/help-centre.html" },
+    { "source": "/blog", "destination": "/blog.html" }
   ]
 }
