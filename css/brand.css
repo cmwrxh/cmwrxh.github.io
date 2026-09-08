@@ -46,6 +46,28 @@
   display: flex;
 }
 
+/* Prevent intrinsic image/form widths from forcing the contact grid beyond its container. */
+.contact-image-form {
+  grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.18fr);
+}
+
+.contact-image-form > * {
+  min-width: 0;
+}
+
+.contact-page-form {
+  width: 100%;
+  max-width: none;
+  min-width: 0;
+}
+
+.contact-page-form input,
+.contact-page-form select,
+.contact-page-form textarea {
+  min-width: 0;
+  max-width: 100%;
+}
+
 .help-contact-grid {
   display: grid;
   grid-template-columns: 1fr 0.9fr;
@@ -95,6 +117,10 @@
 
   .brand-name {
     font-size: clamp(0.78rem, 3.8vw, 1rem);
+  }
+
+  .contact-image-form {
+    grid-template-columns: 1fr;
   }
 
   .help-contact-grid {
