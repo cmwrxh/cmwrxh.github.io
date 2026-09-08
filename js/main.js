@@ -41,21 +41,18 @@ document.addEventListener('DOMContentLoaded', () => {
   `;
   document.head.appendChild(menuStyle);
 
-  // Shared brand lockup: icon image + real HTML/CSS brand text.
+  // Shared brand lockup: transform the existing nav-brand anchor in place.
+  // This avoids nested anchors and targets only the navigation brand element.
   document.querySelectorAll('.nav-brand').forEach((brand) => {
-    brand.innerHTML = '';
-    const lockup = document.createElement('a');
-    lockup.className = 'brand-lockup';
-    lockup.href = '/';
-    lockup.setAttribute('aria-label', 'Africa Latency Ltd');
-    lockup.innerHTML = `
+    brand.classList.add('brand-lockup');
+    brand.setAttribute('aria-label', 'Africa Latency Ltd');
+    brand.innerHTML = `
       <img class="brand-icon" src="/images/logo-icon-v4.png" alt="" aria-hidden="true">
       <span class="brand-name">
         <span class="brand-name-white">Africa</span>
         <span class="brand-name-green">Latency</span>
         <span class="brand-name-white">Ltd</span>
       </span>`;
-    brand.appendChild(lockup);
   });
 
   const links = [
