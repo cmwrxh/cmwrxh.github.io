@@ -33,8 +33,22 @@ document.addEventListener('DOMContentLoaded', () => {
       .menu-toggle { display: none !important; }
       .site-menu { display: none !important; }
     }
+    .nav-brand { gap: 0; }
+    .nav-brand-logo { display: block; width: auto; height: 36px; max-width: min(240px, 42vw); object-fit: contain; }
   `;
   document.head.appendChild(menuStyle);
+
+  // The nav brand is rendered on every non-login page. Normalize it here so
+  // the logo is maintained through the shared site interaction layer rather
+  // than duplicated as separate per-page branding markup.
+  document.querySelectorAll('.nav-brand').forEach((brand) => {
+    brand.innerHTML = '';
+    const logo = document.createElement('img');
+    logo.className = 'nav-brand-logo';
+    logo.src = '/images/logo-primary.jpeg';
+    logo.alt = 'Africa Latency Ltd — Performance intelligence for Africa';
+    brand.appendChild(logo);
+  });
 
   const links = [
     ['/services', 'Services'],
