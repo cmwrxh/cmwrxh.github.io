@@ -33,21 +33,31 @@ document.addEventListener('DOMContentLoaded', () => {
       .menu-toggle { display: none !important; }
       .site-menu { display: none !important; }
     }
-    .nav-brand { gap: 0; }
-    .nav-brand-logo { display: block; width: auto; height: 36px; max-width: min(240px, 42vw); object-fit: contain; }
+    .nav-brand { gap: 9px; white-space: nowrap; }
+    .brand-lockup { display: inline-flex; align-items: center; gap: 9px; min-width: 0; color: var(--text); text-decoration: none; }
+    .brand-icon { display: block; width: 42px; height: 42px; flex: 0 0 42px; object-fit: contain; }
+    .brand-name { display: inline-flex; align-items: baseline; font: 700 1rem/1 "Space Grotesk", sans-serif; letter-spacing: -.02em; white-space: nowrap; }
+    .brand-name-white { color: var(--text); }
+    .brand-name-green { color: var(--accent); }
+    @media (max-width: 899px) {
+      .brand-icon { width: 44px; height: 44px; flex-basis: 44px; }
+      .brand-name { font-size: .98rem; }
+      .nav-brand { gap: 8px; }
+    }
   `;
   document.head.appendChild(menuStyle);
 
-  // The nav brand is rendered on every non-login page. Normalize it here so
-  // the logo is maintained through the shared site interaction layer rather
-  // than duplicated as separate per-page branding markup.
+  // Shared brand lockup: icon image + real HTML/CSS brand text.
   document.querySelectorAll('.nav-brand').forEach((brand) => {
     brand.innerHTML = '';
-    const logo = document.createElement('img');
-    logo.className = 'nav-brand-logo';
-    logo.src = '/images/logo-primaryv2.jpeg';
-    logo.alt = 'Africa Latency Ltd — Performance intelligence for Africa';
-    brand.appendChild(logo);
+    const lockup = document.createElement('span');
+    lockup.className = 'brand-lockup';
+    lockup.innerHTML = `
+      <img class="brand-icon" src="/images/logo-primaryV4.jpg" alt="" aria-hidden="true">
+      <span class="brand-name" aria-hidden="true">
+        <span class="brand-name-white">Africa</span><span class="brand-name-green">Latency</span><span class="brand-name-white"> Ltd</span>
+      </span>`;
+    brand.appendChild(lockup);
   });
 
   const links = [
