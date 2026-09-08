@@ -37,6 +37,15 @@
   color: var(--accent);
 }
 
+/* Menu visibility baseline: keep the overlay out of layout/paint until opened. */
+.site-menu {
+  display: none;
+}
+
+.site-menu.open {
+  display: flex;
+}
+
 @media (max-width: 899px) {
   .brand-lockup {
     gap: 8px;
