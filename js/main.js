@@ -8,8 +8,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const menuStyle = document.createElement('style');
   menuStyle.textContent = `
-    .site-menu { position: fixed !important; inset: 0 !important; z-index: 99999 !important; display: block !important; opacity: 0 !important; visibility: hidden !important; pointer-events: none !important; background: #050609 !important; }
-    .site-menu.open { opacity: 1 !important; visibility: visible !important; pointer-events: auto !important; }
+    .site-menu { position: fixed !important; inset: 0 !important; z-index: 99999 !important; display: none !important; opacity: 0 !important; visibility: hidden !important; pointer-events: none !important; background: #050609 !important; transition: opacity .2s ease, visibility .2s ease !important; }
+    .site-menu.open { display: flex !important; opacity: 1 !important; visibility: visible !important; pointer-events: auto !important; }
     .site-menu-inner { position: absolute !important; inset: 0 !important; display: flex !important; flex-direction: column !important; max-width: 100% !important; }
     .menu-grid { flex: 1 !important; display: flex !important; flex-direction: column !important; justify-content: center !important; align-items: center !important; gap: 8px !important; min-height: 0 !important; overflow-y: auto !important; }
     .menu-column { width: min(760px, 100%); text-align: center; }
