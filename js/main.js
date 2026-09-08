@@ -1,6 +1,11 @@
 // Shared site interactions
 
 document.addEventListener('DOMContentLoaded', () => {
+  const brandStyles = document.createElement('link');
+  brandStyles.rel = 'stylesheet';
+  brandStyles.href = '/css/brand.css';
+  document.head.appendChild(brandStyles);
+
   const menuStyle = document.createElement('style');
   menuStyle.textContent = `
     .site-menu { position: fixed !important; inset: 0 !important; z-index: 99999 !important; display: block !important; opacity: 0 !important; visibility: hidden !important; pointer-events: none !important; background: #050609 !important; }
@@ -33,29 +38,22 @@ document.addEventListener('DOMContentLoaded', () => {
       .menu-toggle { display: none !important; }
       .site-menu { display: none !important; }
     }
-    .nav-brand { gap: 9px; white-space: nowrap; }
-    .brand-lockup { display: inline-flex; align-items: center; gap: 9px; min-width: 0; color: var(--text); text-decoration: none; }
-    .brand-icon { display: block; width: 42px; height: 42px; flex: 0 0 42px; object-fit: contain; }
-    .brand-name { display: inline-flex; align-items: baseline; font: 700 1rem/1 "Space Grotesk", sans-serif; letter-spacing: -.02em; white-space: nowrap; }
-    .brand-name-white { color: var(--text); }
-    .brand-name-green { color: var(--accent); }
-    @media (max-width: 899px) {
-      .brand-icon { width: 44px; height: 44px; flex-basis: 44px; }
-      .brand-name { font-size: .98rem; }
-      .nav-brand { gap: 8px; }
-    }
   `;
   document.head.appendChild(menuStyle);
 
   // Shared brand lockup: icon image + real HTML/CSS brand text.
   document.querySelectorAll('.nav-brand').forEach((brand) => {
     brand.innerHTML = '';
-    const lockup = document.createElement('span');
+    const lockup = document.createElement('a');
     lockup.className = 'brand-lockup';
+    lockup.href = '/';
+    lockup.setAttribute('aria-label', 'Africa Latency Ltd');
     lockup.innerHTML = `
-      <img class="brand-icon" src="/images/logo-primaryV4.jpg" alt="" aria-hidden="true">
-      <span class="brand-name" aria-hidden="true">
-        <span class="brand-name-white">Africa</span><span class="brand-name-green">Latency</span><span class="brand-name-white"> Ltd</span>
+      <img class="brand-icon" src="/images/logo-icon-v4.png" alt="" aria-hidden="true">
+      <span class="brand-name">
+        <span class="brand-name-white">Africa</span>
+        <span class="brand-name-green">Latency</span>
+        <span class="brand-name-white">Ltd</span>
       </span>`;
     brand.appendChild(lockup);
   });
