@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
     brand.innerHTML = '';
     const logo = document.createElement('img');
     logo.className = 'nav-brand-logo';
-    logo.src = '/images/logo-primary.jpeg';
+    logo.src = '/images/1788865343198.png';
     logo.alt = 'Africa Latency Ltd — Performance intelligence for Africa';
     brand.appendChild(logo);
   });
