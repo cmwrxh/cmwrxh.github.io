@@ -21,28 +21,69 @@ document.addEventListener('DOMContentLoaded', () => {
     .site-menu .menu-footer .btn-primary { order: 1; }
     .site-menu .menu-footer .btn-secondary { order: 2; }
     body.menu-open { overflow: hidden !important; }
+    .nav-links { display: none; }
+    .nav-cta { display: none; }
+    @media (min-width: 900px) {
+      .nav-inner { gap: 24px; }
+      .nav-links { display: flex; align-items: center; gap: 20px; list-style: none; margin: 0; padding: 0; }
+      .nav-links li { margin: 0; padding: 0; }
+      .nav-links li a { display: inline-flex; align-items: center; white-space: nowrap; }
+      .nav-cta { display: inline-flex; align-items: center; white-space: nowrap; }
+      .nav-actions { margin-left: auto; }
+      .menu-toggle { display: none !important; }
+      .site-menu { display: none !important; }
+    }
   `;
   document.head.appendChild(menuStyle);
 
-  // Legacy pages have an inline nav-links list but no menu button. Convert that
-  // navigation into the same full-screen overlay used by the homepage.
+  const links = [
+    ['/services', 'Services'],
+    ['/scan', 'Free Scan'],
+    ['/methodology', 'Methodology'],
+    ['/cases', 'Cases'],
+    ['/about', 'About us'],
+    ['/blog', 'Blog'],
+    ['/help-centre', 'Help centre'],
+    ['/contact', 'Contact Us'],
+    ['/login', 'Login']
+  ];
+
+  const nav = document.querySelector('nav');
+  if (nav) {
+    let navLinks = nav.querySelector('.nav-links');
+    if (!navLinks) {
+      navLinks = document.createElement('ul');
+      navLinks.className = 'nav-links';
+      const navInner = nav.querySelector('.nav-inner');
+      if (navInner) {
+        const actions = navInner.querySelector('.nav-actions') || document.createElement('div');
+        actions.className = 'nav-actions';
+        navInner.appendChild(actions);
+        navInner.insertBefore(navLinks, actions);
+      }
+    }
+
+    navLinks.innerHTML = links.map(([href, text]) => `<li><a href="${href}">${text}</a></li>`).join('');
+
+    let navCta = nav.querySelector('.nav-cta');
+    if (!navCta) {
+      navCta = document.createElement('a');
+      navCta.className = 'nav-cta btn btn-primary';
+      navCta.href = '/scan';
+      navCta.textContent = 'Run a free scan';
+      const navInner = nav.querySelector('.nav-inner');
+      const actions = navInner?.querySelector('.nav-actions');
+      if (actions) actions.appendChild(navCta);
+    }
+  }
+
+  // Legacy pages have an inline nav-links list but no menu button. Keep that
+  // horizontal navigation for desktop and convert it into the same full-screen
+  // overlay used by the homepage for mobile.
   if (!document.getElementById('site-menu')) {
-    const nav = document.querySelector('nav');
     const navLinks = nav?.querySelector('.nav-links');
 
     if (nav && navLinks) {
-      const links = [
-        ['/services', 'Services'],
-        ['/scan', 'Free Scan'],
-        ['/methodology', 'Methodology'],
-        ['/cases', 'Cases'],
-        ['/about', 'About us'],
-        ['/blog', 'Blog'],
-        ['/help-centre', 'Help centre'],
-        ['/contact', 'Contact Us'],
-        ['/login', 'Login']
-      ];
-
       const toggle = document.createElement('button');
       toggle.id = 'menu-toggle';
       toggle.className = 'menu-toggle';
@@ -52,7 +93,6 @@ document.addEventListener('DOMContentLoaded', () => {
       toggle.setAttribute('aria-controls', 'site-menu');
       toggle.innerHTML = '<span></span><span></span><span></span>';
 
-      navLinks.remove();
       const actions = nav.querySelector('.nav-actions') || document.createElement('div');
       actions.className = 'nav-actions';
       actions.appendChild(toggle);
