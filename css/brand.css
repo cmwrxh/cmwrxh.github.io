@@ -86,8 +86,9 @@
 .help-contact-image img {
   display: block;
   width: 100%;
-  height: 280px;
-  object-fit: cover;
+  height: auto;
+  aspect-ratio: auto;
+  object-fit: contain;
   object-position: center;
   border: 1px solid var(--border);
   border-radius: 14px;
@@ -132,10 +133,6 @@
     order: 2;
   }
 
-  .help-contact-image img {
-    height: 300px;
-  }
-
   .about-signal-single img {
     height: 320px !important;
   }
@@ -151,9 +148,5 @@
   .brand-name {
     font-size: 0.78rem;
     gap: 0.25em;
-  }
-
-  .help-contact-image img {
-    height: 240px;
   }
 }
