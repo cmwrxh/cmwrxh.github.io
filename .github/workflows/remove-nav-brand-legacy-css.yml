@@ -1,0 +1,40 @@
+name: Remove legacy nav brand CSS
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/remove-nav-brand-legacy-css.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Remove obsolete nav brand selectors
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          path = Path('css/style.css')
+          text = path.read_text(encoding='utf-8')
+          old_before = '.nav-brand:before{content:"";width:20px;height:20px;border:2px solid var(--accent);border-radius:6px;transform:rotate(45deg);box-shadow:0 0 14px rgba(57,255,154,.15)}'
+          old_span = '.nav-brand span{color:#6f7580}'
+          if old_before not in text or old_span not in text:
+              raise SystemExit('Expected legacy nav-brand selectors were not found; refusing to modify CSS.')
+          text = text.replace(old_before, '').replace(old_span, '')
+          path.write_text(text, encoding='utf-8')
+          PY
+          ! grep -q '\.nav-brand:before\|\.nav-brand span' css/style.css
+      - name: Commit CSS cleanup and remove one-off workflow
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add css/style.css .github/workflows/remove-nav-brand-legacy-css.yml
+          git commit -m 'Remove obsolete nav brand CSS'
+          git rm .github/workflows/remove-nav-brand-legacy-css.yml
+          git commit -m 'Remove one-off nav brand CSS workflow'
+          git push
