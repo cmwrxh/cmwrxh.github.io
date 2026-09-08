@@ -1,0 +1,110 @@
+name: Finalize favicons
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'images/favicon-source.png'
+      - '.github/workflows/finalize-favicons.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  finalize:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Generate favicon assets
+        run: |
+          python -m pip install --quiet Pillow
+          python <<'PY'
+          from pathlib import Path
+          from PIL import Image
+
+          src = Path('images/favicon-source.png')
+          out = Path('images')
+          image = Image.open(src).convert('RGBA')
+
+          for size, name in [
+              (16, 'favicon-16x16.png'),
+              (32, 'favicon-32x32.png'),
+              (48, 'favicon-48x48.png'),
+              (180, 'apple-touch-icon.png'),
+              (192, 'web-app-manifest-192x192.png'),
+              (512, 'web-app-manifest-512x512.png'),
+          ]:
+              icon = image.resize((size, size), Image.Resampling.LANCZOS)
+              icon.save(out / name, format='PNG', optimize=True)
+
+          image.save(out / 'favicon.ico', format='ICO', sizes=[(16,16), (32,32), (48,48)])
+          PY
+
+      - name: Add favicon markup to every HTML page
+        run: |
+          python <<'PY'
+          from pathlib import Path
+
+          markup = '''<link rel="icon" type="image/x-icon" href="/images/favicon.ico">\n<link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">\n<link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">\n<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">'''
+
+          for path in Path('.').rglob('*.html'):
+              text = path.read_text(encoding='utf-8')
+              if '/images/favicon-32x32.png' in text or '/images/favicon.ico' in text:
+                  continue
+              if '</head>' not in text:
+                  continue
+              path.write_text(text.replace('</head>', markup + '</head>', 1), encoding='utf-8')
+          PY
+
+      - name: Update manifest icons when a manifest exists
+        run: |
+          if [ -f manifest.json ]; then
+            python <<'PY'
+          import json
+          from pathlib import Path
+
+          path = Path('manifest.json')
+          data = json.loads(path.read_text(encoding='utf-8'))
+          icons = [i for i in data.get('icons', []) if i.get('src') not in ('/images/web-app-manifest-192x192.png', '/images/web-app-manifest-512x512.png')]
+          icons.extend([
+              {'src': '/images/web-app-manifest-192x192.png', 'sizes': '192x192', 'type': 'image/png'},
+              {'src': '/images/web-app-manifest-512x512.png', 'sizes': '512x512', 'type': 'image/png'},
+          ])
+          data['icons'] = icons
+          path.write_text(json.dumps(data, indent=2) + '\n', encoding='utf-8')
+          PY
+          fi
+
+      - name: Verify generated assets and markup
+        run: |
+          test -s images/favicon.ico
+          test -s images/favicon-16x16.png
+          test -s images/favicon-32x32.png
+          test -s images/apple-touch-icon.png
+          test -s images/web-app-manifest-192x192.png
+          test -s images/web-app-manifest-512x512.png
+          python - <<'PY'
+          from pathlib import Path
+          pages = list(Path('.').rglob('*.html'))
+          missing = [str(p) for p in pages if '/images/favicon-32x32.png' not in p.read_text(encoding='utf-8')]
+          if missing:
+              raise SystemExit('Missing favicon markup: ' + ', '.join(missing))
+          print(f'Verified favicon markup on {len(pages)} HTML pages.')
+          PY
+
+      - name: Commit generated assets and page markup
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add images/favicon.ico images/favicon-16x16.png images/favicon-32x32.png images/favicon-48x48.png images/apple-touch-icon.png images/web-app-manifest-192x192.png images/web-app-manifest-512x512.png '*.html' manifest.json 2>/dev/null || true
+          git add -A
+          git commit -m 'Add final favicon set site-wide' || exit 0
+          git push
+
+      - name: Remove one-off workflow
+        run: |
+          git rm .github/workflows/finalize-favicons.yml
+          git commit -m 'Remove one-off favicon generation workflow'
+          git push
