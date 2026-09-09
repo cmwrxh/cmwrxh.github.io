@@ -317,8 +317,8 @@ async function runScan() {
       <div style="font-size:.95rem;font-weight:600;margin-bottom:.35rem;">Want to know why the results look this way?</div>
       <div style="font-size:.8rem;color:var(--text-muted);margin-bottom:1rem;line-height:1.6;">The free scanner shows what we observed. The Africa Latency Audit™ investigates routing, CDN/edge placement, infrastructure, application/API behavior and other dependencies to identify the likely bottleneck and prioritize fixes.</div>
       <div style="display:flex;gap:.75rem;flex-wrap:wrap;align-items:center;">
-        <a class="btn btn-primary" href="contact.html?service=latency-audit">Request Africa Latency Audit™ →</a>
-        <a href="methodology.html" style="font-size:.82rem;color:var(--text-muted);">View methodology</a>
+        <a class="btn btn-primary" href="/audit-intake">Request Africa Latency Audit™ →</a>
+        <a href="methodology.html" style="font-size:.82rem;color:var(--text-muted);">View our method</a>
       </div>
     </div>
   `;
