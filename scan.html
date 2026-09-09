@@ -77,5 +77,14 @@
 </footer>
 <script src="js/main.js"></script>
 <script src="js/scan.js"></script>
+<script>
+  // Keep every audit-intent CTA on the scanner on the canonical audit intake path.
+  const auditCtaObserver = new MutationObserver(() => {
+    document.querySelectorAll('a[href*="contact.html?service=latency-audit"], a[href*="/contact?service=latency-audit"]').forEach((link) => {
+      link.href = '/audit-intake';
+    });
+  });
+  auditCtaObserver.observe(document.body, { childList: true, subtree: true });
+</script>
 </body>
 </html>
