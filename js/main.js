@@ -6,8 +6,6 @@ document.addEventListener('DOMContentLoaded', () => {
   brandStyles.href = '/css/brand.css';
   document.head.appendChild(brandStyles);
 
-  // Keep the full-screen menu in the render tree while closed so the
-  // opacity/visibility transition can animate smoothly.
   const menuStyle = document.createElement('style');
   menuStyle.textContent = `
     .site-menu { position: fixed !important; inset: 0 !important; z-index: 99999 !important; display: flex !important; opacity: 0 !important; visibility: hidden !important; pointer-events: none !important; background: #050609 !important; transition: opacity .2s ease, visibility .2s ease !important; }
@@ -49,8 +47,6 @@ document.addEventListener('DOMContentLoaded', () => {
   `;
   document.head.appendChild(menuStyle);
 
-  // Load RUM on every page that uses the shared script, while avoiding a
-  // duplicate tag on pages where it is already present explicitly.
   if (!document.querySelector('script[src="/africalatency.js"]')) {
     const rum = document.createElement('script');
     rum.defer = true;
@@ -59,7 +55,6 @@ document.addEventListener('DOMContentLoaded', () => {
     document.head.appendChild(rum);
   }
 
-  // Shared brand lockup: transform the existing nav-brand anchor in place.
   document.querySelectorAll('.nav-brand').forEach((brand) => {
     brand.classList.add('brand-lockup');
     brand.setAttribute('aria-label', 'Africa Latency Ltd');
@@ -113,16 +108,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Build the requested grouped hamburger menu from one central definition.
-  // Desktop navigation continues to use the flat `links` array above.
   function buildMobileMenu(menu) {
     const grid = menu.querySelector('.menu-grid');
     if (!grid) return;
 
     const existingSocialIcons = grid.querySelector('.social-icons');
-    const socialIcons = existingSocialIcons
-      ? existingSocialIcons.cloneNode(true)
-      : null;
+    const socialIcons = existingSocialIcons ? existingSocialIcons.cloneNode(true) : null;
 
     grid.innerHTML = `
       <div class="menu-column">
@@ -130,6 +121,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <a href="/services.html" class="menu-group-title">Services</a>
           <div class="menu-subitems">
             <a href="/scan.html">Free Scan</a>
+            <a href="/sitespeed.html">Website Speed Check</a>
             <a href="/methodology.html">Methodology</a>
           </div>
         </div>
@@ -152,12 +144,9 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="menu-label">Follow</div>
       </div>`;
 
-    if (socialIcons) {
-      grid.querySelector('.legacy-menu-bottom').appendChild(socialIcons);
-    }
+    if (socialIcons) grid.querySelector('.legacy-menu-bottom').appendChild(socialIcons);
   }
 
-  // Normalize legacy pages into the shared mobile navigation structure.
   if (!document.getElementById('site-menu')) {
     const navLinks = nav?.querySelector('.nav-links');
     if (nav && navLinks) {
@@ -215,8 +204,6 @@ document.addEventListener('DOMContentLoaded', () => {
       wireMenu(menu, toggle);
     }
   } else {
-    // Current pages already contain the canonical toggle + overlay. Normalize
-    // their menu contents here so the grouping is controlled in one place.
     const menu = document.getElementById('site-menu');
     const toggle = document.getElementById('menu-toggle');
     if (menu && toggle) {
