@@ -6,9 +6,11 @@ document.addEventListener('DOMContentLoaded', () => {
   brandStyles.href = '/css/brand.css';
   document.head.appendChild(brandStyles);
 
+  // Keep the full-screen menu in the render tree while closed so the
+  // opacity/visibility transition in style.css can animate smoothly.
   const menuStyle = document.createElement('style');
   menuStyle.textContent = `
-    .site-menu { position: fixed !important; inset: 0 !important; z-index: 99999 !important; display: none !important; opacity: 0 !important; visibility: hidden !important; pointer-events: none !important; background: #050609 !important; transition: opacity .2s ease, visibility .2s ease !important; }
+    .site-menu { position: fixed !important; inset: 0 !important; z-index: 99999 !important; display: flex !important; opacity: 0 !important; visibility: hidden !important; pointer-events: none !important; background: #050609 !important; transition: opacity .2s ease, visibility .2s ease !important; }
     .site-menu.open { display: flex !important; opacity: 1 !important; visibility: visible !important; pointer-events: auto !important; }
     .site-menu-inner { position: absolute !important; inset: 0 !important; display: flex !important; flex-direction: column !important; max-width: 100% !important; }
     .menu-grid { flex: 1 !important; display: flex !important; flex-direction: column !important; justify-content: center !important; align-items: center !important; gap: 8px !important; min-height: 0 !important; overflow-y: auto !important; }
@@ -36,10 +38,20 @@ document.addEventListener('DOMContentLoaded', () => {
       .nav-cta { display: inline-flex; align-items: center; white-space: nowrap; }
       .nav-actions { margin-left: auto; }
       .menu-toggle { display: none !important; }
-      .site-menu { display: none !important; }
+      .site-menu { display: flex !important; }
     }
   `;
   document.head.appendChild(menuStyle);
+
+  // Load RUM on every page that uses the shared script, while avoiding a
+  // duplicate tag on the homepage where it is already present explicitly.
+  if (!document.querySelector('script[src="/africalatency.js"]')) {
+    const rum = document.createElement('script');
+    rum.defer = true;
+    rum.src = '/africalatency.js';
+    rum.setAttribute('data-al-key', 'test-site-001');
+    document.head.appendChild(rum);
+  }
 
   // Shared brand lockup: transform the existing nav-brand anchor in place.
   // This avoids nested anchors and targets only the navigation brand element.
@@ -56,15 +68,15 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   const links = [
-    ['/services', 'Services'],
-    ['/scan', 'Free Scan'],
-    ['/methodology', 'Methodology'],
-    ['/cases', 'Cases'],
-    ['/about', 'About us'],
-    ['/blog', 'Blog'],
-    ['/help-centre', 'Help centre'],
-    ['/contact', 'Contact Us'],
-    ['/login', 'Login']
+    ['/services.html', 'Services'],
+    ['/scan.html', 'Free Scan'],
+    ['/methodology.html', 'Methodology'],
+    ['/cases.html', 'Cases'],
+    ['/about.html', 'About'],
+    ['/blog.html', 'Blog'],
+    ['/help-centre.html', 'Help centre'],
+    ['/contact.html', 'Contact'],
+    ['/login.html', 'Login']
   ];
 
   const nav = document.querySelector('nav');
@@ -88,7 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!navCta) {
       navCta = document.createElement('a');
       navCta.className = 'nav-cta btn btn-primary';
-      navCta.href = '/scan';
+      navCta.href = '/scan.html';
       navCta.textContent = 'Run a free scan';
       const navInner = nav.querySelector('.nav-inner');
       const actions = navInner?.querySelector('.nav-actions');
@@ -139,8 +151,8 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
           </div>
           <div class="menu-footer">
-            <a class="btn btn-primary" href="/scan">Run a free scan</a>
-            <a class="btn btn-secondary" href="/contact">Contact Us</a>
+            <a class="btn btn-primary" href="/scan.html">Run a free scan</a>
+            <a class="btn btn-secondary" href="/contact.html">Contact</a>
           </div>
         </div>`;
 
