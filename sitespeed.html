@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Website Speed Check — AfricaLatency.dev</title>
+  <meta name="description" content="A fast, affordable check of your website's front-end performance and Core Web Vitals.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/marketing.css">
+  <link rel="stylesheet" href="/css/brand.css?v=4">
+  <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+</head>
+<body>
+  <nav>
+    <div class="nav-inner">
+      <a href="/" class="nav-brand brand-lockup" aria-label="africalatency.dev">
+        <img class="brand-icon" src="/images/logo-icon-v4.png" alt="" aria-hidden="true">
+        <span class="brand-name"><span class="brand-name-white">africalatency</span><span class="brand-name-green">.dev</span></span>
+      </a>
+      <div class="nav-actions">
+        <button id="menu-toggle" class="menu-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="site-menu"><span></span><span></span><span></span></button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="site-menu" id="site-menu" aria-hidden="true">
+    <div class="site-menu-inner">
+      <div class="menu-head"><span class="label">AfricaLatency</span><button id="menu-close" class="menu-close" type="button" aria-label="Close menu">×</button></div>
+      <div class="menu-grid"></div>
+      <div class="menu-footer"><a class="btn btn-primary" href="/scan.html">Run a free scan</a><a class="btn btn-secondary" href="/contact.html">Contact</a></div>
+    </div>
+  </div>
+
+  <main>
+    <section class="section hero-section">
+      <div class="container narrow">
+        <div class="label">Website Speed Check</div>
+        <h1>Is your website fast where it counts — in the browser and on Google?</h1>
+        <p class="hero-subtitle">A fast, affordable check of your website's front-end performance and Core Web Vitals — the metrics Google uses to rank you, and the ones that make visitors stay or leave.</p>
+        <div class="btn-group"><a class="btn btn-primary" href="#check-form">Check my website's speed →</a></div>
+      </div>
+    </section>
+
+    <section class="section" style="background:var(--bg-elevated)">
+      <div class="container">
+        <div class="section-heading"><div class="label">What's checked</div><h2>A focused check of the things visitors and search engines actually experience.</h2></div>
+        <div class="feature-grid">
+          <div class="card">
+            <ul class="clean-list">
+              <li>Page load time and asset weight (images, scripts, fonts)</li>
+              <li>Core Web Vitals (LCP, INP, CLS) — Google's ranking signals</li>
+            </ul>
+          </div>
+          <div class="card">
+            <ul class="clean-list">
+              <li>Mobile performance score</li>
+              <li>Quick-win recommendations, prioritized by impact</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="section-heading"><div class="label">Pricing</div><h2>One simple check. A clear list of what to fix.</h2></div>
+        <div style="overflow-x:auto">
+          <table>
+            <thead><tr><th>Package</th><th>Price</th><th>Scope</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><strong>Starter Website Speed Check</strong></td>
+                <td>$29–49</td>
+                <td>Single page or domain, PageSpeed Insights + Lighthouse report, prioritized fix list, delivered within 24–48 hours.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" style="background:var(--bg-elevated)">
+      <div class="container narrow">
+        <div class="card card-accent-green" id="check-form">
+          <div class="label">Request a check</div>
+          <h2>Get your website speed checked.</h2>
+          <p class="section-lead">Tell us where to look. We'll use the details below to start your Website Speed Check.</p>
+          <form id="sitespeed-lead-form" style="margin-top:28px">
+            <div style="display:grid;gap:16px">
+              <div><label for="sitespeed-name">Name</label><input class="form-input" id="sitespeed-name" name="name" type="text" autocomplete="name" required></div>
+              <div><label for="sitespeed-email">Email</label><input class="form-input" id="sitespeed-email" name="email" type="email" autocomplete="email" required></div>
+              <div><label for="sitespeed-domain">Domain to check</label><input class="form-input" id="sitespeed-domain" name="domain" type="text" placeholder="example.com" autocomplete="url" required></div>
+              <button class="btn btn-primary" type="submit">Check my website's speed →</button>
+            </div>
+            <p id="sitespeed-form-status" class="section-lead" role="status" aria-live="polite" style="margin-top:16px"></p>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="homepage-footer">
+    <div class="footer-inner">
+      <div class="footer-intro"><div class="label">AfricaLatency.dev</div><h3>Better performance. Better digital experiences.</h3><p>Helping businesses understand, improve, and monitor digital performance across Africa.</p><p class="footer-address">1st Parklands Avenue, 00623 Nairobi, Kenya</p><p class="footer-copy">© 2026 AfricaLatency.dev</p></div>
+      <div class="footer-links"><span>Company</span><a href="/about.html">About us</a><a href="/cases.html">Cases</a><a href="/terms-of-service.html">Terms of Service</a><a href="/service-level-agreement.html">Service Level Agreement</a><a href="/acceptable-use-policy.html">Acceptable Use Policy</a><a href="/refund-policy.html">Refund Policy</a><span>Support</span><a href="/help-centre.html">Help centre</a><a href="/blog.html">Blog</a></div>
+      <div class="footer-follow"><strong>Follow Us</strong><div class="footer-follow-row"><a href="mailto:support@africalatency.dev">support@africalatency.dev</a><div class="footer-social"><a href="https://www.linkedin.com/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a><a href="https://github.com/cmwrxh/cmwrxh.github.io" target="_blank" rel="noopener" aria-label="GitHub">⌘</a><a href="mailto:support@africalatency.dev" aria-label="Email">✉</a></div></div></div>
+    </div>
+  </footer>
+
+  <script src="/js/main.js"></script>
+  <script>
+    document.getElementById('sitespeed-lead-form').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const form = event.currentTarget;
+      const status = document.getElementById('sitespeed-form-status');
+      const button = form.querySelector('button[type="submit"]');
+      button.disabled = true;
+      status.textContent = 'Sending…';
+      try {
+        const response = await fetch('/api/submit-sitespeed', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: form.name.value.trim(),
+            email: form.email.value.trim(),
+            domain: form.domain.value.trim()
+          })
+        });
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(result.error || 'Unable to submit your request.');
+        form.reset();
+        status.textContent = 'Request received ✓ We’ll get back to you with the next step.';
+      } catch (error) {
+        status.textContent = error.message || 'Something went wrong. Please try again.';
+      } finally {
+        button.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
