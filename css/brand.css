@@ -37,15 +37,6 @@
   color: var(--accent);
 }
 
-/* Menu visibility baseline: keep the overlay out of layout/paint until opened. */
-.site-menu {
-  display: none;
-}
-
-.site-menu.open {
-  display: flex;
-}
-
 /* Prevent intrinsic image/form widths from forcing the contact grid beyond its container. */
 .contact-image-form {
   grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.18fr);
