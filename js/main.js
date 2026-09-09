@@ -16,6 +16,14 @@ document.addEventListener('DOMContentLoaded', () => {
     .menu-grid { flex: 1 !important; display: flex !important; flex-direction: column !important; justify-content: center !important; align-items: center !important; gap: 8px !important; min-height: 0 !important; overflow-y: auto !important; }
     .menu-column { width: min(760px, 100%); text-align: center; }
     .menu-column > a { text-align: center; }
+    .menu-group { width: 100%; padding: 0 0 1.3rem; }
+    .menu-group-title,
+    .menu-item { display: block; width: 100%; color: #fff; font: 500 1.18rem/1.25 Inter, sans-serif; letter-spacing: 0; text-decoration: none; }
+    .menu-group-title { padding: 0; }
+    .menu-subitems { display: flex; flex-direction: column; align-items: center; gap: .55rem; margin-top: .55rem; padding-left: 1.5rem; }
+    .menu-subitems > a { display: block; width: 100%; color: #fff; font: 400 1rem/1.3 Inter, sans-serif; letter-spacing: 0; text-decoration: none; text-align: center; }
+    .menu-item { padding: 0 0 1.3rem; }
+    .menu-item:last-child { padding-bottom: 0; }
     .legacy-menu-grid { justify-content: center !important; }
     .legacy-menu-links { display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 0 !important; }
     .legacy-menu-links > a { width: 100%; padding: 0 0 1.3rem !important; color: #fff !important; font: 500 1.18rem/1.25 Inter, sans-serif !important; letter-spacing: 0 !important; }
@@ -105,6 +113,50 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  // Build the requested grouped hamburger menu from one central definition.
+  // Desktop navigation continues to use the flat `links` array above.
+  function buildMobileMenu(menu) {
+    const grid = menu.querySelector('.menu-grid');
+    if (!grid) return;
+
+    const existingSocialIcons = grid.querySelector('.social-icons');
+    const socialIcons = existingSocialIcons
+      ? existingSocialIcons.cloneNode(true)
+      : null;
+
+    grid.innerHTML = `
+      <div class="menu-column">
+        <div class="menu-group">
+          <a href="/services.html" class="menu-group-title">Services</a>
+          <div class="menu-subitems">
+            <a href="/scan.html">Free Scan</a>
+            <a href="/methodology.html">Methodology</a>
+          </div>
+        </div>
+
+        <a href="/about.html" class="menu-item">About</a>
+
+        <div class="menu-group">
+          <div class="menu-label menu-group-title">Resources</div>
+          <div class="menu-subitems">
+            <a href="/blog.html">Blog</a>
+            <a href="/cases.html">Cases</a>
+            <a href="/help-centre.html">Help centre</a>
+          </div>
+        </div>
+
+        <a href="/contact.html" class="menu-item">Contact</a>
+        <a href="/login.html" class="menu-item">Login</a>
+      </div>
+      <div class="legacy-menu-bottom">
+        <div class="menu-label">Follow</div>
+      </div>`;
+
+    if (socialIcons) {
+      grid.querySelector('.legacy-menu-bottom').appendChild(socialIcons);
+    }
+  }
+
   // Normalize legacy pages into the shared mobile navigation structure.
   if (!document.getElementById('site-menu')) {
     const navLinks = nav?.querySelector('.nav-links');
@@ -159,14 +211,18 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       document.body.appendChild(menu);
+      buildMobileMenu(menu);
       wireMenu(menu, toggle);
     }
   } else {
-    // Current pages already contain the canonical toggle + overlay. Wire those
-    // elements here so menu behavior is never duplicated in page-specific HTML.
+    // Current pages already contain the canonical toggle + overlay. Normalize
+    // their menu contents here so the grouping is controlled in one place.
     const menu = document.getElementById('site-menu');
     const toggle = document.getElementById('menu-toggle');
-    if (menu && toggle) wireMenu(menu, toggle);
+    if (menu && toggle) {
+      buildMobileMenu(menu);
+      wireMenu(menu, toggle);
+    }
   }
 
   function wireMenu(menu, toggle) {
