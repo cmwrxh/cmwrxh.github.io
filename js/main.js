@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.head.appendChild(brandStyles);
 
   // Keep the full-screen menu in the render tree while closed so the
-  // opacity/visibility transition in style.css can animate smoothly.
+  // opacity/visibility transition can animate smoothly.
   const menuStyle = document.createElement('style');
   menuStyle.textContent = `
     .site-menu { position: fixed !important; inset: 0 !important; z-index: 99999 !important; display: flex !important; opacity: 0 !important; visibility: hidden !important; pointer-events: none !important; background: #050609 !important; transition: opacity .2s ease, visibility .2s ease !important; }
@@ -20,9 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
     .legacy-menu-links { display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 0 !important; }
     .legacy-menu-links > a { width: 100%; padding: 0 0 1.3rem !important; color: #fff !important; font: 500 1.18rem/1.25 Inter, sans-serif !important; letter-spacing: 0 !important; }
     .legacy-menu-links > a:last-child { padding-bottom: 0 !important; }
-    .legacy-menu-links > a strong { font: inherit !important; font-weight: 500 !important; }
     .legacy-menu-bottom { margin-top: 18px; text-align: center; }
-    .legacy-menu-bottom .menu-label { margin-top: 0; }
     .site-menu .social-icons { margin-top: 8px; }
     .site-menu .menu-footer { flex-shrink: 0; }
     .site-menu .menu-footer .btn-primary { order: 1; }
@@ -44,7 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.head.appendChild(menuStyle);
 
   // Load RUM on every page that uses the shared script, while avoiding a
-  // duplicate tag on the homepage where it is already present explicitly.
+  // duplicate tag on pages where it is already present explicitly.
   if (!document.querySelector('script[src="/africalatency.js"]')) {
     const rum = document.createElement('script');
     rum.defer = true;
@@ -54,7 +52,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Shared brand lockup: transform the existing nav-brand anchor in place.
-  // This avoids nested anchors and targets only the navigation brand element.
   document.querySelectorAll('.nav-brand').forEach((brand) => {
     brand.classList.add('brand-lockup');
     brand.setAttribute('aria-label', 'Africa Latency Ltd');
@@ -108,12 +105,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Legacy pages have an inline nav-links list but no menu button. Keep that
-  // horizontal navigation for desktop and convert it into the same full-screen
-  // overlay used by the homepage for mobile.
+  // Normalize legacy pages into the shared mobile navigation structure.
   if (!document.getElementById('site-menu')) {
     const navLinks = nav?.querySelector('.nav-links');
-
     if (nav && navLinks) {
       const toggle = document.createElement('button');
       toggle.id = 'menu-toggle';
@@ -167,15 +161,21 @@ document.addEventListener('DOMContentLoaded', () => {
       document.body.appendChild(menu);
       wireMenu(menu, toggle);
     }
+  } else {
+    // Current pages already contain the canonical toggle + overlay. Wire those
+    // elements here so menu behavior is never duplicated in page-specific HTML.
+    const menu = document.getElementById('site-menu');
+    const toggle = document.getElementById('menu-toggle');
+    if (menu && toggle) wireMenu(menu, toggle);
   }
 
   function wireMenu(menu, toggle) {
     if (toggle.dataset.menuWired) return;
-    toggle.dataset.menuWired = 'true';
     const close = menu.querySelector('#menu-close');
     if (!close) return;
+    toggle.dataset.menuWired = 'true';
 
-    let isOpen = false;
+    let isOpen = menu.classList.contains('open');
     const setMenu = (next) => {
       isOpen = Boolean(next);
       menu.classList.toggle('open', isOpen);
@@ -194,9 +194,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (event.target === menu) setMenu(false);
     });
     menu.querySelectorAll('a').forEach((a) => {
-      a.addEventListener('click', () => {
-        setTimeout(() => setMenu(false), 0);
-      });
+      a.addEventListener('click', () => setTimeout(() => setMenu(false), 0));
     });
     document.addEventListener('keydown', (event) => {
       if (event.key === 'Escape') setMenu(false);
