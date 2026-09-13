@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#050609"/>
+  <rect x="70" y="70" width="1060" height="490" rx="28" fill="#0b0d12" stroke="#20242c"/>
+  <image x="105" y="105" width="118" height="118" preserveAspectRatio="xMidYMid meet" href="https://africalatency.dev/images/logo-icon-v4.png" xlink:href="https://africalatency.dev/images/logo-icon-v4.png"/>
+  <text x="250" y="168" fill="#ffffff" font-family="Inter,Arial,sans-serif" font-size="48" font-weight="700">africalatency<tspan fill="#39ff9a">.dev</tspan></text>
+  <text x="105" y="315" fill="#ffffff" font-family="Inter,Arial,sans-serif" font-size="54" font-weight="700">Infrastructure Performance</text>
+  <text x="105" y="382" fill="#ffffff" font-family="Inter,Arial,sans-serif" font-size="54" font-weight="700">&amp; Latency Intelligence</text>
+  <text x="105" y="455" fill="#9aa0ab" font-family="Inter,Arial,sans-serif" font-size="28">Measure. Diagnose. Fix. Validate.</text>
+  <text x="105" y="510" fill="#39ff9a" font-family="Inter,Arial,sans-serif" font-size="24" font-weight="600">Built for digital performance across African networks.</text>
+</svg>
