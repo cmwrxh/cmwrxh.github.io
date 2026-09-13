@@ -1,5 +1,6 @@
 /* AfricaLatency legal/compliance layer
  * Loads privacy-first analytics only after the visitor explicitly accepts analytics.
+ * Also normalizes SEO/social metadata, favicons, and image accessibility metadata site-wide.
  */
 (function () {
   'use strict';
@@ -7,6 +8,47 @@
   var CONSENT_KEY = 'africalatency_analytics_consent_v1';
   var PLAUSIBLE_SCRIPT = 'https://plausible.io/js/script.js';
   var DOMAIN = 'africalatency.dev';
+
+  var PAGE_SEO = {
+    '/': ['AfricaLatency | Performance Intelligence for Africa', 'Measure website, API and infrastructure performance across African networks. Find latency causes, prioritize fixes, and validate improvements with AfricaLatency.'],
+    '/index.html': ['AfricaLatency | Performance Intelligence for Africa', 'Measure website, API and infrastructure performance across African networks. Find latency causes, prioritize fixes, and validate improvements with AfricaLatency.'],
+    '/about.html': ['About AfricaLatency | Digital Performance in Africa', 'Learn how AfricaLatency helps businesses understand, improve, and monitor digital performance for customers across African markets and networks today.'],
+    '/acceptable-use-policy.html': ['Acceptable Use Policy | AfricaLatency', 'Read the AfricaLatency Acceptable Use Policy covering permitted use, prohibited activity, authorized testing, security, and responsible use of our services.'],
+    '/audit-intake.html': ['Request an Africa Latency Audit | AfricaLatency', 'Request an Africa Latency Audit to measure your application across African locations, identify performance bottlenecks, and get a prioritized remediation plan.'],
+    '/audit-report.html': ['Audit Report | AfricaLatency', 'Review an AfricaLatency performance audit report with measured findings, bottlenecks, evidence, and recommended remediation actions for African users.'],
+    '/blog.html': ['AfricaLatency Blog | Performance Engineering in Africa', 'Practical insights on latency, networks, cloud regions, CDNs, APIs, infrastructure, and digital performance across African markets and networks today.'],
+    '/cases.html': ['Case Studies | AfricaLatency Performance Intelligence', 'Explore AfricaLatency case studies and performance investigations showing how measured evidence can uncover latency and infrastructure problems across Africa.'],
+    '/contact.html': ['Contact AfricaLatency | Performance & Latency Experts', 'Contact AfricaLatency about website performance, API latency, infrastructure diagnostics, audits, validation, or improving digital experiences across Africa.'],
+    '/dashboard.html': ['AfricaLatency Dashboard | Performance Intelligence', 'Access the AfricaLatency dashboard to review performance measurements, regional results, reports, and infrastructure intelligence for monitored services.'],
+    '/help-centre.html': ['Help Centre | AfricaLatency', 'Find answers about AfricaLatency scans, latency audits, diagnostics, performance measurements, reports, and how to get technical support for your service.'],
+    '/labs.html': ['AfricaLatency Labs | Performance Research & Experiments', 'Explore AfricaLatency Labs, where we investigate tools, measurements, network behavior, and new approaches to digital performance across African markets.'],
+    '/login.html': ['Log In | AfricaLatency', 'Log in to your AfricaLatency account to access performance data, reports, scans, and available infrastructure intelligence for your monitored services.'],
+    '/methodology.html': ['Methodology | How AfricaLatency Measures Performance', 'See how AfricaLatency measures latency and digital performance across African locations, networks, routing paths, infrastructure, applications, and dependencies.'],
+    '/privacy-policy.html': ['Privacy Policy | AfricaLatency', 'Read the AfricaLatency Privacy Policy covering data collection, diagnostic data, analytics, cookies, third-party services, user rights, retention, and privacy.'],
+    '/refund-policy.html': ['Refund Policy | AfricaLatency', 'Read the AfricaLatency Refund Policy covering eligibility, service fees, cancellations, refunds, and how to contact support about a billing issue or request.'],
+    '/scan.html': ['Free Latency Scan | AfricaLatency', 'Run a free AfricaLatency scan to measure website or API response performance and see how your service performs from key African locations and networks.'],
+    '/service-level-agreement.html': ['Service Level Agreement | AfricaLatency', 'Review the AfricaLatency Service Level Agreement covering service availability, support commitments, measurement scope, exclusions, and service remedies.'],
+    '/services.html': ['Africa Latency Audit | Performance Diagnosis', 'Get an evidence-based diagnosis of why your application, API, or infrastructure is slow for African users, with prioritized recommendations to fix it.'],
+    '/sitespeed.html': ['Website Speed Check | AfricaLatency', 'Check website speed and response performance from African locations. Identify latency signals and see where your digital experience may be slowing down.'],
+    '/terms-of-service.html': ['Terms of Service | AfricaLatency', 'Read the AfricaLatency Terms of Service covering diagnostic scans, acceptable use, intellectual property, liability, third-party systems, and Kenyan law.'],
+    '/work.html': ['Work With AfricaLatency | Performance Engineering', 'See how AfricaLatency works with teams to measure digital performance, diagnose latency, prioritize fixes, and validate improvements across African markets.']
+  };
+
+  var NOINDEX = {
+    '/dashboard.html': true,
+    '/login.html': true,
+    '/audit-report.html': true
+  };
+
+  var IMAGE_ALT = {
+    '/images/hero-team-review.jpeg': 'Team reviewing digital performance together on a laptop',
+    '/images/about-team-lead.jpeg': 'AfricaLatency team lead reviewing digital performance',
+    '/images/about-team-secondary.jpeg': 'AfricaLatency team member working on digital performance analysis',
+    '/images/contact-support-rep.jpeg': 'Support representative assisting with a digital performance issue',
+    '/images/services-analyst-laptop.jpeg': 'Analyst reviewing website and infrastructure performance on a laptop',
+    '/images/favicon-source.png': 'SourceForge badge',
+    '/images/logo-icon-v4.png': ''
+  };
 
   function loadAnalytics() {
     if (window.__africaLatencyAnalyticsLoaded) return;
@@ -44,6 +86,85 @@
       @media (max-width: 640px) { .al-cookie-banner { left: 12px; right: 12px; bottom: 12px; padding: 15px; } }
     `;
     document.head.appendChild(style);
+  }
+
+  function upsertMeta(name, content) {
+    if (!content) return;
+    var el = document.head.querySelector('meta[name="' + name + '"]');
+    if (!el) {
+      el = document.createElement('meta');
+      el.name = name;
+      document.head.appendChild(el);
+    }
+    el.content = content;
+  }
+
+  function upsertProperty(property, content) {
+    if (!content) return;
+    var el = document.head.querySelector('meta[property="' + property + '"]');
+    if (!el) {
+      el = document.createElement('meta');
+      el.setAttribute('property', property);
+      document.head.appendChild(el);
+    }
+    el.content = content;
+  }
+
+  function upsertLink(rel, href, attrs) {
+    var el = document.head.querySelector('link[rel="' + rel + '"]');
+    if (!el) {
+      el = document.createElement('link');
+      el.rel = rel;
+      document.head.appendChild(el);
+    }
+    el.href = href;
+    Object.keys(attrs || {}).forEach(function (key) { el.setAttribute(key, attrs[key]); });
+  }
+
+  function initSEO() {
+    var path = window.location.pathname.replace(/\/+$/, '') || '/';
+    var data = PAGE_SEO[path];
+    var canonicalPath = path === '/index.html' ? '/' : path;
+    var canonical = 'https://africalatency.dev' + canonicalPath;
+    var ogImage = 'https://africalatency.dev/images/og-image.svg';
+
+    upsertLink('icon', '/images/favicon.ico', { type: 'image/x-icon' });
+    upsertLink('icon', '/images/favicon-32x32.png', { type: 'image/png', sizes: '32x32' });
+    upsertLink('icon', '/images/favicon-16x16.png', { type: 'image/png', sizes: '16x16' });
+    upsertLink('apple-touch-icon', '/images/apple-touch-icon.png', { sizes: '180x180' });
+
+    if (!data) return;
+
+    document.title = data[0];
+    upsertMeta('description', data[1]);
+    upsertMeta('robots', NOINDEX[path] ? 'noindex, nofollow' : 'index, follow');
+    upsertLink('canonical', canonical);
+
+    upsertProperty('og:type', 'website');
+    upsertProperty('og:site_name', 'AfricaLatency');
+    upsertProperty('og:title', data[0]);
+    upsertProperty('og:description', data[1]);
+    upsertProperty('og:url', canonical);
+    upsertProperty('og:image', ogImage);
+    upsertProperty('og:image:width', '1200');
+    upsertProperty('og:image:height', '630');
+    upsertProperty('og:image:alt', 'AfricaLatency infrastructure performance and latency intelligence');
+    upsertMeta('twitter:card', 'summary_large_image');
+    upsertMeta('twitter:title', data[0]);
+    upsertMeta('twitter:description', data[1]);
+    upsertMeta('twitter:image', ogImage);
+  }
+
+  function initImageAltText() {
+    document.querySelectorAll('img').forEach(function (img) {
+      if (img.hasAttribute('alt')) return;
+      var src = (img.getAttribute('src') || '').split('?')[0];
+      if (Object.prototype.hasOwnProperty.call(IMAGE_ALT, src)) {
+        img.alt = IMAGE_ALT[src];
+      } else {
+        img.alt = '';
+      }
+    });
   }
 
   function showBanner() {
@@ -113,6 +234,8 @@
   }
 
   function init() {
+    initSEO();
+    initImageAltText();
     addStyles();
     addFooterCompliance();
 
