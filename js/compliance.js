@@ -83,8 +83,12 @@
         links.appendChild(privacy);
       }
 
+      footer.querySelectorAll('.footer-address').forEach(function (address) {
+        address.innerHTML = 'Africa Latency Ltd<br>1 Parklands Ave, Nairobi 00623, Kenya<br><a href="mailto:support@africalatency.dev">support@africalatency.dev</a>';
+      });
+
       var inner = footer.querySelector('.footer-inner') || footer;
-      if (!inner.querySelector('.al-footer-contact')) {
+      if (!inner.querySelector('.al-footer-contact') && !footer.querySelector('.footer-address')) {
         var contact = document.createElement('div');
         contact.className = 'al-footer-contact';
         contact.innerHTML = 'Africa Latency Ltd · 1 Parklands Ave, Nairobi 00623, Kenya · <a href="mailto:support@africalatency.dev">support@africalatency.dev</a>';
