@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /supabase/
+Disallow: /dashboard.html
+Disallow: /login.html
+Disallow: /audit-report.html
+
+Sitemap: https://africalatency.dev/sitemap.xml
