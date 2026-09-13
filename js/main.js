@@ -266,4 +266,11 @@ document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('calculator-results').style.display = 'block';
     });
   }
+
+  if (!document.querySelector('script[src="/js/compliance.js"]')) {
+    const compliance = document.createElement('script');
+    compliance.defer = true;
+    compliance.src = '/js/compliance.js';
+    document.head.appendChild(compliance);
+  }
 });
