@@ -37,7 +37,10 @@
   var NOINDEX = {
     '/dashboard.html': true,
     '/login.html': true,
-    '/audit-report.html': true
+    '/audit-report.html': true,
+    '/dashboard': true,
+    '/login': true,
+    '/audit-report': true
   };
 
   var IMAGE_ALT = {
@@ -53,7 +56,6 @@
   function loadAnalytics() {
     if (window.__africaLatencyAnalyticsLoaded) return;
     window.__africaLatencyAnalyticsLoaded = true;
-
     var script = document.createElement('script');
     script.defer = true;
     script.dataset.domain = DOMAIN;
@@ -123,7 +125,7 @@
 
   function initSEO() {
     var path = window.location.pathname.replace(/\/+$/, '') || '/';
-    var data = PAGE_SEO[path];
+    var data = PAGE_SEO[path] || PAGE_SEO[path + '.html'];
     var canonicalPath = path === '/index.html' ? '/' : path;
     var canonical = 'https://africalatency.dev' + canonicalPath;
     var ogImage = 'https://africalatency.dev/images/og-image.svg';
@@ -187,7 +189,6 @@
       loadAnalytics();
       banner.remove();
     });
-
     document.getElementById('al-consent-reject').addEventListener('click', function () {
       setConsent('rejected');
       banner.remove();
@@ -203,11 +204,9 @@
         privacy.textContent = 'Privacy Policy';
         links.appendChild(privacy);
       }
-
       footer.querySelectorAll('.footer-address').forEach(function (address) {
         address.innerHTML = 'Africa Latency Ltd<br>1 Parklands Ave, Nairobi 00623, Kenya<br><a href="mailto:support@africalatency.dev">support@africalatency.dev</a>';
       });
-
       var inner = footer.querySelector('.footer-inner') || footer;
       if (!inner.querySelector('.al-footer-contact') && !footer.querySelector('.footer-address')) {
         var contact = document.createElement('div');
@@ -215,7 +214,6 @@
         contact.innerHTML = 'Africa Latency Ltd · 1 Parklands Ave, Nairobi 00623, Kenya · <a href="mailto:support@africalatency.dev">support@africalatency.dev</a>';
         inner.appendChild(contact);
       }
-
       if (!footer.querySelector('.al-cookie-settings')) {
         var settings = document.createElement('button');
         settings.type = 'button';
@@ -238,18 +236,11 @@
     initImageAltText();
     addStyles();
     addFooterCompliance();
-
     var consent = getConsent();
-    if (consent === 'accepted') {
-      loadAnalytics();
-    } else if (consent !== 'rejected') {
-      showBanner();
-    }
+    if (consent === 'accepted') loadAnalytics();
+    else if (consent !== 'rejected') showBanner();
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
-    init();
-  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
 })();
