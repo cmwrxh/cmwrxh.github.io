@@ -48,7 +48,7 @@ export default async function handler(req, res) {
       await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: { Authorization: `Bearer ${resendApiKey}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ from: fromEmail, to: [notifyEmail], reply_to: email, subject: `Website Speed Check request — ${domain}`, html: `<h2>New Website Speed Check request</h2><p><strong>Name:</strong> ${esc(name)}</p><p><strong>Email:</strong> ${esc(email)}</p><p><strong>Domain:</strong> ${esc(domain)}</p><p><strong>Offer:</strong> Starter Website Speed Check ($29–49)</p>` })
+        body: JSON.stringify({ from: fromEmail, to: [notifyEmail], reply_to: email, subject: `Website Speed Check request — ${domain}`, html: `<h2>New Website Speed Check request</h2><p><strong>Name:</strong> ${esc(name)}</p><p><strong>Email:</strong> ${esc(email)}</p><p><strong>Domain:</strong> ${esc(domain)}</p><p><strong>Offer:</strong> Website Speed Check ($39 USD, one-time)</p>` })
       }).catch(error => console.error('Website Speed Check notification error:', error));
     }
 
