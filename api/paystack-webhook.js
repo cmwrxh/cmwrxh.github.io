@@ -92,7 +92,13 @@ async function processPaidOrder(reference) {
 
     if (readyError) throw readyError;
 
-    await sendReportEmail(order.email, order.domain, signed.signedUrl);
+    // A report that is already stored and marked ready must never be turned
+    // into a failed order solely because email delivery failed.
+    try {
+      await sendReportEmail(order.email, order.domain, signed.signedUrl);
+    } catch (emailError) {
+      console.error('Report email delivery failed after report completion:', emailError);
+    }
   } catch (error) {
     console.error('Self-serve audit failed:', error);
     await supabase
