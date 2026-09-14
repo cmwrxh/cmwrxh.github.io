@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Africa Latency Audit — AfricaLatency.dev</title>
+  <meta name="description" content="Your Africa Latency Audit is being measured and prepared.">
+  <meta name="robots" content="noindex,nofollow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/marketing.css">
+  <link rel="stylesheet" href="/css/brand.css?v=4">
+  <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+  <style>
+    .audit-status-hero{padding:76px 0 90px}
+    .audit-status-wrap{max-width:760px;margin:0 auto}
+    .audit-status-card{background:var(--bg-card);border:1px solid var(--border);border-radius:18px;padding:34px}
+    .audit-status-icon{width:56px;height:56px;border:1px solid rgba(57,255,154,.25);border-radius:50%;display:grid;place-items:center;background:rgba(57,255,154,.07);margin-bottom:22px}
+    .audit-status-icon svg{color:var(--accent)}
+    .audit-progress{display:grid;gap:10px;margin:28px 0 0}
+    .audit-progress-row{display:grid;grid-template-columns:24px 1fr;gap:11px;align-items:start;padding:12px 0;border-bottom:1px solid var(--border)}
+    .audit-progress-row:last-child{border-bottom:0}
+    .audit-progress-dot{width:9px;height:9px;border-radius:50%;background:var(--text-dim);margin:7px 0 0 5px}
+    .audit-progress-row.active .audit-progress-dot{background:var(--accent);box-shadow:0 0 13px rgba(57,255,154,.5)}
+    .audit-progress-row.done .audit-progress-dot{background:var(--accent)}
+    .audit-progress-row strong{display:block;font-size:.88rem;color:#fff}
+    .audit-progress-row span{display:block;color:var(--text-muted);font-size:.78rem;margin-top:2px;line-height:1.5}
+    .audit-ref{margin-top:24px;padding:13px 15px;border:1px dashed var(--border-strong);border-radius:12px;color:var(--text-dim);font:500 .74rem/1.5 ui-monospace,SFMono-Regular,monospace;overflow-wrap:anywhere}
+    .audit-success{border-color:rgba(57,255,154,.25)}
+    .audit-success .audit-status-icon{background:rgba(57,255,154,.1)}
+    .audit-error{border-color:rgba(255,98,98,.3)}
+    .audit-error .audit-status-icon{border-color:rgba(255,98,98,.3);background:rgba(255,98,98,.07)}
+    .audit-error .audit-status-icon svg{color:var(--error)}
+    .audit-error-copy{color:#ffb0b0;line-height:1.6}
+    .audit-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:26px}
+    .audit-small{color:var(--text-dim);font-size:.75rem;line-height:1.6;margin-top:18px}
+    @media(max-width:520px){.audit-status-hero{padding:52px 0 65px}.audit-status-card{padding:23px}.audit-actions .btn{width:100%}}
+  </style>
+</head>
+<body>
+  <nav>
+    <div class="nav-inner">
+      <a href="/" class="nav-brand brand-lockup" aria-label="africalatency.dev"><img class="brand-icon" src="/images/logo-icon-v4.png" alt="" aria-hidden="true"><span class="brand-name"><span class="brand-name-white">africalatency</span><span class="brand-name-green">.dev</span></span></a>
+      <div class="nav-actions"><button id="menu-toggle" class="menu-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="site-menu"><span></span><span></span><span></span></button></div>
+    </div>
+  </nav>
+  <div class="site-menu" id="site-menu" aria-hidden="true">
+    <div class="site-menu-inner">
+      <div class="menu-head"><span class="label">AfricaLatency</span><button id="menu-close" class="menu-close" type="button" aria-label="Close menu">×</button></div>
+      <div class="menu-grid"><div class="menu-column"><a href="/services.html">Services</a><a href="/scan.html">Free Scan</a><a href="/methodology.html">Methodology</a><a href="/data-centers.html">Data centers</a><a href="/kenya.html">Kenya</a><a href="/nigeria.html">Nigeria</a><a href="/cases.html">Cases</a><a href="/about.html">About</a><a href="/blog.html">Blog</a><a href="/help-centre.html">Help centre</a><a href="/contact.html">Contact</a><a href="/login.html">Login</a></div></div>
+      <div class="menu-footer"><a class="btn btn-primary" href="/scan.html">Run a free scan</a><a class="btn btn-secondary" href="/contact.html">Contact</a></div>
+    </div>
+  </div>
+
+  <main>
+    <section class="section audit-status-hero">
+      <div class="container audit-status-wrap">
+        <div id="status-card" class="audit-status-card">
+          <div id="status-icon" class="audit-status-icon" aria-hidden="true">
+            <span id="status-icon-mark">◌</span>
+          </div>
+          <div class="label" id="status-label">Audit in progress</div>
+          <h1 id="status-title" style="font-size:clamp(2.3rem,6vw,4.2rem)">Your audit is being prepared.</h1>
+          <p id="status-detail" class="hero-subtitle">We are measuring your domain from Nairobi, Lagos, Accra and Johannesburg. Keep this page open while the report is generated.</p>
+
+          <div id="progress" class="audit-progress" aria-live="polite">
+            <div class="audit-progress-row active" data-status="pending"><span class="audit-progress-dot"></span><div><strong>Payment confirmation</strong><span>Waiting for Paystack to confirm the charge.</span></div></div>
+            <div class="audit-progress-row" data-status="scanning"><span class="audit-progress-dot"></span><div><strong>African network measurements</strong><span>Running the fixed probe set across Nairobi, Lagos, Accra and Johannesburg.</span></div></div>
+            <div class="audit-progress-row" data-status="ready"><span class="audit-progress-dot"></span><div><strong>PDF report</strong><span>Rendering the observed results and recommended next steps.</span></div></div>
+          </div>
+
+          <div id="reference" class="audit-ref">Order reference: <span id="reference-value">—</span></div>
+          <div id="result-actions" class="audit-actions" style="display:none"></div>
+          <p id="status-footnote" class="audit-small">Your report link is private and time-limited. A copy is also emailed when the report is ready.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="homepage-footer">
+    <div class="footer-inner">
+      <div class="footer-intro"><div class="label">AfricaLatency.dev</div><h3>Better performance. Better digital experiences.</h3><p>Helping businesses understand, improve, and monitor digital performance across Africa.</p><p class="footer-address">1st Parklands Avenue, 00623 Nairobi, Kenya</p><p class="footer-copy">© 2026 AfricaLatency.dev</p></div>
+      <div class="footer-links"><span>Company</span><a href="/about.html">About us</a><a href="/cases.html">Cases</a><a href="/terms-of-service.html">Terms of Service</a><a href="/service-level-agreement.html">Service Level Agreement</a><a href="/acceptable-use-policy.html">Acceptable Use Policy</a><a href="/refund-policy.html">Refund Policy</a><span>Support</span><a href="/help-centre.html">Help centre</a><a href="/blog.html">Blog</a></div>
+      <div class="footer-follow"><strong>Follow Us</strong><div class="footer-follow-row"><a href="mailto:support@africalatency.dev">support@africalatency.dev</a><div class="footer-social"><a href="https://www.linkedin.com/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a><a href="https://github.com/cmwrxh/cmwrxh.github.io" target="_blank" rel="noopener" aria-label="GitHub">⌘</a><a href="mailto:support@africalatency.dev" aria-label="Email">✉</a></div></div></div>
+    </div>
+  </footer>
+
+  <script src="/js/main.js"></script>
+  <script>
+    (() => {
+      const reference = new URLSearchParams(window.location.search).get('reference');
+      const card = document.getElementById('status-card');
+      const icon = document.getElementById('status-icon');
+      const mark = document.getElementById('status-icon-mark');
+      const label = document.getElementById('status-label');
+      const title = document.getElementById('status-title');
+      const detail = document.getElementById('status-detail');
+      const referenceValue = document.getElementById('reference-value');
+      const actions = document.getElementById('result-actions');
+      const footnote = document.getElementById('status-footnote');
+      const rows = [...document.querySelectorAll('.audit-progress-row')];
+      let stopped = false;
+
+      referenceValue.textContent = reference || 'Missing';
+
+      function setProgress(status) {
+        const order = { pending: 0, paid: 0, scanning: 1, ready: 2 };
+        const current = order[status] ?? 0;
+        rows.forEach((row) => {
+          const step = order[row.dataset.status] ?? 0;
+          row.classList.toggle('active', step === current);
+          row.classList.toggle('done', step < current);
+        });
+      }
+
+      function showFailure(message) {
+        stopped = true;
+        card.classList.add('audit-error');
+        icon.setAttribute('aria-hidden', 'false');
+        mark.textContent = '!';
+        label.textContent = 'Report generation issue';
+        title.textContent = 'We could not finish your report.';
+        detail.innerHTML = '';
+        const copy = document.createElement('span');
+        copy.className = 'audit-error-copy';
+        copy.textContent = message || 'The payment was received, but the automated audit could not be completed.';
+        detail.appendChild(copy);
+        rows.forEach((row) => row.classList.remove('active'));
+        actions.style.display = 'flex';
+        actions.innerHTML = '';
+        const support = document.createElement('a');
+        support.className = 'btn btn-primary';
+        support.href = `mailto:support@africalatency.dev?subject=${encodeURIComponent('Paid audit support — ' + (reference || 'missing reference'))}`;
+        support.textContent = 'Contact support';
+        const home = document.createElement('a');
+        home.className = 'btn btn-secondary';
+        home.href = '/';
+        home.textContent = 'Back to AfricaLatency';
+        actions.append(support, home);
+        footnote.textContent = `Please include order reference ${reference || '—'} in your message so we can trace the paid order.`;
+      }
+
+      function showSuccess(data) {
+        stopped = true;
+        card.classList.add('audit-success');
+        mark.textContent = '✓';
+        label.textContent = 'Audit complete';
+        title.textContent = `Your audit for ${data.domain} is ready.`;
+        detail.textContent = 'Your PDF is ready to download. A copy has also been emailed to you.';
+        rows.forEach((row) => { row.classList.remove('active'); row.classList.add('done'); });
+        actions.style.display = 'flex';
+        actions.innerHTML = '';
+        const download = document.createElement('a');
+        download.className = 'btn btn-primary';
+        download.href = data.downloadUrl;
+        download.target = '_blank';
+        download.rel = 'noopener';
+        download.textContent = 'Download PDF report →';
+        const method = document.createElement('a');
+        method.className = 'btn btn-secondary';
+        method.href = '/methodology.html';
+        method.textContent = 'Explore the methodology';
+        actions.append(download, method);
+        footnote.textContent = 'The download link is time-limited. If you need help with the results, contact support@africalatency.dev.';
+      }
+
+      async function poll() {
+        if (stopped) return;
+        if (!reference) {
+          showFailure('This page is missing the order reference returned by Paystack.');
+          return;
+        }
+
+        try {
+          const response = await fetch(`/api/order-status?reference=${encodeURIComponent(reference)}`, { cache: 'no-store' });
+          const data = await response.json().catch(() => ({}));
+
+          if (!response.ok) {
+            if (response.status === 404) {
+              showFailure('We could not find this order reference. If you have just completed payment, wait a moment and refresh this page.');
+              return;
+            }
+            throw new Error(data.error || 'Status check failed.');
+          }
+
+          if (data.status === 'ready' && data.downloadUrl) {
+            showSuccess(data);
+            return;
+          }
+          if (data.status === 'failed') {
+            showFailure(data.errorMessage);
+            return;
+          }
+
+          setProgress(data.status || 'pending');
+        } catch (error) {
+          // A temporary status request failure should not be treated as a paid-order failure.
+          // Keep polling while showing the customer that the audit is still active.
+          detail.textContent = 'The audit is still running. We are checking its status again shortly.';
+        }
+
+        setTimeout(poll, 3000);
+      }
+
+      poll();
+    })();
+  </script>
+</body>
+</html>
