@@ -107,11 +107,21 @@
     document.head.appendChild(style);
   }
 
+  function addCountryFooterLinks() {
+    const resourceHeading = Array.from(document.querySelectorAll('.tier4-footer-col h4')).find((heading) => heading.textContent.trim() === 'Resources');
+    if (!resourceHeading || resourceHeading.parentElement.dataset.countryLinks) return;
+    const links = resourceHeading.parentElement.querySelector('.tier4-footer-links');
+    if (!links) return;
+    links.insertAdjacentHTML('beforeend', '<a href="/kenya.html">Kenya</a><a href="/nigeria.html">Nigeria</a>');
+    resourceHeading.parentElement.dataset.countryLinks = 'true';
+  }
+
   function loadTier4() {
     if (document.querySelector('script[src="/js/tier4.js"]')) return;
     const script = document.createElement('script');
     script.defer = true;
     script.src = '/js/tier4.js';
+    script.onload = addCountryFooterLinks;
     document.head.appendChild(script);
   }
 
