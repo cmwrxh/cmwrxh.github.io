@@ -33,6 +33,8 @@ document.addEventListener('DOMContentLoaded', () => {
     body.menu-open { overflow: hidden !important; }
     .nav-links { display: none; }
     .nav-cta { display: none; }
+    nav .nav-inner { transition: padding .22s ease, min-height .22s ease; }
+    body.nav-scrolled nav .nav-inner { padding-top: 8px; padding-bottom: 8px; }
     @media (min-width: 900px) {
       .nav-inner { gap: 24px; }
       .nav-links { display: flex; align-items: center; gap: 20px; list-style: none; margin: 0; padding: 0; }
@@ -45,6 +47,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   `;
   document.head.appendChild(menuStyle);
+
+  const updateNavScrollState = () => document.body.classList.toggle('nav-scrolled', window.scrollY > 100);
+  updateNavScrollState();
+  window.addEventListener('scroll', updateNavScrollState, { passive: true });
 
   if (!document.querySelector('script[src="/africalatency.js"]')) {
     const rum = document.createElement('script');
