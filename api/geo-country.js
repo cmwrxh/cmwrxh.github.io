@@ -1,11 +1,10 @@
-export default function handler(req) {
-  const country = (req.headers.get('x-vercel-ip-country') || '').trim().toUpperCase();
+export default function handler(req, res) {
+  const header = typeof req.headers?.get === 'function'
+    ? req.headers.get('x-vercel-ip-country')
+    : req.headers?.['x-vercel-ip-country'];
+  const country = String(header || '').trim().toUpperCase();
 
-  return new Response(JSON.stringify({ country: country || null }), {
-    status: 200,
-    headers: {
-      'content-type': 'application/json; charset=utf-8',
-      'cache-control': 'no-store'
-    }
+  res.status(200).setHeader('Cache-Control', 'no-store').json({
+    country: country || null
   });
 }
