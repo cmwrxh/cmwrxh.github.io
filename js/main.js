@@ -85,10 +85,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.querySelectorAll('.nav-brand').forEach((brand) => {
     brand.classList.add('brand-lockup');
-    brand.setAttribute('aria-label', 'Africa Latency Ltd');
+    brand.setAttribute('aria-label', 'AfricaLatency.dev');
     brand.innerHTML = `
       <img class="brand-icon" src="/images/logo-icon-v4.png" alt="" aria-hidden="true">
-      <span class="brand-name"><span class="brand-name-white">Africa</span><span class="brand-name-green">Latency</span><span class="brand-name-white">Ltd</span></span>`;
+      <span class="brand-name"><span class="brand-name-white">Africa</span><span class="brand-name-green">Latency</span><span class="brand-name-white">.dev</span></span>`;
   });
 
   const serviceLinks = [
