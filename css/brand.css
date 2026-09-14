@@ -96,6 +96,59 @@
   margin: 0 auto;
 }
 
+/* --------------------------------------------------------------------------
+   Global desktop navigation guardrail
+   main.js builds the same navigation on every page. Keep the desktop bar
+   intentionally compact; the full hierarchy remains available in the mobile
+   menu and footer. This prevents long page titles/links from crushing the
+   header at laptop widths.
+   -------------------------------------------------------------------------- */
+@media (min-width: 900px) {
+  nav .nav-links {
+    flex: 0 1 auto;
+    min-width: 0;
+    gap: 18px !important;
+  }
+
+  /* The primary desktop bar should not expose every resource individually. */
+  nav .nav-links li:nth-child(2),
+  nav .nav-links li:nth-child(4),
+  nav .nav-links li:nth-child(5),
+  nav .nav-links li:nth-child(6),
+  nav .nav-links li:nth-child(9),
+  nav .nav-links li:nth-child(10) {
+    display: none !important;
+  }
+
+  nav .nav-links li a {
+    font-size: 0.9rem;
+  }
+
+  nav .nav-actions {
+    flex: 0 0 auto;
+    min-width: 0;
+  }
+
+  nav .nav-cta {
+    flex: 0 0 auto;
+    font-size: 0.82rem;
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+}
+
+/* At ordinary laptop widths, reduce the bar one more step rather than
+   allowing navigation to collide with the logo or CTA. */
+@media (min-width: 900px) and (max-width: 1150px) {
+  nav .nav-links li:nth-child(3) {
+    display: none !important;
+  }
+
+  nav .nav-links {
+    gap: 14px !important;
+  }
+}
+
 @media (max-width: 900px) {
   .brand-lockup {
     gap: 8px;
