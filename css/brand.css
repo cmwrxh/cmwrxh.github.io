@@ -96,13 +96,6 @@
   margin: 0 auto;
 }
 
-/* --------------------------------------------------------------------------
-   Global desktop navigation guardrail
-   main.js builds the same navigation on every page. Keep the desktop bar
-   intentionally compact; the full hierarchy remains available in the mobile
-   menu and footer. This prevents long page titles/links from crushing the
-   header at laptop widths.
-   -------------------------------------------------------------------------- */
 @media (min-width: 900px) {
   nav .nav-links {
     flex: 0 1 auto;
@@ -110,7 +103,6 @@
     gap: 18px !important;
   }
 
-  /* The primary desktop bar should not expose every resource individually. */
   nav .nav-links li:nth-child(2),
   nav .nav-links li:nth-child(4),
   nav .nav-links li:nth-child(5),
@@ -137,8 +129,6 @@
   }
 }
 
-/* At ordinary laptop widths, reduce the bar one more step rather than
-   allowing navigation to collide with the logo or CTA. */
 @media (min-width: 900px) and (max-width: 1150px) {
   nav .nav-links li:nth-child(3) {
     display: none !important;
@@ -149,13 +139,6 @@
   }
 }
 
-/* --------------------------------------------------------------------------
-   Tier 4 footer grid correction
-   Tier 4 currently builds five footer columns: Intro, Company, Legal,
-   Resources, and Connect. The original four-column rule caused Connect to
-   wrap onto a second row on desktop. Keep the five-column structure explicit
-   while retaining the intended two-column and one-column mobile layouts.
-   -------------------------------------------------------------------------- */
 .homepage-footer .footer-inner.tier4-footer-grid {
   grid-template-columns: minmax(0, 1.3fr) repeat(4, minmax(0, 1fr)) !important;
 }
@@ -218,11 +201,7 @@
   }
 }
 
-/* --------------------------------------------------------------------------
-   Tier 4 typography normalization
-   Keep Inter for interface/body text and Space Grotesk for headings, while
-   replacing the older page-specific display sizes with one responsive scale.
-   -------------------------------------------------------------------------- */
+/* Tier 4 typography normalization */
 h1,
 .page-title {
   font-size: clamp(2.55rem, 4.4vw, 4rem) !important;
@@ -293,5 +272,65 @@ body {
   .hero-subtitle {
     font-size: 1rem;
     line-height: 1.68;
+  }
+}
+
+/* Tier 4 color discipline: green is a deliberate brand/performance signal,
+   while generic UI chrome stays neutral. */
+:root {
+  --accent-soft: rgba(57,255,154,.10);
+  --accent-line: rgba(57,255,154,.18);
+  --neutral-highlight: rgba(255,255,255,.06);
+}
+
+main a:not(.btn):not(.btn-primary),
+footer a:not(.btn),
+.legal-content a,
+.help-content a {
+  color: var(--text-muted);
+}
+
+main a:not(.btn):not(.btn-primary):hover,
+footer a:not(.btn):hover,
+.legal-content a:hover,
+.help-content a:hover {
+  color: var(--text);
+}
+
+.label,
+.tag,
+.path-diagram span,
+.principle > span,
+.editorial-number {
+  color: var(--text-muted);
+}
+
+.label {
+  background: var(--neutral-highlight);
+  border-color: var(--border);
+}
+
+.label:before {
+  background: var(--text-dim);
+  box-shadow: none;
+}
+
+.path-diagram b {
+  color: var(--text);
+}
+
+.card-accent-green,
+.card-accent-orange,
+.card-accent-blue {
+  border-top-color: var(--border);
+}
+
+th {
+  color: var(--text-muted);
+}
+
+@media (max-width: 900px) {
+  .about-signal-single img {
+    height: 320px !important;
   }
 }
