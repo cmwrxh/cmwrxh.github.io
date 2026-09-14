@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Website Speed Check — AfricaLatency.dev</title>
-  <meta name="description" content="A fast, affordable check of your website's front-end performance and Core Web Vitals.">
+  <title>Website Speed Check — Front-end Performance &amp; Core Web Vitals | AfricaLatency.dev</title>
+  <meta name="description" content="A fast, affordable check of your website's front-end performance and Core Web Vitals — the metrics Google uses to rank you, and the ones that make visitors stay or leave.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
@@ -29,14 +29,6 @@
     </div>
   </nav>
 
-  <div class="site-menu" id="site-menu" aria-hidden="true">
-    <div class="site-menu-inner">
-      <div class="menu-head"><span class="label">AfricaLatency</span><button id="menu-close" class="menu-close" type="button" aria-label="Close menu">×</button></div>
-      <div class="menu-grid"></div>
-      <div class="menu-footer"><a class="btn btn-primary" href="/scan.html">Run a free scan</a><a class="btn btn-secondary" href="/contact.html">Contact</a></div>
-    </div>
-  </div>
-
   <main>
     <section class="section hero-section">
       <div class="container narrow">
@@ -49,7 +41,7 @@
 
     <section class="section" style="background:var(--bg-elevated)">
       <div class="container">
-        <div class="section-heading"><div class="label">What's checked</div><h2>A focused check of the things visitors and search engines actually experience.</h2></div>
+        <div class="section-heading"><div class="label">What's checked</div></div>
         <div class="feature-grid">
           <div class="card">
             <ul class="clean-list">
@@ -69,7 +61,7 @@
 
     <section class="section">
       <div class="container">
-        <div class="section-heading"><div class="label">Pricing</div><h2>One simple check. A clear list of what to fix.</h2></div>
+        <div class="section-heading"><div class="label">Pricing</div></div>
         <div style="overflow-x:auto">
           <table>
             <thead><tr><th>Package</th><th>Price</th><th>Scope</th></tr></thead>
@@ -87,20 +79,25 @@
 
     <section class="section" style="background:var(--bg-elevated)">
       <div class="container narrow">
-        <div class="card card-accent-green" id="check-form">
-          <div class="label">Request a check</div>
-          <h2>Get your website speed checked.</h2>
-          <p class="section-lead">Tell us where to look. We'll use the details below to start your Website Speed Check.</p>
-          <form id="sitespeed-lead-form" style="margin-top:28px">
+        <div class="card" id="check-form">
+          <div class="label">Website Speed Check</div>
+          <form id="sitespeed-lead-form" novalidate style="margin-top:28px">
             <div style="display:grid;gap:16px">
               <div><label for="sitespeed-name">Name</label><input class="form-input" id="sitespeed-name" name="name" type="text" autocomplete="name" required></div>
               <div><label for="sitespeed-email">Email</label><input class="form-input" id="sitespeed-email" name="email" type="email" autocomplete="email" required></div>
-              <div><label for="sitespeed-domain">Domain to check</label><input class="form-input" id="sitespeed-domain" name="domain" type="text" placeholder="example.com" autocomplete="url" required></div>
+              <div><label for="sitespeed-domain">Domain</label><input class="form-input" id="sitespeed-domain" name="domain" type="text" placeholder="example.com" autocomplete="url" required></div>
+              <p class="muted" style="margin:0">By submitting, you agree to our <a href="/privacy-policy.html">Privacy Policy</a>.</p>
               <button class="btn btn-primary" type="submit">Check my website's speed →</button>
             </div>
             <p id="sitespeed-form-status" class="section-lead" role="status" aria-live="polite" style="margin-top:16px"></p>
           </form>
         </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container narrow">
+        <p class="section-lead">Need a deeper diagnosis across African networks, not just Core Web Vitals? <a href="/services.html">See the Africa Latency Audit™.</a></p>
       </div>
     </section>
   </main>
@@ -120,25 +117,20 @@
       const form = event.currentTarget;
       const status = document.getElementById('sitespeed-form-status');
       const button = form.querySelector('button[type="submit"]');
+      if (form.querySelector('.ux-field-error')) return;
       button.disabled = true;
       status.textContent = 'Sending…';
       try {
         const response = await fetch('/api/submit-sitespeed', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            name: form.name.value.trim(),
-            email: form.email.value.trim(),
-            domain: form.domain.value.trim()
-          })
+          body: JSON.stringify({ name: form.name.value.trim(), email: form.email.value.trim(), domain: form.domain.value.trim() })
         });
         const result = await response.json().catch(() => ({}));
         if (!response.ok) throw new Error(result.error || 'Unable to submit your request.');
-        form.reset();
-        status.textContent = 'Request received ✓ We’ll get back to you with the next step.';
+        window.location.assign('/sitespeed-thank-you.html');
       } catch (error) {
         status.textContent = error.message || 'Something went wrong. Please try again.';
-      } finally {
         button.disabled = false;
       }
     });
