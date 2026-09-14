@@ -1,4 +1,4 @@
-/* Tier 3 UX: shared mobile CTA and inline form validation. */
+/* Tier 3 UX: shared mobile CTA, inline form validation and confirmation routing. */
 (function () {
   'use strict';
 
@@ -44,10 +44,7 @@
     form.querySelectorAll('input, select, textarea').forEach((field) => {
       if (!validateField(field)) valid = false;
     });
-    if (!valid) {
-      const first = form.querySelector('.ux-field-error');
-      first?.focus({ preventScroll: false });
-    }
+    if (!valid) form.querySelector('.ux-field-error')?.focus({ preventScroll: false });
     return valid;
   }
 
@@ -67,6 +64,19 @@
         if (!validateForm(form)) event.preventDefault();
       }, true);
     });
+  }
+
+  function watchAuditConfirmation() {
+    const status = document.getElementById('form-status');
+    if (!status || !document.getElementById('audit-intake-form')) return;
+    const observer = new MutationObserver(() => {
+      const text = status.textContent || '';
+      if (/^Request received\./i.test(text)) {
+        observer.disconnect();
+        window.location.assign('/thank-you.html');
+      }
+    });
+    observer.observe(status, { childList: true, characterData: true, subtree: true });
   }
 
   function addMobileCta() {
@@ -100,6 +110,7 @@
   function init() {
     addStyles();
     installFormValidation();
+    watchAuditConfirmation();
     addMobileCta();
   }
 
