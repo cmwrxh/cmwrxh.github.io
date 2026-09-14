@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 560" role="img" aria-labelledby="title desc">
+  <title id="title">AfricaLatency network intelligence</title>
+  <desc id="desc">An abstract technical visualization of African network paths connecting regional measurement points.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0b1018"/>
+      <stop offset="1" stop-color="#111b26"/>
+    </linearGradient>
+    <linearGradient id="route" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#39ff9a" stop-opacity=".18"/>
+      <stop offset=".5" stop-color="#39ff9a" stop-opacity=".95"/>
+      <stop offset="1" stop-color="#55b9ff" stop-opacity=".38"/>
+    </linearGradient>
+    <filter id="glow"><feGaussianBlur stdDeviation="5" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" fill="none" stroke="#fff" stroke-opacity=".045"/></pattern>
+  </defs>
+  <rect width="1200" height="560" rx="24" fill="url(#bg)"/>
+  <rect width="1200" height="560" rx="24" fill="url(#grid)"/>
+  <g opacity=".55" fill="none" stroke="#9aa0ab" stroke-opacity=".22" stroke-width="2">
+    <path d="M90 125 C250 70 340 110 450 185 S690 300 790 205 S1010 110 1120 165"/>
+    <path d="M65 390 C220 330 330 350 455 285 S700 180 850 300 S1030 405 1140 350"/>
+    <path d="M185 485 C290 380 390 420 520 355 S735 260 930 415"/>
+  </g>
+  <g fill="none" stroke="url(#route)" stroke-width="4" stroke-linecap="round" filter="url(#glow)">
+    <path d="M230 300 C350 205 430 205 535 265 S720 390 865 290 S980 225 1060 270"/>
+    <path d="M230 300 C340 355 430 370 535 265 S710 155 865 290" opacity=".75"/>
+  </g>
+  <g fill="#0b1018" stroke="#39ff9a" stroke-width="3">
+    <circle cx="230" cy="300" r="10"/><circle cx="535" cy="265" r="10"/><circle cx="865" cy="290" r="10"/>
+  </g>
+  <g fill="#55b9ff" stroke="#0b1018" stroke-width="3"><circle cx="1060" cy="270" r="9"/></g>
+  <g font-family="Inter,Arial,sans-serif" font-size="18" fill="#e8edf3">
+    <text x="190" y="338">Nairobi</text><text x="495" y="232">Lagos</text><text x="820" y="328">Johannesburg</text><text x="1015" y="245">Cairo</text>
+  </g>
+  <g font-family="Space Grotesk,Inter,Arial,sans-serif" fill="#9aa0ab">
+    <text x="54" y="58" font-size="15" letter-spacing="2.5">AFRICA LATENCY INTELLIGENCE</text>
+    <text x="54" y="91" font-size="30" fill="#fff">Measure the path. Find the bottleneck.</text>
+    <text x="54" y="520" font-size="14">Regional network view · measurement-driven · no fabricated benchmarks</text>
+  </g>
+  <g transform="translate(930 52)">
+    <rect width="215" height="74" rx="14" fill="#090d13" stroke="#fff" stroke-opacity=".12"/>
+    <circle cx="24" cy="27" r="6" fill="#39ff9a"/>
+    <text x="40" y="32" font-family="Inter,Arial,sans-serif" font-size="14" fill="#fff">Live measurement layer</text>
+    <text x="24" y="56" font-family="Inter,Arial,sans-serif" font-size="12" fill="#9aa0ab">Network → edge → application</text>
+  </g>
+</svg>
