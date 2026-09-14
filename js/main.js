@@ -15,8 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
     .menu-column { width: min(760px, 100%); text-align: center; }
     .menu-column > a { text-align: center; }
     .menu-group { width: 100%; padding: 0 0 1.3rem; }
-    .menu-group-title,
-    .menu-item { display: block; width: 100%; color: #fff; font: 500 1.18rem/1.25 Inter, sans-serif; letter-spacing: 0; text-decoration: none; }
+    .menu-group-title, .menu-item { display: block; width: 100%; color: #fff; font: 500 1.18rem/1.25 Inter, sans-serif; letter-spacing: 0; text-decoration: none; }
     .menu-group-title { padding: 0; }
     .menu-subitems { display: flex; flex-direction: column; align-items: center; gap: .55rem; margin-top: .55rem; padding-left: 1.5rem; }
     .menu-subitems > a { display: block; width: 100%; color: #fff; font: 400 1rem/1.3 Inter, sans-serif; letter-spacing: 0; text-decoration: none; text-align: center; }
@@ -60,217 +59,89 @@ document.addEventListener('DOMContentLoaded', () => {
     brand.setAttribute('aria-label', 'Africa Latency Ltd');
     brand.innerHTML = `
       <img class="brand-icon" src="/images/logo-icon-v4.png" alt="" aria-hidden="true">
-      <span class="brand-name">
-        <span class="brand-name-white">Africa</span>
-        <span class="brand-name-green">Latency</span>
-        <span class="brand-name-white">Ltd</span>
-      </span>`;
+      <span class="brand-name"><span class="brand-name-white">Africa</span><span class="brand-name-green">Latency</span><span class="brand-name-white">Ltd</span></span>`;
   });
 
   const links = [
-    ['/services.html', 'Services'],
-    ['/scan.html', 'Free Scan'],
-    ['/methodology.html', 'Methodology'],
-    ['/cases.html', 'Cases'],
-    ['/about.html', 'About'],
-    ['/blog.html', 'Blog'],
-    ['/help-centre.html', 'Help centre'],
-    ['/contact.html', 'Contact'],
-    ['/login.html', 'Login']
+    ['/services.html', 'Services'], ['/scan.html', 'Free Scan'], ['/methodology.html', 'Methodology'],
+    ['/cases.html', 'Cases'], ['/about.html', 'About'], ['/blog.html', 'Blog'],
+    ['/help-centre.html', 'Help centre'], ['/contact.html', 'Contact'], ['/login.html', 'Login']
   ];
 
   const nav = document.querySelector('nav');
   if (nav) {
     let navLinks = nav.querySelector('.nav-links');
     if (!navLinks) {
-      navLinks = document.createElement('ul');
-      navLinks.className = 'nav-links';
+      navLinks = document.createElement('ul'); navLinks.className = 'nav-links';
       const navInner = nav.querySelector('.nav-inner');
       if (navInner) {
         const actions = navInner.querySelector('.nav-actions') || document.createElement('div');
-        actions.className = 'nav-actions';
-        navInner.appendChild(actions);
-        navInner.insertBefore(navLinks, actions);
+        actions.className = 'nav-actions'; navInner.appendChild(actions); navInner.insertBefore(navLinks, actions);
       }
     }
-
     navLinks.innerHTML = links.map(([href, text]) => `<li><a href="${href}">${text}</a></li>`).join('');
-
     let navCta = nav.querySelector('.nav-cta');
     if (!navCta) {
-      navCta = document.createElement('a');
-      navCta.className = 'nav-cta btn btn-primary';
-      navCta.href = '/scan.html';
-      navCta.textContent = 'Run a free scan';
-      const navInner = nav.querySelector('.nav-inner');
-      const actions = navInner?.querySelector('.nav-actions');
-      if (actions) actions.appendChild(navCta);
+      navCta = document.createElement('a'); navCta.className = 'nav-cta btn btn-primary'; navCta.href = '/scan.html'; navCta.textContent = 'Run a free scan';
+      const navInner = nav.querySelector('.nav-inner'); const actions = navInner?.querySelector('.nav-actions'); if (actions) actions.appendChild(navCta);
     }
   }
 
   function buildMobileMenu(menu) {
-    const grid = menu.querySelector('.menu-grid');
-    if (!grid) return;
-
+    const grid = menu.querySelector('.menu-grid'); if (!grid) return;
     const existingSocialIcons = grid.querySelector('.social-icons');
     const socialIcons = existingSocialIcons ? existingSocialIcons.cloneNode(true) : null;
-
     grid.innerHTML = `
       <div class="menu-column">
-        <div class="menu-group">
-          <a href="/services.html" class="menu-group-title">Services</a>
-          <div class="menu-subitems">
-            <a href="/scan.html">Free Scan</a>
-            <a href="/sitespeed.html">Website Speed Check</a>
-            <a href="/methodology.html">Methodology</a>
-          </div>
-        </div>
-
+        <div class="menu-group"><a href="/services.html" class="menu-group-title">Services</a><div class="menu-subitems"><a href="/scan.html">Free Scan</a><a href="/sitespeed.html">Website Speed Check</a><a href="/methodology.html">Methodology</a></div></div>
         <a href="/about.html" class="menu-item">About</a>
-
-        <div class="menu-group">
-          <div class="menu-label menu-group-title">Resources</div>
-          <div class="menu-subitems">
-            <a href="/blog.html">Blog</a>
-            <a href="/cases.html">Cases</a>
-            <a href="/help-centre.html">Help centre</a>
-          </div>
-        </div>
-
-        <a href="/contact.html" class="menu-item">Contact</a>
-        <a href="/login.html" class="menu-item">Login</a>
-      </div>
-      <div class="legacy-menu-bottom">
-        <div class="menu-label">Follow</div>
-      </div>`;
-
+        <div class="menu-group"><div class="menu-label menu-group-title">Resources</div><div class="menu-subitems"><a href="/blog.html">Blog</a><a href="/cases.html">Cases</a><a href="/help-centre.html">Help centre</a></div></div>
+        <a href="/contact.html" class="menu-item">Contact</a><a href="/login.html" class="menu-item">Login</a>
+      </div><div class="legacy-menu-bottom"><div class="menu-label">Follow</div></div>`;
     if (socialIcons) grid.querySelector('.legacy-menu-bottom').appendChild(socialIcons);
   }
 
   if (!document.getElementById('site-menu')) {
     const navLinks = nav?.querySelector('.nav-links');
     if (nav && navLinks) {
-      const toggle = document.createElement('button');
-      toggle.id = 'menu-toggle';
-      toggle.className = 'menu-toggle';
-      toggle.type = 'button';
-      toggle.setAttribute('aria-label', 'Open menu');
-      toggle.setAttribute('aria-expanded', 'false');
-      toggle.setAttribute('aria-controls', 'site-menu');
-      toggle.innerHTML = '<span></span><span></span><span></span>';
-
-      const actions = nav.querySelector('.nav-actions') || document.createElement('div');
-      actions.className = 'nav-actions';
-      actions.appendChild(toggle);
-      nav.querySelector('.nav-inner').appendChild(actions);
-
-      const menu = document.createElement('div');
-      menu.className = 'site-menu legacy-menu';
-      menu.id = 'site-menu';
-      menu.setAttribute('aria-hidden', 'true');
-      menu.innerHTML = `
-        <div class="site-menu-inner">
-          <div class="menu-head">
-            <span class="label">AfricaLatency</span>
-            <button id="menu-close" class="menu-close" type="button" aria-label="Close menu">×</button>
-          </div>
-          <div class="menu-grid legacy-menu-grid">
-            <div class="menu-column legacy-menu-links"></div>
-            <div class="legacy-menu-bottom">
-              <div class="menu-label">Follow</div>
-              <div class="social-icons">
-                <a href="https://www.linkedin.com/in/charles-mwaura-bb7814140/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
-                <a href="https://github.com/cmwrxh/cmwrxh.github.io" target="_blank" rel="noopener" aria-label="GitHub">⌘</a>
-                <a href="mailto:support@africalatency.dev" aria-label="Email">✉</a>
-              </div>
-            </div>
-          </div>
-          <div class="menu-footer">
-            <a class="btn btn-primary" href="/scan.html">Run a free scan</a>
-            <a class="btn btn-secondary" href="/contact.html">Contact</a>
-          </div>
-        </div>`;
-
+      const toggle = document.createElement('button'); toggle.id = 'menu-toggle'; toggle.className = 'menu-toggle'; toggle.type = 'button';
+      toggle.setAttribute('aria-label', 'Open menu'); toggle.setAttribute('aria-expanded', 'false'); toggle.setAttribute('aria-controls', 'site-menu'); toggle.innerHTML = '<span></span><span></span><span></span>';
+      const actions = nav.querySelector('.nav-actions') || document.createElement('div'); actions.className = 'nav-actions'; actions.appendChild(toggle); nav.querySelector('.nav-inner').appendChild(actions);
+      const menu = document.createElement('div'); menu.className = 'site-menu legacy-menu'; menu.id = 'site-menu'; menu.setAttribute('aria-hidden', 'true');
+      menu.innerHTML = `<div class="site-menu-inner"><div class="menu-head"><span class="label">AfricaLatency</span><button id="menu-close" class="menu-close" type="button" aria-label="Close menu">×</button></div><div class="menu-grid legacy-menu-grid"><div class="menu-column legacy-menu-links"></div><div class="legacy-menu-bottom"><div class="menu-label">Follow</div><div class="social-icons"><a href="https://www.linkedin.com/in/charles-mwaura-bb7814140/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a><a href="https://github.com/cmwrxh/cmwrxh.github.io" target="_blank" rel="noopener" aria-label="GitHub">⌘</a><a href="mailto:support@africalatency.dev" aria-label="Email">✉</a></div></div></div><div class="menu-footer"><a class="btn btn-primary" href="/scan.html">Run a free scan</a><a class="btn btn-secondary" href="/contact.html">Contact</a></div></div>`;
       const linkContainer = menu.querySelector('.legacy-menu-links');
-      links.forEach(([href, text]) => {
-        const a = document.createElement('a');
-        a.href = href;
-        a.textContent = text;
-        linkContainer.appendChild(a);
-      });
-
-      document.body.appendChild(menu);
-      buildMobileMenu(menu);
-      wireMenu(menu, toggle);
+      links.forEach(([href, text]) => { const a = document.createElement('a'); a.href = href; a.textContent = text; linkContainer.appendChild(a); });
+      document.body.appendChild(menu); buildMobileMenu(menu); wireMenu(menu, toggle);
     }
   } else {
-    const menu = document.getElementById('site-menu');
-    const toggle = document.getElementById('menu-toggle');
-    if (menu && toggle) {
-      buildMobileMenu(menu);
-      wireMenu(menu, toggle);
-    }
+    const menu = document.getElementById('site-menu'); const toggle = document.getElementById('menu-toggle'); if (menu && toggle) { buildMobileMenu(menu); wireMenu(menu, toggle); }
   }
 
   function wireMenu(menu, toggle) {
-    if (toggle.dataset.menuWired) return;
-    const close = menu.querySelector('#menu-close');
-    if (!close) return;
-    toggle.dataset.menuWired = 'true';
-
+    if (toggle.dataset.menuWired) return; const close = menu.querySelector('#menu-close'); if (!close) return; toggle.dataset.menuWired = 'true';
     let isOpen = menu.classList.contains('open');
-    const setMenu = (next) => {
-      isOpen = Boolean(next);
-      menu.classList.toggle('open', isOpen);
-      menu.setAttribute('aria-hidden', String(!isOpen));
-      toggle.setAttribute('aria-expanded', String(isOpen));
-      toggle.setAttribute('aria-label', isOpen ? 'Close menu' : 'Open menu');
-      document.body.classList.toggle('menu-open', isOpen);
-    };
-
-    toggle.addEventListener('click', (event) => {
-      event.preventDefault();
-      setMenu(!isOpen);
-    });
-    close.addEventListener('click', () => setMenu(false));
-    menu.addEventListener('click', (event) => {
-      if (event.target === menu) setMenu(false);
-    });
-    menu.querySelectorAll('a').forEach((a) => {
-      a.addEventListener('click', () => setTimeout(() => setMenu(false), 0));
-    });
-    document.addEventListener('keydown', (event) => {
-      if (event.key === 'Escape') setMenu(false);
-    });
+    const setMenu = (next) => { isOpen = Boolean(next); menu.classList.toggle('open', isOpen); menu.setAttribute('aria-hidden', String(!isOpen)); toggle.setAttribute('aria-expanded', String(isOpen)); toggle.setAttribute('aria-label', isOpen ? 'Close menu' : 'Open menu'); document.body.classList.toggle('menu-open', isOpen); };
+    toggle.addEventListener('click', (event) => { event.preventDefault(); setMenu(!isOpen); }); close.addEventListener('click', () => setMenu(false));
+    menu.addEventListener('click', (event) => { if (event.target === menu) setMenu(false); }); menu.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => setTimeout(() => setMenu(false), 0)));
+    document.addEventListener('keydown', (event) => { if (event.key === 'Escape') setMenu(false); });
   }
 
   const calcForm = document.getElementById('impact-calculator-form');
   if (calcForm) {
     calcForm.addEventListener('submit', (e) => {
       e.preventDefault();
-      const domain = document.getElementById('calc-domain').value;
-      const latency = parseFloat(document.getElementById('calc-latency').value);
-      const traffic = parseInt(document.getElementById('calc-traffic').value);
-      const aov = parseFloat(document.getElementById('calc-aov').value);
-      const baseConversion = parseFloat(document.getElementById('calc-conversion').value) / 100;
-      const latencyPenaltyMs = Math.max(0, latency - 150);
-      const penaltyFactor = (latencyPenaltyMs / 100) * 0.035;
-      const normalTransactions = traffic * baseConversion;
-      const degradedConversion = Math.max(0, baseConversion * (1 - penaltyFactor));
-      const actualTransactions = traffic * degradedConversion;
-      const lostTransactions = normalTransactions - actualTransactions;
-      const estimatedMonthlyLoss = lostTransactions * aov;
-      document.getElementById('res-domain').textContent = domain;
-      document.getElementById('loss-output').textContent = `$${estimatedMonthlyLoss.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} lost / month`;
+      const domain = document.getElementById('calc-domain').value; const latency = parseFloat(document.getElementById('calc-latency').value);
+      const traffic = parseInt(document.getElementById('calc-traffic').value); const aov = parseFloat(document.getElementById('calc-aov').value);
+      const baseConversion = parseFloat(document.getElementById('calc-conversion').value) / 100; const latencyPenaltyMs = Math.max(0, latency - 150);
+      const penaltyFactor = (latencyPenaltyMs / 100) * 0.035; const normalTransactions = traffic * baseConversion;
+      const degradedConversion = Math.max(0, baseConversion * (1 - penaltyFactor)); const actualTransactions = traffic * degradedConversion;
+      const lostTransactions = normalTransactions - actualTransactions; const estimatedMonthlyLoss = lostTransactions * aov;
+      document.getElementById('res-domain').textContent = domain; document.getElementById('loss-output').textContent = `$${estimatedMonthlyLoss.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} lost / month`;
       document.getElementById('breakdown-text').innerHTML = `With <span class="command">${latency}ms</span> latency from Nairobi, conversion suffers a <span class="command">${(penaltyFactor * 100).toFixed(1)}%</span> friction penalty (~${Math.round(lostTransactions)} dropped orders/mo).`;
       document.getElementById('calculator-results').style.display = 'block';
     });
   }
 
-  if (!document.querySelector('script[src="/js/compliance.js"]')) {
-    const compliance = document.createElement('script');
-    compliance.defer = true;
-    compliance.src = '/js/compliance.js';
-    document.head.appendChild(compliance);
-  }
+  if (!document.querySelector('script[src="/js/compliance.js"]')) { const compliance = document.createElement('script'); compliance.defer = true; compliance.src = '/js/compliance.js'; document.head.appendChild(compliance); }
+  if (!document.querySelector('script[src="/js/ux.js"]')) { const ux = document.createElement('script'); ux.defer = true; ux.src = '/js/ux.js'; document.head.appendChild(ux); }
 });
