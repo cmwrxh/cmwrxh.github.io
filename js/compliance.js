@@ -16,14 +16,19 @@
     '/acceptable-use-policy.html': ['Acceptable Use Policy | AfricaLatency', 'Read the AfricaLatency Acceptable Use Policy covering permitted use, prohibited activity, authorized testing, security, and responsible use of our services.'],
     '/audit-intake.html': ['Request an Africa Latency Audit | AfricaLatency', 'Request an Africa Latency Audit to measure your application across African locations, identify performance bottlenecks, and get a prioritized remediation plan.'],
     '/audit-report.html': ['Audit Report | AfricaLatency', 'Review an AfricaLatency performance audit report with measured findings, bottlenecks, evidence, and recommended remediation actions for African users.'],
+    '/audit-checkout.html': ['Africa Latency Audit Checkout | AfricaLatency', 'Purchase the standardized Africa Latency Audit for a one-time $247 USD fee and receive an automated evidence-based performance report.'],
+    '/audit-processing.html': ['Processing Africa Latency Audit | AfricaLatency', 'Your Africa Latency Audit is being processed.'],
     '/blog.html': ['AfricaLatency Blog | Performance Engineering in Africa', 'Practical insights on latency, networks, cloud regions, CDNs, APIs, infrastructure, and digital performance across African markets and networks today.'],
     '/cases.html': ['Case Studies | AfricaLatency Performance Intelligence', 'Explore AfricaLatency case studies and performance investigations showing how measured evidence can uncover latency and infrastructure problems across Africa.'],
     '/contact.html': ['Contact AfricaLatency | Performance & Latency Experts', 'Contact AfricaLatency about website performance, API latency, infrastructure diagnostics, audits, validation, or improving digital experiences across Africa.'],
     '/dashboard.html': ['AfricaLatency Dashboard | Performance Intelligence', 'Access the AfricaLatency dashboard to review performance measurements, regional results, reports, and infrastructure intelligence for monitored services.'],
+    '/data-centers.html': ['African Data Centers | AfricaLatency', 'Explore African data center and cloud-region coverage relevant to digital performance, latency, routing, and infrastructure decisions.'],
     '/help-centre.html': ['Help Centre | AfricaLatency', 'Find answers about AfricaLatency scans, latency audits, diagnostics, performance measurements, reports, and how to get technical support for your service.'],
+    '/kenya.html': ['Kenya Digital Performance | AfricaLatency', 'Understand website, API, network, and infrastructure performance for users and services operating across Kenya.'],
     '/labs.html': ['AfricaLatency Labs | Performance Research & Experiments', 'Explore AfricaLatency Labs, where we investigate tools, measurements, network behavior, and new approaches to digital performance across African markets.'],
     '/login.html': ['Log In | AfricaLatency', 'Log in to your AfricaLatency account to access performance data, reports, scans, and available infrastructure intelligence for your monitored services.'],
     '/methodology.html': ['Methodology | How AfricaLatency Measures Performance', 'See how AfricaLatency measures latency and digital performance across African locations, networks, routing paths, infrastructure, applications, and dependencies.'],
+    '/nigeria.html': ['Nigeria Digital Performance | AfricaLatency', 'Understand website, API, network, and infrastructure performance for users and services operating across Nigeria.'],
     '/privacy-policy.html': ['Privacy Policy | AfricaLatency', 'Read the AfricaLatency Privacy Policy covering data collection, diagnostic data, analytics, cookies, third-party services, user rights, retention, and privacy.'],
     '/refund-policy.html': ['Refund Policy | AfricaLatency', 'Read the AfricaLatency Refund Policy covering eligibility, service fees, cancellations, refunds, and how to contact support about a billing issue or request.'],
     '/scan.html': ['Free Latency Scan | AfricaLatency', 'Run a free AfricaLatency scan to measure website or API response performance and see how your service performs from key African locations and networks.'],
@@ -38,9 +43,11 @@
     '/dashboard.html': true,
     '/login.html': true,
     '/audit-report.html': true,
+    '/audit-processing.html': true,
     '/dashboard': true,
     '/login': true,
-    '/audit-report': true
+    '/audit-report': true,
+    '/audit-processing': true
   };
 
   var IMAGE_ALT = {
