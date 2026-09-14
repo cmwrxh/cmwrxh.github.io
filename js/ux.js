@@ -107,11 +107,20 @@
     document.head.appendChild(style);
   }
 
+  function loadTier4() {
+    if (document.querySelector('script[src="/js/tier4.js"]')) return;
+    const script = document.createElement('script');
+    script.defer = true;
+    script.src = '/js/tier4.js';
+    document.head.appendChild(script);
+  }
+
   function init() {
     addStyles();
     installFormValidation();
     watchAuditConfirmation();
     addMobileCta();
+    loadTier4();
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
