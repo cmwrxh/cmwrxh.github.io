@@ -149,6 +149,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  if (document.querySelector('.hero-highlight') && !document.querySelector('script[src="/js/dogfood-geo.js"]')) { const geoDogfood = document.createElement('script'); geoDogfood.src = '/js/dogfood-geo.js'; document.head.appendChild(geoDogfood); }
   if (!document.querySelector('script[src="/js/compliance.js"]')) { const compliance = document.createElement('script'); compliance.defer = true; compliance.src = '/js/compliance.js'; document.head.appendChild(compliance); }
   if (!document.querySelector('script[src="/js/ux.js"]')) { const ux = document.createElement('script'); ux.defer = true; ux.src = '/js/ux.js'; document.head.appendChild(ux); }
 });
