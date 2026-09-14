@@ -1,0 +1,49 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<style>
+  @page { margin: 40px 48px; }
+  body { font-family: Inter, 'Helvetica Neue', Arial, sans-serif; color: #1a1a1a; font-size: 13px; }
+  .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #12543f; padding-bottom: 14px; margin-bottom: 24px; }
+  .header h1 { font-size: 20px; color: #0d3b2e; margin: 0; }
+  .header .meta { text-align: right; font-size: 11px; color: #555; }
+  .badge { display: inline-block; background: #12543f; color: #fff; padding: 3px 10px; border-radius: 3px; font-size: 11px; margin-bottom: 4px; }
+  h2 { font-size: 15px; color: #0d3b2e; border-bottom: 1px solid #e0e0e0; padding-bottom: 6px; margin-top: 28px; }
+  table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 12px; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid #eee; }
+  th { background: #f0f5f2; color: #0d3b2e; }
+  .callout { background: #eef5f1; border-left: 4px solid #12543f; padding: 12px 16px; margin-top: 16px; font-size: 12.5px; }
+  .disclaimer { font-size: 10.5px; color: #777; margin-top: 30px; border-top: 1px solid #eee; padding-top: 10px; }
+  .footer { position: fixed; bottom: 20px; left: 48px; right: 48px; font-size: 10px; color: #999; display: flex; justify-content: space-between; }
+</style>
+</head>
+<body>
+<div class="header">
+  <div><div class="badge">AFRICA LATENCY AUDIT</div><h1>{{domain}}</h1></div>
+  <div class="meta">Report generated {{generatedAtFormatted}}<br/>Reference: {{reference}}</div>
+</div>
+<h2>Executive Summary</h2>
+<p>This report measures {{domain}}'s real-world response performance from key African network locations. Measurements were taken from {{locationCount}} vantage points: {{locationList}}.</p>
+<div class="callout">
+  <strong>Slowest observed location:</strong> {{worstLocation}} at {{worstTtfbMs}} ms time-to-first-byte.<br/>
+  <strong>Fastest observed location:</strong> {{bestLocation}} at {{bestTtfbMs}} ms time-to-first-byte.
+</div>
+<h2>Measurements by Location</h2>
+<table>
+  <thead><tr><th>Location</th><th>DNS (ms)</th><th>TLS Handshake (ms)</th><th>TTFB (ms)</th><th>Total (ms)</th><th>Status</th></tr></thead>
+  <tbody>{{rowsHtml}}</tbody>
+</table>
+<h2>What This Means</h2>
+<p>Time-to-first-byte (TTFB) reflects DNS resolution, connection setup (including TLS handshake), and the time your origin server or edge takes to begin responding. A gap of more than roughly 150–200 ms between your fastest and slowest African location usually points to routing distance from origin, missing CDN/edge coverage in that region, or DNS resolving outside the continent rather than application-code issues.</p>
+<h2>Recommended Next Steps</h2>
+<ul>
+  <li>If TTFB is high across all locations: investigate origin server load, backend processing time, and database query latency.</li>
+  <li>If TTFB is high only in specific locations: investigate CDN/edge coverage and DNS geo-steering for that region.</li>
+  <li>If TLS handshake time is high: confirm TLS 1.3 and session resumption are enabled at the edge.</li>
+  <li>Re-run this audit after any change to validate the improvement with the same methodology.</li>
+</ul>
+<div class="disclaimer">Measurements were taken at a single point in time from public network probes and reflect network and server-response conditions at that moment; results can vary by time of day, ISP, and routing changes. This report presents observed facts (timings) separately from recommendations, which are general guidance rather than a guarantee of a specific outcome.</div>
+<div class="footer"><span>AfricaLatency.dev — Infrastructure Performance &amp; Latency Intelligence</span><span>support@africalatency.dev</span></div>
+</body>
+</html>
