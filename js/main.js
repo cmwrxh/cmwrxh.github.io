@@ -40,6 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
     @media (min-width: 900px) {
       .nav-inner { gap: 24px; }
       .nav-links { display: flex !important; align-items: center; gap: 18px; list-style: none; margin: 0; padding: 0; }
+      nav .nav-links > li:nth-child(n) { display: list-item !important; }
       .nav-links li { position: relative; display: list-item !important; margin: 0; padding: 0; }
       .nav-links li a,
       .nav-links .nav-dropdown-trigger { display: inline-flex; align-items: center; white-space: nowrap; }
@@ -52,13 +53,8 @@ document.addEventListener('DOMContentLoaded', () => {
       .nav-dropdown-menu a:focus-visible { background: rgba(255,255,255,.06); color: #fff; outline: none; }
       .nav-dropdown:hover .nav-dropdown-menu,
       .nav-dropdown:focus-within .nav-dropdown-menu { display: block; }
-      .nav-links > li:nth-child(n) { display: list-item !important; }
-      .nav-links > li:nth-child(1) .nav-dropdown-menu { display: none; }
-      .nav-links > li:nth-child(1):hover .nav-dropdown-menu,
-      .nav-links > li:nth-child(1):focus-within .nav-dropdown-menu { display: block; }
       .nav-links .nav-dropdown-menu.nav-services { min-width: 225px; }
-      .nav-links .nav-dropdown-menu.nav-resources { min-width: 210px; }
-      .nav-links .nav-dropdown-menu.nav-resources { left: -10px; }
+      .nav-links .nav-dropdown-menu.nav-resources { min-width: 210px; left: -10px; }
       .nav-links .nav-dropdown-menu.nav-resources::before { left: 22px; }
       .nav-cta { display: inline-flex; align-items: center; white-space: nowrap; }
       .nav-actions { margin-left: auto; }
