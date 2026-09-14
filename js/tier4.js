@@ -54,41 +54,6 @@
     });
   }
 
-  function ensureMobileMenuSafety() {
-    const menu=document.getElementById('site-menu');
-    const toggle=document.getElementById('menu-toggle');
-    if(!menu||!toggle)return;
-
-    // main.js normally wires this first. If it did not, Tier 4 repairs the binding
-    // after its own DOM work without ever adding a second click listener.
-    if(!toggle.dataset.menuWired) {
-      const close=menu.querySelector('#menu-close');
-      if(close) {
-        let open=menu.classList.contains('open');
-        const setMenu=(next)=>{
-          open=Boolean(next);
-          menu.classList.toggle('open',open);
-          menu.setAttribute('aria-hidden',String(!open));
-          toggle.setAttribute('aria-expanded',String(open));
-          toggle.setAttribute('aria-label',open?'Close menu':'Open menu');
-          document.body.classList.toggle('menu-open',open);
-        };
-        toggle.addEventListener('click',(event)=>{event.preventDefault();setMenu(!open);});
-        close.addEventListener('click',()=>setMenu(false));
-        menu.addEventListener('click',(event)=>{if(event.target===menu)setMenu(false);});
-        menu.querySelectorAll('a').forEach((a)=>a.addEventListener('click',()=>setTimeout(()=>setMenu(false),0)));
-        toggle.dataset.menuWired='true';
-        toggle.dataset.tier4MenuRepair='true';
-      }
-    }
-
-    // A closed menu must never leave the page in the locked-scroll state.
-    if(!menu.classList.contains('open')) {
-      document.body.classList.remove('menu-open');
-      if(document.body.style.overflow==='hidden') document.body.style.removeProperty('overflow');
-    }
-  }
-
   function addDogfoodWidget() {
     if(!document.querySelector('.hero-highlight')||document.querySelector('.dogfood-card'))return;
     const section=document.createElement('section');section.className='section dogfood-section';section.innerHTML='<div class="container narrow"><div class="dogfood-card" aria-live="polite"><span class="dogfood-dot" aria-hidden="true"></span><div class="dogfood-copy"><div class="dogfood-value" data-dogfood-value>Measuring this page…</div><div class="dogfood-note">Your browser · current visit. This is visitor-side page-load timing, not a regional latency measurement.</div></div></div></div>';
@@ -116,7 +81,6 @@
   function htmlIntro(intro){return intro.innerHTML.replace(/1st Parklands Avenue, 00623 Nairobi, Kenya/g,'1 Parklands Ave, Nairobi 00623, Kenya');}
   function refreshIcons(){if(window.lucide?.createIcons)window.lucide.createIcons({attrs:{'stroke-width':1.7}});}
 
-  async function init(){addStyles();document.body.classList.add('tier4-disciplined');enhanceAuditList();enhanceProcessCards();makeAccordionMenus();addNetworkTopology();addDogfoodWidget();restructureHomepageFooter();ensureMobileMenuSafety();await loadLucide();refreshIcons();ensureMobileMenuSafety();window.dispatchEvent(new CustomEvent('tier4:ready'));}
+  async function init(){addStyles();document.body.classList.add('tier4-disciplined');enhanceAuditList();enhanceProcessCards();makeAccordionMenus();addNetworkTopology();addDogfoodWidget();restructureHomepageFooter();await loadLucide();refreshIcons();window.dispatchEvent(new CustomEvent('tier4:ready'));}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
-  const observer=new MutationObserver(()=>{makeAccordionMenus();enhanceAuditList();refreshIcons();ensureMobileMenuSafety();});observer.observe(document.documentElement,{childList:true,subtree:true});
 })();
