@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const links = [
     ['/services.html', 'Services'], ['/scan.html', 'Free Scan'], ['/methodology.html', 'Methodology'],
-    ['/cases.html', 'Cases'], ['/about.html', 'About'], ['/blog.html', 'Blog'],
+    ['/data-centers.html', 'Data centers'], ['/cases.html', 'Cases'], ['/about.html', 'About'], ['/blog.html', 'Blog'],
     ['/help-centre.html', 'Help centre'], ['/contact.html', 'Contact'], ['/login.html', 'Login']
   ];
 
@@ -95,7 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
       <div class="menu-column">
         <div class="menu-group"><a href="/services.html" class="menu-group-title">Services</a><div class="menu-subitems"><a href="/scan.html">Free Scan</a><a href="/sitespeed.html">Website Speed Check</a><a href="/methodology.html">Methodology</a></div></div>
         <a href="/about.html" class="menu-item">About</a>
-        <div class="menu-group"><div class="menu-label menu-group-title">Resources</div><div class="menu-subitems"><a href="/blog.html">Blog</a><a href="/cases.html">Cases</a><a href="/help-centre.html">Help centre</a></div></div>
+        <div class="menu-group"><div class="menu-label menu-group-title">Resources</div><div class="menu-subitems"><a href="/data-centers.html">Data centers</a><a href="/blog.html">Blog</a><a href="/cases.html">Cases</a><a href="/help-centre.html">Help centre</a></div></div>
         <a href="/contact.html" class="menu-item">Contact</a><a href="/login.html" class="menu-item">Login</a>
       </div><div class="legacy-menu-bottom"><div class="menu-label">Follow</div></div>`;
     if (socialIcons) grid.querySelector('.legacy-menu-bottom').appendChild(socialIcons);
