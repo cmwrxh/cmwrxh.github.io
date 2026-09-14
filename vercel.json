@@ -1,47 +1,9 @@
 {
   "functions": { "api/paystack-webhook.js": { "maxDuration": 60 } },
   "redirects": [
-    { "source": "/about.html", "destination": "/about", "permanent": true },
-    { "source": "/services.html", "destination": "/services", "permanent": true },
-    { "source": "/scan.html", "destination": "/scan", "permanent": true },
-    { "source": "/methodology.html", "destination": "/methodology", "permanent": true },
-    { "source": "/work.html", "destination": "/work", "permanent": true },
-    { "source": "/contact.html", "destination": "/contact", "permanent": true },
-    { "source": "/audit-intake.html", "destination": "/audit-intake", "permanent": true },
-    { "source": "/audit-report.html", "destination": "/audit-report", "permanent": true },
-    { "source": "/labs.html", "destination": "/labs", "permanent": true },
-    { "source": "/login.html", "destination": "/login", "permanent": true },
-    { "source": "/dashboard.html", "destination": "/dashboard", "permanent": true },
-    { "source": "/cases.html", "destination": "/cases", "permanent": true },
-    { "source": "/terms-of-service.html", "destination": "/terms-of-service", "permanent": true },
-    { "source": "/service-level-agreement.html", "destination": "/service-level-agreement", "permanent": true },
-    { "source": "/acceptable-use-policy.html", "destination": "/acceptable-use-policy", "permanent": true },
-    { "source": "/refund-policy.html", "destination": "/refund-policy", "permanent": true },
-    { "source": "/help-centre.html", "destination": "/help-centre", "permanent": true },
-    { "source": "/blog.html", "destination": "/blog", "permanent": true },
-    { "source": "/audit-checkout.html", "destination": "/audit-checkout", "permanent": true },
-    { "source": "/sitespeed-checkout.html", "destination": "/sitespeed-checkout", "permanent": true }
+    { "source": "/about.html", "destination": "/about", "permanent": true }, { "source": "/services.html", "destination": "/services", "permanent": true }, { "source": "/scan.html", "destination": "/scan", "permanent": true }, { "source": "/methodology.html", "destination": "/methodology", "permanent": true }, { "source": "/work.html", "destination": "/work", "permanent": true }, { "source": "/contact.html", "destination": "/contact", "permanent": true }, { "source": "/audit-intake.html", "destination": "/audit-intake", "permanent": true }, { "source": "/audit-report.html", "destination": "/audit-report", "permanent": true }, { "source": "/labs.html", "destination": "/labs", "permanent": true }, { "source": "/login.html", "destination": "/login", "permanent": true }, { "source": "/dashboard.html", "destination": "/dashboard", "permanent": true }, { "source": "/cases.html", "destination": "/cases", "permanent": true }, { "source": "/terms-of-service.html", "destination": "/terms-of-service", "permanent": true }, { "source": "/service-level-agreement.html", "destination": "/service-level-agreement", "permanent": true }, { "source": "/acceptable-use-policy.html", "destination": "/acceptable-use-policy", "permanent": true }, { "source": "/refund-policy.html", "destination": "/refund-policy", "permanent": true }, { "source": "/help-centre.html", "destination": "/help-centre", "permanent": true }, { "source": "/blog.html", "destination": "/blog", "permanent": true }, { "source": "/audit-checkout.html", "destination": "/audit-checkout", "permanent": true }, { "source": "/sitespeed-checkout.html", "destination": "/sitespeed-checkout", "permanent": true }
   ],
   "rewrites": [
-    { "source": "/about", "destination": "/about.html" },
-    { "source": "/services", "destination": "/services.html" },
-    { "source": "/scan", "destination": "/scan.html" },
-    { "source": "/methodology", "destination": "/methodology.html" },
-    { "source": "/work", "destination": "/work.html" },
-    { "source": "/contact", "destination": "/contact.html" },
-    { "source": "/audit-intake", "destination": "/audit-intake.html" },
-    { "source": "/audit-report", "destination": "/audit-report.html" },
-    { "source": "/labs", "destination": "/labs.html" },
-    { "source": "/login", "destination": "/login.html" },
-    { "source": "/dashboard", "destination": "/dashboard.html" },
-    { "source": "/cases", "destination": "/cases.html" },
-    { "source": "/terms-of-service", "destination": "/terms-of-service.html" },
-    { "source": "/service-level-agreement", "destination": "/service-level-agreement.html" },
-    { "source": "/acceptable-use-policy", "destination": "/acceptable-use-policy.html" },
-    { "source": "/refund-policy", "destination": "/refund-policy.html" },
-    { "source": "/help-centre", "destination": "/help-centre.html" },
-    { "source": "/blog", "destination": "/blog.html" },
-    { "source": "/audit-checkout", "destination": "/sitespeed-checkout.html" },
-    { "source": "/sitespeed-checkout", "destination": "/sitespeed-checkout.html" }
+    { "source": "/about", "destination": "/about.html" }, { "source": "/services", "destination": "/services.html" }, { "source": "/scan", "destination": "/scan.html" }, { "source": "/methodology", "destination": "/methodology.html" }, { "source": "/work", "destination": "/work.html" }, { "source": "/contact", "destination": "/contact.html" }, { "source": "/audit-intake", "destination": "/audit-intake.html" }, { "source": "/audit-report", "destination": "/audit-report.html" }, { "source": "/labs", "destination": "/labs.html" }, { "source": "/login", "destination": "/login.html" }, { "source": "/dashboard", "destination": "/dashboard.html" }, { "source": "/cases", "destination": "/cases.html" }, { "source": "/terms-of-service", "destination": "/terms-of-service.html" }, { "source": "/service-level-agreement", "destination": "/service-level-agreement.html" }, { "source": "/acceptable-use-policy", "destination": "/acceptable-use-policy.html" }, { "source": "/refund-policy", "destination": "/refund-policy.html" }, { "source": "/help-centre", "destination": "/help-centre.html" }, { "source": "/blog", "destination": "/blog.html" }, { "source": "/audit-checkout", "destination": "/audit-checkout.html" }, { "source": "/sitespeed-checkout", "destination": "/sitespeed-checkout.html" }
   ]
 }
