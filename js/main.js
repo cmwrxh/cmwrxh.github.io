@@ -133,6 +133,64 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('keydown', (event) => { if (event.key === 'Escape') setMenu(false); });
   }
 
+  function normalizeFooter() {
+    const footer = document.querySelector('footer');
+    if (!footer || footer.dataset.unifiedFooter) return;
+    footer.dataset.unifiedFooter = 'true';
+    footer.classList.add('homepage-footer');
+    footer.innerHTML = `
+      <div class="footer-inner tier4-footer-grid">
+        <div class="tier4-footer-col footer-intro">
+          <div class="label">AfricaLatency.dev</div>
+          <h3>Better performance. Better digital experiences.</h3>
+          <p>Helping businesses understand, improve, and monitor digital performance across Africa.</p>
+          <p class="footer-address">1st Parklands Avenue, 00623 Nairobi, Kenya</p>
+          <p class="footer-copy">© 2026 AfricaLatency.dev</p>
+        </div>
+        <div class="tier4-footer-col">
+          <h4>Company</h4>
+          <div class="tier4-footer-links">
+            <a href="/about.html">About</a>
+            <a href="/contact.html">Contact</a>
+            <a href="/cases.html">Cases</a>
+          </div>
+        </div>
+        <div class="tier4-footer-col">
+          <h4>Legal</h4>
+          <div class="tier4-footer-links">
+            <a href="/terms-of-service.html">Terms of Service</a>
+            <a href="/privacy-policy.html">Privacy Policy</a>
+            <a href="/service-level-agreement.html">Service Level Agreement</a>
+            <a href="/acceptable-use-policy.html">Acceptable Use</a>
+            <a href="/refund-policy.html">Refund Policy</a>
+          </div>
+        </div>
+        <div class="tier4-footer-col">
+          <h4>Resources</h4>
+          <div class="tier4-footer-links">
+            <a href="/scan.html">Free Scan</a>
+            <a href="/sitespeed.html">Website Speed Check</a>
+            <a href="/methodology.html">Methodology</a>
+            <a href="/data-centers.html">Data centers</a>
+            <a href="/kenya.html">Kenya</a>
+            <a href="/nigeria.html">Nigeria</a>
+            <a href="/blog.html">Blog</a>
+            <a href="/help-centre.html">Help centre</a>
+          </div>
+        </div>
+        <div class="tier4-footer-col">
+          <h4>Connect</h4>
+          <div class="tier4-footer-links">
+            <a href="mailto:support@africalatency.dev">support@africalatency.dev</a>
+            <a href="https://github.com/cmwrxh/cmwrxh.github.io" target="_blank" rel="noopener">GitHub</a>
+          </div>
+          <p style="margin-top:16px;color:rgba(255,255,255,.55);font-size:.72rem">Africa Latency Ltd<br>1 Parklands Ave, Nairobi 00623, Kenya</p>
+        </div>
+      </div>`;
+  }
+
+  normalizeFooter();
+
   const calcForm = document.getElementById('impact-calculator-form');
   if (calcForm) {
     calcForm.addEventListener('submit', (e) => {
