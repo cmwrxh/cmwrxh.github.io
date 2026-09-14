@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "private": true,
   "dependencies": {
-    "@supabase/supabase-js": "^2.57.0"
+    "@sparticuz/chromium": "^138.0.0",
+    "@supabase/supabase-js": "^2.57.0",
+    "@vercel/functions": "^2.0.0",
+    "puppeteer-core": "^24.0.0"
   }
 }
