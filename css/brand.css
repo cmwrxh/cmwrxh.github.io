@@ -149,6 +149,29 @@
   }
 }
 
+/* --------------------------------------------------------------------------
+   Tier 4 footer grid correction
+   Tier 4 currently builds five footer columns: Intro, Company, Legal,
+   Resources, and Connect. The original four-column rule caused Connect to
+   wrap onto a second row on desktop. Keep the five-column structure explicit
+   while retaining the intended two-column and one-column mobile layouts.
+   -------------------------------------------------------------------------- */
+.homepage-footer .footer-inner.tier4-footer-grid {
+  grid-template-columns: minmax(0, 1.3fr) repeat(4, minmax(0, 1fr)) !important;
+}
+
+@media (max-width: 900px) {
+  .homepage-footer .footer-inner.tier4-footer-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 560px) {
+  .homepage-footer .footer-inner.tier4-footer-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+}
+
 @media (max-width: 900px) {
   .brand-lockup {
     gap: 8px;
