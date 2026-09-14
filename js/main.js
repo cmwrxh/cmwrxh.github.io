@@ -35,15 +35,42 @@ document.addEventListener('DOMContentLoaded', () => {
     .nav-cta { display: none; }
     nav .nav-inner { transition: padding .22s ease, min-height .22s ease; }
     body.nav-scrolled nav .nav-inner { padding-top: 8px; padding-bottom: 8px; }
+
+    /* Tier 4 desktop navigation: compact hierarchy instead of a flat sitemap. */
     @media (min-width: 900px) {
       .nav-inner { gap: 24px; }
-      .nav-links { display: flex; align-items: center; gap: 20px; list-style: none; margin: 0; padding: 0; }
-      .nav-links li { margin: 0; padding: 0; }
-      .nav-links li a { display: inline-flex; align-items: center; white-space: nowrap; }
+      .nav-links { display: flex !important; align-items: center; gap: 18px; list-style: none; margin: 0; padding: 0; }
+      .nav-links li { position: relative; display: list-item !important; margin: 0; padding: 0; }
+      .nav-links li a,
+      .nav-links .nav-dropdown-trigger { display: inline-flex; align-items: center; white-space: nowrap; }
+      .nav-links .nav-dropdown-trigger { appearance: none; border: 0; background: transparent; color: inherit; cursor: pointer; font: inherit; padding: 0; }
+      .nav-links .nav-dropdown-trigger::after { content: ''; width: 6px; height: 6px; margin: -3px 0 0 7px; border-right: 1px solid currentColor; border-bottom: 1px solid currentColor; transform: rotate(45deg); opacity: .65; }
+      .nav-dropdown-menu { position: absolute; top: calc(100% + 12px); left: -14px; display: none; min-width: 205px; padding: 9px; border: 1px solid rgba(255,255,255,.10); border-radius: 12px; background: #111114; box-shadow: 0 18px 45px rgba(0,0,0,.35); }
+      .nav-dropdown-menu::before { content: ''; position: absolute; top: -8px; left: 20px; width: 14px; height: 14px; background: #111114; border-left: 1px solid rgba(255,255,255,.10); border-top: 1px solid rgba(255,255,255,.10); transform: rotate(45deg); }
+      .nav-dropdown-menu a { position: relative; z-index: 1; display: flex !important; width: 100%; padding: 9px 10px; border-radius: 7px; color: #c8ccd4; text-decoration: none; font-size: .86rem; }
+      .nav-dropdown-menu a:hover,
+      .nav-dropdown-menu a:focus-visible { background: rgba(255,255,255,.06); color: #fff; outline: none; }
+      .nav-dropdown:hover .nav-dropdown-menu,
+      .nav-dropdown:focus-within .nav-dropdown-menu { display: block; }
+      .nav-links > li:nth-child(n) { display: list-item !important; }
+      .nav-links > li:nth-child(1) .nav-dropdown-menu { display: none; }
+      .nav-links > li:nth-child(1):hover .nav-dropdown-menu,
+      .nav-links > li:nth-child(1):focus-within .nav-dropdown-menu { display: block; }
+      .nav-links .nav-dropdown-menu.nav-services { min-width: 225px; }
+      .nav-links .nav-dropdown-menu.nav-resources { min-width: 210px; }
+      .nav-links .nav-dropdown-menu.nav-resources { left: -10px; }
+      .nav-links .nav-dropdown-menu.nav-resources::before { left: 22px; }
       .nav-cta { display: inline-flex; align-items: center; white-space: nowrap; }
       .nav-actions { margin-left: auto; }
       .menu-toggle { display: none !important; }
       .site-menu { display: flex !important; }
+    }
+
+    @media (min-width: 900px) and (max-width: 1150px) {
+      .nav-inner { gap: 16px; }
+      .nav-links { gap: 14px; }
+      .nav-links a, .nav-links .nav-dropdown-trigger { font-size: .88rem; }
+      .nav-cta { font-size: .8rem; padding-left: 13px; padding-right: 13px; }
     }
   `;
   document.head.appendChild(menuStyle);
@@ -68,11 +95,23 @@ document.addEventListener('DOMContentLoaded', () => {
       <span class="brand-name"><span class="brand-name-white">Africa</span><span class="brand-name-green">Latency</span><span class="brand-name-white">Ltd</span></span>`;
   });
 
-  const links = [
-    ['/services.html', 'Services'], ['/scan.html', 'Free Scan'], ['/methodology.html', 'Methodology'],
-    ['/data-centers.html', 'Data centers'], ['/kenya.html', 'Kenya'], ['/nigeria.html', 'Nigeria'],
-    ['/cases.html', 'Cases'], ['/about.html', 'About'], ['/blog.html', 'Blog'],
-    ['/help-centre.html', 'Help centre'], ['/contact.html', 'Contact'], ['/login.html', 'Login']
+  const serviceLinks = [
+    ['/scan.html', 'Free Scan'],
+    ['/sitespeed.html', 'Website Speed Check'],
+    ['/methodology.html', 'Methodology']
+  ];
+  const resourceLinks = [
+    ['/data-centers.html', 'Data centers'],
+    ['/kenya.html', 'Kenya'],
+    ['/nigeria.html', 'Nigeria'],
+    ['/cases.html', 'Cases'],
+    ['/blog.html', 'Blog'],
+    ['/help-centre.html', 'Help centre']
+  ];
+  const topLinks = [
+    ['/about.html', 'About'],
+    ['/contact.html', 'Contact'],
+    ['/login.html', 'Login']
   ];
 
   const nav = document.querySelector('nav');
@@ -86,7 +125,12 @@ document.addEventListener('DOMContentLoaded', () => {
         actions.className = 'nav-actions'; navInner.appendChild(actions); navInner.insertBefore(navLinks, actions);
       }
     }
-    navLinks.innerHTML = links.map(([href, text]) => `<li><a href="${href}">${text}</a></li>`).join('');
+    const renderDropdown = (label, items, extraClass) => `<li class="nav-dropdown"><button class="nav-dropdown-trigger" type="button" aria-haspopup="true">${label}</button><div class="nav-dropdown-menu ${extraClass}">${items.map(([href, text]) => `<a href="${href}">${text}</a>`).join('')}</div></li>`;
+    navLinks.innerHTML = [
+      renderDropdown('Services', serviceLinks, 'nav-services'),
+      renderDropdown('Resources', resourceLinks, 'nav-resources'),
+      ...topLinks.map(([href, text]) => `<li><a href="${href}">${text}</a></li>`)
+    ].join('');
     let navCta = nav.querySelector('.nav-cta');
     if (!navCta) {
       navCta = document.createElement('a'); navCta.className = 'nav-cta btn btn-primary'; navCta.href = '/scan.html'; navCta.textContent = 'Run a free scan';
@@ -117,7 +161,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const menu = document.createElement('div'); menu.className = 'site-menu legacy-menu'; menu.id = 'site-menu'; menu.setAttribute('aria-hidden', 'true');
       menu.innerHTML = `<div class="site-menu-inner"><div class="menu-head"><span class="label">AfricaLatency</span><button id="menu-close" class="menu-close" type="button" aria-label="Close menu">×</button></div><div class="menu-grid legacy-menu-grid"><div class="menu-column legacy-menu-links"></div><div class="legacy-menu-bottom"><div class="menu-label">Follow</div><div class="social-icons"><a href="https://www.linkedin.com/in/charles-mwaura-bb7814140/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a><a href="https://github.com/cmwrxh/cmwrxh.github.io" target="_blank" rel="noopener" aria-label="GitHub">⌘</a><a href="mailto:support@africalatency.dev" aria-label="Email">✉</a></div></div></div><div class="menu-footer"><a class="btn btn-primary" href="/scan.html">Run a free scan</a><a class="btn btn-secondary" href="/contact.html">Contact</a></div></div>`;
       const linkContainer = menu.querySelector('.legacy-menu-links');
-      links.forEach(([href, text]) => { const a = document.createElement('a'); a.href = href; a.textContent = text; linkContainer.appendChild(a); });
+      [...serviceLinks, ...topLinks, ...resourceLinks].forEach(([href, text]) => { const a = document.createElement('a'); a.href = href; a.textContent = text; linkContainer.appendChild(a); });
       document.body.appendChild(menu); buildMobileMenu(menu); wireMenu(menu, toggle);
     }
   } else {
@@ -144,7 +188,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <div class="label">AfricaLatency.dev</div>
           <h3>Better performance. Better digital experiences.</h3>
           <p>Helping businesses understand, improve, and monitor digital performance across Africa.</p>
-          <p class="footer-address">1st Parklands Avenue, 00623 Nairobi, Kenya</p>
+          <p class="footer-address">1 Parklands Ave, Nairobi 00623, Kenya</p>
           <p class="footer-copy">© 2026 AfricaLatency.dev</p>
         </div>
         <div class="tier4-footer-col">
