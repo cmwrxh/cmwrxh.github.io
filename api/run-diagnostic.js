@@ -81,7 +81,10 @@ function getClientIp(req) {
 
 async function checkRateLimit(ip) {
   const supabaseUrl = process.env.SUPABASE_URL;
-  const serviceKey = process.env.SUPABASE_SERVICE_KEY;
+  const serviceKey =
+    process.env.SUPABASE_SECRET_KEY ||
+    process.env.SUPABASE_SERVICE_KEY ||
+    process.env.SUPABASE_SERVICE_ROLE_KEY;
 
   // Keep the scanner usable even when the optional lead database is not configured.
   // The Globalping token remains protected server-side either way.
