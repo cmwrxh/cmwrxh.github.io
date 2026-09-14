@@ -1,4 +1,4 @@
-/* Tier 4 visual/interaction layer. Keeps the existing site structure intact while adding restrained icons, accessible mobile accordions, dogfooding telemetry, and color discipline. */
+/* Tier 4 visual/interaction layer. Keeps the existing site structure intact while adding restrained icons, accessible mobile accordions, dogfooding telemetry, network topology, proof coverage, and color discipline. */
 (function () {
   'use strict';
 
@@ -25,8 +25,9 @@
       .tier4-icon{width:17px;height:17px;stroke-width:1.7;flex:0 0 17px;color:var(--text-muted,#9aa0ab)}.tier4-icon-list{list-style:none!important;padding-left:0!important}.tier4-icon-list li{display:flex;align-items:flex-start;gap:11px}.tier4-icon-list li::before{display:none!important}.process-card .tier4-process-icon{margin-bottom:14px;width:19px;height:19px;color:var(--text-muted,#9aa0ab);stroke-width:1.7}
       .menu-group-title.menu-accordion-trigger{appearance:none;border:0;background:transparent;cursor:pointer;text-align:center}.menu-group-title.menu-accordion-trigger::after{content:'+';display:inline-block;margin-left:8px;color:#7f8997;font-weight:400}.menu-group.is-open .menu-group-title.menu-accordion-trigger::after{content:'−'}.menu-subitems.menu-accordion-panel{display:none}.menu-group.is-open .menu-subitems.menu-accordion-panel{display:flex}.menu-subitems.menu-accordion-panel a{padding:4px 0}
       .dogfood-card{padding:16px 18px;border:1px solid var(--border,rgba(255,255,255,.1));border-radius:14px;background:rgba(255,255,255,.025);display:flex;align-items:center;gap:14px}.dogfood-dot{width:8px;height:8px;border-radius:50%;background:#39ff9a;flex:0 0 8px}.dogfood-copy{min-width:0}.dogfood-value{font:700 1.05rem/1.2 "Space Grotesk",sans-serif;color:#fff}.dogfood-note{margin-top:4px;color:var(--text-muted,#9aa0ab);font-size:.74rem;line-height:1.45}.dogfood-section{padding-top:0!important;padding-bottom:26px!important}
+      .tier4-topology-section{padding-top:34px!important}.tier4-topology-card{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(280px,.75fr);gap:28px;align-items:center;padding:22px;border:1px solid var(--border,rgba(255,255,255,.1));border-radius:18px;background:rgba(255,255,255,.02);overflow:hidden}.tier4-topology-card img{display:block;width:100%;height:auto;border-radius:12px}.tier4-topology-copy{padding:6px 4px}.tier4-topology-copy h3{margin:10px 0 10px}.tier4-topology-copy p{color:var(--text-muted,#9aa0ab);font-size:.88rem;line-height:1.6}.tier4-proof-card{margin-top:22px;padding:18px 20px;border:1px solid var(--border,rgba(255,255,255,.1));border-radius:14px;background:rgba(255,255,255,.025)}.tier4-proof-value{font:700 1.18rem/1.2 "Space Grotesk",sans-serif;color:#fff}.tier4-proof-note{margin-top:6px;color:var(--text-muted,#9aa0ab);font-size:.78rem;line-height:1.5}
       .homepage-footer .footer-inner.tier4-footer-grid{display:grid;grid-template-columns:1.3fr 1fr 1fr 1fr;gap:34px}.tier4-footer-col{min-width:0}.tier4-footer-col h4{margin:0 0 13px;font-size:.75rem;color:#fff;text-transform:uppercase;letter-spacing:.08em}.tier4-footer-col p{margin:0 0 9px}.tier4-footer-links{display:grid;gap:8px}.tier4-footer-links a{color:rgba(255,255,255,.7)!important;font-size:.8rem;text-decoration:none}.tier4-footer-links a:hover{color:#fff!important}
-      @media(max-width:900px){.homepage-footer .footer-inner.tier4-footer-grid{grid-template-columns:1fr 1fr}.tier4-footer-col:first-child{grid-column:1/-1}}@media(max-width:560px){.homepage-footer .footer-inner.tier4-footer-grid{grid-template-columns:1fr}.tier4-footer-col:first-child{grid-column:auto}}
+      @media(max-width:900px){.tier4-topology-card{grid-template-columns:1fr}.homepage-footer .footer-inner.tier4-footer-grid{grid-template-columns:1fr 1fr}.tier4-footer-col:first-child{grid-column:1/-1}}@media(max-width:560px){.homepage-footer .footer-inner.tier4-footer-grid{grid-template-columns:1fr}.tier4-footer-col:first-child{grid-column:auto}}
     `; document.head.appendChild(style);
   }
 
@@ -60,6 +61,14 @@
     requestAnimationFrame(()=>{const nav=performance.getEntriesByType('navigation')[0],value=document.querySelector('[data-dogfood-value]');if(!value)return;const ms=nav&&Number.isFinite(nav.loadEventEnd)&&nav.loadEventEnd>0?Math.round(nav.loadEventEnd):Math.round(performance.now());value.textContent=`This page loaded in ${ms} ms`;});
   }
 
+  function addNetworkTopology() {
+    if (!document.querySelector('.compact-band') || document.querySelector('.tier4-topology-section')) return;
+    const section=document.createElement('section');
+    section.className='section tier4-topology-section';
+    section.innerHTML=`<div class="container"><div class="section-heading"><div class="label">Regional performance view</div><h2>One continent. Many paths.</h2><p class="section-lead">The topology is illustrative: node placement represents regions and network paths, not live measurements or regional averages.</p></div><div class="tier4-topology-card"><div><img src="/images/africa-network-topology.svg" alt="Illustrative Africa network topology showing Cairo, Lagos, Nairobi and Johannesburg connected by network paths" loading="lazy"></div><div class="tier4-topology-copy"><div class="label">Coverage evidence</div><h3>53 verified Kenya IP ranges</h3><div class="tier4-proof-card"><div class="tier4-proof-value">53 verified Kenya IP ranges</div><div class="tier4-proof-note">Current Kenya lookup coverage from our verified reference dataset.</div></div></div></div></div>`;
+    document.querySelector('.compact-band').insertAdjacentElement('afterend',section);
+  }
+
   function restructureHomepageFooter() {
     const footer=document.querySelector('.homepage-footer .footer-inner');if(!footer||footer.dataset.tier4Footer)return;footer.dataset.tier4Footer='true';footer.classList.add('tier4-footer-grid');
     const intro=footer.querySelector('.footer-intro');if(!intro)return;
@@ -72,7 +81,7 @@
   function htmlIntro(intro){return intro.innerHTML.replace(/1st Parklands Avenue, 00623 Nairobi, Kenya/g,'1 Parklands Ave, Nairobi 00623, Kenya');}
   function refreshIcons(){if(window.lucide?.createIcons)window.lucide.createIcons({attrs:{'stroke-width':1.7}});}
 
-  async function init(){addStyles();document.body.classList.add('tier4-disciplined');enhanceAuditList();enhanceProcessCards();makeAccordionMenus();addDogfoodWidget();restructureHomepageFooter();await loadLucide();refreshIcons();}
+  async function init(){addStyles();document.body.classList.add('tier4-disciplined');enhanceAuditList();enhanceProcessCards();makeAccordionMenus();addNetworkTopology();addDogfoodWidget();restructureHomepageFooter();await loadLucide();refreshIcons();}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
   const observer=new MutationObserver(()=>{makeAccordionMenus();enhanceAuditList();refreshIcons();});observer.observe(document.documentElement,{childList:true,subtree:true});
 })();
