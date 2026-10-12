@@ -15,6 +15,7 @@ function bearerToken(req) {
 
 function safeResults(value) {
   if (!Array.isArray(value) || value.length > 4) return null;
+  const metric = (value) => value !== null && value !== undefined && value !== '' && Number.isFinite(Number(value)) ? Number(value) : null;
   return value.map((item) => ({
     label: typeof item.label === 'string' ? item.label.slice(0, 80) : 'Unknown',
     available: item.available === true,
@@ -22,11 +23,11 @@ function safeResults(value) {
     probeNetwork: typeof item.probeNetwork === 'string' ? item.probeNetwork.slice(0, 120) : null,
     statusCode: Number.isInteger(item.statusCode) ? item.statusCode : null,
     timings: item.timings && typeof item.timings === 'object' ? {
-      dns: Number.isFinite(Number(item.timings.dns)) ? Number(item.timings.dns) : null,
-      tcp: Number.isFinite(Number(item.timings.tcp)) ? Number(item.timings.tcp) : null,
-      tls: Number.isFinite(Number(item.timings.tls)) ? Number(item.timings.tls) : null,
-      firstByte: Number.isFinite(Number(item.timings.firstByte)) ? Number(item.timings.firstByte) : null,
-      total: Number.isFinite(Number(item.timings.total)) ? Number(item.timings.total) : null
+      dns: metric(item.timings.dns),
+      tcp: metric(item.timings.tcp),
+      tls: metric(item.timings.tls),
+      firstByte: metric(item.timings.firstByte),
+      total: metric(item.timings.total)
     } : null,
     hopCount: Number.isInteger(item.hopCount) ? item.hopCount : null,
     pathSummary: typeof item.pathSummary === 'string' ? item.pathSummary.slice(0, 500) : null,
