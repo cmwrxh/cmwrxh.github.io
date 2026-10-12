@@ -30,6 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
     .site-menu .menu-footer { flex-shrink: 0; }
     .site-menu .menu-footer .btn-primary { order: 1; }
     .site-menu .menu-footer .btn-secondary { order: 2; }
+    .brand-name { gap: 0 !important; }
     body.menu-open { overflow: hidden !important; }
     .nav-links { display: none; }
     .nav-cta { display: none; }
@@ -51,8 +52,15 @@ document.addEventListener('DOMContentLoaded', () => {
       .nav-dropdown-menu a { position: relative; z-index: 1; display: flex !important; width: 100%; padding: 9px 10px; border-radius: 7px; color: #c8ccd4; text-decoration: none; font-size: .86rem; }
       .nav-dropdown-menu a:hover,
       .nav-dropdown-menu a:focus-visible { background: rgba(255,255,255,.06); color: #fff; outline: none; }
+      .nav-links > li > a { color: #fff; font-weight: 500; }
+      .nav-links > li > a:hover, .nav-links .nav-dropdown-trigger:hover { color: #39ff9a; }
+      .nav-dropdown-menu::after { content: ''; position: absolute; top: -14px; left: 0; right: 0; height: 14px; }
       .nav-dropdown:hover .nav-dropdown-menu,
-      .nav-dropdown:focus-within .nav-dropdown-menu { display: block; }
+      .nav-dropdown:focus-within .nav-dropdown-menu,
+      .nav-dropdown.open .nav-dropdown-menu { display: block; }
+      .nav-links .nav-dropdown-trigger:hover,
+      .nav-dropdown.open .nav-dropdown-trigger { color: #fff; }
+      .nav-dropdown-menu a.nav-dropdown-highlight { color: #fff; font-weight: 600; }
       .nav-links .nav-dropdown-menu.nav-services { min-width: 225px; }
       .nav-links .nav-dropdown-menu.nav-resources { min-width: 210px; left: -10px; }
       .nav-links .nav-dropdown-menu.nav-resources::before { left: 22px; }
@@ -92,6 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   const serviceLinks = [
+    ['/audit-checkout.html', 'Africa Latency Audit'],
     ['/scan.html', 'Free Scan'],
     ['/sitespeed.html', 'Website Speed Check'],
     ['/methodology.html', 'Methodology']
@@ -121,12 +130,26 @@ document.addEventListener('DOMContentLoaded', () => {
         actions.className = 'nav-actions'; navInner.appendChild(actions); navInner.insertBefore(navLinks, actions);
       }
     }
-    const renderDropdown = (label, items, extraClass) => `<li class="nav-dropdown"><button class="nav-dropdown-trigger" type="button" aria-haspopup="true">${label}</button><div class="nav-dropdown-menu ${extraClass}">${items.map(([href, text]) => `<a href="${href}">${text}</a>`).join('')}</div></li>`;
+    const renderDropdown = (label, items, extraClass) => `<li class="nav-dropdown"><button class="nav-dropdown-trigger" type="button" aria-haspopup="true" aria-expanded="false">${label}</button><div class="nav-dropdown-menu ${extraClass}">${items.map(([href, text]) => `<a href="${href}">${text}</a>`).join('')}</div></li>`;
     navLinks.innerHTML = [
       renderDropdown('Services', serviceLinks, 'nav-services'),
       renderDropdown('Resources', resourceLinks, 'nav-resources'),
       ...topLinks.map(([href, text]) => `<li><a href="${href}">${text}</a></li>`)
     ].join('');
+    const dropdowns = navLinks.querySelectorAll('.nav-dropdown');
+    const closeDropdowns = (except) => dropdowns.forEach((d) => { if (d !== except) { d.classList.remove('open'); d.querySelector('.nav-dropdown-trigger').setAttribute('aria-expanded', 'false'); } });
+    dropdowns.forEach((d) => {
+      const trigger = d.querySelector('.nav-dropdown-trigger');
+      trigger.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const next = !d.classList.contains('open');
+        closeDropdowns(d);
+        d.classList.toggle('open', next);
+        trigger.setAttribute('aria-expanded', String(next));
+      });
+    });
+    document.addEventListener('click', () => closeDropdowns());
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeDropdowns(); });
     let navCta = nav.querySelector('.nav-cta');
     if (!navCta) {
       navCta = document.createElement('a'); navCta.className = 'nav-cta btn btn-primary'; navCta.href = '/scan.html'; navCta.textContent = 'Run a free scan';
@@ -140,7 +163,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const socialIcons = existingSocialIcons ? existingSocialIcons.cloneNode(true) : null;
     grid.innerHTML = `
       <div class="menu-column">
-        <div class="menu-group"><a href="/services.html" class="menu-group-title">Services</a><div class="menu-subitems"><a href="/scan.html">Free Scan</a><a href="/sitespeed.html">Website Speed Check</a><a href="/methodology.html">Methodology</a></div></div>
+        <div class="menu-group"><a href="/services.html" class="menu-group-title">Services</a><div class="menu-subitems"><a href="/audit-checkout.html">Africa Latency Audit</a><a href="/scan.html">Free Scan</a><a href="/sitespeed.html">Website Speed Check</a><a href="/methodology.html">Methodology</a></div></div>
         <a href="/about.html" class="menu-item">About</a>
         <div class="menu-group"><div class="menu-label menu-group-title">Resources</div><div class="menu-subitems"><a href="/data-centers.html">Data centers</a><a href="/kenya.html">Kenya</a><a href="/nigeria.html">Nigeria</a><a href="/blog.html">Blog</a><a href="/cases.html">Cases</a><a href="/help-centre.html">Help centre</a></div></div>
         <a href="/contact.html" class="menu-item">Contact</a><a href="/login.html" class="menu-item">Login</a>
@@ -208,6 +231,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="tier4-footer-col">
           <h4>Resources</h4>
           <div class="tier4-footer-links">
+            <a href="/audit-checkout.html">Africa Latency Audit</a>
             <a href="/scan.html">Free Scan</a>
             <a href="/sitespeed.html">Website Speed Check</a>
             <a href="/methodology.html">Methodology</a>
