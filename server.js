@@ -60,4 +60,4 @@ app.use((req, res) => {
   res.status(404).sendFile(path.join(__dirname, '404.html'));
 });
 
-app.listen(process.env.PORT || 3000, '0.0.0.0', () => console.log('up'));
+app.listen(process.env.PORT || 3000, () => console.log('up'));
