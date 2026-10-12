@@ -238,6 +238,28 @@ function appendLine(body, text) {
   body.appendChild(div);
 }
 
+async function saveScanHistory(domain, results, verdict, startedAt, completedAt) {
+  const client = window.africaLatencySupabase;
+  if (!client) return { saved: false, reason: 'Sign-in is not available on this page.' };
+  const { data: { session }, error } = await client.auth.getSession();
+  if (error || !session) return { saved: false, reason: 'Sign in to save this scan to your dashboard.' };
+  const compactResults = results.map(result => ({
+    label: result.label, available: result.available === true,
+    probeLocation: result.probeLocation || null, probeNetwork: result.probeNetwork || null,
+    statusCode: result.statusCode || null, timings: result.timings || null,
+    hopCount: result.hopCount || null, pathSummary: result.pathSummary || null,
+    overall: result.overall || { label: 'UNKNOWN' }
+  }));
+  try {
+    const response = await fetch('/api/scan-history', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + session.access_token },
+      body: JSON.stringify({ domain, verdict: verdict.label, startedAt: startedAt.toISOString(), completedAt: completedAt.toISOString(), results: compactResults })
+    });
+    if (!response.ok) { const payload = await response.json().catch(() => ({})); return { saved: false, reason: payload.error || 'Unable to save scan history.' }; }
+    return { saved: true };
+  } catch (_) { return { saved: false, reason: 'Scan completed, but saving its history failed.' }; }
+}
 function buildSummary(results, timestamp) {
   const available = results.filter(r => r.available);
   const totals = available.map(r => Number(r.timings.total)).filter(Number.isFinite);
@@ -324,6 +346,14 @@ async function runScan() {
   `;
 
   body.appendChild(report);
+  const saveStatus = document.createElement('div');
+  saveStatus.style.cssText = 'margin-top:1rem;font-size:.85rem;color:var(--text-muted);';
+  saveStatus.textContent = 'Saving scan history…';
+  body.appendChild(saveStatus);
+  const saveResult = await saveScanHistory(domain, results, verdict, startedAt, completedAt);
+  saveStatus.textContent = saveResult.saved
+    ? '✓ This scan has been saved to your Performance Dashboard under Recent scans.'
+    : saveResult.reason;
 
   results.forEach(result => {
     if (!result.available) return;
