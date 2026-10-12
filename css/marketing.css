@@ -20,7 +20,7 @@
 .latency-collage:before {
   content: ""; position: absolute; z-index: 0; left: 0; right: 0; bottom: 0; height: 214px;
   border-radius: 18px; border: 1px solid rgba(255,255,255,.1);
-  background: #0b1424 url('/images/africa-latency-network.svg') center/cover no-repeat;
+  background: #0b1424 url('/images/Africa%20map%20latency%20image.jfif') center/cover no-repeat;
   box-shadow: 0 18px 45px rgba(0,0,0,.24);
 }
 .floating-stat {
