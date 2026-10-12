@@ -464,6 +464,19 @@
 
         </div>
 
+        <div class="section">
+            <div class="section-header">
+                <h2>Recent free scans</h2>
+                <a href="/scan" style="font-size:13px;">Run another scan →</a>
+            </div>
+            <p style="color:var(--muted);font-size:14px;margin:0 0 16px;">
+                One-time diagnostic snapshots from African probe locations. These are separate from real-user monitoring (RUM).
+            </p>
+            <div id="scan-history" style="display:grid;gap:12px;">
+                <div class="empty">Loading saved scans…</div>
+            </div>
+        </div>
+
     </section>
 
 </main>
@@ -499,6 +512,7 @@
 
     const segmentsBody = document.getElementById('segments-body');
     const noData = document.getElementById('no-data');
+    const scanHistory = document.getElementById('scan-history');
 
     const daysSelect = document.getElementById('days-select');
     const groupSelect = document.getElementById('group-select');
@@ -699,6 +713,58 @@
         }
     }
 
+    async function loadScanHistory(session) {
+        if (!scanHistory || !session) return;
+        scanHistory.innerHTML = '';
+        try {
+            const response = await fetch('/api/scan-history?days=' + encodeURIComponent(daysSelect.value), {
+                headers: { Authorization: 'Bearer ' + session.access_token }
+            });
+            if (!response.ok) throw new Error('Unable to load saved scans.');
+            const payload = await response.json();
+            const scans = Array.isArray(payload.scans) ? payload.scans : [];
+            if (!scans.length) {
+                const empty = document.createElement('div');
+                empty.className = 'empty';
+                empty.textContent = 'No saved free scans in this period yet. Run a scan while signed in to keep it here.';
+                scanHistory.appendChild(empty);
+                return;
+            }
+            for (const scan of scans) {
+                const card = document.createElement('article');
+                card.style.cssText = 'background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;';
+                const top = document.createElement('div');
+                top.style.cssText = 'display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center;';
+                const title = document.createElement('strong');
+                title.textContent = scan.domain;
+                const verdict = document.createElement('span');
+                verdict.style.cssText = 'font-size:12px;font-weight:700;padding:5px 9px;border-radius:999px;background:var(--soft);';
+                verdict.textContent = scan.verdict || 'UNKNOWN';
+                top.append(title, verdict);
+                const meta = document.createElement('p');
+                meta.style.cssText = 'font-size:13px;color:var(--muted);margin:8px 0 12px;';
+                const when = new Date(scan.completed_at || scan.created_at);
+                meta.textContent = (Number.isNaN(when.getTime()) ? 'Date unavailable' : when.toLocaleString()) + ' · ' + Number(scan.available_locations || 0) + ' of 4 locations returned results';
+                card.append(top, meta);
+                const metrics = document.createElement('div');
+                metrics.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;';
+                for (const result of (Array.isArray(scan.results) ? scan.results : [])) {
+                    const item = document.createElement('div');
+                    item.style.cssText = 'background:var(--soft);border-radius:7px;padding:10px;font-size:13px;';
+                    const ttfb = result.timings && result.timings.firstByte != null ? Math.round(Number(result.timings.firstByte)) + ' ms' : 'n/a';
+                    item.textContent = (result.label || 'Unknown location') + ': TTFB ' + ttfb + (result.available ? '' : ' · unavailable');
+                    metrics.appendChild(item);
+                }
+                card.appendChild(metrics);
+                scanHistory.appendChild(card);
+            }
+        } catch (error) {
+            const message = document.createElement('div');
+            message.className = 'empty';
+            message.textContent = error.message || 'Unable to load saved scans.';
+            scanHistory.appendChild(message);
+        }
+    }
     async function initialiseDashboard() {
         try {
             const {
@@ -729,6 +795,7 @@
             dashboardContent.classList.remove('hidden');
 
             await loadStats();
+            await loadScanHistory(session);
 
         } catch (error) {
             console.error('[dashboard] initialization error:', error);
@@ -740,7 +807,11 @@
         }
     }
 
-    daysSelect.addEventListener('change', loadStats);
+    daysSelect.addEventListener('change', async function () {
+        await loadStats();
+        const { data: { session } } = await client.auth.getSession();
+        await loadScanHistory(session);
+    });
     groupSelect.addEventListener('change', loadStats);
 
     logoutButton.addEventListener('click', async function () {
