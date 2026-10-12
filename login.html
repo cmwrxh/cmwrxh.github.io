@@ -2,83 +2,233 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
   <title>Login — AfricaLatency.dev</title>
   <meta name="description" content="Sign in to your AfricaLatency account.">
+  <meta name="robots" content="noindex, follow">
+  <meta name="theme-color" content="#0a0a0d">
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/brand.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/marketing.css?v=5">
+  <link rel="stylesheet" href="/css/brand.css?v=4">
+
   <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
   <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
   <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+  <style>
+    /* Login page only: sit between the shared nav and footer instead of filling the viewport */
+    .login-page { min-height: 0; display: grid; place-items: start center; padding: clamp(48px, 9vh, 96px) 20px clamp(64px, 12vh, 120px); }
+    .login-card { width: min(460px, 100%); }
+    .login-card .hero-subtitle { margin: 0 0 28px; }
+    .login-status { margin-top: 14px; min-height: 1.2em; color: var(--text-muted); font-size: .82rem; }
+    .login-status.is-error { color: var(--error); }
+    .login-card .password-wrap .form-input { padding-right: 58px; }
+    .login-card .btn[disabled] { opacity: .6; cursor: progress; transform: none; }
+    /* shared link colours are muted globally; keep the login links readable */
+    main .login-links a:not(.btn) { color: var(--text); text-decoration: underline; text-underline-offset: 3px; }
+    main .login-links a:not(.btn):hover { color: var(--accent); }
+  </style>
 </head>
 <body>
-  <main class="login-page login-page-offset">
-    <section class="login-card">
-      <a class="nav-brand brand-lockup login-logo" href="/" aria-label="AfricaLatency.dev">
-        <img class="brand-icon" src="/images/logo-icon-v4.png" alt="" aria-hidden="true">
-        <span class="brand-name">
-          <span class="brand-name-white">Africa</span><span class="brand-name-green">Latency</span><span class="brand-name-white">.dev</span>
-        </span>
-      </a>
 
-      <div class="label">Sign in</div>
-      <h1>Sign in to your account</h1>
-      <p class="hero-subtitle" style="margin:0 0 28px">Welcome back.</p>
+<nav>
+  <div class="nav-inner">
+    <a href="/" class="nav-brand brand-lockup" aria-label="AfricaLatency.dev">
+      <img class="brand-icon" src="/images/logo-icon-v4.png" alt="" aria-hidden="true" width="32" height="32">
+      <span class="brand-name"><span class="brand-name-white">Africa</span><span class="brand-name-green">Latency</span><span class="brand-name-white">.dev</span></span>
+    </a>
+    <div class="nav-actions">
+      <button id="menu-toggle" class="menu-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="site-menu"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
 
-      <form id="login-form">
-        <div class="login-field">
-          <label for="email">Email <span class="required">*</span></label>
-          <input class="form-input" id="email" type="email" autocomplete="email" required placeholder="you@company.com">
-        </div>
-        <div class="login-field">
-          <label for="password">Password <span class="required">*</span></label>
-          <div class="password-wrap">
-            <input class="form-input" id="password" type="password" autocomplete="current-password" required placeholder="Your password" style="padding-right:58px">
-            <button class="password-toggle" id="password-toggle" type="button" aria-label="Show password" title="Show password">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"></path><circle cx="12" cy="12" r="2.5"></circle></svg>
-            </button>
+<div class="site-menu" id="site-menu" aria-hidden="true">
+  <div class="site-menu-inner">
+    <div class="menu-head">
+      <span class="label">AfricaLatency</span>
+      <button id="menu-close" class="menu-close" type="button" aria-label="Close menu">×</button>
+    </div>
+    <div class="menu-grid">
+      <div class="menu-column">
+        <div class="menu-group">
+          <a href="/services.html" class="menu-group-title">Services</a>
+          <div class="menu-subitems">
+            <a href="/audit-checkout.html">Africa Latency Audit</a>
+            <a href="/scan.html">Free Scan</a>
+            <a href="/sitespeed.html">Website Speed Check</a>
+            <a href="/methodology.html">Methodology</a>
           </div>
         </div>
-
-        <div class="login-links">
-          <a href="mailto:support@africalatency.dev?subject=Password%20reset">Forgot your password?</a>
-          <span>New to AfricaLatency? <a href="/contact">Sign up</a></span>
+        <a href="/about.html" class="menu-item">About</a>
+        <div class="menu-group">
+          <div class="menu-label menu-group-title">Resources</div>
+          <div class="menu-subitems">
+            <a href="/data-centers.html">Data centers</a>
+            <a href="/kenya.html">Kenya</a>
+            <a href="/nigeria.html">Nigeria</a>
+            <a href="/blog.html">Blog</a>
+            <a href="/cases.html">Cases</a>
+            <a href="/help-centre.html">Help centre</a>
+          </div>
         </div>
-        <button class="btn btn-primary" type="submit">Sign in</button>
-        <div id="login-status" role="status" aria-live="polite" style="margin-top:14px;color:var(--text-muted);font-size:.78rem"></div>
-      </form>
-    </section>
-  </main>
+        <a href="/contact.html" class="menu-item">Contact</a>
+        <a href="/login.html" class="menu-item">Login</a>
+      </div>
+      <div class="legacy-menu-bottom">
+        <div class="menu-label">Follow</div>
+        <div class="social-icons">
+          <a href="https://www.linkedin.com/in/charles-mwaura-bb7814140/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://github.com/cmwrxh/cmwrxh.github.io" target="_blank" rel="noopener" aria-label="GitHub">⌘</a>
+          <a href="mailto:support@africalatency.dev" aria-label="Email">✉</a>
+        </div>
+      </div>
+    </div>
+    <div class="menu-footer">
+      <a class="btn btn-primary" href="/scan.html">Run a free scan</a>
+      <a class="btn btn-secondary" href="/contact.html">Contact</a>
+    </div>
+  </div>
+</div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script>
-    const SUPABASE_URL='https://uzihwtxffklisczqvurf.supabase.co';
-    const SUPABASE_PUBLISHABLE_KEY='sb_publishable_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx';
-    const supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
-    const form=document.getElementById('login-form');
-    const status=document.getElementById('login-status');
-    const password=document.getElementById('password');
-    const toggle=document.getElementById('password-toggle');
-    toggle.addEventListener('click',function(){
-      const shown=password.type==='text';
-      password.type=shown?'password':'text';
-      this.setAttribute('aria-label',shown?'Show password':'Hide password');
-      this.setAttribute('title',shown?'Show password':'Hide password');
-      this.innerHTML=shown?'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"></path><circle cx="12" cy="12" r="2.5"></circle></svg>':'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18"></path><path d="M10.6 6.2A10.8 10.8 0 0 1 12 6c6.5 0 10 6 10 6a18.5 18.5 0 0 1-3.1 3.7"></path><path d="M6.1 6.9C3.3 8.7 2 12 2 12s3.5 6 10 6c1.3 0 2.5-.2 3.5-.6"></path><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"></path></svg>';
-    });
-    form.addEventListener('submit',async(e)=>{
-      e.preventDefault();
-      status.textContent='Signing in…';
-      const email=document.getElementById('email').value.trim();
-      const pwd=password.value;
-      const{error}=await supabaseClient.auth.signInWithPassword({email,password:pwd});
-      if(error){status.textContent=error.message;return}
-      window.location.href='/dashboard';
-    });
-  </script>
+<main class="login-page">
+  <section class="login-card" aria-labelledby="login-title">
+    <div class="label">Sign in</div>
+    <h1 id="login-title">Sign in to your account</h1>
+    <p class="hero-subtitle">Welcome back.</p>
+
+    <form id="login-form" novalidate>
+      <div class="login-field">
+        <label for="email">Email <span class="required">*</span></label>
+        <input class="form-input" id="email" name="email" type="email" autocomplete="email" required placeholder="you@company.com">
+      </div>
+      <div class="login-field">
+        <label for="password">Password <span class="required">*</span></label>
+        <div class="password-wrap">
+          <input class="form-input" id="password" name="password" type="password" autocomplete="current-password" required placeholder="Your password">
+          <button class="password-toggle" id="password-toggle" type="button" aria-label="Show password" title="Show password">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"></path><circle cx="12" cy="12" r="2.5"></circle></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="login-links">
+        <a href="mailto:support@africalatency.dev?subject=Password%20reset">Forgot your password?</a>
+        <span>New to AfricaLatency? <a href="/contact">Sign up</a></span>
+      </div>
+      <button class="btn btn-primary" id="login-submit" type="submit">Sign in</button>
+      <div id="login-status" class="login-status" role="status" aria-live="polite"></div>
+    </form>
+  </section>
+</main>
+
+<footer class="homepage-footer">
+  <div class="footer-inner tier4-footer-grid">
+    <div class="tier4-footer-col footer-intro">
+      <div class="label">AfricaLatency.dev</div>
+      <h3>Better performance. Better digital experiences.</h3>
+      <p>Helping businesses understand, improve, and monitor digital performance across Africa.</p>
+      <p class="footer-address">1 Parklands Ave, Nairobi 00623, Kenya</p>
+      <p class="footer-copy">© 2026 AfricaLatency.dev</p>
+    </div>
+    <div class="tier4-footer-col">
+      <h4>Company</h4>
+      <div class="tier4-footer-links">
+        <a href="/about.html">About</a>
+        <a href="/contact.html">Contact</a>
+        <a href="/cases.html">Cases</a>
+      </div>
+    </div>
+    <div class="tier4-footer-col">
+      <h4>Legal</h4>
+      <div class="tier4-footer-links">
+        <a href="/terms-of-service.html">Terms of Service</a>
+        <a href="/privacy-policy.html">Privacy Policy</a>
+        <a href="/service-level-agreement.html">Service Level Agreement</a>
+        <a href="/acceptable-use-policy.html">Acceptable Use</a>
+        <a href="/refund-policy.html">Refund Policy</a>
+      </div>
+    </div>
+    <div class="tier4-footer-col">
+      <h4>Resources</h4>
+      <div class="tier4-footer-links">
+        <a href="/audit-checkout.html">Africa Latency Audit</a>
+        <a href="/scan.html">Free Scan</a>
+        <a href="/sitespeed.html">Website Speed Check</a>
+        <a href="/methodology.html">Methodology</a>
+        <a href="/data-centers.html">Data centers</a>
+        <a href="/kenya.html">Kenya</a>
+        <a href="/nigeria.html">Nigeria</a>
+        <a href="/blog.html">Blog</a>
+        <a href="/help-centre.html">Help centre</a>
+      </div>
+    </div>
+    <div class="tier4-footer-col">
+      <h4>Connect</h4>
+      <div class="tier4-footer-links">
+        <a href="mailto:support@africalatency.dev">support@africalatency.dev</a>
+        <a href="https://github.com/cmwrxh/cmwrxh.github.io" target="_blank" rel="noopener">GitHub</a>
+      </div>
+      <p class="footer-company">Africa Latency Ltd<br>1 Parklands Ave, Nairobi 00623, Kenya</p>
+    </div>
+  </div>
+</footer>
+
+<script defer src="/africalatency.js" data-al-key="test-site-001"></script>
+<script src="/js/main.js?v=4"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  // Supabase settings — unchanged from your existing login page
+  const SUPABASE_URL = 'https://uzihwtxffklisczqvurf.supabase.co';
+  const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx';
+
+  let supabaseClient = null;
+  try { supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY); } catch (err) { console.error('Supabase failed to load', err); }
+
+  const form = document.getElementById('login-form');
+  const status = document.getElementById('login-status');
+  const submit = document.getElementById('login-submit');
+  const password = document.getElementById('password');
+  const toggle = document.getElementById('password-toggle');
+
+  const ICON_SHOW = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"></path><circle cx="12" cy="12" r="2.5"></circle></svg>';
+  const ICON_HIDE = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18"></path><path d="M10.6 6.2A10.8 10.8 0 0 1 12 6c6.5 0 10 6 10 6a18.5 18.5 0 0 1-3.1 3.7"></path><path d="M6.1 6.9C3.3 8.7 2 12 2 12s3.5 6 10 6c1.3 0 2.5-.2 3.5-.6"></path><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"></path></svg>';
+
+  function setStatus(message, isError) {
+    status.textContent = message;
+    status.classList.toggle('is-error', Boolean(isError));
+  }
+
+  toggle.addEventListener('click', function () {
+    const shown = password.type === 'text';
+    password.type = shown ? 'password' : 'text';
+    this.setAttribute('aria-label', shown ? 'Show password' : 'Hide password');
+    this.setAttribute('title', shown ? 'Show password' : 'Hide password');
+    this.innerHTML = shown ? ICON_SHOW : ICON_HIDE;
+  });
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!form.reportValidity()) return;
+    if (!supabaseClient) { setStatus('Sign-in is temporarily unavailable. Please try again or email support@africalatency.dev.', true); return; }
+    setStatus('Signing in…', false);
+    submit.disabled = true;
+    try {
+      const email = document.getElementById('email').value.trim();
+      const { error } = await supabaseClient.auth.signInWithPassword({ email, password: password.value });
+      if (error) { setStatus(error.message, true); submit.disabled = false; return; }
+      window.location.href = '/dashboard';
+    } catch (err) {
+      setStatus('Could not reach the sign-in service. Check your connection and try again.', true);
+      submit.disabled = false;
+    }
+  });
+</script>
 </body>
 </html>
