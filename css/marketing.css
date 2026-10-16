@@ -268,3 +268,57 @@ main .section .data-centers-callout a:not(.btn):not(.btn-primary) {
 .scan-value-paid h4 { color:#39ff9a; }
 @media(max-width:900px) { .audience-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .secondary-offers-grid,.case-study-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
 @media(max-width:560px) { .audience-grid,.secondary-offers-grid,.case-study-grid,.scan-value-compare { grid-template-columns:1fr; } .audience-card,.secondary-offer,.case-study-card { padding:18px; } .case-problem { min-height:0; } }
+
+
+/* Compact system pass — preserve existing palette, imagery and visual language. */
+:root { --section-space: clamp(2.9rem, 5.4vw, 4.5rem); }
+.section { padding-block: var(--section-space); }
+.hero-section, .hero-highlight { padding-block: clamp(3.25rem, 6vw, 5rem); }
+.section-heading { margin-bottom: clamp(1.35rem, 2.8vw, 2rem); }
+.label { margin-bottom: 10px; padding: 4px 9px; }
+h1, .page-title { line-height: 1.04; }
+h2 { line-height: 1.12; }
+p { margin-bottom: .8rem; }
+.section-lead, .hero-subtitle { line-height: 1.62; }
+.btn-group { gap: 10px; margin-top: 20px; }
+.btn { min-height: 44px; padding-inline: 17px; }
+.nav-inner { padding-block: 12px; }
+.card, .principle, .privacy-card, .contact-choice { padding: 22px; }
+.process-cards { gap: 12px; }
+.process-cards .process-card { padding: 20px; }
+.proof-metrics-grid, .use-case-grid, .audience-grid, .secondary-offers-grid, .case-study-grid { gap: 12px; }
+.proof-metric, .use-case-card, .audience-card, .secondary-offer, .case-study-card { padding: 18px; }
+.proof-metric strong { margin-top: 10px; }
+.audience-card h3, .secondary-offer h3 { margin-top: 10px; }
+.secondary-offers-grid { margin-top: 20px; }
+.scan-upgrade-panel { margin-top: 22px; padding: clamp(18px, 3vw, 26px); }
+.scan-value-column { padding: 14px; }
+.audit-buy-hero { padding: 54px 0 34px !important; }
+.audit-buy-card { padding: 22px; }
+.audit-buy-grid { gap: 18px; }
+.homepage-footer { padding-block: 34px; }
+.homepage-footer .tier4-footer-links { gap: 7px; }
+@media (max-width: 900px) {
+  .section { padding-block: 3rem; }
+  .hero-section, .hero-highlight { padding-block: 3rem; }
+  .hero-grid, .feature-grid { gap: 24px; }
+  .section-heading { margin-bottom: 1.4rem; }
+  .audit-buy-grid { grid-template-columns: minmax(0,1fr); }
+}
+@media (max-width: 640px) {
+  .container { padding-inline: 20px; }
+  .section { padding-block: 2.35rem; }
+  .hero-section, .hero-highlight { padding-block: 2.5rem; }
+  .nav-inner { padding: 10px 20px; }
+  .btn-group { gap: 8px; margin-top: 16px; }
+  .btn-group .btn { flex: 1 1 auto; }
+  .card, .principle, .privacy-card, .contact-choice,
+  .process-cards .process-card, .proof-metric, .use-case-card,
+  .audience-card, .secondary-offer, .case-study-card, .audit-buy-card { padding: 17px; }
+  .section-lead, .hero-subtitle { line-height: 1.58; }
+  .case-before-after { padding: 10px; gap: 6px; }
+  .case-before-after div strong { font-size: 1.15rem; }
+  .scan-upgrade-panel { padding: 18px; }
+  .audit-price strong { font-size: clamp(2.4rem, 11vw, 3.3rem); }
+  .homepage-footer { padding-block: 28px; }
+}
