@@ -1,4 +1,4 @@
-// Creates the hosted Paystack checkout for the fixed $247 Africa Latency Audit.
+// Creates the hosted Paystack checkout for the KES 3,500 Africa Latency Audit.
 import { createClient } from '@supabase/supabase-js';
 
 const supabaseKey = process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -6,8 +6,8 @@ const supabase = createClient(process.env.SUPABASE_URL, supabaseKey);
 
 const PRODUCT = {
   name: 'Africa Latency Audit',
-  amountSubunit: 24700,
-  currency: process.env.PAYSTACK_CURRENCY || 'USD',
+  amountSubunit: 350000,
+  currency: 'KES',
 };
 
 function isValidEmail(value) {
