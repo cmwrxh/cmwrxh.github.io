@@ -91,30 +91,25 @@ function validateDomainInput(value) {
 }
 
 async function gpRunCity(type, target, cityConfig) {
-  const attempts = [
-    [{ city: cityConfig.city, limit: 1 }],
-    [{ country: cityConfig.country, limit: 1 }]
-  ];
-
-  for (const locations of attempts) {
-    try {
-      const response = await fetch('/api/run-diagnostic', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type, target, locations })
-      });
-
-      if (response.ok) return await response.json();
-
-      // A 400/422 can mean the requested city has no suitable probe;
-      // retry at country level. Other errors should not be hidden.
-      if (response.status !== 400 && response.status !== 422) return null;
-    } catch (_) {
-      return null;
+  // Country-level requests can use any available probe in the country.
+  try {
+    const response = await fetch('/api/run-diagnostic', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type, target, locations: [{ country: cityConfig.country, limit: 1 }] })
+    });
+    if (response.ok) return await response.json();
+    const payload = await response.json().catch(() => ({}));
+    if (response.status === 400 || response.status === 422) {
+      return { _unavailableReason: 'No matching live probe returned for this country.' };
     }
+    if (response.status === 429) {
+      return { _requestError: 'The diagnostic service rate-limited this request. Please try again later.' };
+    }
+    return { _requestError: payload.error || `Diagnostic request failed (HTTP ${response.status}).` };
+  } catch (_) {
+    return { _requestError: 'Could not reach the diagnostic service; no live result was returned.' };
   }
-
-  return null;
 }
 
 function validNumber(value) {
@@ -158,20 +153,21 @@ function metricDisplay(verdict, value) {
 }
 
 async function runCityDiagnostic(cityConfig, domain) {
-  const [httpMeasurement, traceMeasurement] = await Promise.all([
-    gpRunCity('http', domain, cityConfig),
-    gpRunCity('traceroute', domain, cityConfig)
-  ]);
-
-  if (!httpMeasurement) {
-    return { city: cityConfig, label: cityConfig.label, flag: cityConfig.flag, available: false, reason: 'No probe currently available' };
+  const httpMeasurement = await gpRunCity('http', domain, cityConfig);
+  if (!httpMeasurement || httpMeasurement._unavailableReason || httpMeasurement._requestError) {
+    return {
+      city: cityConfig, label: cityConfig.label, flag: cityConfig.flag, available: false,
+      reason: (httpMeasurement && (httpMeasurement._unavailableReason || httpMeasurement._requestError)) || 'No live result returned.'
+    };
   }
 
   const httpResult = httpMeasurement.results && httpMeasurement.results[0];
   if (!httpResult || !httpResult.result || httpResult.result.status !== 'finished') {
-    return { city: cityConfig, label: cityConfig.label, flag: cityConfig.flag, available: false, reason: 'Diagnostic incomplete' };
+    return { city: cityConfig, label: cityConfig.label, flag: cityConfig.flag, available: false, reason: 'No completed HTTP measurement was returned.' };
   }
 
+  // Traceroute is secondary: HTTP results remain valid if route diagnostics fail.
+  const traceMeasurement = await gpRunCity('traceroute', domain, cityConfig);
   const probe = httpResult.probe || {};
   const result = httpResult.result;
   const timings = result.timings || {};
@@ -330,12 +326,12 @@ async function runScan() {
   output.innerHTML = `<div class="terminal-header"><div class="terminal-dot red"></div><div class="terminal-dot yellow"></div><div class="terminal-dot green"></div><div class="terminal-title">africalatency-scan ~ ${domain}</div></div><div class="terminal-body" id="scan-body"></div>`;
 
   const body = document.getElementById('scan-body');
-  appendLine(body, `Starting live Africa scan for ${domain} across up to 31 countries…`);
-  appendLine(body, 'HTTP response + traceroute diagnostics from up to 31 African country-level probe locations.');
+  appendLine(body, `Requesting live measurements for ${domain} from up to 31 African countries…`);
+  appendLine(body, 'Only locations with available probes return live results. The 31-country list is a request scope, not a guarantee of probe availability.');
 
   const results = await Promise.all(AFRICA_PROBE_CITIES.map(city =>
     runCityDiagnostic(city, domain).then(result => {
-      appendResultLine(body, `${city.flag} ${city.label}: ${result.available ? `${result.overall.symbol} ${result.overall.label}` : '⚪ unavailable'}`);
+      appendResultLine(body, `${city.flag} ${city.label}: ${result.available ? `${result.overall.symbol} ${result.overall.label} · live result` : `⚪ unavailable · ${result.reason || 'no live result returned'}`}`);
       return result;
     })
   ));
@@ -356,11 +352,11 @@ async function runScan() {
 
   report.innerHTML = `
     <div style="display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;align-items:center;margin-bottom:1rem;">
-      <div><span style="color:var(--${verdict.color});font-weight:600;font-size:1.1rem;">${verdict.symbol} ${verdict.label}</span><div style="color:var(--text-muted);font-size:.78rem;margin-top:.25rem;">Observed worst result across ${availableCount} of ${AFRICA_PROBE_CITIES.length} requested country locations. Probe availability varies.</div></div>
+      <div><span style="color:var(--${verdict.color});font-weight:600;font-size:1.1rem;">${verdict.symbol} ${verdict.label}</span><div style="color:var(--text-muted);font-size:.78rem;margin-top:.25rem;">${availableCount} of ${AFRICA_PROBE_CITIES.length} requested country locations returned live HTTP measurements; ${AFRICA_PROBE_CITIES.length - availableCount} returned no live result. Unavailable locations are excluded from performance comparisons.</div></div>
       <div style="color:var(--text-muted);font-size:.75rem;text-align:right;">Started ${startedAt.toLocaleString()}<br>Completed ${completedAt.toLocaleString()}</div>
     </div>
     ${buildSummary(results, completedAt)}
-    <div style="color:var(--text-muted);font-size:.8rem;line-height:1.6;margin-bottom:1rem;">Africa is not one network. Each result is tied to the actual probe location and network available for this scan. A country fallback may be used when the requested city has no suitable probe.</div>
+    <div style="color:var(--text-muted);font-size:.8rem;line-height:1.6;margin-bottom:1rem;">We request measurements from up to 31 countries. Only locations with available probes return live results. “Unavailable” means this scan returned no completed live HTTP measurement for that country; it does not mean the country’s networks are universally unavailable. Request errors and rate limits are identified separately where returned.</div>
     ${results.map(renderCityBlock).join('')}
     <div style="padding:1.25rem;background:var(--bg);border-radius:6px;border:1px solid var(--border);margin-top:1rem;">
       <div style="font-size:.95rem;font-weight:600;margin-bottom:.35rem;">Want to know why the results look this way?</div>
@@ -392,7 +388,7 @@ async function runScan() {
     appendRawToggle(body, `${result.label} traceroute`, result.traceMeasurement);
   });
 
-  status.textContent = `Scan completed at ${completedAt.toLocaleTimeString()}. Measurements shown above are the observations returned by the live probes.`;
+  status.textContent = `Scan completed at ${completedAt.toLocaleTimeString()}: ${availableCount} of ${AFRICA_PROBE_CITIES.length} requested countries returned live HTTP results; ${AFRICA_PROBE_CITIES.length - availableCount} did not. Only returned measurements are used in the performance summary.`;
   button.disabled = false;
   button.textContent = 'Analyze Another Domain';
 }
