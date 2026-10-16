@@ -5,10 +5,37 @@
  */
 
 const AFRICA_PROBE_CITIES = [
-  { city: 'Nairobi', country: 'KE', label: 'Nairobi, KE', flag: '🇰🇪' },
-  { city: 'Lagos', country: 'NG', label: 'Lagos, NG', flag: '🇳🇬' },
-  { city: 'Johannesburg', country: 'ZA', label: 'Johannesburg, ZA', flag: '🇿🇦' },
-  { city: 'Cairo', country: 'EG', label: 'Cairo, EG', flag: '🇪🇬' }
+  { city: 'Nairobi', country: 'KE', label: 'Kenya', flag: '🇰🇪' },
+  { city: 'Lagos', country: 'NG', label: 'Nigeria', flag: '🇳🇬' },
+  { city: 'Johannesburg', country: 'ZA', label: 'South Africa', flag: '🇿🇦' },
+  { city: 'Cairo', country: 'EG', label: 'Egypt', flag: '🇪🇬' },
+  { city: 'Casablanca', country: 'MA', label: 'Morocco', flag: '🇲🇦' },
+  { city: 'Accra', country: 'GH', label: 'Ghana', flag: '🇬🇭' },
+  { city: 'Kigali', country: 'RW', label: 'Rwanda', flag: '🇷🇼' },
+  { city: 'Port Louis', country: 'MU', label: 'Mauritius', flag: '🇲🇺' },
+  { city: 'Tunis', country: 'TN', label: 'Tunisia', flag: '🇹🇳' },
+  { city: 'Gaborone', country: 'BW', label: 'Botswana', flag: '🇧🇼' },
+  { city: 'Dakar', country: 'SN', label: 'Senegal', flag: '🇸🇳' },
+  { city: 'Abidjan', country: 'CI', label: 'Côte d’Ivoire', flag: '🇨🇮' },
+  { city: 'Dar es Salaam', country: 'TZ', label: 'Tanzania', flag: '🇹🇿' },
+  { city: 'Kampala', country: 'UG', label: 'Uganda', flag: '🇺🇬' },
+  { city: 'Addis Ababa', country: 'ET', label: 'Ethiopia', flag: '🇪🇹' },
+  { city: 'Algiers', country: 'DZ', label: 'Algeria', flag: '🇩🇿' },
+  { city: 'Windhoek', country: 'NA', label: 'Namibia', flag: '🇳🇦' },
+  { city: 'Lusaka', country: 'ZM', label: 'Zambia', flag: '🇿🇲' },
+  { city: 'Maputo', country: 'MZ', label: 'Mozambique', flag: '🇲🇿' },
+  { city: 'Luanda', country: 'AO', label: 'Angola', flag: '🇦🇴' },
+  { city: 'Douala', country: 'CM', label: 'Cameroon', flag: '🇨🇲' },
+  { city: 'Libreville', country: 'GA', label: 'Gabon', flag: '🇬🇦' },
+  { city: 'Djibouti', country: 'DJ', label: 'Djibouti', flag: '🇩🇯' },
+  { city: 'Victoria', country: 'SC', label: 'Seychelles', flag: '🇸🇨' },
+  { city: 'Praia', country: 'CV', label: 'Cabo Verde', flag: '🇨🇻' },
+  { city: 'Mbabane', country: 'SZ', label: 'Eswatini', flag: '🇸🇿' },
+  { city: 'Antananarivo', country: 'MG', label: 'Madagascar', flag: '🇲🇬' },
+  { city: 'Harare', country: 'ZW', label: 'Zimbabwe', flag: '🇿🇼' },
+  { city: 'Lilongwe', country: 'MW', label: 'Malawi', flag: '🇲🇼' },
+  { city: 'Cotonou', country: 'BJ', label: 'Benin', flag: '🇧🇯' },
+  { city: 'Lomé', country: 'TG', label: 'Togo', flag: '🇹🇬' }
 ];
 
 const VERDICT_SEVERITY = { CRITICAL: 3, WARNING: 2, GOOD: 1, UNKNOWN: 0 };
@@ -303,8 +330,8 @@ async function runScan() {
   output.innerHTML = `<div class="terminal-header"><div class="terminal-dot red"></div><div class="terminal-dot yellow"></div><div class="terminal-dot green"></div><div class="terminal-title">africalatency-scan ~ ${domain}</div></div><div class="terminal-body" id="scan-body"></div>`;
 
   const body = document.getElementById('scan-body');
-  appendLine(body, `Starting live Africa scan for ${domain}…`);
-  appendLine(body, 'HTTP response + traceroute diagnostics from 4 selected African locations.');
+  appendLine(body, `Starting live Africa scan for ${domain} across up to 31 countries…`);
+  appendLine(body, 'HTTP response + traceroute diagnostics from up to 31 African country-level probe locations.');
 
   const results = await Promise.all(AFRICA_PROBE_CITIES.map(city =>
     runCityDiagnostic(city, domain).then(result => {
@@ -329,7 +356,7 @@ async function runScan() {
 
   report.innerHTML = `
     <div style="display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;align-items:center;margin-bottom:1rem;">
-      <div><span style="color:var(--${verdict.color});font-weight:600;font-size:1.1rem;">${verdict.symbol} ${verdict.label}</span><div style="color:var(--text-muted);font-size:.78rem;margin-top:.25rem;">Observed worst result across ${availableCount} of ${AFRICA_PROBE_CITIES.length} available locations.</div></div>
+      <div><span style="color:var(--${verdict.color});font-weight:600;font-size:1.1rem;">${verdict.symbol} ${verdict.label}</span><div style="color:var(--text-muted);font-size:.78rem;margin-top:.25rem;">Observed worst result across ${availableCount} of ${AFRICA_PROBE_CITIES.length} requested country locations. Probe availability varies.</div></div>
       <div style="color:var(--text-muted);font-size:.75rem;text-align:right;">Started ${startedAt.toLocaleString()}<br>Completed ${completedAt.toLocaleString()}</div>
     </div>
     ${buildSummary(results, completedAt)}
@@ -337,9 +364,9 @@ async function runScan() {
     ${results.map(renderCityBlock).join('')}
     <div style="padding:1.25rem;background:var(--bg);border-radius:6px;border:1px solid var(--border);margin-top:1rem;">
       <div style="font-size:.95rem;font-weight:600;margin-bottom:.35rem;">Want to know why the results look this way?</div>
-      <div style="font-size:.8rem;color:var(--text-muted);margin-bottom:1rem;line-height:1.6;">The free scanner shows what we observed. The Africa Latency Audit™ investigates routing, CDN/edge placement, infrastructure, application/API behavior and other dependencies to identify the likely bottleneck and prioritize fixes.</div>
+      <div style="font-size:.8rem;color:var(--text-muted);margin-bottom:1rem;line-height:1.6;">The free scan shows the live observations returned by available probes. The Africa Latency Audit™ organizes those results into a fuller report, compares responding locations, explains likely bottlenecks with appropriate caveats, and prioritizes practical next steps.</div>
       <div style="display:flex;gap:.75rem;flex-wrap:wrap;align-items:center;">
-        <a class="btn btn-primary" href="/audit-intake">Request Africa Latency Audit™ →</a>
+        <a class="btn btn-primary" href="/audit-checkout.html">Get Full Audit · KES 3,500 →</a>
         <a href="methodology.html" style="font-size:.82rem;color:var(--text-muted);">View our method</a>
       </div>
     </div>
