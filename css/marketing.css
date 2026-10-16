@@ -227,3 +227,6 @@ main .section .data-centers-callout a:not(.btn):not(.btn-primary) {
 .scan-privacy-note { margin:16px 0 0 !important; font-size:.76rem !important; }
 @media(max-width:800px) { .proof-metrics-grid { grid-template-columns:1fr; } .use-case-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
 @media(max-width:480px) { .use-case-grid { grid-template-columns:1fr; } .proof-metric,.use-case-card { padding:18px; } }
+
+.paystack-badge { display:inline-flex; align-items:center; gap:6px; flex-shrink:0; padding:6px 9px; border:1px solid rgba(57,255,154,.25); border-radius:999px; background:rgba(57,255,154,.07); color:#b9ffd9; font-size:.68rem; font-weight:700; letter-spacing:.01em; white-space:nowrap; }
+@media(max-width:480px) { .audit-trust { flex-wrap:wrap; } .paystack-badge { white-space:normal; } }
