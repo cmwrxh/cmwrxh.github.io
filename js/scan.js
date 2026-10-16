@@ -364,7 +364,11 @@ async function runScan() {
     ${results.map(renderCityBlock).join('')}
     <div style="padding:1.25rem;background:var(--bg);border-radius:6px;border:1px solid var(--border);margin-top:1rem;">
       <div style="font-size:.95rem;font-weight:600;margin-bottom:.35rem;">Want to know why the results look this way?</div>
-      <div style="font-size:.8rem;color:var(--text-muted);margin-bottom:1rem;line-height:1.6;">The free scan shows the live observations returned by available probes. The Africa Latency Audit™ organizes those results into a fuller report, compares responding locations, explains likely bottlenecks with appropriate caveats, and prioritizes practical next steps.</div>
+      <div style="font-size:.8rem;color:var(--text-muted);margin-bottom:1rem;line-height:1.6;">The free scan shows a point-in-time snapshot. The Africa Latency Audit™ organizes available observations into a fuller report, compares responding locations, explains likely bottlenecks with appropriate caveats, and prioritizes practical next steps.</div>
+      <div class="scan-value-compare">
+        <div class="scan-value-column"><h4>Free scan</h4><ul><li>Snapshot of available live probe results</li><li>HTTP status and observed response timings</li><li>Basic route evidence where available</li><li>Useful starting point for investigation</li></ul></div>
+        <div class="scan-value-column scan-value-paid"><h4>Full audit · KES 3,500</h4><ul><li>Structured downloadable PDF report</li><li>Location-by-location result comparison</li><li>Clear limits and measurement context</li><li>Prioritized next steps based on observed patterns</li><li>Automated email delivery after payment</li></ul></div>
+      </div>
       <div style="display:flex;gap:.75rem;flex-wrap:wrap;align-items:center;">
         <a class="btn btn-primary" href="/audit-checkout.html">Get Full Audit · KES 3,500 →</a>
         <a href="methodology.html" style="font-size:.82rem;color:var(--text-muted);">View our method</a>
