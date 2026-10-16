@@ -4,8 +4,8 @@
 // African locations used by the public AfricaLatency scanner.
 
 const GP_API_BASE = 'https://api.globalping.io/v1';
-const ALLOWED_CITIES = ['Nairobi', 'Lagos', 'Johannesburg', 'Cairo'];
-const ALLOWED_COUNTRIES = ['KE', 'NG', 'ZA', 'EG'];
+const ALLOWED_CITIES = ['Nairobi', 'Lagos', 'Johannesburg', 'Cairo', 'Casablanca', 'Accra', 'Kigali', 'Port Louis', 'Tunis', 'Gaborone', 'Dakar', 'Abidjan', 'Dar es Salaam', 'Kampala', 'Addis Ababa', 'Algiers', 'Windhoek', 'Lusaka', 'Maputo', 'Luanda', 'Douala', 'Libreville', 'Djibouti', 'Victoria', 'Praia', 'Mbabane', 'Antananarivo', 'Harare', 'Lilongwe', 'Cotonou', 'Lomé'];
+const ALLOWED_COUNTRIES = ['KE', 'NG', 'ZA', 'EG', 'MA', 'GH', 'RW', 'MU', 'TN', 'BW', 'SN', 'CI', 'TZ', 'UG', 'ET', 'DZ', 'NA', 'ZM', 'MZ', 'AO', 'CM', 'GA', 'DJ', 'SC', 'CV', 'SZ', 'MG', 'ZW', 'MW', 'BJ', 'TG'];
 const ALLOWED_TYPES = ['http', 'traceroute'];
 
 function isValidLocations(locations) {
@@ -101,7 +101,7 @@ async function checkRateLimit(ip) {
     body: JSON.stringify({
       p_ip_address: ip,
       p_endpoint: 'run-diagnostic',
-      p_max_requests: 12,
+      p_max_requests: 70,
       p_window_minutes: 60
     })
   });
