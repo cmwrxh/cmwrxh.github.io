@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <link rel="icon" type="image/svg+xml" href="/images/favicon.svg">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Africa Latency Scanner — africalatency.dev</title>
+  <title>Africa Latency Scanner — AfricaLatency</title>
   <meta name="description" content="Request live measurements from up to 31 African countries. Only locations with available probes return live results.">
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="/css/style.css">\n  <link rel="stylesheet" href="/css/marketing.css">\n  <link rel="stylesheet" href="/css/brand.css?v=5">
 <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
 <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
@@ -13,7 +14,7 @@
 <body>
 <nav>
   <div class="nav-inner">
-    <a href="index.html" class="nav-brand">africalatency<span>.dev</span></a>
+    <a href="index.html" class="nav-brand brand-lockup" aria-label="AfricaLatency"><img class="brand-wordmark" src="/images/africalatency-logo-light.svg" alt="AfricaLatency" width="180" height="28"></a>
     <ul class="nav-links">
       <li><a href="services.html">Services</a></li>
       <li><a href="scan.html" class="active">Scan</a></li>
@@ -43,6 +44,11 @@
           <button type="submit" class="btn btn-primary" id="scan-btn" style="white-space:nowrap;">Run Free Scan →</button>
         </div>
       </form>
+      <section class="nairobi-probe-card" aria-labelledby="nairobi-probe-title">
+        <div class="nairobi-probe-copy"><h2 id="nairobi-probe-title">Measure now from Nairobi</h2><p>Run one live HTTP measurement of AfricaLatency from an available Nairobi probe. This is a point-in-time result, not a regional average.</p></div>
+        <button id="nairobi-probe-button" type="button">Measure now</button>
+        <div id="nairobi-probe-status" class="nairobi-probe-status" aria-live="polite">Not measured yet.</div>
+      </section>
 
       <div class="scan-availability-note" role="note" style="margin:1rem 0;padding:1rem 1.1rem;border:1px solid var(--border);border-radius:8px;background:var(--bg-elevated);color:var(--text-muted);font-size:.85rem;line-height:1.65;"><strong style="color:var(--text);">Probe availability</strong><br>Available = a completed live HTTP measurement was returned. Unavailable = no completed live result was returned for that location during this scan. Unavailable locations are not treated as slow or healthy and are excluded from the performance comparison.</div>
       <div id="scan-status" style="display:none;" aria-live="polite"></div>
@@ -53,12 +59,12 @@
       <div style="margin-top:3rem; padding:1.5rem; border:1px solid var(--border); border-radius:8px; background:var(--bg-elevated);">
         <h3 style="font-size:1rem; margin-bottom:1rem; color:var(--text-muted);">What this free scan checks</h3>
         <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:1rem; font-size:.85rem; color:var(--text-muted);">
-          <div>✓ HTTP response timing</div>
-          <div>✓ Time to first byte</div>
-          <div>✓ DNS / connection timing when returned</div>
-          <div>✓ TLS timing when returned</div>
-          <div>✓ Network path / hop count</div>
-          <div>✓ Probe location and network</div>
+          <div><svg class="inline-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg> HTTP response timing</div>
+          <div><svg class="inline-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg> Time to first byte</div>
+          <div><svg class="inline-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg> DNS / connection timing when returned</div>
+          <div><svg class="inline-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg> TLS timing when returned</div>
+          <div><svg class="inline-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg> Network path / hop count</div>
+          <div><svg class="inline-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg> Probe location and network</div>
         </div>
       </div>
 
@@ -71,7 +77,7 @@
 
 <footer>
   <div class="footer-inner">
-    <div class="footer-left">© 2026 africalatency.dev</div>
+    <div class="footer-left"><img class="footer-wordmark" src="/images/africalatency-logo-dark.svg" alt="AfricaLatency" width="180" height="28"><span>© 2026 AfricaLatency</span></div>
     <div class="footer-links">
       <a href="https://github.com/cmwrxh" target="_blank" rel="noopener">GitHub</a>
       <a href="https://www.linkedin.com/in/charles-mwaura-bb7814140/" target="_blank" rel="noopener">LinkedIn</a>
@@ -85,7 +91,7 @@
     'sb_publishable_dGaR1jgofny7tGVWh0TK2w_haSVNyWv'
   );
 </script>
-<script src="js/main.js"></script>
+<script src="js/main.js?v=5"></script>
 <script src="js/scan.js?v=2"></script>
 <script>
   // Keep every audit-intent CTA on the scanner on the canonical audit intake path.
@@ -95,6 +101,37 @@
     });
   });
   auditCtaObserver.observe(document.body, { childList: true, subtree: true });
+</script>
+
+<script>
+(() => {
+  const button = document.getElementById('nairobi-probe-button');
+  const status = document.getElementById('nairobi-probe-status');
+  if (!button || !status) return;
+  button.addEventListener('click', async () => {
+    button.disabled = true;
+    status.textContent = 'Measuring from Nairobi…';
+    try {
+      const response = await fetch('/api/run-diagnostic', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'http', target: location.hostname, locations: [{ city: 'Nairobi', limit: 1 }] })
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.error || `Diagnostic unavailable (HTTP ${response.status})`);
+      const result = data.results && data.results[0];
+      const timings = result && result.result && result.result.timings;
+      const total = timings && Number.isFinite(Number(timings.total)) ? Math.round(Number(timings.total)) : null;
+      const ttfb = timings && Number.isFinite(Number(timings.firstByte)) ? Math.round(Number(timings.firstByte)) : null;
+      if (total === null && ttfb === null) throw new Error('The probe returned no timing data.');
+      status.textContent = `Nairobi probe: ${total !== null ? total + ' ms total' : 'total unavailable'}${ttfb !== null ? ' · ' + ttfb + ' ms TTFB' : ''} · observed just now.`;
+    } catch (error) {
+      status.textContent = error.message || 'Live measurement failed. Try again later.';
+    } finally {
+      button.disabled = false;
+    }
+  });
+})();
 </script>
 </body>
 </html>
