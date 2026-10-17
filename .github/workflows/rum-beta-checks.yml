@@ -1,0 +1,23 @@
+name: RUM Beta checks
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'api/rum*.js'
+      - 'lib/rum-beta-client.js'
+      - 'rum.js'
+      - 'rum-dashboard.html'
+      - 'sql/rum-beta-mvp.sql'
+      - 'tests/rum-beta.test.js'
+      - 'package.json'
+      - '.github/workflows/rum-beta-checks.yml'
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install --ignore-scripts
+      - run: npm test
