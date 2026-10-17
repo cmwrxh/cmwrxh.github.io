@@ -120,6 +120,26 @@ function fmtMs(value) {
   return validNumber(value) ? `${Math.round(Number(value))}ms` : 'n/a';
 }
 
+function percentile(values, p) {
+  const sorted = values.filter(Number.isFinite).sort((a, b) => a - b);
+  if (!sorted.length) return null;
+  return sorted[Math.max(0, Math.ceil((p / 100) * sorted.length) - 1)];
+}
+
+function summarizeProbeSamples(results, requested = 3) {
+  const samples = Array.isArray(results) ? results : [];
+  const completed = samples.filter(item => item && item.result && item.result.status === "finished");
+  const valuesFor = key => completed.map(item => Number(item.result?.timings?.[key])).filter(Number.isFinite);
+  const p50 = {}, p95 = {}, metricSamples = {};
+  for (const key of ["dns", "tcp", "tls", "firstByte", "total"]) {
+    const values = valuesFor(key);
+    p50[key] = percentile(values, 50);
+    p95[key] = percentile(values, 95);
+    metricSamples[key] = values.length;
+  }
+  return { requested, returned: samples.length, completed: completed.length, failures: Math.max(0, requested - completed.length), p50, p95, metricSamples };
+}
+
 function metricVerdict(value, goodMax, warningMax) {
   if (!validNumber(value)) return { label: 'N/A', color: 'warning', symbol: '⚪' };
   const n = Number(value);
@@ -161,9 +181,12 @@ async function runCityDiagnostic(cityConfig, domain) {
     };
   }
 
-  const httpResult = httpMeasurement.results && httpMeasurement.results[0];
-  if (!httpResult || !httpResult.result || httpResult.result.status !== 'finished') {
-    return { city: cityConfig, label: cityConfig.label, flag: cityConfig.flag, available: false, reason: 'No completed HTTP measurement was returned.' };
+  const rawHttpSamples = Array.isArray(httpMeasurement.results) ? httpMeasurement.results : [];
+  const sampleStats = summarizeProbeSamples(rawHttpSamples, 3);
+  const completedHttpSamples = rawHttpSamples.filter(item => item && item.result && item.result.status === 'finished');
+  const httpResult = completedHttpSamples[0];
+  if (!httpResult) {
+    return { city: cityConfig, label: cityConfig.label, flag: cityConfig.flag, available: false, sampleStats, reason: 'No completed HTTP sample; ' + sampleStats.failures + ' of ' + sampleStats.requested + ' samples failed or were not returned.' };
   }
 
   // Traceroute is secondary: HTTP results remain valid if route diagnostics fail.
@@ -173,7 +196,7 @@ async function runCityDiagnostic(cityConfig, domain) {
     ? httpMeasurement.provider_results.find(item => item && item.status === 'finished') || httpMeasurement.provider_results[0]
     : null;
   const result = httpResult.result;
-  const timings = result.timings || {};
+  const timings = sampleStats.p50;
   const traceResult = traceMeasurement && traceMeasurement.results && traceMeasurement.results[0];
   const hops = traceResult && traceResult.result && traceResult.result.hops;
   const hopCount = Array.isArray(hops) && hops.length ? hops.length : null;
@@ -211,6 +234,7 @@ async function runCityDiagnostic(cityConfig, domain) {
     statusCode: result.statusCode || null,
     tlsProtocol: (result.tls && (result.tls.protocol || result.tls.version)) || null,
     timings,
+    sampleStats,
     hopCount,
     pathSummary,
     dnsVerdict,
@@ -234,6 +258,7 @@ function renderCityBlock(c) {
       <div style="color:var(--${c.overall.color});font-weight:600;font-size:.9rem;">${c.overall.symbol} ${c.overall.label}</div>
     </div>
     <div style="font-size:.75rem;color:var(--text-muted);margin-bottom:.75rem;">Provider: ${c.provider || 'unknown'} · Probe type: ${c.probeType || 'unknown'} · Probe: ${c.probeLocation}${c.probeNetwork ? ` — ${c.probeNetwork}` : ''}${c.probeAsn ? ` · ASN ${c.probeAsn}` : ''}</div>
+    <div style="font-size:.78rem;color:var(--text-muted);margin-bottom:.75rem;">Samples: ${c.sampleStats?.completed || 0}/${c.sampleStats?.requested || 3} completed · ${c.sampleStats?.failures ?? 3} failures · Total p50 ${fmtMs(c.sampleStats?.p50?.total)} · p95 ${fmtMs(c.sampleStats?.p95?.total)} · TTFB p50 ${fmtMs(c.sampleStats?.p50?.firstByte)} · p95 ${fmtMs(c.sampleStats?.p95?.firstByte)}</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;font-size:.9rem;">
       <div>DNS: ${metricDisplay(c.dnsVerdict, c.timings.dns)}</div>
       <div>TLS: ${metricDisplay(c.tlsVerdict, c.timings.tls)}</div>
