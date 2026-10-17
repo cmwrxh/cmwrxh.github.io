@@ -12,6 +12,13 @@ test('probe tags classify known probe types without guessing', () => {
   assert.equal(classifyProbe({ tags: ['real-user'] }), 'real-user');
 });
 
+test('Globalping provider category tags normalize common spellings', () => {
+  assert.equal(classifyProbe({ tags: ['cloud'] }), 'datacenter');
+  assert.equal(classifyProbe({ tags: ['data_center'] }), 'datacenter');
+  assert.equal(classifyProbe({ tags: ['residential'] }), 'fixed');
+  assert.equal(classifyProbe({ tags: ['5G'] }), 'mobile');
+});
+
 test('normalizer returns unified metadata and preserves the raw provider result', () => {
   const item = { probe: { country: 'KE', city: 'Nairobi', asn: 64500, network: 'Example ISP', tags: ['datacenter'] }, result: { status: 'finished', timings: { total: 120 } } };
   const normalized = normalizeGlobalpingResult({ status: 'finished', results: [item] }, 'KE');
