@@ -10,7 +10,7 @@ const ALLOWED_TYPES = ['http', 'traceroute'];
 function isValidLocations(locations) {
   if (!Array.isArray(locations) || locations.length !== 1) return false;
   const loc = locations[0];
-  if (!loc || loc.limit !== 1) return false;
+  if (!loc || !Number.isInteger(loc.limit) || loc.limit < 3 || loc.limit > 5) return false;
   if (loc.city) return ALLOWED_CITIES.includes(loc.city) && Object.keys(loc).every(k => ['city','limit'].includes(k)) && Object.keys(loc).length === 2;
   if (loc.country) return ALLOWED_COUNTRIES.includes(loc.country) && Object.keys(loc).every(k => ['country','limit'].includes(k)) && Object.keys(loc).length === 2;
   return false;
