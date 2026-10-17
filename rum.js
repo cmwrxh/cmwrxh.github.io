@@ -9,7 +9,15 @@
   var rate = Number.isFinite(rawRate) && rawRate >= 0 && rawRate <= 1 ? rawRate : 1;
   if (rate === 0 || Math.random() > rate) return;
   var endpoint = new URL('/api/rum', script.src).href;
-  var path = location.pathname.slice(0, 512) || '/';
+  function cleanPath(value) {
+    return String(value || '/').split(/[?#]/, 1)[0].split('/').map(function (part) {
+      if (!part) return '';
+      if (part.indexOf('@') !== -1 || /^[0-9a-f]{8}-[0-9a-f-]{27,}$/i.test(part) ||
+          /^\d{4,}$/.test(part) || /^[A-Za-z0-9_-]{32,}$/.test(part)) return ':id';
+      return part.slice(0, 80);
+    }).join('/').slice(0, 512) || '/';
+  }
+  var path = cleanPath(location.pathname);
   var connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
   var connectionType = connection && (connection.type || connection.effectiveType) || 'unknown';
   var events = [];
