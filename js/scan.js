@@ -169,6 +169,9 @@ async function runCityDiagnostic(cityConfig, domain) {
   // Traceroute is secondary: HTTP results remain valid if route diagnostics fail.
   const traceMeasurement = await gpRunCity('traceroute', domain, cityConfig);
   const probe = httpResult.probe || {};
+  const unifiedProbe = Array.isArray(httpMeasurement.provider_results)
+    ? httpMeasurement.provider_results.find(item => item && item.status === 'finished') || httpMeasurement.provider_results[0]
+    : null;
   const result = httpResult.result;
   const timings = result.timings || {};
   const traceResult = traceMeasurement && traceMeasurement.results && traceMeasurement.results[0];
@@ -193,8 +196,17 @@ async function runCityDiagnostic(cityConfig, domain) {
     label: cityConfig.label,
     flag: cityConfig.flag,
     available: true,
-    probeLocation: [probe.city, probe.country].filter(Boolean).join(', ') || cityConfig.label,
-    probeNetwork: probe.network || null,
+    provider: unifiedProbe?.provider || httpMeasurement.provider || 'unknown',
+    probeType: unifiedProbe?.probe_type || 'unknown',
+    probeCountry: unifiedProbe?.country || cityConfig.country,
+    probeCity: unifiedProbe?.city || probe.city || null,
+    probeAsn: unifiedProbe?.asn ?? null,
+    probeTags: Array.isArray(unifiedProbe?.tags) ? unifiedProbe.tags : [],
+    probeTimestamp: unifiedProbe?.timestamp || null,
+    probeMetrics: unifiedProbe?.metrics || timings,
+    rawProviderPayload: unifiedProbe?.raw_provider_payload || httpResult,
+    probeLocation: [unifiedProbe?.city || probe.city, unifiedProbe?.country || probe.country].filter(Boolean).join(', ') || cityConfig.label,
+    probeNetwork: unifiedProbe?.network_name || probe.network || null,
     resolvedAddress: result.resolvedAddress || null,
     statusCode: result.statusCode || null,
     tlsProtocol: (result.tls && (result.tls.protocol || result.tls.version)) || null,
@@ -221,7 +233,7 @@ function renderCityBlock(c) {
       <div style="font-weight:600;">${c.flag} ${c.label}</div>
       <div style="color:var(--${c.overall.color});font-weight:600;font-size:.9rem;">${c.overall.symbol} ${c.overall.label}</div>
     </div>
-    <div style="font-size:.75rem;color:var(--text-muted);margin-bottom:.75rem;">Probe: ${c.probeLocation}${c.probeNetwork ? ` — ${c.probeNetwork}` : ''}</div>
+    <div style="font-size:.75rem;color:var(--text-muted);margin-bottom:.75rem;">Provider: ${c.provider || 'unknown'} · Probe type: ${c.probeType || 'unknown'} · Probe: ${c.probeLocation}${c.probeNetwork ? ` — ${c.probeNetwork}` : ''}${c.probeAsn ? ` · ASN ${c.probeAsn}` : ''}</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;font-size:.9rem;">
       <div>DNS: ${metricDisplay(c.dnsVerdict, c.timings.dns)}</div>
       <div>TLS: ${metricDisplay(c.tlsVerdict, c.timings.tls)}</div>
@@ -268,6 +280,12 @@ async function saveScanHistory(domain, results, verdict, startedAt, completedAt)
   if (error || !session) return { saved: false, reason: 'Sign in to save this scan to your dashboard.' };
   const compactResults = results.map(result => ({
     label: result.label, available: result.available === true,
+    provider: result.provider || 'unknown', probeType: result.probeType || 'unknown',
+    country: result.probeCountry || result.city?.country || null,
+    city: result.probeCity || null, asn: result.probeAsn ?? null,
+    networkName: result.probeNetwork || null, tags: result.probeTags || [],
+    timestamp: result.probeTimestamp || null, metrics: result.probeMetrics || null,
+    rawProviderPayload: result.rawProviderPayload || null,
     probeLocation: result.probeLocation || null, probeNetwork: result.probeNetwork || null,
     statusCode: result.statusCode || null, timings: result.timings || null,
     hopCount: result.hopCount || null, pathSummary: result.pathSummary || null,
