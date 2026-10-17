@@ -45,8 +45,13 @@ begin
 
   if not found then
     insert into public.api_rate_limits(ip_address, endpoint, request_count, window_started_at, created_at)
-    values (p_ip_hash, p_endpoint, 1, v_now, v_now);
-    return true;
+    values (p_ip_hash, p_endpoint, 1, v_now, v_now)
+    on conflict (ip_address, endpoint) do nothing;
+    if found then return true; end if;
+    select * into v_record
+    from public.api_rate_limits
+    where ip_address = p_ip_hash and endpoint = p_endpoint
+    for update;
   end if;
 
   if v_now >= v_record.window_started_at + make_interval(mins => p_window_minutes) then
@@ -82,6 +87,37 @@ commit;
 update public.calculator_leads set user_ip = null where user_ip is not null;
 update public.audit_requests set user_ip = null where user_ip is not null;
 update public.website_speed_checks set user_ip = null where user_ip is not null;
+
+-- Database-level guard: preserve the 131 legacy test cache rows but make
+-- future cache writes/deletes fail, including writes from privileged API code.
+create or replace function public.block_ip_geo_cache_mutation()
+returns trigger language plpgsql set search_path = public as $
+begin
+  raise exception 'ip_geo_cache is legacy read-only test data';
+end;
+$;
+drop trigger if exists ip_geo_cache_read_only_guard on public.ip_geo_cache;
+create trigger ip_geo_cache_read_only_guard
+before insert or update or delete on public.ip_geo_cache
+for each row execute function public.block_ip_geo_cache_mutation();
+
+-- Defense in depth: null IP fields even if a legacy intake handler still sends them.
+create or replace function public.strip_intake_user_ip()
+returns trigger language plpgsql set search_path = public as $
+begin
+  new.user_ip := null;
+  return new;
+end;
+$;
+drop trigger if exists calculator_leads_strip_user_ip on public.calculator_leads;
+create trigger calculator_leads_strip_user_ip before insert or update of user_ip on public.calculator_leads
+for each row execute function public.strip_intake_user_ip();
+drop trigger if exists audit_requests_strip_user_ip on public.audit_requests;
+create trigger audit_requests_strip_user_ip before insert or update of user_ip on public.audit_requests
+for each row execute function public.strip_intake_user_ip();
+drop trigger if exists website_speed_checks_strip_user_ip on public.website_speed_checks;
+create trigger website_speed_checks_strip_user_ip before insert or update of user_ip on public.website_speed_checks
+for each row execute function public.strip_intake_user_ip();
 
 -- Prevent the old callable overloads from accepting raw IPs from clients.
 revoke execute on function public.check_ip_rate_limit(text, text, integer, integer) from public, anon, authenticated;
