@@ -3,7 +3,9 @@ import { createClient } from '@supabase/supabase-js';
 const supabaseKey = process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
 const supabase = createClient(process.env.SUPABASE_URL, supabaseKey);
 
-const PRODUCT = { name: 'Website Speed Check', amountSubunit: 3900, currency: process.env.PAYSTACK_CURRENCY || 'USD' };
+const PRODUCT_CURRENCY = process.env.PAYSTACK_CURRENCY || 'KES';
+const PRODUCT_AMOUNT_SUBUNIT = PRODUCT_CURRENCY === 'USD' ? 1900 : Number(process.env.SITESPEED_AMOUNT_KES || 0);
+const PRODUCT = { name: 'Website Speed Check', amountSubunit: PRODUCT_AMOUNT_SUBUNIT, currency: PRODUCT_CURRENCY };
 
 function validEmail(value) { return typeof value === 'string' && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim()); }
 function normalizeDomain(value) {
@@ -19,6 +21,7 @@ function normalizeDomain(value) {
 export default async function handler(req, res) {
   if (req.method !== 'POST') { res.setHeader('Allow', 'POST'); return res.status(405).json({ error: 'Method not allowed.' }); }
   if (!process.env.PAYSTACK_SECRET_KEY || !process.env.SUPABASE_URL || !supabaseKey) return res.status(500).json({ error: 'Checkout service is not configured.' });
+  if (!Number.isSafeInteger(PRODUCT.amountSubunit) || PRODUCT.amountSubunit <= 0) return res.status(503).json({ error: 'Website Speed Check KES pricing is not configured yet.' });
 
   const body = typeof req.body === 'string' ? JSON.parse(req.body) : (req.body || {});
   const name = typeof body.name === 'string' ? body.name.trim().slice(0, 120) : '';
