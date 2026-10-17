@@ -96,7 +96,7 @@ async function gpRunCity(type, target, cityConfig) {
     const response = await fetch('/api/run-diagnostic', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type, target, locations: [{ country: cityConfig.country, limit: 3 }] })
+      body: JSON.stringify({ type, target, locations: [{ country: cityConfig.country, limit: type === 'http' ? 3 : 1 }] })
     });
     if (response.ok) return await response.json();
     const payload = await response.json().catch(() => ({}));
