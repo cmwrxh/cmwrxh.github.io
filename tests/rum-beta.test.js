@@ -20,4 +20,6 @@ test('RUM snippet stays under 3 KB gzipped and does not use cookies or local sto
   assert.doesNotMatch(source, /document\.cookie|localStorage|sessionStorage/);
   assert.doesNotMatch(source, /location\.search|location\.href/);
   assert.match(source, /navigator\.sendBeacon/);
+  assert.match(source, /rateAttribute === null/);
+  assert.match(source, /function cleanPath/);
 });
