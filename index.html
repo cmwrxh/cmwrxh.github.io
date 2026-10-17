@@ -10,7 +10,8 @@
   <link rel="canonical" href="https://www.africalatency.dev/">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="AfricaLatency">
-  <meta property="og:title" content="AfricaLatency — Infrastructure Performance &amp; Latency Intelligence">\n  <meta property="og:image" content="https://africalatency.dev/images/og-image.svg">
+  <meta property="og:title" content="AfricaLatency — Infrastructure Performance &amp; Latency Intelligence">
+  <meta property="og:image" content="https://africalatency.dev/images/og-image.svg">
   <meta property="og:description" content="We request measurements from up to 31 African countries. Only locations with available probes return live results.">
   <meta property="og:url" content="https://www.africalatency.dev/">
   <meta name="twitter:card" content="summary">
@@ -21,12 +22,13 @@
 
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/marketing.css?v=6">
-  <link rel="stylesheet" href="/css/brand.css?v=5">
+  <link rel="stylesheet" href="/css/brand.css?v=6">
 
   <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
   <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
   <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+<script type="application/ld+json" id="faq-schema">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Does every scan return results from all 31 countries?","acceptedAnswer":{"@type":"Answer","text":"No. Measurements are requested from up to 31 countries. Only locations with available probes return live results."}},{"@type":"Question","name":"Does the automated audit inspect private databases?","acceptedAnswer":{"@type":"Answer","text":"No. The automated audit tests public endpoints only. Private databases and third-party dependencies require a separately scoped engagement."}},{"@type":"Question","name":"Is continuous monitoring available now?","acceptedAnswer":{"@type":"Answer","text":"Continuous Monitoring is in development. Join the waitlist to hear when pilot places are available."}}]}</script>
 </head>
 <body>
 
@@ -97,7 +99,7 @@
           <p class="hero-subtitle">Measure public websites and APIs from available African network probes, compare the results, and get clear next steps for what to investigate.</p>
           <div class="btn-group">
             <a class="btn btn-primary" href="/scan.html">Run free scan <i data-lucide="arrow-right" aria-hidden="true"></i></a>
-            <a class="btn btn-secondary" href="/audit-report.html">See sample report</a>
+            <a class="btn btn-secondary" href="/sample-report">See sample report</a>
           </div>
           <p class="audit-path-note">Free public-endpoint snapshot. For a structured audit, start at KES 3,500.</p>
         </div>
@@ -172,22 +174,9 @@
     </div>
   </section>
 
-  <section class="section section-elevated" id="pricing">
-    <div class="container">
-      <div class="section-heading">
-        <div class="label">Simple starting points</div>
-        <h2>Start with the level of evidence you need.</h2>
-      </div>
-      <div class="pricing-grid">
-        <article class="pricing-card"><div class="label">Free</div><h3>Free Scan</h3><p class="price">KES 0</p><p>Get an initial view of public HTTP response timing from available probes.</p><a class="btn btn-secondary" href="/scan.html">Run free scan</a></article>
-        <article class="pricing-card pricing-card-featured"><div class="label">Recommended</div><h3>Africa Latency Audit</h3><p class="price">KES 3,500 <span>one-time</span></p><p>Receive a structured report with measurements, interpretation and prioritized recommendations.</p><a class="btn btn-primary" href="/audit-checkout.html">Get Full Audit <i data-lucide="arrow-right" aria-hidden="true"></i></a></article>
-        <article class="pricing-card"><div class="label">Custom</div><h3>Custom Deep Dive</h3><p class="price">From KES 25,000</p><p>Agree a scope for deeper infrastructure, database or third-party dependency investigation.</p><a class="btn btn-secondary" href="/audit-intake">Discuss custom work</a></article>
-      </div>
-      <p class="pricing-note">Measurements depend on probe availability and conditions at the time of the scan. Unavailable locations are not counted as measured results.</p>
-    </div>
-  </section>
+  <section class="section section-elevated" id="pricing"><div class="container"><div class="section-heading"><div class="label">Our product ladder</div><h2>Start with a snapshot. Build toward continuous visibility.</h2><p class="section-lead">Choose the smallest useful step. Monitoring is planned and currently accepting waitlist interest.</p></div><div class="currency-switch" role="group" aria-label="Display currency"><span>Display:</span><button type="button" data-currency="KES" aria-pressed="true">KES</button><button type="button" data-currency="USD" aria-pressed="false">USD</button></div><div class="product-grid"><article class="product-card"><div class="label">Free entry</div><h3>Free Scan</h3><p class="product-price" data-kes="KES 0" data-usd="$0">KES 0</p><p>A point-in-time view of public HTTP response timing from available probes.</p><a class="btn btn-secondary" href="/scan">Run free scan</a></article><article class="product-card product-card-featured"><div class="label">One-time</div><h3>Africa Latency Audit</h3><p class="product-price" data-kes="KES 3,500 · one-time" data-usd="$XX · one-time (approval pending)">KES 3,500 · one-time</p><p>A structured report with observed timings, interpretation and prioritized next steps.</p><a class="btn btn-primary" href="/audit-checkout">View audit</a></article><article class="product-card"><div class="label">Recurring · waitlist</div><h3>Continuous Monitoring</h3><p class="product-price" data-kes="Pilot pricing to be confirmed" data-usd="$XX/month (placeholder; approval pending)">Pilot pricing to be confirmed</p><p>Planned recurring visibility and reporting. Scope and delivery are being validated.</p><a class="btn btn-secondary" href="/monitoring">Join waitlist</a></article><article class="product-card"><div class="label">Custom scope</div><h3>Custom Deep Dive</h3><p class="product-price" data-kes="From KES 25,000" data-usd="USD price pending approval">From KES 25,000</p><p>Manual scoping for broader endpoint coverage, architecture review or authorized deeper investigation.</p><a class="btn btn-secondary" href="/contact">Discuss scope</a></article></div><p class="pricing-note">USD values are placeholders and are not approved for launch. The automated audit tests public endpoints only. Private databases, internal services and third-party dependencies require separate authorization and scope. Results depend on available probes.</p></div></section>
 
-  <section class="section" id="who-its-for">
+  <section class="section"><div class="container"><div class="section-heading"><div class="label">Pilot evidence</div><h2>Case studies will be published when pilots are verified.</h2><p class="section-lead">We are preparing the first customer pilots. No case study is published here yet; future examples will use measured evidence and be shared with permission.</p></div><div class="empty-state"><h3>No published pilot case studies yet</h3><p>Want to be an early pilot customer? We can discuss a scoped public-endpoint baseline and agree what evidence can be shared.</p><a class="btn btn-secondary" href="/contact">Discuss a pilot</a></div></div></section><section class="section" id="who-its-for">
     <div class="container">
       <div class="section-heading">
         <div class="label">Who it's for</div>
@@ -200,7 +189,7 @@
         <article class="audience-card"><i data-lucide="panels-top-left" aria-hidden="true"></i><h3>Digital agencies</h3><p>Support client conversations with observed measurements and clear limitations.</p></article>
       </div>
 
-      <div class="faq-section">
+      <div class="methodology-summary"><div><div class="label">Methodology</div><h3>Measurements first, conclusions second.</h3><p>We request measurements from available probes, compare only returned results, and distinguish observations from hypotheses. A missing result is not a slow result.</p><a href="/methodology">Read the full methodology →</a></div><div class="methodology-tags"><span>Public endpoints</span><span>Point-in-time results</span><span>Availability disclosed</span></div></div><div class="faq-section">
         <div class="section-heading"><div class="label">FAQ</div><h2>Common questions.</h2></div>
         <div class="faq">
           <div class="faq-item"><button class="faq-question" type="button" aria-expanded="false"><span>Does every scan return results from all 31 countries?</span><span class="plus" aria-hidden="true">+</span></button><div class="faq-answer">No. We request measurements from up to 31 countries. Only locations with available probes return live results, and unavailable locations are excluded from performance comparisons.</div></div>
@@ -274,7 +263,7 @@
 </footer>
 
 <script defer src="/africalatency.js" data-al-key="test-site-001"></script>
-<script src="/js/main.js?v=5"></script>
+<script src="/js/main.js?v=6"></script>
 <script>
   document.querySelectorAll('.faq-question').forEach(function (b) {
     b.addEventListener('click', function () {
@@ -285,5 +274,6 @@
 
 
 </script>
+<script src="/js/product-pages.js?v=1"></script>
 </body>
 </html>
