@@ -310,6 +310,7 @@ async function saveScanHistory(domain, results, verdict, startedAt, completedAt)
     city: result.probeCity || null, asn: result.probeAsn ?? null,
     networkName: result.probeNetwork || null, tags: result.probeTags || [],
     timestamp: result.probeTimestamp || null, metrics: result.probeMetrics || null,
+    sampleStats: result.sampleStats || null,
     rawProviderPayload: result.rawProviderPayload || null,
     probeLocation: result.probeLocation || null, probeNetwork: result.probeNetwork || null,
     statusCode: result.statusCode || null, timings: result.timings || null,
