@@ -13,20 +13,37 @@ function bearerToken(req) {
   return header.startsWith('Bearer ') ? header.slice(7).trim() : '';
 }
 
+function safeRawProviderPayload(value) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
+  try {
+    const serialized = JSON.stringify(value);
+    if (serialized.length > 12000) return { truncated: true, note: 'Raw provider payload exceeded the per-result storage cap.' };
+    return JSON.parse(serialized);
+  } catch (_) { return null; }
+}
+
 function safeResults(value) {
-  if (!Array.isArray(value) || value.length > 4) return null;
+  if (!Array.isArray(value) || value.length > 31) return null;
   const metric = (value) => value !== null && value !== undefined && value !== '' && Number.isFinite(Number(value)) ? Number(value) : null;
   return value.map((item) => ({
     label: typeof item.label === 'string' ? item.label.slice(0, 80) : 'Unknown',
     available: item.available === true,
+    provider: typeof item.provider === 'string' ? item.provider.slice(0, 40) : 'unknown',
+    probeType: ['datacenter','fixed','mobile','real-user','unknown'].includes(item.probeType) ? item.probeType : 'unknown',
+    country: typeof item.country === 'string' ? item.country.slice(0, 2).toUpperCase() : null,
+    city: typeof item.city === 'string' ? item.city.slice(0, 120) : null,
+    asn: Number.isInteger(item.asn) && item.asn >= 0 ? item.asn : null,
+    networkName: typeof item.networkName === 'string' ? item.networkName.slice(0, 180) : null,
+    tags: Array.isArray(item.tags) ? item.tags.filter(v => typeof v === 'string').slice(0, 30).map(v => v.slice(0, 80)) : [],
+    timestamp: typeof item.timestamp === 'string' && Number.isFinite(Date.parse(item.timestamp)) ? new Date(item.timestamp).toISOString() : null,
+    metrics: item.metrics && typeof item.metrics === 'object' ? item.metrics : null,
+    rawProviderPayload: safeRawProviderPayload(item.rawProviderPayload),
     probeLocation: typeof item.probeLocation === 'string' ? item.probeLocation.slice(0, 120) : null,
     probeNetwork: typeof item.probeNetwork === 'string' ? item.probeNetwork.slice(0, 120) : null,
     statusCode: Number.isInteger(item.statusCode) ? item.statusCode : null,
     timings: item.timings && typeof item.timings === 'object' ? {
-      dns: metric(item.timings.dns),
-      tcp: metric(item.timings.tcp),
-      tls: metric(item.timings.tls),
-      firstByte: metric(item.timings.firstByte),
+      dns: metric(item.timings.dns), tcp: metric(item.timings.tcp),
+      tls: metric(item.timings.tls), firstByte: metric(item.timings.firstByte),
       total: metric(item.timings.total)
     } : null,
     hopCount: Number.isInteger(item.hopCount) ? item.hopCount : null,
@@ -34,12 +51,12 @@ function safeResults(value) {
     verdict: item.overall && ['GOOD', 'WARNING', 'CRITICAL', 'UNKNOWN'].includes(item.overall.label)
       ? item.overall.label : 'UNKNOWN'
   }));
-}
 
 module.exports = async function handler(req, res) {
   if (!supabaseUrl || !supabaseSecretKey) {
     return res.status(500).json({ error: 'Scan history is not configured.' });
   }
+  if (Number(req.headers['content-length'] || 0) > 600 * 1024) return res.status(413).json({ error: 'Scan history payload too large.' });
   if (!['GET', 'POST'].includes(req.method)) {
     res.setHeader('Allow', 'GET, POST');
     return res.status(405).json({ error: 'Method not allowed' });
