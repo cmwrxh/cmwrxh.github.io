@@ -1,7 +1,9 @@
 // /api/rum.js — AfricaLatency RUM beacon ingestion (Vercel serverless function)
 // Receives navigator.sendBeacon payloads from the africalatency.js snippet.
 // Auth = public site key in query string (?k=...), because sendBeacon cannot set headers.
-// Env: SUPABASE_URL, SUPABASE_SECRET_KEY (fallback: SUPABASE_SERVICE_ROLE_KEY), IPINFO_TOKEN
+// Env: SUPABASE_URL, SUPABASE_SECRET_KEY (fallback: SUPABASE_SERVICE_ROLE_KEY)
+// Privacy hotfix: visitor IPs are used only for the in-memory rate limiter;
+// they are not sent to IPinfo or persisted in ip_geo_cache.
 
 import { createClient } from '@supabase/supabase-js';
 
@@ -33,54 +35,6 @@ function rateOk(ip) {
   arr.push(now);
   hits.set(ip, arr);
   return true;
-}
-
-async function geoFor(ip) {
-  const db = supa();
-
-  const { data: cached } = await db
-    .from('ip_geo_cache')
-    .select('data')
-    .eq('ip', ip)
-    .gt(
-      'fetched_at',
-      new Date(Date.now() - 7 * 864e5).toISOString()
-    )
-    .maybeSingle();
-
-  if (cached) return cached.data;
-
-  if (!process.env.IPINFO_TOKEN) return null;
-
-  try {
-    const r = await fetch(
-      `https://ipinfo.io/${encodeURIComponent(ip)}/json?token=${process.env.IPINFO_TOKEN}`
-    );
-
-    if (!r.ok) return null;
-
-    const j = await r.json();
-
-    const mm = String(j.org || '').match(/^(AS\d+)\s*(.*)$/);
-
-    const data = {
-      country: j.country || null,
-      region: j.region || null,
-      city: j.city || null,
-      asn: mm ? mm[1] : null,
-      isp: mm && mm[2]
-        ? mm[2].trim()
-        : (j.org || null),
-    };
-
-    await db
-      .from('ip_geo_cache')
-      .upsert({ ip, data });
-
-    return data;
-  } catch {
-    return null;
-  }
 }
 
 function deviceType(ua) {
@@ -156,8 +110,6 @@ export default async function handler(req, res) {
     return res.status(204).end();
   }
 
-  const geo = await geoFor(ip);
-
   const { error } = await db
     .from('rum_events')
     .insert({
@@ -178,7 +130,6 @@ export default async function handler(req, res) {
       device_type:
         deviceType(String(req.headers['user-agent'] || '')),
 
-      ...(geo || {}),
 
       payload: body,
     });
