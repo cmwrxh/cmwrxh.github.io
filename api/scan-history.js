@@ -51,6 +51,7 @@ function safeResults(value) {
     verdict: item.overall && ['GOOD', 'WARNING', 'CRITICAL', 'UNKNOWN'].includes(item.overall.label)
       ? item.overall.label : 'UNKNOWN'
   }));
+}
 
 module.exports = async function handler(req, res) {
   if (!supabaseUrl || !supabaseSecretKey) {
