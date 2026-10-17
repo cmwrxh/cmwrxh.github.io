@@ -13,18 +13,17 @@
   var connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
   var connectionType = connection && (connection.type || connection.effectiveType) || 'unknown';
   var events = [];
-  var sent = false;
   function send(metric) {
     if (!metric || !['LCP', 'INP', 'CLS', 'TTFB'].includes(metric.name) || !Number.isFinite(metric.value) || metric.value < 0) return;
     events.push({ metric: metric.name, value: metric.value, path: path, connection_type: connectionType });
     if (events.length >= 4) flush();
   }
   function flush() {
-    if (sent || !events.length || !navigator.sendBeacon) return;
+    if (!events.length || !navigator.sendBeacon) return;
     var payload = new URLSearchParams();
     payload.set('key', key);
     payload.set('events', JSON.stringify(events.slice(0, 8)));
-    try { if (navigator.sendBeacon(endpoint, payload)) sent = true; } catch (_) {}
+    try { if (navigator.sendBeacon(endpoint, payload)) events = []; } catch (_) {}
   }
   var library = document.createElement('script');
   library.src = new URL('/api/rum-library', script.src).href;
