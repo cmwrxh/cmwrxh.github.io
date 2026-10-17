@@ -33,4 +33,14 @@ jobs:
         with:
           node-version: 22
       - run: npm install --ignore-scripts
+      - name: Syntax-check changed server modules
+        run: |
+          node --check api/run-diagnostic.js
+          node --check api/scan-history.js
+          node --check api/submit-lead.js
+          node --check api/submit-audit.js
+          node --check api/ip-lookup.js
+          node --check lib/privacy/client-ip.js
+          node --check lib/probe-providers/globalping.js
+          node --check lib/probe-providers/index.js
       - run: npm test
