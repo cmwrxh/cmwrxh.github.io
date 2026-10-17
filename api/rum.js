@@ -28,7 +28,13 @@ function browserFamily(value) {
 function safePath(value) {
   if (typeof value !== 'string') return '/';
   const pathOnly = value.split(/[?#]/, 1)[0];
-  return pathOnly.startsWith('/') && pathOnly.length <= 512 ? pathOnly : '/';
+  if (!pathOnly.startsWith('/')) return '/';
+  return pathOnly.split('/').map((part) => {
+    if (!part) return '';
+    if (part.includes('@') || /^[0-9a-f]{8}-[0-9a-f-]{27,}$/i.test(part) ||
+        /^\d{4,}$/.test(part) || /^[A-Za-z0-9_-]{32,}$/.test(part)) return ':id';
+    return part.slice(0, 80);
+  }).join('/').slice(0, 512) || '/';
 }
 function normalizeOrigin(value) {
   try {
