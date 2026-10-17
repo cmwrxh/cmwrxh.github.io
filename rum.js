@@ -5,7 +5,8 @@
   if (!script) return;
   var key = script.getAttribute('data-key') || '';
   if (!/^rum_pub_[a-f0-9]{48}$/.test(key)) return;
-  var rawRate = Number(script.getAttribute('data-sample-rate'));
+  var rateAttribute = script.getAttribute('data-sample-rate');
+  var rawRate = rateAttribute === null ? 1 : Number(rateAttribute);
   var rate = Number.isFinite(rawRate) && rawRate >= 0 && rawRate <= 1 ? rawRate : 1;
   if (rate === 0 || Math.random() > rate) return;
   var endpoint = new URL('/api/rum', script.src).href;
