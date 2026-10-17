@@ -144,6 +144,11 @@
       "source": "/internet-performance-index.html",
       "destination": "/performance-index",
       "permanent": true
+    },
+    {
+      "source": "/test-my-connection.html",
+      "destination": "/test-my-connection",
+      "permanent": true
     }
   ],
   "rewrites": [
@@ -258,6 +263,10 @@
     {
       "source": "/performance-index",
       "destination": "/internet-performance-index.html"
+    },
+    {
+      "source": "/test-my-connection",
+      "destination": "/test-my-connection.html"
     }
   ]
 }
