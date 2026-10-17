@@ -1,9 +1,16 @@
+const { createHmac } = require('node:crypto');
+const { isIP } = require('node:net');
+function privacyRateLimitHash(ip, key) {
+  const normalized = String(ip || '').trim().replace(/^::ffff:/i, '').split(',')[0].trim();
+  if (!isIP(normalized) || typeof key !== 'string' || !key) return null;
+  return 'hmac-sha256:' + createHmac('sha256', key).update(normalized).digest('hex');
+}
+
 const { createClient } = require('@supabase/supabase-js');
 
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_SECRET_KEY
-);
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseServiceKey = process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
+const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 function isValidIPv4(ip) {
   const parts = ip.split('.');
@@ -66,12 +73,16 @@ module.exports = async (req, res) => {
     req.headers['x-real-ip'] ||
     'unknown';
 
+  const ipRateHash = privacyRateLimitHash(clientIP, supabaseServiceKey);
+  if (!ipRateHash) return res.status(503).json({ error: 'Privacy-preserving rate limiting is unavailable.' });
+
   const { data: allowed, error: rateLimitError } = await supabase.rpc(
-    'check_rate_limit',
+    'check_ip_rate_limit',
     {
-      client_ip: clientIP,
-      client_endpoint: '/api/ip-lookup',
-      max_requests: 60
+      p_ip_hash: ipRateHash,
+      p_endpoint: '/api/ip-lookup',
+      p_max_requests: 60,
+      p_window_minutes: 60
     }
   );
 
