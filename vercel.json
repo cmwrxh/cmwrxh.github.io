@@ -111,11 +111,6 @@
       "permanent": true
     },
     {
-      "source": "/internet-performance-index.html",
-      "destination": "/index",
-      "permanent": true
-    },
-    {
       "source": "/tools.html",
       "destination": "/tools",
       "permanent": true
@@ -143,6 +138,11 @@
     {
       "source": "/changelog.html",
       "destination": "/changelog",
+      "permanent": true
+    },
+    {
+      "source": "/internet-performance-index.html",
+      "destination": "/performance-index",
       "permanent": true
     }
   ],
@@ -232,10 +232,6 @@
       "destination": "/monitoring.html"
     },
     {
-      "source": "/index",
-      "destination": "/internet-performance-index.html"
-    },
-    {
       "source": "/tools",
       "destination": "/tools.html"
     },
@@ -258,6 +254,10 @@
     {
       "source": "/changelog",
       "destination": "/changelog.html"
+    },
+    {
+      "source": "/performance-index",
+      "destination": "/internet-performance-index.html"
     }
   ]
 }
