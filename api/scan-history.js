@@ -37,6 +37,7 @@ function safeResults(value) {
     tags: Array.isArray(item.tags) ? item.tags.filter(v => typeof v === 'string').slice(0, 30).map(v => v.slice(0, 80)) : [],
     timestamp: typeof item.timestamp === 'string' && Number.isFinite(Date.parse(item.timestamp)) ? new Date(item.timestamp).toISOString() : null,
     metrics: item.metrics && typeof item.metrics === 'object' ? item.metrics : null,
+    sampleStats: item.sampleStats && typeof item.sampleStats === 'object' ? item.sampleStats : null,
     rawProviderPayload: safeRawProviderPayload(item.rawProviderPayload),
     probeLocation: typeof item.probeLocation === 'string' ? item.probeLocation.slice(0, 120) : null,
     probeNetwork: typeof item.probeNetwork === 'string' ? item.probeNetwork.slice(0, 120) : null,
