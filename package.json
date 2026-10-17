@@ -10,6 +10,8 @@
     "@supabase/supabase-js": "^2.57.0",
     "@vercel/functions": "^2.0.0",
     "express": "^4.21.2",
-    "puppeteer-core": "^24.0.0"
+    "maxmind": "^5.0.0",
+    "puppeteer-core": "^24.0.0",
+    "web-vitals": "^4.2.4"
   }
 }
