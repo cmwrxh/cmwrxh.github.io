@@ -107,7 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
     ['/sitespeed.html', 'Website Speed Check']
   ];
   const resourceLinks = [
-    ['/tools', 'Tools'], ['/sample-report', 'Sample Report'], ['/compare', 'Compare'], ['/index', 'Africa Internet Performance Index'],
+    ['/tools', 'Tools'], ['/sample-report', 'Sample Report'], ['/compare', 'Compare'], ['/performance-index', 'Africa Internet Performance Index'],
     ['/methodology', 'Methodology'], ['/security', 'Security'], ['/docs', 'Docs'], ['/changelog', 'Changelog'],
     ['/blog', 'Blog'], ['/cases', 'Case Studies'], ['/data-centers.html', 'Data Centers'], ['/kenya.html', 'Kenya'], ['/nigeria.html', 'Nigeria']
   ];
