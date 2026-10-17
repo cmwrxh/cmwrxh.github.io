@@ -1,40 +1,42 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <link rel="icon" type="image/svg+xml" href="/images/favicon.svg">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <title>AfricaLatency.dev — Infrastructure Performance &amp; Latency Intelligence</title>
+  <title>AfricaLatency — Infrastructure Performance &amp; Latency Intelligence</title>
   <meta name="description" content="AfricaLatency measures the real-world performance of applications, APIs and infrastructure across African networks.">
-  <meta name="theme-color" content="#0a0a0d">
+  <meta name="theme-color" content="#F7F9FC">
   <link rel="canonical" href="https://www.africalatency.dev/">
   <meta property="og:type" content="website">
-  <meta property="og:site_name" content="AfricaLatency.dev">
-  <meta property="og:title" content="AfricaLatency.dev — Infrastructure Performance &amp; Latency Intelligence">
-  <meta property="og:description" content="We measure how websites, apps and APIs perform across 31 African markets — with live probe availability clearly reported, not assumed.">
+  <meta property="og:site_name" content="AfricaLatency">
+  <meta property="og:title" content="AfricaLatency — Infrastructure Performance &amp; Latency Intelligence">
+  <meta property="og:image" content="https://africalatency.dev/images/og-image.svg">
+  <meta property="og:description" content="We request measurements from up to 31 African countries. Only locations with available probes return live results.">
   <meta property="og:url" content="https://www.africalatency.dev/">
   <meta name="twitter:card" content="summary">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/marketing.css?v=6">
-  <link rel="stylesheet" href="/css/brand.css?v=4">
+  <link rel="stylesheet" href="/css/brand.css?v=6">
+  <link rel="stylesheet" href="/css/product-pages.css?v=1">
 
   <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
   <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
   <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+<script type="application/ld+json" id="faq-schema">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Does every scan return results from all 31 countries?","acceptedAnswer":{"@type":"Answer","text":"No. Measurements are requested from up to 31 countries. Only locations with available probes return live results."}},{"@type":"Question","name":"Does the automated audit inspect private databases?","acceptedAnswer":{"@type":"Answer","text":"No. The automated audit tests public endpoints only. Private databases and third-party dependencies require a separately scoped engagement."}},{"@type":"Question","name":"Is continuous monitoring available now?","acceptedAnswer":{"@type":"Answer","text":"Continuous Monitoring is in development. Join the waitlist to hear when pilot places are available."}}]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"AfricaLatency","url":"https://africalatency.dev/","logo":"https://africalatency.dev/images/africalatency-logo-dark.svg","email":"support@africalatency.dev"}</script>
 </head>
 <body>
 
 <nav>
   <div class="nav-inner">
-    <a href="/" class="nav-brand brand-lockup" aria-label="AfricaLatency.dev">
-      <img class="brand-icon" src="/images/logo-icon-v4.png" alt="" aria-hidden="true" width="32" height="32">
-      <span class="brand-name"><span class="brand-name-white">Africa</span><span class="brand-name-green">Latency</span><span class="brand-name-white">.dev</span></span>
-    </a>
+    <a href="/" class="nav-brand brand-lockup" aria-label="AfricaLatency"><img class="brand-wordmark" src="/images/africalatency-logo-light.svg" alt="AfricaLatency" width="180" height="28"></a>
     <div class="nav-actions">
       <button id="menu-toggle" class="menu-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="site-menu"><span></span><span></span><span></span></button>
     </div>
@@ -44,7 +46,7 @@
 <div class="site-menu" id="site-menu" aria-hidden="true">
   <div class="site-menu-inner">
     <div class="menu-head">
-      <span class="label">AfricaLatency</span>
+      <img class="menu-wordmark" src="/images/africalatency-logo-dark.svg" alt="AfricaLatency" width="180" height="28">
       <button id="menu-close" class="menu-close" type="button" aria-label="Close menu">×</button>
     </div>
     <div class="menu-grid">
@@ -76,9 +78,9 @@
       <div class="legacy-menu-bottom">
         <div class="menu-label">Follow</div>
         <div class="social-icons">
-          <a href="https://www.linkedin.com/in/charles-mwaura-bb7814140/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
-          <a href="https://github.com/cmwrxh/cmwrxh.github.io" target="_blank" rel="noopener" aria-label="GitHub">⌘</a>
-          <a href="mailto:support@africalatency.dev" aria-label="Email">✉</a>
+          <a href="https://www.linkedin.com/in/charles-mwaura-bb7814140/" target="_blank" rel="noopener" aria-label="LinkedIn"><i data-lucide="linkedin" aria-hidden="true"></i></a>
+          <a href="https://github.com/cmwrxh/cmwrxh.github.io" target="_blank" rel="noopener" aria-label="GitHub"><i data-lucide="github" aria-hidden="true"></i></a>
+          <a href="mailto:support@africalatency.dev" aria-label="Email"><i data-lucide="mail" aria-hidden="true"></i></a>
         </div>
       </div>
     </div>
@@ -90,276 +92,134 @@
 </div>
 
 <main>
-
-  <!-- HERO -->
   <section class="section hero-highlight">
     <div class="container">
       <div class="hero-grid">
         <div>
-          <div class="label">Infrastructure Performance &amp; Latency Intelligence for Africa</div>
-          <h1 class="hero-title">Is your application actually fast for users in Africa?</h1>
-          <p class="hero-subtitle">AfricaLatency measures the real-world performance of your applications, APIs and infrastructure across African networks — so you know exactly where latency comes from and what to fix.</p>
-          <p class="hero-subtitle hero-subtitle-secondary">In plain terms: we test how your public website or API responds from available African network probes, then show what was measured and where deeper diagnosis may be needed.</p>
+          <div class="label">Infrastructure Performance &amp; Latency Intelligence</div>
+          <h1 class="hero-title">Know how your digital services perform across African networks.</h1>
+          <p class="hero-subtitle">Measure public websites and APIs from available African network probes, compare the results, and get clear next steps for what to investigate.</p>
           <div class="btn-group">
-            <a class="btn btn-primary" href="/scan.html">Run a free latency scan →</a>
-            <a class="btn btn-secondary" href="/audit-checkout.html">Get Full Audit · KES 3,500 →</a>
+            <a class="btn btn-primary" href="/scan.html">Run free scan <i data-lucide="arrow-right" aria-hidden="true"></i></a>
+            <a class="btn btn-secondary" href="/sample-report">See sample report</a>
           </div>
-          <p class="audit-path-note">One-time price: <strong>KES 3,500</strong>. Public-endpoint testing only. Need custom scope or a larger engagement? <a href="/audit-intake">Request a custom engagement →</a></p>
+          <p class="audit-path-note">Free public-endpoint snapshot. For a structured audit, start at KES 3,500.</p>
         </div>
         <div class="latency-collage">
-          <img src="/images/hero-team-review.jpeg" alt="Team working together on digital technology" loading="eager" decoding="async">
-          <div class="floating-stat stat-one"><strong>142 ms</strong><span>Example response</span></div>
-          <div class="floating-stat stat-two"><strong>Healthy</strong><span>Experience status</span></div>
-          <div class="floating-stat stat-three"><strong>Africa</strong><span>Regional view</span></div>
+          <img src="/images/hero-team-review.jpeg" alt="Team reviewing digital performance together" width="720" height="540" loading="eager" decoding="async">
         </div>
       </div>
     </div>
   </section>
 
-  <!-- PROCESS -->
-  <section class="section compact-band">
+  <section class="section compact-section proof-section" aria-label="Coverage evidence">
     <div class="container">
-      <div class="section-heading">
-        <div class="label">Our process</div>
-        <h2>Discover → Measure → Compare → Diagnose → Recommend → Validate</h2>
-      </div>
-      <div class="about-metrics process-cards">
-        <div class="process-card">
-          <h3>Discover → Measure</h3>
-          <p>Define the performance question and measure from relevant African locations and networks.</p>
-        </div>
-        <div class="process-card">
-          <h3>Compare → Diagnose</h3>
-          <p>Compare countries, networks and paths to identify where performance breaks down.</p>
-        </div>
-        <div class="process-card">
-          <h3>Recommend</h3>
-          <p>Turn evidence into a prioritized remediation plan focused on the changes that matter.</p>
-        </div>
-        <div class="process-card">
-          <h3>Validate</h3>
-          <p>Repeat the relevant measurements and verify what improved after remediation.</p>
-        </div>
+      <div class="proof-strip">
+        <div class="proof-strip-item"><strong>4 countries</strong><span>In the current reference dataset</span></div>
+        <div class="proof-strip-item"><strong>53 IP ranges</strong><span>Verified Kenya lookup ranges</span></div>
+        <p>Scans request measurements from up to 31 countries. Only locations with available probes return live results.</p>
       </div>
     </div>
   </section>
 
-  <!-- AFRICA IS NOT ONE NETWORK -->
   <section class="section">
-    <div class="container narrow">
-      <div class="section-heading">
-        <div class="label">How performance actually breaks down</div>
-        <h2>Africa is not one network.</h2>
-        <p class="section-lead">Performance can differ by country, ISP, routing path, cloud region, CDN footprint and local infrastructure. We request measurements from up to 31 African countries. Only locations with available probes return live results; the requested country list does not mean all 31 are currently measurable. We don't assume — we measure.</p>
-        <p class="data-centers-callout">Curious how many data centers actually serve Africa? <a href="/data-centers.html">See the current count →</a></p>
-      </div>
-      <div class="path-diagram" aria-label="Request path from user to third-party services">
-        <span>User</span><b>→</b><span>ISP</span><b>→</b><span>Network</span><b>→</b><span>Routing</span><b>→</b><span>CDN/Edge</span><b>→</b><span>Load Balancer</span><b>→</b><span>Application</span><b>→</b><span>API</span><b>→</b><span>Database</span><b>→</b><span>Third Party</span>
-      </div>
-    </div>
-  </section>
-
-  <section class="section regional-map-section">
     <div class="container">
       <div class="section-heading">
-        <div class="label">Regional performance view</div>
-        <h2>One continent. Many paths.</h2>
+        <div class="label">Why Africa isn't one network</div>
+        <h2>The same service can feel different from one network to another.</h2>
+        <p class="section-lead">Country, ISP, routing, cloud region and edge coverage can all change the path a request takes. We measure what is observable instead of assuming every location behaves the same.</p>
       </div>
-      <figure style="margin:0;overflow:hidden;border:1px solid rgba(255,255,255,.12);border-radius:18px;background:var(--bg-elevated,#0b1424);">
-        <img src="/images/Africa%20map%20latency%20image.jfif" alt="Africa map illustrating regional network latency and performance paths" loading="lazy" decoding="async" style="display:block;width:100%;height:auto;object-fit:contain;">
+      <div class="principles-grid">
+        <article class="principle"><i data-lucide="route" aria-hidden="true"></i><h3>Routing varies</h3><p>Traffic may take different paths between ISPs, exchange points and your service.</p></article>
+        <article class="principle"><i data-lucide="cloud" aria-hidden="true"></i><h3>Infrastructure varies</h3><p>Origin region, DNS answers and CDN or edge coverage affect connection and response time.</p></article>
+        <article class="principle"><i data-lucide="activity" aria-hidden="true"></i><h3>Evidence matters</h3><p>Probe availability changes. We report completed measurements separately from locations that returned no result.</p></article>
+      </div>
+      <figure class="regional-image">
+        <img src="/images/Africa%20map%20latency%20image.jfif" alt="Africa at night, illustrating the continent's varied regions and connectivity needs" width="1200" height="700" loading="lazy" decoding="async">
       </figure>
     </div>
   </section>
+
   <section class="section section-elevated">
     <div class="container">
-      <div class="feature-grid">
-        <div>
-          <div class="label">What we audit</div>
-          <h2>Six layers. One root cause.</h2>
-        </div>
-        <div class="card">
-          <ul class="clean-list">
-            <li><strong>Network</strong> — Latency, packet loss, jitter, DNS, TCP/TLS, routing</li>
-            <li><strong>Edge</strong> — CDN, caching, edge locations, cache-hit behavior</li>
-            <li><strong>Infrastructure</strong> — Cloud region, compute, load balancers, containers</li>
-            <li><strong>Application</strong> — API latency, backend processing, concurrency, errors</li>
-            <li><strong>Database</strong> — Query latency, connections, indexing, replication</li>
-            <li><strong>Third parties</strong> — Payments, identity, messaging, synchronous dependencies</li>
-          </ul>
-        </div>
+      <div class="section-heading">
+        <div class="label">How it works</div>
+        <h2>From a measurement to a practical next step.</h2>
+      </div>
+      <div class="process-cards grid">
+        <article class="process-card"><h3>Measure</h3><p>Request live HTTP measurements from available African probes.</p></article>
+        <article class="process-card"><h3>Compare</h3><p>Review returned timings by location and network where evidence is available.</p></article>
+        <article class="process-card"><h3>Diagnose</h3><p>Identify likely areas for investigation and separate observed facts from hypotheses.</p></article>
+        <article class="process-card"><h3>Fix &amp; validate</h3><p>Prioritize changes, then measure again to check whether performance improved.</p></article>
       </div>
     </div>
   </section>
 
-  <!-- WHY IT MATTERS -->
-  <section class="section">
-    <div class="container">
-      <div class="feature-grid">
-        <div>
-          <div class="label">Why performance matters</div>
-          <h2>Slow experiences create expensive uncertainty.</h2>
-        </div>
-        <div class="card">
-          <ul class="clean-list">
-            <li>Slow apps lose users — people abandon a page or a payment if it takes too long, especially on mobile networks</li>
-            <li>Most companies are guessing at the cause (is it our servers? the user's phone? their network?) — we replace guessing with evidence</li>
-            <li>It's cheaper to fix the right thing once than to keep throwing engineering time at the wrong problem</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- FLAGSHIP -->
-  <section class="section">
-    <div class="container narrow">
-      <div class="card card-accent-blue">
-        <div class="label">Flagship service</div>
-        <h2>Africa Latency Audit™</h2>
-        <p class="section-lead">Know exactly how your infrastructure performs across Africa — not a guess, a measured, prioritized, evidence-based diagnosis.</p>
-        <div class="btn-group">
-          <a class="btn btn-primary" href="/audit-checkout.html">Get Full Audit · KES 3,500 →</a>
-          <a class="btn btn-secondary" href="/audit-intake">Request a custom engagement →</a>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- PRINCIPLES -->
   <section class="section">
     <div class="container">
       <div class="section-heading">
-        <div class="label">Evidence first</div>
-        <h2>Performance problems need evidence, not assumptions.</h2>
-        <p class="section-lead">We turn confusing performance issues into practical actions your engineering team can understand, prioritize and validate.</p>
+        <div class="label">What the audit covers</div>
+        <h2>A clear public-endpoint performance baseline.</h2>
+        <p class="section-lead">The standard audit tests public websites and API endpoints. It does not claim direct access to your private infrastructure.</p>
       </div>
-      <div class="principles-grid">
-        <div class="principle"><span>01</span><h3>Measure reality</h3><p>See how users actually experience your application across relevant African networks.</p></div>
-        <div class="principle"><span>02</span><h3>Find the cause</h3><p>Separate network, routing, infrastructure, application, database and dependency effects.</p></div>
-        <div class="principle"><span>03</span><h3>Prioritize fixes</h3><p>Focus engineering effort where the evidence suggests the biggest performance impact.</p></div>
-        <div class="principle"><span>04</span><h3>Validate change</h3><p>Measure again after remediation so improvement is demonstrated rather than assumed.</p></div>
+      <div class="audit-scope-layout">
+        <ul class="clean-list audit-scope-list">
+          <li><strong>DNS</strong> — lookup timing and returned resolution evidence</li>
+          <li><strong>Connection and TLS</strong> — connection setup and handshake timing when available</li>
+          <li><strong>HTTP response</strong> — time to first byte, total response timing and status</li>
+          <li><strong>Network path</strong> — route evidence and hop information when returned</li>
+          <li><strong>Location comparison</strong> — compare only locations that returned live measurements</li>
+          <li><strong>Prioritized next steps</strong> — practical recommendations with limitations stated</li>
+        </ul>
+        <aside class="custom-scope-note"><h3>Need deeper diagnosis?</h3><p>Database internals, third-party dependencies and private application layers belong in a separately scoped Custom Deep Dive.</p><a href="/audit-intake">Discuss custom scope <i data-lucide="arrow-up-right" aria-hidden="true"></i></a></aside>
       </div>
     </div>
   </section>
 
-  <!-- TRUST / CUSTOMER FIT -->
-  <section class="section proof-section" id="trust">
+  <section class="section section-elevated" id="pricing"><div class="container"><div class="section-heading"><div class="label">Our product ladder</div><h2>Start with a snapshot. Build toward continuous visibility.</h2><p class="section-lead">Choose the smallest useful step. Monitoring is planned and currently accepting waitlist interest.</p></div><div class="currency-switch" role="group" aria-label="Display currency"><span>Display:</span><button type="button" data-currency="KES" aria-pressed="true">KES</button><button type="button" data-currency="USD" aria-pressed="false">USD</button></div><div class="product-grid"><article class="product-card"><div class="label">Free entry</div><h3>Free Scan</h3><p class="product-price" data-kes="KES 0" data-usd="$0">KES 0</p><p>A point-in-time view of public HTTP response timing from available probes.</p><a class="btn btn-secondary" href="/scan">Run free scan</a></article><article class="product-card product-card-featured"><div class="label">One-time</div><h3>Africa Latency Audit</h3><p class="product-price" data-kes="KES 3,500 · one-time" data-usd="$XX · one-time (approval pending)">KES 3,500 · one-time</p><p>A structured report with observed timings, interpretation and prioritized next steps.</p><a class="btn btn-primary" href="/audit-checkout">View audit</a></article><article class="product-card"><div class="label">Recurring · waitlist</div><h3>Continuous Monitoring</h3><p class="product-price" data-kes="Pilot pricing to be confirmed" data-usd="$XX/month (placeholder; approval pending)">Pilot pricing to be confirmed</p><p>Planned recurring visibility and reporting. Scope and delivery are being validated.</p><a class="btn btn-secondary" href="/monitoring">Join waitlist</a></article><article class="product-card"><div class="label">Custom scope</div><h3>Custom Deep Dive</h3><p class="product-price" data-kes="From KES 25,000" data-usd="USD price pending approval">From KES 25,000</p><p>Manual scoping for broader endpoint coverage, architecture review or authorized deeper investigation.</p><a class="btn btn-secondary" href="/contact">Discuss scope</a></article></div><p class="pricing-note">USD values are placeholders and are not approved for launch. The automated audit tests public endpoints only. Private databases, internal services and third-party dependencies require separate authorization and scope. Results depend on available probes.</p></div></section>
+
+  <section class="section"><div class="container"><div class="section-heading"><div class="label">Pilot evidence</div><h2>Case studies will be published when pilots are verified.</h2><p class="section-lead">We are preparing the first customer pilots. No case study is published here yet; future examples will use measured evidence and be shared with permission.</p></div><div class="empty-state"><h3>No published pilot case studies yet</h3><p>Want to be an early pilot customer? We can discuss a scoped public-endpoint baseline and agree what evidence can be shared.</p><a class="btn btn-secondary" href="/contact">Discuss a pilot</a></div></div></section><section class="section" id="who-its-for">
     <div class="container">
       <div class="section-heading">
-        <div class="label">Built for real engineering teams</div>
-        <h2>Trusted decisions start with measurable evidence.</h2>
-        <p class="section-lead">AfricaLatency is designed for teams that need to understand the experience their customers actually get across African networks. We publish observed results, not invented benchmarks or unverified customer quotes.</p>
+        <div class="label">Who it's for</div>
+        <h2>Built for teams responsible for real user experience.</h2>
       </div>
-      <div class="proof-metrics-grid">
-        <div class="proof-metric"><span class="proof-icon">◎</span><strong>Up to 31 countries</strong><span>We request measurements from up to 31 countries. Only locations with available probes return live results.</span></div>
-        <div class="proof-metric"><span class="proof-icon">⌁</span><strong>Evidence-based</strong><span>Reports distinguish observations from hypotheses</span></div>
-        <div class="proof-metric"><span class="proof-icon">↗</span><strong>Pay once</strong><span>Automated report delivery after payment confirmation</span></div>
-      </div>
-      <div class="use-case-grid">
-        <article class="use-case-card"><span class="use-case-kicker">FINTECH &amp; PAYMENTS</span><h3>Find the slow part of checkout</h3><p>Compare response timing and reachability before assuming a payment delay is caused by the gateway.</p></article>
-        <article class="use-case-card"><span class="use-case-kicker">E-COMMERCE</span><h3>Understand market-by-market experience</h3><p>Identify where DNS, connection setup or server response time deserves closer investigation.</p></article>
-        <article class="use-case-card"><span class="use-case-kicker">SAAS &amp; API TEAMS</span><h3>Prioritize the next engineering fix</h3><p>Use repeatable measurements to guide investigation across routing, edge, application and dependencies.</p></article>
-        <article class="use-case-card"><span class="use-case-kicker">DIGITAL AGENCIES</span><h3>Show clients what was observed</h3><p>Give performance conversations a concrete starting point instead of relying on a single global speed score.</p></article>
-      </div>
-      <p class="proof-transparency">Customer reviews will be published here as verified feedback is collected. We do not fabricate testimonials or attribute sample quotes to real companies.</p>
-    </div>
-  </section>
-
-  <section class="section audience-section" id="who-its-for">
-    <div class="container">
-      <div class="section-heading"><div class="label">Who this is for</div><h2>For teams serving customers across African networks.</h2><p class="section-lead">If your users are in Africa, a global speed score may not explain their actual experience.</p></div>
       <div class="audience-grid">
-        <article class="audience-card"><span class="audience-icon">↗</span><h3>Digital agencies</h3><p>Bring measurable evidence into client performance reviews and technical recommendations.</p></article>
-        <article class="audience-card"><span class="audience-icon">▤</span><h3>E-commerce</h3><p>Investigate slow storefronts, product pages and checkout dependencies across markets.</p></article>
-        <article class="audience-card"><span class="audience-icon">◇</span><h3>Fintech &amp; payments</h3><p>Separate endpoint response issues from assumptions about payment providers or user networks.</p></article>
-        <article class="audience-card"><span class="audience-icon">⌘</span><h3>SaaS &amp; API teams</h3><p>Compare public API response behavior and prioritize the next engineering investigation.</p></article>
+        <article class="audience-card"><i data-lucide="wallet-cards" aria-hidden="true"></i><h3>Fintech &amp; payments</h3><p>Investigate slow public endpoints around customer journeys without assuming the gateway is the cause.</p></article>
+        <article class="audience-card"><i data-lucide="shopping-cart" aria-hidden="true"></i><h3>E-commerce</h3><p>Compare response behavior for storefronts and APIs serving customers across multiple markets.</p></article>
+        <article class="audience-card"><i data-lucide="server" aria-hidden="true"></i><h3>SaaS &amp; API teams</h3><p>Give engineering teams regional evidence to guide the next investigation.</p></article>
+        <article class="audience-card"><i data-lucide="panels-top-left" aria-hidden="true"></i><h3>Digital agencies</h3><p>Support client conversations with observed measurements and clear limitations.</p></article>
       </div>
-    </div>
-  </section>
-  <section class="section secondary-offers-section">
-    <div class="container">
-      <div class="section-heading"><div class="label">Beyond the first audit</div><h2>Start with one clear answer. Expand when you need more.</h2><p class="section-lead">The KES 3,500 Africa Latency Audit remains the recommended starting point. These optional services are available for teams with broader needs.</p></div>
-      <div class="secondary-offers-grid">
-        <article class="secondary-offer"><span class="offer-tag">RECURRING</span><h3>Monthly Performance Monitoring</h3><p class="offer-price">KES 2,500–4,000 <span>/ month</span></p><p>Monthly re-audits and performance-drop alerts, scoped to supported monitoring capabilities.</p></article>
-        <article class="secondary-offer"><span class="offer-tag">IMPLEMENTATION</span><h3>Fix Implementation Package</h3><p class="offer-price">From KES 15,000</p><p>Hands-on help implementing agreed, prioritized performance fixes.</p></article>
-        <article class="secondary-offer"><span class="offer-tag">FOR AGENCIES</span><h3>Agency White-label Report</h3><p class="offer-price">KES 5,000–8,000</p><p>Client-ready report branding and agency delivery workflow, subject to scope confirmation.</p></article>
-        <article class="secondary-offer"><span class="offer-tag">MULTI-SITE</span><h3>Multi-site / API Pack</h3><p class="offer-price">KES 12,000 <span>/ 5 sites</span></p><p>Compare up to five public domains or API endpoints in one coordinated engagement.</p></article>
-        <article class="secondary-offer"><span class="offer-tag">ADVANCED</span><h3>Custom Deep Dive</h3><p class="offer-price">From KES 25,000</p><p>Deeper infrastructure and application-level investigation with agreed access and scope.</p></article>
-        <article class="secondary-offer"><span class="offer-tag">OPTIONAL ADD-ON</span><h3>Priority Support</h3><p class="offer-price">KES 3,000 <span>/ month</span></p><p>Priority response for agreed support requests; scope and response window confirmed before activation.</p></article>
+
+      <div class="methodology-summary"><div><div class="label">Methodology</div><h3>Measurements first, conclusions second.</h3><p>We request measurements from available probes, compare only returned results, and distinguish observations from hypotheses. A missing result is not a slow result.</p><a href="/methodology">Read the full methodology →</a></div><div class="methodology-tags"><span>Public endpoints</span><span>Point-in-time results</span><span>Availability disclosed</span></div></div><div class="faq-section">
+        <div class="section-heading"><div class="label">FAQ</div><h2>Common questions.</h2></div>
+        <div class="faq">
+          <div class="faq-item"><button class="faq-question" type="button" aria-expanded="false"><span>Does every scan return results from all 31 countries?</span><span class="plus" aria-hidden="true">+</span></button><div class="faq-answer">No. We request measurements from up to 31 countries. Only locations with available probes return live results, and unavailable locations are excluded from performance comparisons.</div></div>
+          <div class="faq-item"><button class="faq-question" type="button" aria-expanded="false"><span>Does the standard audit inspect my database?</span><span class="plus" aria-hidden="true">+</span></button><div class="faq-answer">No. The standard audit tests public endpoints. Database internals and third-party dependencies require a separately scoped Custom Deep Dive.</div></div>
+          <div class="faq-item"><button class="faq-question" type="button" aria-expanded="false"><span>Can I start without talking to anyone?</span><span class="plus" aria-hidden="true">+</span></button><div class="faq-answer">Yes. Run the free scan or purchase the Africa Latency Audit online. Custom engagements are scoped separately.</div></div>
+        </div>
       </div>
-      <p class="offer-disclaimer">Secondary offers are service packages and may require manual scoping before purchase. Monitoring alerts, white-label delivery and implementation are not included in the automated KES 3,500 audit.</p>
-      <div class="btn-group"><a class="btn btn-primary" href="/audit-checkout.html">Start with Full Audit · KES 3,500 →</a><a class="btn btn-secondary" href="/contact.html">Discuss a larger engagement</a></div>
     </div>
   </section>
 
-  <!-- FAQ -->
-  <section class="section">
+  <section class="section cta-section">
     <div class="container narrow">
-      <div class="section-heading center">
-        <div class="label">Frequently asked</div>
-        <h2>Simple answers to common questions.</h2>
-      </div>
-      <div class="faq">
-        <div class="faq-item">
-          <button class="faq-question" type="button" aria-expanded="false"><span>What does AfricaLatency help with?</span><span class="plus" aria-hidden="true">+</span></button>
-          <div class="faq-answer">We help businesses understand application, API and infrastructure performance across African networks, identify problems, prioritize fixes, and validate improvements.</div>
-        </div>
-        <div class="faq-item">
-          <button class="faq-question" type="button" aria-expanded="false"><span>Can I start without speaking to someone?</span><span class="plus" aria-hidden="true">+</span></button>
-          <div class="faq-answer">Yes. Start with the free scan for an initial view, or purchase the standardized Africa Latency Audit™ for KES 3,500 directly if you need a deeper automated assessment. Custom and larger engagements are handled separately.</div>
-        </div>
-        <div class="faq-item">
-          <button class="faq-question" type="button" aria-expanded="false"><span>Is AfricaLatency only for African businesses?</span><span class="plus" aria-hidden="true">+</span></button>
-          <div class="faq-answer">No. Africa is our focus, but the underlying performance work can support businesses serving customers anywhere.</div>
-        </div>
-      </div>
+      <div class="label">Start with evidence</div>
+      <h2>Find out what your users may be experiencing.</h2>
+      <p class="section-lead">Run a free scan first, then decide whether a full audit or custom investigation is right for your team.</p>
+      <div class="btn-group"><a class="btn btn-primary" href="/scan.html">Run free scan <i data-lucide="arrow-right" aria-hidden="true"></i></a><a class="btn btn-secondary" href="/contact.html">Talk to AfricaLatency</a></div>
     </div>
   </section>
-
-  <!-- CONTACT -->
-  <section class="section contact-gradient">
-    <div class="container">
-      <div class="section-heading">
-        <div class="label">Talk to us</div>
-        <h2>Have a performance problem you cannot explain?</h2>
-        <p class="section-lead">Tell us what is happening. We will help you work out the right next step.</p>
-      </div>
-      <form class="contact-form" onsubmit="return sendEnquiry(event)">
-        <div class="form-grid">
-          <div><label for="contact-name">Name</label><input id="contact-name" name="name" autocomplete="name" required placeholder="Your name"></div>
-          <div><label for="contact-email">Email</label><input id="contact-email" name="email" type="email" autocomplete="email" required placeholder="you@company.com"></div>
-          <div><label for="contact-phone">Phone</label><input id="contact-phone" name="phone" type="tel" autocomplete="tel" placeholder="Optional"></div>
-          <div>
-            <label for="contact-service">What do you need?</label>
-            <select id="contact-service" name="service" required>
-              <option value="">Choose one</option>
-              <option>Free performance scan</option>
-              <option>Latency audit</option>
-              <option>Infrastructure assessment</option>
-              <option>Post-remediation validation</option>
-              <option>Something else</option>
-            </select>
-          </div>
-          <div class="full"><label for="contact-message">Message</label><textarea id="contact-message" name="message" required placeholder="Tell us briefly what you are experiencing..."></textarea></div>
-        </div>
-        <div class="btn-group">
-          <button class="btn btn-primary" type="submit">Send enquiry →</button>
-          <a class="btn btn-secondary" href="mailto:support@africalatency.dev">Email support</a>
-        </div>
-      </form>
-    </div>
-  </section>
-
 </main>
 
 <footer class="homepage-footer">
   <div class="footer-inner tier4-footer-grid">
     <div class="tier4-footer-col footer-intro">
-      <div class="label">AfricaLatency.dev</div>
+      <img class="footer-wordmark" src="/images/africalatency-logo-dark.svg" alt="AfricaLatency" width="180" height="28">
       <h3>Better performance. Better digital experiences.</h3>
       <p>Helping businesses understand, improve, and monitor digital performance across Africa.</p>
       <p class="footer-address">1 Parklands Ave, Nairobi 00623, Kenya</p>
-      <p class="footer-copy">© 2026 AfricaLatency.dev</p>
+      <p class="footer-copy">© 2026 AfricaLatency</p>
     </div>
     <div class="tier4-footer-col">
       <h4>Company</h4>
@@ -405,7 +265,7 @@
 </footer>
 
 <script defer src="/africalatency.js" data-al-key="test-site-001"></script>
-<script src="/js/main.js?v=4"></script>
+<script src="/js/main.js?v=6"></script>
 <script>
   document.querySelectorAll('.faq-question').forEach(function (b) {
     b.addEventListener('click', function () {
@@ -414,18 +274,8 @@
     });
   });
 
-  window.sendEnquiry = function (e) {
-    e.preventDefault();
-    var n  = document.getElementById('contact-name').value.trim(),
-        em = document.getElementById('contact-email').value.trim(),
-        ph = document.getElementById('contact-phone').value.trim(),
-        s  = document.getElementById('contact-service').value,
-        m  = document.getElementById('contact-message').value.trim();
-    var subject = encodeURIComponent('AfricaLatency enquiry — ' + s);
-    var body = encodeURIComponent('Name: ' + n + '\nEmail: ' + em + '\nPhone: ' + ph + '\nNeed: ' + s + '\n\n' + m);
-    window.location.href = 'mailto:support@africalatency.dev?subject=' + subject + '&body=' + body;
-    return false;
-  };
+
 </script>
+<script src="/js/product-pages.js?v=1"></script>
 </body>
 </html>

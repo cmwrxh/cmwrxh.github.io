@@ -1,14 +1,16 @@
 // Shared site interactions
 
 document.addEventListener('DOMContentLoaded', () => {
-  const brandStyles = document.createElement('link');
-  brandStyles.rel = 'stylesheet';
-  brandStyles.href = '/css/brand.css';
-  document.head.appendChild(brandStyles);
+  if (!document.querySelector('link[href*="/css/brand.css"]')) {
+    const brandStyles = document.createElement('link');
+    brandStyles.rel = 'stylesheet';
+    brandStyles.href = '/css/brand.css?v=5';
+    document.head.appendChild(brandStyles);
+  }
 
   const menuStyle = document.createElement('style');
   menuStyle.textContent = `
-    .site-menu { position: fixed !important; inset: 0 !important; z-index: 99999 !important; display: flex !important; opacity: 0 !important; visibility: hidden !important; pointer-events: none !important; background: #050609 !important; transition: opacity .2s ease, visibility .2s ease !important; }
+    .site-menu { position: fixed !important; inset: 0 !important; z-index: 99999 !important; display: flex !important; opacity: 0 !important; visibility: hidden !important; pointer-events: none !important; background: #102A43 !important; transition: opacity .2s ease, visibility .2s ease !important; }
     .site-menu.open { display: flex !important; opacity: 1 !important; visibility: visible !important; pointer-events: auto !important; }
     .site-menu-inner { position: absolute !important; inset: 0 !important; display: flex !important; flex-direction: column !important; max-width: 100% !important; }
     .menu-grid { flex: 1 !important; display: flex !important; flex-direction: column !important; justify-content: center !important; align-items: center !important; gap: 8px !important; min-height: 0 !important; overflow-y: auto !important; }
@@ -93,31 +95,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.querySelectorAll('.nav-brand').forEach((brand) => {
     brand.classList.add('brand-lockup');
-    brand.setAttribute('aria-label', 'AfricaLatency.dev');
-    brand.innerHTML = `
-      <img class="brand-icon" src="/images/logo-icon-v4.png" alt="" aria-hidden="true">
-      <span class="brand-name"><span class="brand-name-white">Africa</span><span class="brand-name-green">Latency</span><span class="brand-name-white">.dev</span></span>`;
+    brand.setAttribute('aria-label', 'AfricaLatency');
+    brand.innerHTML = '<img class="brand-wordmark" src="/images/africalatency-logo-light.svg" alt="AfricaLatency" width="180" height="28">';
   });
 
   const serviceLinks = [
-    ['/audit-checkout.html', 'Africa Latency Audit'],
-    ['/scan.html', 'Free Scan'],
-    ['/sitespeed.html', 'Website Speed Check'],
-    ['/methodology.html', 'Methodology']
+    ['/scan', 'Free Scan'],
+    ['/audit-checkout', 'Africa Latency Audit'],
+    ['/monitoring', 'Continuous Monitoring'],
+    ['/services', 'Custom Deep Dive / Enterprise'],
+    ['/sitespeed.html', 'Website Speed Check']
   ];
   const resourceLinks = [
-    ['/data-centers.html', 'Data centers'],
-    ['/kenya.html', 'Kenya'],
-    ['/nigeria.html', 'Nigeria'],
-    ['/cases.html', 'Cases'],
-    ['/blog.html', 'Blog'],
-    ['/help-centre.html', 'Help centre']
+    ['/tools', 'Tools'], ['/sample-report', 'Sample Report'], ['/compare', 'Compare'], ['/performance-index', 'Africa Internet Performance Index'],
+    ['/methodology', 'Methodology'], ['/security', 'Security'], ['/docs', 'Docs'], ['/changelog', 'Changelog'],
+    ['/blog', 'Blog'], ['/cases', 'Case Studies'], ['/data-centers.html', 'Data Centers'], ['/kenya.html', 'Kenya'], ['/nigeria.html', 'Nigeria']
   ];
-  const topLinks = [
-    ['/about.html', 'About'],
-    ['/contact.html', 'Contact'],
-    ['/login.html', 'Login']
-  ];
+  const topLinks = [ ['/about', 'About'], ['/contact', 'Contact'], ['/login.html', 'Login'] ];
 
   const nav = document.querySelector('nav');
   if (nav) {
@@ -163,10 +157,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const socialIcons = existingSocialIcons ? existingSocialIcons.cloneNode(true) : null;
     grid.innerHTML = `
       <div class="menu-column">
-        <div class="menu-group"><a href="/services.html" class="menu-group-title">Services</a><div class="menu-subitems"><a href="/audit-checkout.html">Africa Latency Audit</a><a href="/scan.html">Free Scan</a><a href="/sitespeed.html">Website Speed Check</a><a href="/methodology.html">Methodology</a></div></div>
-        <a href="/about.html" class="menu-item">About</a>
-        <div class="menu-group"><div class="menu-label menu-group-title">Resources</div><div class="menu-subitems"><a href="/data-centers.html">Data centers</a><a href="/kenya.html">Kenya</a><a href="/nigeria.html">Nigeria</a><a href="/blog.html">Blog</a><a href="/cases.html">Cases</a><a href="/help-centre.html">Help centre</a></div></div>
-        <a href="/contact.html" class="menu-item">Contact</a><a href="/login.html" class="menu-item">Login</a>
+        <div class="menu-group"><a href="/services" class="menu-group-title">Services</a><div class="menu-subitems"><a href="/scan">Free Scan</a><a href="/audit-checkout">Africa Latency Audit</a><a href="/monitoring">Continuous Monitoring</a><a href="/services">Custom Deep Dive</a></div></div>
+        <a href="/about" class="menu-item">About</a>
+        <div class="menu-group"><div class="menu-label menu-group-title">Resources</div><div class="menu-subitems"><a href="/tools">Tools</a><a href="/sample-report">Sample report</a><a href="/compare">Compare</a><a href="/performance-index">Performance Index</a><a href="/methodology">Methodology</a><a href="/security">Security</a><a href="/docs">Docs</a><a href="/changelog">Changelog</a><a href="/blog">Blog</a><a href="/cases">Case studies</a></div></div>
+        <a href="/contact" class="menu-item">Contact</a><a href="/login.html" class="menu-item">Login</a>
       </div><div class="legacy-menu-bottom"><div class="menu-label">Follow</div></div>`;
     if (socialIcons) grid.querySelector('.legacy-menu-bottom').appendChild(socialIcons);
   }
@@ -178,7 +172,7 @@ document.addEventListener('DOMContentLoaded', () => {
       toggle.setAttribute('aria-label', 'Open menu'); toggle.setAttribute('aria-expanded', 'false'); toggle.setAttribute('aria-controls', 'site-menu'); toggle.innerHTML = '<span></span><span></span><span></span>';
       const actions = nav.querySelector('.nav-actions') || document.createElement('div'); actions.className = 'nav-actions'; actions.appendChild(toggle); nav.querySelector('.nav-inner').appendChild(actions);
       const menu = document.createElement('div'); menu.className = 'site-menu legacy-menu'; menu.id = 'site-menu'; menu.setAttribute('aria-hidden', 'true');
-      menu.innerHTML = `<div class="site-menu-inner"><div class="menu-head"><span class="label">AfricaLatency</span><button id="menu-close" class="menu-close" type="button" aria-label="Close menu">×</button></div><div class="menu-grid legacy-menu-grid"><div class="menu-column legacy-menu-links"></div><div class="legacy-menu-bottom"><div class="menu-label">Follow</div><div class="social-icons"><a href="https://www.linkedin.com/in/charles-mwaura-bb7814140/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a><a href="https://github.com/cmwrxh/cmwrxh.github.io" target="_blank" rel="noopener" aria-label="GitHub">⌘</a><a href="mailto:support@africalatency.dev" aria-label="Email">✉</a></div></div></div><div class="menu-footer"><a class="btn btn-primary" href="/scan.html">Run a free scan</a><a class="btn btn-secondary" href="/contact.html">Contact</a></div></div>`;
+      menu.innerHTML = `<div class="site-menu-inner"><div class="menu-head"><img class="menu-wordmark" src="/images/africalatency-logo-dark.svg" alt="AfricaLatency" width="180" height="28"><button id="menu-close" class="menu-close" type="button" aria-label="Close menu">×</button></div><div class="menu-grid legacy-menu-grid"><div class="menu-column legacy-menu-links"></div><div class="legacy-menu-bottom"><div class="menu-label">Follow</div><div class="social-icons"><a href="https://www.linkedin.com/in/charles-mwaura-bb7814140/" target="_blank" rel="noopener" aria-label="LinkedIn"><i data-lucide="linkedin" aria-hidden="true"></i></a><a href="https://github.com/cmwrxh/cmwrxh.github.io" target="_blank" rel="noopener" aria-label="GitHub"><i data-lucide="github" aria-hidden="true"></i></a><a href="mailto:support@africalatency.dev" aria-label="Email"><i data-lucide="mail" aria-hidden="true"></i></a></div></div></div><div class="menu-footer"><a class="btn btn-primary" href="/scan.html">Run a free scan</a><a class="btn btn-secondary" href="/contact.html">Contact</a></div></div>`;
       const linkContainer = menu.querySelector('.legacy-menu-links');
       [...serviceLinks, ...topLinks, ...resourceLinks].forEach(([href, text]) => { const a = document.createElement('a'); a.href = href; a.textContent = text; linkContainer.appendChild(a); });
       document.body.appendChild(menu); buildMobileMenu(menu); wireMenu(menu, toggle);
@@ -203,53 +197,11 @@ document.addEventListener('DOMContentLoaded', () => {
     footer.classList.add('homepage-footer');
     footer.innerHTML = `
       <div class="footer-inner tier4-footer-grid">
-        <div class="tier4-footer-col footer-intro">
-          <div class="label">AfricaLatency.dev</div>
-          <h3>Better performance. Better digital experiences.</h3>
-          <p>Helping businesses understand, improve, and monitor digital performance across Africa.</p>
-          <p class="footer-address">1 Parklands Ave, Nairobi 00623, Kenya</p>
-          <p class="footer-copy">© 2026 AfricaLatency.dev</p>
-        </div>
-        <div class="tier4-footer-col">
-          <h4>Company</h4>
-          <div class="tier4-footer-links">
-            <a href="/about.html">About</a>
-            <a href="/contact.html">Contact</a>
-            <a href="/cases.html">Cases</a>
-          </div>
-        </div>
-        <div class="tier4-footer-col">
-          <h4>Legal</h4>
-          <div class="tier4-footer-links">
-            <a href="/terms-of-service.html">Terms of Service</a>
-            <a href="/privacy-policy.html">Privacy Policy</a>
-            <a href="/service-level-agreement.html">Service Level Agreement</a>
-            <a href="/acceptable-use-policy.html">Acceptable Use</a>
-            <a href="/refund-policy.html">Refund Policy</a>
-          </div>
-        </div>
-        <div class="tier4-footer-col">
-          <h4>Resources</h4>
-          <div class="tier4-footer-links">
-            <a href="/audit-checkout.html">Africa Latency Audit</a>
-            <a href="/scan.html">Free Scan</a>
-            <a href="/sitespeed.html">Website Speed Check</a>
-            <a href="/methodology.html">Methodology</a>
-            <a href="/data-centers.html">Data centers</a>
-            <a href="/kenya.html">Kenya</a>
-            <a href="/nigeria.html">Nigeria</a>
-            <a href="/blog.html">Blog</a>
-            <a href="/help-centre.html">Help centre</a>
-          </div>
-        </div>
-        <div class="tier4-footer-col">
-          <h4>Connect</h4>
-          <div class="tier4-footer-links">
-            <a href="mailto:support@africalatency.dev">support@africalatency.dev</a>
-            <a href="https://github.com/cmwrxh/cmwrxh.github.io" target="_blank" rel="noopener">GitHub</a>
-          </div>
-          <p style="margin-top:16px;color:rgba(255,255,255,.55);font-size:.72rem">Africa Latency Ltd<br>1 Parklands Ave, Nairobi 00623, Kenya</p>
-        </div>
+        <div class="tier4-footer-col footer-intro"><img class="footer-wordmark" src="/images/africalatency-logo-dark.svg" alt="AfricaLatency" width="180" height="28"><h3>Better performance. Better digital experiences.</h3><p>Infrastructure performance and latency intelligence for African networks.</p><p class="footer-copy">© 2026 AfricaLatency</p></div>
+        <div class="tier4-footer-col"><h4>Products</h4><div class="tier4-footer-links"><a href="/scan">Free Scan</a><a href="/audit-checkout">Africa Latency Audit</a><a href="/monitoring">Continuous Monitoring</a><a href="/services">Custom Deep Dive</a></div></div>
+        <div class="tier4-footer-col"><h4>Company</h4><div class="tier4-footer-links"><a href="/about">About</a><a href="/contact">Contact</a><a href="/cases">Case studies</a><a href="/security">Security</a></div></div>
+        <div class="tier4-footer-col"><h4>Resources</h4><div class="tier4-footer-links"><a href="/tools">Tools</a><a href="/sample-report">Sample report</a><a href="/compare">Compare</a><a href="/performance-index">Index</a><a href="/methodology">Methodology</a><a href="/docs">Docs</a><a href="/changelog">Changelog</a><a href="/blog">Blog</a></div></div>
+        <div class="tier4-footer-col"><h4>Contact &amp; legal</h4><div class="tier4-footer-links"><a href="mailto:support@africalatency.dev">support@africalatency.dev</a><a href="/terms-of-service.html">Terms of Service</a><a href="/privacy-policy.html">Privacy Policy</a><a href="/refund-policy.html">Refund Policy</a></div><p style="margin-top:16px;color:rgba(255,255,255,.72);font-size:.72rem">Africa Latency Ltd<br>1 Parklands Ave, Nairobi 00623, Kenya</p></div>
       </div>`;
   }
 
@@ -271,7 +223,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  if (document.querySelector('.hero-highlight') && !document.querySelector('script[src="/js/dogfood-geo.js"]')) { const geoDogfood = document.createElement('script'); geoDogfood.src = '/js/dogfood-geo.js'; document.head.appendChild(geoDogfood); }
   if (!document.querySelector('script[src="/js/compliance.js"]')) { const compliance = document.createElement('script'); compliance.defer = true; compliance.src = '/js/compliance.js'; document.head.appendChild(compliance); }
-  if (!document.querySelector('script[src="/js/ux.js"]')) { const ux = document.createElement('script'); ux.defer = true; ux.src = '/js/ux.js'; document.head.appendChild(ux); }
+  if (!document.querySelector('script[src^="/js/ux.js"]')) { const ux = document.createElement('script'); ux.defer = true; ux.src = '/js/ux.js?v=2'; document.head.appendChild(ux); }
 });

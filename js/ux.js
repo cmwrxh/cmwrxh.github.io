@@ -98,7 +98,7 @@
       .ux-field-error { outline: 2px solid var(--error, #ff6b6b) !important; outline-offset: 1px; }
       .mobile-sticky-cta { display: none; }
       @media (max-width: 899px) {
-        .mobile-sticky-cta { position: fixed; left: 12px; right: 12px; bottom: calc(12px + env(safe-area-inset-bottom)); z-index: 9998; display: flex; min-height: 48px; align-items: center; justify-content: center; padding: 10px 16px; border-radius: 8px; text-decoration: none; font: 700 .9rem/1.2 Inter, sans-serif; box-shadow: 0 8px 28px rgba(0,0,0,.28); }
+        .mobile-sticky-cta { position: fixed; left: 12px; right: 12px; bottom: calc(12px + env(safe-area-inset-bottom)); z-index: 9998; display: flex; min-height: 48px; align-items: center; justify-content: center; padding: 10px 16px; border: 1px solid #1769AA; border-radius: 8px; background: #1769AA; color: #fff; text-decoration: none; font: 600 .9rem/1.2 Inter, sans-serif; box-shadow: none; }
         body { padding-bottom: 76px; }
         .site-menu.open ~ .mobile-sticky-cta { display: none; }
       }
@@ -117,10 +117,10 @@
   }
 
   function loadTier4() {
-    if (document.querySelector('script[src="/js/tier4.js"]')) return;
+    if (document.querySelector('script[src^="/js/tier4.js"]')) return;
     const script = document.createElement('script');
     script.defer = true;
-    script.src = '/js/tier4.js';
+    script.src = '/js/tier4.js?v=2';
     script.onload = addCountryFooterLinks;
     document.head.appendChild(script);
   }
