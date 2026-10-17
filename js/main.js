@@ -100,24 +100,18 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   const serviceLinks = [
-    ['/audit-checkout.html', 'Africa Latency Audit'],
-    ['/scan.html', 'Free Scan'],
-    ['/sitespeed.html', 'Website Speed Check'],
-    ['/methodology.html', 'Methodology']
+    ['/scan', 'Free Scan'],
+    ['/audit-checkout', 'Africa Latency Audit'],
+    ['/monitoring', 'Continuous Monitoring'],
+    ['/services', 'Custom Deep Dive / Enterprise'],
+    ['/sitespeed.html', 'Website Speed Check']
   ];
   const resourceLinks = [
-    ['/data-centers.html', 'Data Centers'],
-    ['/kenya.html', 'Kenya'],
-    ['/nigeria.html', 'Nigeria'],
-    ['/cases.html', 'Cases'],
-    ['/blog.html', 'Blog'],
-    ['/help-centre.html', 'Help Centre']
+    ['/tools', 'Tools'], ['/sample-report', 'Sample Report'], ['/compare', 'Compare'], ['/index', 'Africa Internet Performance Index'],
+    ['/methodology', 'Methodology'], ['/security', 'Security'], ['/docs', 'Docs'], ['/changelog', 'Changelog'],
+    ['/blog', 'Blog'], ['/cases', 'Case Studies'], ['/data-centers.html', 'Data Centers'], ['/kenya.html', 'Kenya'], ['/nigeria.html', 'Nigeria']
   ];
-  const topLinks = [
-    ['/about.html', 'About'],
-    ['/contact.html', 'Contact'],
-    ['/login.html', 'Login']
-  ];
+  const topLinks = [ ['/about', 'About'], ['/contact', 'Contact'], ['/login.html', 'Login'] ];
 
   const nav = document.querySelector('nav');
   if (nav) {
@@ -163,10 +157,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const socialIcons = existingSocialIcons ? existingSocialIcons.cloneNode(true) : null;
     grid.innerHTML = `
       <div class="menu-column">
-        <div class="menu-group"><a href="/services.html" class="menu-group-title">Services</a><div class="menu-subitems"><a href="/audit-checkout.html">Africa Latency Audit</a><a href="/scan.html">Free Scan</a><a href="/sitespeed.html">Website Speed Check</a><a href="/methodology.html">Methodology</a></div></div>
-        <a href="/about.html" class="menu-item">About</a>
-        <div class="menu-group"><div class="menu-label menu-group-title">Resources</div><div class="menu-subitems"><a href="/data-centers.html">Data Centers</a><a href="/kenya.html">Kenya</a><a href="/nigeria.html">Nigeria</a><a href="/blog.html">Blog</a><a href="/cases.html">Cases</a><a href="/help-centre.html">Help Centre</a></div></div>
-        <a href="/contact.html" class="menu-item">Contact</a><a href="/login.html" class="menu-item">Login</a>
+        <div class="menu-group"><a href="/services" class="menu-group-title">Services</a><div class="menu-subitems"><a href="/scan">Free Scan</a><a href="/audit-checkout">Africa Latency Audit</a><a href="/monitoring">Continuous Monitoring</a><a href="/services">Custom Deep Dive</a></div></div>
+        <a href="/about" class="menu-item">About</a>
+        <div class="menu-group"><div class="menu-label menu-group-title">Resources</div><div class="menu-subitems"><a href="/tools">Tools</a><a href="/sample-report">Sample report</a><a href="/compare">Compare</a><a href="/index">Performance Index</a><a href="/methodology">Methodology</a><a href="/security">Security</a><a href="/docs">Docs</a><a href="/changelog">Changelog</a><a href="/blog">Blog</a><a href="/cases">Case studies</a></div></div>
+        <a href="/contact" class="menu-item">Contact</a><a href="/login.html" class="menu-item">Login</a>
       </div><div class="legacy-menu-bottom"><div class="menu-label">Follow</div></div>`;
     if (socialIcons) grid.querySelector('.legacy-menu-bottom').appendChild(socialIcons);
   }
@@ -203,53 +197,11 @@ document.addEventListener('DOMContentLoaded', () => {
     footer.classList.add('homepage-footer');
     footer.innerHTML = `
       <div class="footer-inner tier4-footer-grid">
-        <div class="tier4-footer-col footer-intro">
-          <img class="footer-wordmark" src="/images/africalatency-logo-dark.svg" alt="AfricaLatency" width="180" height="28">
-          <h3>Better performance. Better digital experiences.</h3>
-          <p>Helping businesses understand, improve, and monitor digital performance across Africa.</p>
-          <p class="footer-address">1 Parklands Ave, Nairobi 00623, Kenya</p>
-          <p class="footer-copy">© 2026 AfricaLatency</p>
-        </div>
-        <div class="tier4-footer-col">
-          <h4>Company</h4>
-          <div class="tier4-footer-links">
-            <a href="/about.html">About</a>
-            <a href="/contact.html">Contact</a>
-            <a href="/cases.html">Cases</a>
-          </div>
-        </div>
-        <div class="tier4-footer-col">
-          <h4>Legal</h4>
-          <div class="tier4-footer-links">
-            <a href="/terms-of-service.html">Terms of Service</a>
-            <a href="/privacy-policy.html">Privacy Policy</a>
-            <a href="/service-level-agreement.html">Service Level Agreement</a>
-            <a href="/acceptable-use-policy.html">Acceptable Use</a>
-            <a href="/refund-policy.html">Refund Policy</a>
-          </div>
-        </div>
-        <div class="tier4-footer-col">
-          <h4>Resources</h4>
-          <div class="tier4-footer-links">
-            <a href="/audit-checkout.html">Africa Latency Audit</a>
-            <a href="/scan.html">Free Scan</a>
-            <a href="/sitespeed.html">Website Speed Check</a>
-            <a href="/methodology.html">Methodology</a>
-            <a href="/data-centers.html">Data Centers</a>
-            <a href="/kenya.html">Kenya</a>
-            <a href="/nigeria.html">Nigeria</a>
-            <a href="/blog.html">Blog</a>
-            <a href="/help-centre.html">Help Centre</a>
-          </div>
-        </div>
-        <div class="tier4-footer-col">
-          <h4>Connect</h4>
-          <div class="tier4-footer-links">
-            <a href="mailto:support@africalatency.dev">support@africalatency.dev</a>
-            <a href="https://github.com/cmwrxh/cmwrxh.github.io" target="_blank" rel="noopener">GitHub</a>
-          </div>
-          <p style="margin-top:16px;color:rgba(255,255,255,.55);font-size:.72rem">Africa Latency Ltd<br>1 Parklands Ave, Nairobi 00623, Kenya</p>
-        </div>
+        <div class="tier4-footer-col footer-intro"><img class="footer-wordmark" src="/images/africalatency-logo-dark.svg" alt="AfricaLatency" width="180" height="28"><h3>Better performance. Better digital experiences.</h3><p>Infrastructure performance and latency intelligence for African networks.</p><p class="footer-copy">© 2026 AfricaLatency</p></div>
+        <div class="tier4-footer-col"><h4>Products</h4><div class="tier4-footer-links"><a href="/scan">Free Scan</a><a href="/audit-checkout">Africa Latency Audit</a><a href="/monitoring">Continuous Monitoring</a><a href="/services">Custom Deep Dive</a></div></div>
+        <div class="tier4-footer-col"><h4>Company</h4><div class="tier4-footer-links"><a href="/about">About</a><a href="/contact">Contact</a><a href="/cases">Case studies</a><a href="/security">Security</a></div></div>
+        <div class="tier4-footer-col"><h4>Resources</h4><div class="tier4-footer-links"><a href="/tools">Tools</a><a href="/sample-report">Sample report</a><a href="/compare">Compare</a><a href="/index">Index</a><a href="/methodology">Methodology</a><a href="/docs">Docs</a><a href="/changelog">Changelog</a><a href="/blog">Blog</a></div></div>
+        <div class="tier4-footer-col"><h4>Contact &amp; legal</h4><div class="tier4-footer-links"><a href="mailto:support@africalatency.dev">support@africalatency.dev</a><a href="/terms-of-service.html">Terms of Service</a><a href="/privacy-policy.html">Privacy Policy</a><a href="/refund-policy.html">Refund Policy</a></div><p style="margin-top:16px;color:rgba(255,255,255,.72);font-size:.72rem">Africa Latency Ltd<br>1 Parklands Ave, Nairobi 00623, Kenya</p></div>
       </div>`;
   }
 
