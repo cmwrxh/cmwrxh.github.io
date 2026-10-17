@@ -1,0 +1,46 @@
+name: RUM Beta checks
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'api/rum*.js'
+      - 'api/run-diagnostic.js'
+      - 'api/scan-history.js'
+      - 'api/submit-lead.js'
+      - 'api/submit-audit.js'
+      - 'api/ip-lookup.js'
+      - 'lib/probe-providers/**'
+      - 'lib/privacy/**'
+      - 'js/scan.js'
+      - 'privacy-policy.html'
+      - 'sql/privacy-probe-provider-migration.sql'
+      - 'docs/probe-provider-layer.md'
+      - 'tests/probe-provider.test.js'
+      - 'tests/privacy-ip.test.js'
+      - 'lib/rum-beta-client.js'
+      - 'rum.js'
+      - 'rum-dashboard.html'
+      - 'sql/rum-beta-mvp.sql'
+      - 'tests/rum-beta.test.js'
+      - 'package.json'
+      - '.github/workflows/rum-beta-checks.yml'
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install --ignore-scripts
+      - name: Syntax-check changed server modules
+        run: |
+          node --check api/run-diagnostic.js
+          node --check api/scan-history.js
+          node --check api/submit-lead.js
+          node --check api/submit-audit.js
+          node --check api/ip-lookup.js
+          node --check lib/privacy/client-ip.js
+          node --check lib/probe-providers/globalping.js
+          node --check lib/probe-providers/index.js
+      - run: npm test

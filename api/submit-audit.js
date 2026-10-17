@@ -1,3 +1,11 @@
+const { createHmac } = require('node:crypto');
+const { isIP } = require('node:net');
+function privacyRateLimitHash(ip, key) {
+  const normalized = String(ip || '').trim().replace(/^::ffff:/i, '').split(',')[0].trim();
+  if (!isIP(normalized) || typeof key !== 'string' || !key) return null;
+  return 'hmac-sha256:' + createHmac('sha256', key).update(normalized).digest('hex');
+}
+
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -50,10 +58,12 @@ module.exports = async function handler(req, res) {
   const userIp = forwardedFor ? String(forwardedFor).split(',')[0].trim() : (req.headers['x-real-ip'] || req.socket?.remoteAddress || 'Unknown');
   const base = supabaseUrl.replace(/\/$/, '');
 
+  const ipRateHash = privacyRateLimitHash(userIp, supabaseServiceKey);
+  if (!ipRateHash) return res.status(503).json({ success: false, error: 'Privacy-preserving rate limiting is unavailable.' });
   const rateLimitResponse = await fetch(`${base}/rest/v1/rpc/check_ip_rate_limit`, {
     method: 'POST',
     headers: { apikey: supabaseServiceKey, Authorization: `Bearer ${supabaseServiceKey}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ p_ip_address: userIp, p_endpoint: 'submit-audit', p_max_requests: 5, p_window_minutes: 60 })
+    body: JSON.stringify({ p_ip_hash: ipRateHash, p_endpoint: 'submit-audit', p_max_requests: 5, p_window_minutes: 60 })
   });
   if (!rateLimitResponse.ok || (await rateLimitResponse.text()) !== 'true') return res.status(429).json({ success: false, error: 'Too many audit requests. Please try again later.' });
 
@@ -68,7 +78,7 @@ module.exports = async function handler(req, res) {
     name, company_name: company, contact_email: email, role, package_name: packageName || null,
     markets, domain, endpoints: endpoints || null, architecture: architecture || null,
     symptoms: symptoms || null, timeline: timeline || null, authorization: authorization || null,
-    user_ip: userIp, status: 'new'
+    status: 'new'
   };
 
   const dbResponse = await fetch(`${base}/rest/v1/audit_requests`, {

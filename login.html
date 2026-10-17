@@ -221,7 +221,8 @@
       const email = document.getElementById('email').value.trim();
       const { error } = await supabaseClient.auth.signInWithPassword({ email, password: password.value });
       if (error) { setStatus(error.message, true); submit.disabled = false; return; }
-      window.location.href = '/dashboard';
+      const next = new URLSearchParams(window.location.search).get('next');
+      window.location.href = next && next.startsWith('/') && !next.startsWith('//') ? next : '/dashboard';
     } catch (err) {
       setStatus('Could not reach the sign-in service. Check your connection and try again.', true);
       submit.disabled = false;

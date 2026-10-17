@@ -1,3 +1,11 @@
+const { createHmac } = require('node:crypto');
+const { isIP } = require('node:net');
+function privacyRateLimitHash(ip, key) {
+  const normalized = String(ip || '').trim().replace(/^::ffff:/i, '').split(',')[0].trim();
+  if (!isIP(normalized) || typeof key !== 'string' || !key) return null;
+  return 'hmac-sha256:' + createHmac('sha256', key).update(normalized).digest('hex');
+}
+
 module.exports = async function handler(req, res) {
   // --------------------------------------------------
   // CORS
@@ -240,6 +248,13 @@ module.exports = async function handler(req, res) {
     }
 
     // --------------------------------------------------
+    const ipRateHash = privacyRateLimitHash(userIp, supabaseServiceKey);
+    if (!ipRateHash) {
+      res.statusCode = 503;
+      res.setHeader('Content-Type', 'application/json');
+      return res.end(JSON.stringify({ success: false, error: 'Privacy-preserving rate limiting is unavailable.' }));
+    }
+
     // IP RATE LIMIT PROTECTION
     // --------------------------------------------------
     //
@@ -260,7 +275,7 @@ module.exports = async function handler(req, res) {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          p_ip_address: userIp,
+          p_ip_hash: ipRateHash,
           p_endpoint: 'submit-lead',
           p_max_requests: 5,
           p_window_minutes: 60
@@ -430,7 +445,6 @@ module.exports = async function handler(req, res) {
     const leadPayload = {
       company_name: company || null,
       contact_email: email,
-      user_ip: userIp,
       current_latency_ms: latency,
       target_latency_ms: targetLatency,
       monthly_requests: monthlyRequests,
@@ -583,8 +597,6 @@ module.exports = async function handler(req, res) {
                 </p>
 
                 <p>
-                  <strong>IP address:</strong>
-                  ${safeIp}
                 </p>
 
                 <hr>
