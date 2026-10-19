@@ -273,7 +273,7 @@ app.post('/internal/jobs', async (req, res) => {
   }
   if (user) {
     const { data: allowed, error } = await supabase.rpc('check_scan_rate_limit', {
-      p_ip_hash: hashIp(clientIp(req)), p_endpoint: `user:${user.id}`, p_max_requests: 20, p_window_minutes: 60
+      p_ip_hash: hashIp('user:' + user.id), p_endpoint: 'user', p_max_requests: 20, p_window_minutes: 60
     });
     if (error) return res.status(503).json({ error: 'Rate-limit service is temporarily unavailable.' });
     if (allowed !== true) return res.status(429).json({ error: 'Scan limit reached. Please try again later.' });
