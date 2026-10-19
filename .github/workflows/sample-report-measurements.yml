@@ -37,8 +37,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - name: Check out this branch
+      - name: Check out measurement script branch
         uses: actions/checkout@v4
+        with:
+          ref: research/sample-report-measurements
 
       - name: Run one bounded measurement
         env:
