@@ -7,10 +7,15 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
 
 app.set('trust proxy', true); // behind Coolify's Traefik proxy
-app.use(express.json());
+app.use(express.json({
+  verify: (req, res, buf) => {
+    // Paystack signatures must be checked against the exact request bytes.
+    if (req.path === '/api/paystack-webhook') req.rawBody = Buffer.from(buf);
+  },
+}));
 app.use(express.urlencoded({ extended: true }));
 
-// 1. Auto-mount api/*.js as /api/<name> (Vercel-style handlers)
+// Mount each api/*.js module as /api/<name>.
 const apiDir = path.join(__dirname, 'api');
 if (fs.existsSync(apiDir)) {
   for (const file of fs.readdirSync(apiDir)) {
@@ -34,14 +39,13 @@ if (fs.existsSync(apiDir)) {
   }
 }
 
-// 2. Block server-side files and folders from being served as static
+// Prevent server-side files and folders from being served as static assets.
 const blockedFiles = [
   '/server.js',
   '/package.json',
   '/package-lock.json',
   '/Dockerfile',
   '/.dockerignore',
-  '/vercel.json',
 ];
 const blockedDirs = ['/api/', '/lib/', '/templates/', '/sql/', '/supabase/', '/node_modules/'];
 app.use((req, res, next) => {
@@ -52,10 +56,59 @@ app.use((req, res, next) => {
   next();
 });
 
-// 3. Static site, with extension fallback (/contact -> contact.html)
+// Preserve canonical clean URLs and legacy HTML redirects.
+// .html URLs redirect to their canonical paths; clean paths serve the matching HTML file.
+const cleanPageRoutes = {
+  '/about': 'about.html',
+  '/services': 'services.html',
+  '/scan': 'scan.html',
+  '/methodology': 'methodology.html',
+  '/work': 'work.html',
+  '/contact': 'contact.html',
+  '/audit-intake': 'audit-intake.html',
+  '/audit-report': 'audit-report.html',
+  '/labs': 'labs.html',
+  '/login': 'login.html',
+  '/dashboard': 'dashboard.html',
+  '/cases': 'cases.html',
+  '/terms-of-service': 'terms-of-service.html',
+  '/service-level-agreement': 'service-level-agreement.html',
+  '/acceptable-use-policy': 'acceptable-use-policy.html',
+  '/refund-policy': 'refund-policy.html',
+  '/help-centre': 'help-centre.html',
+  '/blog': 'blog.html',
+  '/audit-checkout': 'audit-checkout.html',
+  '/sitespeed-checkout': 'sitespeed-checkout.html',
+  '/monitoring': 'monitoring.html',
+  '/tools': 'tools.html',
+  '/sample-report': 'sample-report.html',
+  '/compare': 'compare.html',
+  '/security': 'security.html',
+  '/docs': 'docs.html',
+  '/changelog': 'changelog.html',
+  '/performance-index': 'internet-performance-index.html',
+};
+
+const canonicalHtmlRoutes = Object.fromEntries(
+  Object.keys(cleanPageRoutes).map((route) => [`${route}.html`, route])
+);
+
+app.use((req, res, next) => {
+  const destination = canonicalHtmlRoutes[req.path];
+  if (!destination) return next();
+  const query = req.url.includes('?') ? req.url.slice(req.url.indexOf('?')) : '';
+  return res.redirect(308, `${destination}${query}`);
+});
+
+app.use((req, res, next) => {
+  const file = cleanPageRoutes[req.path];
+  if (!file) return next();
+  return res.sendFile(path.join(__dirname, file));
+});
+
+// Static site; extension fallback allows other pages such as /rum-dashboard.
 app.use(express.static(__dirname, { extensions: ['html'] }));
 
-// 4. Anything else -> your 404 page
 app.use((req, res) => {
   res.status(404).sendFile(path.join(__dirname, '404.html'));
 });
