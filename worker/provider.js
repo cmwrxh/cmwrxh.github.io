@@ -1,6 +1,6 @@
 import lighthouse from 'lighthouse';
 import chromeLauncher from 'chrome-launcher';
-import { summarizeRun } from './scoring.js';
+import { summarizeRun, overallGrade } from './scoring.js';
 import { validateRedirectChain } from './url-safety.js';
 
 const timeoutMs = Math.max(60000, Math.min(90000, Number(process.env.LIGHTHOUSE_TIMEOUT_MS) || 75000));
@@ -35,9 +35,38 @@ async function runLighthouseOnce(url, device) {
   }
 }
 
+async function runPageSpeed(url, device) {
+  const key = process.env.PAGESPEED_API_KEY;
+  if (!key) throw new Error('PageSpeed fallback is not configured.');
+  const params = new URLSearchParams({ url, strategy: device === 'desktop' ? 'DESKTOP' : 'MOBILE', key });
+  for (const category of ['PERFORMANCE','ACCESSIBILITY','BEST_PRACTICES','SEO']) params.append('category', category);
+  const response = await fetch('https://www.googleapis.com/pagespeedonline/v5/runPagespeed?' + params.toString(), { signal: AbortSignal.timeout(timeoutMs) });
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok || !payload.lighthouseResult) throw new Error('PageSpeed Insights provider failed.');
+  const result = summarizeRun(payload.lighthouseResult);
+  result.provider = 'PageSpeed Insights';
+  return result;
+}
+async function runOne(url, device) {
+  const provider = String(process.env.LIGHTHOUSE_PROVIDER || 'local').toLowerCase();
+  if (provider === 'pagespeed') return runPageSpeed(url, device);
+  try {
+    const result = await runLighthouseOnce(url, device);
+    result.provider = 'local Lighthouse';
+    return result;
+  } catch (error) {
+    if (process.env.PAGESPEED_API_KEY) {
+      const fallback = await runPageSpeed(url, device);
+      fallback.providerFallback = 'PageSpeed Insights';
+      return fallback;
+    }
+    throw error;
+  }
+}
+
 export async function runLighthouse(url, device, runCount = 1) {
   const runs = [];
-  for (let i = 0; i < runCount; i += 1) runs.push(await runLighthouseOnce(url, device));
+  for (let i = 0; i < runCount; i += 1) runs.push(await runOne(url, device));
   if (runs.length === 1) return runs[0];
   const medianMetric = key => {
     const values = runs.map(r => r.metrics?.[key]).filter(Number.isFinite).sort((a,b) => a-b);
@@ -51,7 +80,6 @@ export async function runLighthouse(url, device, runCount = 1) {
     const mid = Math.floor(values.length / 2);
     return Math.round(values.length % 2 ? values[mid] : (values[mid - 1] + values[mid]) / 2);
   };
-  const { overallGrade } = await import('./scoring.js');
   const merged = {
     ...runs[0],
     performance: medianScore('performance'),
@@ -63,7 +91,8 @@ export async function runLighthouse(url, device, runCount = 1) {
     },
     metrics: Object.fromEntries(['lcpMs','fcpMs','tbtMs','cls','speedIndexMs','ttfbMs'].map(key => [key, medianMetric(key)])),
     runCount: runs.length,
-    aggregation: 'median of 3 Lighthouse runs'
+    aggregation: 'median of 3 Lighthouse runs',
+    provider: runs.every(r => r.provider === runs[0].provider) ? runs[0].provider : 'mixed providers'
   };
   merged.grade = overallGrade(merged.performance, merged.structure);
   merged.runVariability = {
