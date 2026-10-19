@@ -72,9 +72,11 @@ export function summarizeRun(lhr) {
   const screenshot = audits['final-screenshot']?.details?.data || null;
   const requests = audits['network-requests']?.details?.items || [];
   const pageWeight = requests.reduce((sum, r) => sum + (Number(r.transferSize) || 0), 0);
+  const ua = String(lhr.userAgent || lhr.environment?.networkUserAgent || '');
+  const chromeVersion = (ua.match(/Chrome\\/([0-9.]+)/) || [])[1] || null;
   return {
     lighthouseVersion: lhr.lighthouseVersion || null,
-    chromeVersion: lhr.environment?.networkUserAgent || lhr.userAgent || null,
+    chromeVersion,
     testedUrl: lhr.finalDisplayedUrl || lhr.requestedUrl || null,
     performance, structure, grade: overallGrade(performance, structure),
     scores: { accessibility: score('accessibility'), bestPractices: score('best-practices'), seo: score('seo') },
