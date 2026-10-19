@@ -262,10 +262,10 @@ app.post('/internal/jobs', async (req, res) => {
   let normalized;
   try { normalized = await validatePublicUrl(url); } catch (e) { return res.status(400).json({ error: e.message }); }
   const user = await userFromRequest(req);
-  if (!user && turnstileVerified !== true) return res.status(403).json({ error: 'Bot verification is required.' });
   const apiKey = String(req.headers['x-api-key'] || '');
   const keyRecord = apiKey ? await validateApiKey(apiKey) : null;
   if (apiKey && !keyRecord) return res.status(401).json({ error: 'Invalid API key.' });
+  if (!user && !keyRecord && turnstileVerified !== true) return res.status(403).json({ error: 'Bot verification is required.' });
   const ipHash = user || keyRecord ? null : hashIp(clientIp(req));
   const endpoint = keyRecord ? 'api-lighthouse' : 'scan';
   if (keyRecord) {
