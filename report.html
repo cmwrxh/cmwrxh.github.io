@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#102a43">
+<title>Website Performance Report | AfricaLatency</title><meta name="description" content="A website performance report combining Lighthouse and African network latency.">
+<meta property="og:site_name" content="AfricaLatency"><meta property="og:title" content="Website Performance Report | AfricaLatency"><meta property="og:description" content="Lighthouse page quality, measured alongside latency from African networks."><meta property="og:image" content="https://africalatency.dev/images/scan-report-og.svg">
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg"><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/marketing.css"><link rel="stylesheet" href="/css/brand.css?v=6"><link rel="stylesheet" href="/css/scan-v2.css?v=1">
+<style>
+.report-v2{max-width:1100px;margin:0 auto;padding:42px 20px 80px}.report-top{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap}.report-top h1{font-size:clamp(1.7rem,4vw,2.7rem);overflow-wrap:anywhere}.report-meta{color:var(--text-muted);font-size:.85rem}.report-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:24px 0}.report-card{border:1px solid #dbe4ee;border-radius:14px;padding:18px;background:var(--bg-elevated,#fff);min-width:0}.report-card .value{font-size:clamp(1.5rem,3.4vw,2.5rem);font-weight:750;letter-spacing:-.04em}.report-card .label{font-size:.8rem;color:var(--text-muted);margin-bottom:10px}.report-card p{margin:8px 0 0;font-size:.82rem;color:var(--text-muted)}.report-grade{display:flex;align-items:center;gap:16px}.grade-disc{width:72px;height:72px;flex:0 0 72px;border:4px solid #2c67c7;border-radius:50%;display:grid;place-items:center;font-size:2rem;font-weight:800;color:#1746a2}.report-section{margin-top:28px}.report-section h2{font-size:1.45rem;margin-bottom:12px}.report-table-wrap{overflow-x:auto;border:1px solid #dbe4ee;border-radius:12px}.report-table{border-collapse:collapse;width:100%;font-size:.9rem;min-width:480px}.report-table th,.report-table td{text-align:left;padding:12px 14px;border-bottom:1px solid #e6edf4}.report-table th{background:#f3f7fb;color:#41556b;font-weight:700}.report-table tr:last-child td{border-bottom:0}.report-preview{width:100%;max-height:420px;object-fit:contain;object-position:top;border:1px solid #dbe4ee;border-radius:12px;background:#f3f6fa}.locked-shell{position:relative;overflow:hidden;border-radius:14px;margin-top:14px}.locked-content{filter:blur(5px);opacity:.68;user-select:none;pointer-events:none}.locked-overlay{position:absolute;inset:0;display:grid;place-items:center;padding:20px;background:rgba(245,248,252,.84);backdrop-filter:blur(2px);text-align:center}.locked-card{max-width:460px;background:#fff;border:1px solid #dbe4ee;border-radius:16px;padding:26px;box-shadow:0 18px 55px #102a4314}.locked-card h3{font-size:1.35rem;margin:0 0 10px}.locked-card p{color:#526275;line-height:1.6}.report-actions{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0}.report-button{display:inline-flex;align-items:center;justify-content:center;border-radius:9px;padding:11px 15px;background:#1746a2;color:white;text-decoration:none;font-weight:700}.report-button.secondary{background:#eaf2ff;color:#1746a2}.report-status{padding:24px;border:1px solid #dbe4ee;border-radius:12px;background:#f6f9fc;color:#41556b}.report-cta{margin-top:28px;padding:20px;border-radius:14px;background:#eff5fc;border:1px solid #dbe4ee}.report-cta p{color:#526275;line-height:1.6}@media(max-width:700px){.report-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.report-grid .report-card:first-child{grid-column:1/-1}.report-card{padding:14px}.report-v2{padding-top:30px}.locked-overlay{position:absolute;inset:0;background:rgba(245,248,252,.84)}.locked-content{max-height:210px;overflow:hidden}}
+@media print{nav,footer,.report-actions,.report-cta,.locked-overlay{display:none!important}.report-v2{max-width:none;padding:0}.locked-content{filter:none;opacity:1}.report-card{break-inside:avoid}.report-table-wrap{overflow:visible}.report-table{min-width:0;font-size:9pt}}\n</style>
+</head>
+<body>
+<nav><div class="nav-inner"><a href="/" class="nav-brand brand-lockup" aria-label="AfricaLatency"><img class="brand-wordmark" src="/images/africalatency-logo-light.svg" alt="AfricaLatency" width="180" height="28"></a><ul class="nav-links"><li><a href="/scan">Run a scan</a></li><li><a href="/how-we-score">How we score</a></li><li><a href="/login">Log in</a></li></ul></div></nav>
+<main class="report-v2">
+<div id="report-status" class="report-status">Loading report…</div>
+<div id="report-content" hidden>
+<div class="report-top"><div><div class="scan-eyebrow">AfricaLatency performance report</div><h1>Latest Performance Report for: <span id="report-url"></span></h1><p class="report-meta" id="report-date"></p></div><div class="report-actions"><button id="share-report" class="report-button secondary" type="button">Copy share link</button><a class="report-button" href="/scan">Run another scan</a></div></div>
+<div class="scan-info">
+<div class="scan-info-card"><span>Test location(s)</span><strong id="report-location">African Globalping probes · availability varies</strong></div>
+<div class="scan-info-card"><span>Using</span><strong id="report-browser">Chrome and Lighthouse version information unavailable</strong></div>
+</div>
+<img id="report-preview" class="report-preview" alt="Screenshot of the website tested" hidden style="margin-top:18px">
+<div class="report-grid" id="free-summary"></div>
+<section class="report-section"><h2>African network latency</h2><p class="scan-note">Point-in-time ping RTT from available Globalping probes. These measurements are separate from Lighthouse and are not a full ISP-wide average.</p><div class="report-table-wrap"><table class="report-table"><thead><tr><th>Country</th><th>Probe</th><th>Ping RTT</th><th>Status</th></tr></thead><tbody id="africa-table"></tbody></table></div><p class="scan-note" id="africa-summary"></p></section>
+<section class="report-section"><h2>Full audit report</h2><div id="full-report-shell" class="locked-shell"><div id="full-report-content" class="locked-content"><div class="report-grid"><div class="report-card"><div class="label">Accessibility</div><div class="value">--</div></div><div class="report-card"><div class="label">Best Practices</div><div class="value">--</div></div><div class="report-card"><div class="label">SEO</div><div class="value">--</div></div></div><div class="report-card"><h3>Opportunities and diagnostics</h3><p>Prioritized recommendations, resource details and audit diagnostics appear here.</p></div></div><div id="locked-overlay" class="locked-overlay"><div class="locked-card"><h3>Unlock the full report</h3><p>Log in or sign up to unlock the full audit list, resource waterfall, recommendations, PDF export and saved report history. See how your site performs in Nairobi, Lagos, Johannesburg, Cairo and more.</p><div class="report-actions" style="justify-content:center"><a id="report-login" class="report-button secondary" href="/login">Log in</a><a id="report-signup" class="report-button" href="/signup">Create a FREE account</a></div></div></div></div><div id="unlocked-report" hidden></div></section>
+<div class="report-cta"><strong>Need help acting on the results?</strong><p>Africa Latency Audit · KES 3,500 (about USD 27) · Custom Deep Dive / Enterprise from KES 25,000 · Website Speed Check USD 19.</p><a class="report-button secondary" href="/services">Explore performance services</a></div>
+</div>
+</main>
+<footer><div class="footer-inner"><div class="footer-left"><img class="footer-wordmark" src="/images/africalatency-logo-dark.svg" alt="AfricaLatency" width="180" height="28"><span>© 2026 AfricaLatency</span></div><div class="footer-links"><a href="/privacy-policy">Privacy</a><a href="/contact">Contact</a></div></div></footer>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(async()=>{
+const status=document.getElementById('report-status'),content=document.getElementById('report-content'),id=new URLSearchParams(location.search).get('id');
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt=(v,unit='ms')=>v===null||v===undefined||!Number.isFinite(Number(v))?'Unavailable':(unit==='score'?Math.round(Number(v))+'%':unit==='cls'?Number(v).toFixed(3):Math.round(Number(v))+' ms');
+const setStatus=t=>{status.hidden=false;status.textContent=t};
+if(!id||!/^[a-f0-9-]{36}$/i.test(id)){setStatus('This report link is invalid. Run a new scan to get a report.');return;}
+const loginPath='/login?next='+encodeURIComponent('/report.html?id='+id),signupPath='/signup?next='+encodeURIComponent('/report.html?id='+id);
+document.getElementById('report-login').href=loginPath;document.getElementById('report-signup').href=signupPath;
+document.getElementById('share-report').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(location.href);document.getElementById('share-report').textContent='Link copied';}catch{window.prompt('Copy this report link',location.href);}});
+let client=null,token='';
+try{client=window.supabase.createClient('https://uzihwtxffklisczqvurf.supabase.co','sb_publishable_dGaR1jgofny7tGVWh0TK2w_haSVNyWv');const session=await client.auth.getSession();token=session.data?.session?.access_token||'';}catch(_){}
+try{
+const response=await fetch('/api/scan/'+encodeURIComponent(id),{headers:token?{Authorization:'Bearer '+token}:{}});
+const data=await response.json().catch(()=>({}));
+if(!response.ok)throw new Error(data.error||'Unable to load this report.');
+if(data.status!=='completed'&&data.status!=='failed'){setStatus('This scan is still running. Refresh this page in a moment to see its progress. Current stage: '+(data.stage||'queued')+'.');return;}
+if(data.status==='failed'){setStatus(data.error||'The scan could not be completed. No scores were invented.');return;}
+status.hidden=true;content.hidden=false;
+document.getElementById('report-url').textContent=data.url||'Website';
+document.getElementById('report-date').textContent='Report generated '+(data.completedAt?new Date(data.completedAt).toLocaleString():'at an unknown time')+' · '+(data.device==='desktop'?'Desktop':'Mobile · simulated slow 4G');
+document.getElementById('report-location').textContent='Lighthouse tested from: '+(data.testedFrom||'Cloud worker')+' · African probe availability varies';
+document.getElementById('report-browser').textContent='Chrome '+(data.chromeVersion||'version unavailable')+' · Lighthouse '+(data.lighthouseVersion||'version unavailable');
+if(data.screenshotUrl&&/^https:\/\//i.test(data.screenshotUrl)){const img=document.getElementById('report-preview');img.src=data.screenshotUrl;img.hidden=false;}
+const s=data.summary||{},m=s.metrics||{};
+const grade=s.grade||'—';
+const cards=[
+['Overall grade',grade,'Weighted composite: 70% Performance + 30% Structure'],
+['Performance',fmt(s.performance,'score'),'Lighthouse Performance score'],
+['Structure',fmt(s.structure,'score'),'AfricaLatency composite score'],
+['LCP',fmt(m.lcpMs),'Largest Contentful Paint'],
+['TBT',fmt(m.tbtMs),'Total Blocking Time'],
+['CLS',fmt(m.cls,'cls'),'Cumulative Layout Shift'],
+['FCP',fmt(m.fcpMs),'First Contentful Paint'],
+['TTFB',fmt(m.ttfbMs),'Server response time audit']
+];
+document.getElementById('free-summary').innerHTML=cards.map((c,i)=>'<div class="report-card">'+(i===0?'<div class="report-grade"><div class="grade-disc">'+esc(c[1])+'</div><div><div class="label">'+esc(c[0])+'</div><p>'+esc(c[2])+'</p></div></div>':'<div class="label">'+esc(c[0])+'</div><div class="value">'+esc(c[1])+'</div><p>'+esc(c[2])+'</p>')+'</div>').join('');
+const rows=Array.isArray(data.africaLatency)?data.africaLatency:[];
+document.getElementById('africa-table').innerHTML=rows.map(r=>'<tr><td>'+esc(r.country)+'</td><td>'+esc(r.probe||'—')+'</td><td>'+(r.status==='measured'?esc(fmt(r.rttMs)):'Unavailable')+'</td><td>'+esc(r.status==='measured'?'Measured':'Unavailable')+'</td></tr>').join('')||'<tr><td colspan="4">No completed African probe results were returned.</td></tr>';
+const am=data.africaLatencySummary;
+document.getElementById('africa-summary').textContent=am?(am.medianRttMs===null?'No country returned a completed ping result.':('Median observed RTT: '+am.medianRttMs+' ms across '+am.measuredCountries+' of '+am.requestedCountries+' requested countries.')):'Country summary unavailable.';
+if(data.fullReport){
+document.getElementById('locked-overlay').hidden=true;document.getElementById('full-report-content').hidden=true;
+const f=data.fullReport, scores=f.scores||{}, metrics=f.metrics||{}, opp=f.opportunities||[];
+document.getElementById('unlocked-report').hidden=false;
+document.getElementById('unlocked-report').innerHTML='<div class="report-actions"><button id="print-report" type="button" class="report-button">Print / Save as PDF</button></div><div class="report-grid">'+[['Accessibility',scores.accessibility],['Best Practices',scores.bestPractices],['SEO',scores.seo]].map(x=>'<div class="report-card"><div class="label">'+esc(x[0])+'</div><div class="value">'+esc(fmt(x[1],'score'))+'</div></div>').join('')+'</div><div class="report-card"><h3>Additional metrics</h3><p>Speed Index: '+esc(fmt(metrics.speedIndexMs))+' · Requests: '+esc(f.requestCount??'Unavailable')+' · Page weight: '+esc(f.pageWeightBytes?Math.round(f.pageWeightBytes/1024)+' KB':'Unavailable')+'</p><h3 style="margin-top:20px">Top opportunities</h3>'+(opp.length?'<ul>'+opp.map(o=>'<li><strong>'+esc(o.title)+'</strong><p>'+esc(o.description)+'</p></li>').join('')+'</ul>':'<p>No scored opportunities were returned.</p>')+'<h3 style="margin-top:20px">Full audit list</h3><div class="report-table-wrap"><table class="report-table"><thead><tr><th>Audit</th><th>Score</th><th>Finding</th></tr></thead><tbody>'+((f.auditList||[]).map(a=>'<tr><td>'+esc(a.title)+'</td><td>'+esc(a.score==null?'—':a.score+'%')+'</td><td>'+esc(a.displayValue||a.description||a.scoreDisplayMode||'—')+'</td></tr>').join('')||'<tr><td colspan="3">Audit details unavailable.</td></tr>')+'</tbody></table></div><h3 style="margin-top:20px">Resource waterfall data</h3><div class="report-table-wrap"><table class="report-table"><thead><tr><th>Resource</th><th>Type</th><th>Status</th><th>Transferred</th></tr></thead><tbody>'+((f.resourceDetails||[]).map(r=>'<tr><td>'+esc(r.url||'—')+'</td><td>'+esc(r.resourceType||'—')+'</td><td>'+esc(r.statusCode??'—')+'</td><td>'+esc(Math.round((Number(r.transferSize)||0)/1024)+' KB')+'</td></tr>').join('')||'<tr><td colspan="4">Resource details unavailable.</td></tr>')+'</tbody></table></div><p>Tested from: '+esc(f.testedFrom||'Cloud worker')+' · '+esc(f.provider||'Lighthouse provider not specified')+' · '+esc(f.aggregation||'Single Lighthouse run')+'</p></div>';
+document.getElementById('print-report').addEventListener('click',()=>window.print());
+}
+}catch(e){setStatus(e.message||'Unable to load the report.');}
+})();
+</script>
+</body></html>

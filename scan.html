@@ -1,140 +1,59 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#102a43">
+  <title>Free Website Performance Scan | AfricaLatency</title>
+  <meta name="description" content="Test Lighthouse page quality and measure response times from available African network probes.">
+  <link rel="canonical" href="https://africalatency.dev/scan">
+  <meta property="og:site_name" content="AfricaLatency"><meta property="og:title" content="Free Website Performance Scan | AfricaLatency"><meta property="og:description" content="Lighthouse page quality, measured alongside latency from African networks."><meta property="og:image" content="https://africalatency.dev/images/scan-report-og.svg">
   <link rel="icon" type="image/svg+xml" href="/images/favicon.svg">
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Africa Latency Scanner — AfricaLatency</title>
-  <meta name="description" content="Request live measurements from up to 31 African countries. Only locations with available probes return live results.">
-  <link rel="canonical" href="https://africalatency.dev/scan"><meta property="og:site_name" content="AfricaLatency"><meta property="og:title" content="Free Latency Scan | AfricaLatency"><meta property="og:description" content="Request live measurements from available African network probes."><meta property="og:image" content="https://africalatency.dev/images/og-image.svg">
-  <link rel="stylesheet" href="/css/style.css">
-  <link rel="stylesheet" href="/css/marketing.css">
-  <link rel="stylesheet" href="/css/brand.css?v=6"><link rel="stylesheet" href="/css/product-pages.css?v=1">
-<link rel="icon" type="image/x-icon" href="/images/favicon.ico">
-<link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
-<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png"></head>
+  <link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/marketing.css"><link rel="stylesheet" href="/css/brand.css?v=6"><link rel="stylesheet" href="/css/scan-v2.css?v=1">
+</head>
 <body>
-<nav>
-  <div class="nav-inner">
-    <a href="index.html" class="nav-brand brand-lockup" aria-label="AfricaLatency"><img class="brand-wordmark" src="/images/africalatency-logo-light.svg" alt="AfricaLatency" width="180" height="28"></a>
-    <ul class="nav-links">
-      <li><a href="services.html">Services</a></li>
-      <li><a href="scan.html" class="active">Scan</a></li>
-      <li><a href="methodology.html">Methodology</a></li>
-      <li><a href="work.html">Work</a></li>
-      <li><a href="about.html">About</a></li>
-      <li><a href="contact.html">Contact</a></li>
-    </ul>
-  </div>
-</nav>
-
-<main>
-  <section class="section" style="padding-top: 6rem;">
-    <div class="container" style="max-width: 980px;">
-      <div class="label">AfricaLatency Scanner · requests from up to 31 countries</div>
-      <h1>Is your application actually fast across Africa?</h1>
-      <p class="subtitle">
-        Enter a public domain. We request measurements from up to 31 countries. Only locations with available probes return live results. The 31-country list describes where we request measurements, not a promise that all countries have a working probe. Available and unavailable locations are reported separately; unavailable locations are never counted as measured results.
-      </p>
-
-      <form id="scan-form" style="margin: 2rem 0;">
-        <div style="display:flex; gap:1rem; flex-wrap:wrap; align-items:flex-start;">
-          <div style="flex:1; min-width:260px;">
-            <input type="text" id="scan-domain" class="form-input" placeholder="api.yourcompany.com" autocomplete="off" inputmode="url" aria-label="Domain to scan">
-            <div class="calc-error" id="err-domain" role="alert"></div>
-          </div>
-          <button type="submit" class="btn btn-primary" id="scan-btn" style="white-space:nowrap;">Run Free Scan →</button>
-        </div>
-      </form>
-      <section class="nairobi-probe-card" aria-labelledby="nairobi-probe-title">
-        <div class="nairobi-probe-copy"><h2 id="nairobi-probe-title">Measure now from Nairobi</h2><p>Run one live HTTP measurement of AfricaLatency from an available Nairobi probe. This is a point-in-time result, not a regional average.</p></div>
-        <button id="nairobi-probe-button" type="button">Measure now</button>
-        <div id="nairobi-probe-status" class="nairobi-probe-status" aria-live="polite">Not measured yet.</div>
-      </section>
-
-      <div class="scan-availability-note" role="note" style="margin:1rem 0;padding:1rem 1.1rem;border:1px solid var(--border);border-radius:8px;background:var(--bg-elevated);color:var(--text-muted);font-size:.85rem;line-height:1.65;"><strong style="color:var(--text);">Probe availability</strong><br>Available = a completed live HTTP measurement was returned. Unavailable = no completed live result was returned for that location during this scan. Unavailable locations are not treated as slow or healthy and are excluded from the performance comparison.</div>
-      <div id="scan-status" style="display:none;" aria-live="polite"></div>
-      <div id="scan-output" style="display:none;"></div>
-
-      <div class="scan-upgrade-panel"><div class="label">Go beyond the snapshot</div><h2>Know what to fix, not just what is slow.</h2><p>The free scan gives you a point-in-time view of available HTTP timings and route evidence. The full audit turns those observations into a structured report with location comparisons, diagnostic interpretation and prioritized next steps.</p><ul><li>Clear breakdown of observed DNS, TLS, TTFB and total response time</li><li>Market-by-market comparison for the probes that returned results</li><li>Evidence-led recommendations and limitations stated explicitly</li><li>Automated PDF delivery after secure checkout</li></ul><div class="btn-group"><a class="btn btn-primary" href="/audit-checkout.html">Get Full Audit · KES 3,500 →</a><a class="btn btn-secondary" href="/methodology.html">Read the methodology</a></div><p class="scan-privacy-note">We test public endpoints only. Never submit credentials, private URLs or sensitive internal hostnames.</p></div>
-
-      <div style="margin-top:3rem; padding:1.5rem; border:1px solid var(--border); border-radius:8px; background:var(--bg-elevated);">
-        <h3 style="font-size:1rem; margin-bottom:1rem; color:var(--text-muted);">What this free scan checks</h3>
-        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:1rem; font-size:.85rem; color:var(--text-muted);">
-          <div><svg class="inline-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg> HTTP response timing</div>
-          <div><svg class="inline-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg> Time to first byte</div>
-          <div><svg class="inline-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg> DNS / connection timing when returned</div>
-          <div><svg class="inline-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg> TLS timing when returned</div>
-          <div><svg class="inline-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg> Network path / hop count</div>
-          <div><svg class="inline-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg> Probe location and network</div>
-        </div>
+<nav><div class="nav-inner">
+  <a href="/" class="nav-brand brand-lockup" aria-label="AfricaLatency"><img class="brand-wordmark" src="/images/africalatency-logo-light.svg" alt="AfricaLatency" width="180" height="28"></a>
+  <ul class="nav-links"><li><a href="/services">Services</a></li><li><a href="/scan" class="active">Scan</a></li><li><a href="/how-we-score">How we score</a></li><li><a href="/methodology">Methodology</a></li><li><a href="/login?next=%2Fscan">Log in</a></li></ul>
+</div></nav>
+<main class="scan-v2">
+  <div class="scan-eyebrow">Free website performance report</div>
+  <h1>How does your website perform for visitors in Africa?</h1>
+  <p class="scan-lead">Get a Lighthouse report alongside live latency measurements from available African network probes. Start with a URL. No account required for the free summary.</p>
+  <form id="scan-form-v2" class="scan-form" novalidate>
+    <label for="scan-url"><strong>Website URL</strong></label>
+    <div class="scan-url-row" style="margin-top:8px">
+      <input id="scan-url" name="url" type="url" inputmode="url" autocomplete="url" placeholder="https://yourwebsite.com" aria-describedby="scan-note scan-error" required>
+      <button class="scan-run" id="scan-run" type="submit">Run free scan</button>
+    </div>
+    <div class="scan-device-row">
+      <span>Test profile</span>
+      <div class="scan-device-toggle" role="group" aria-label="Device profile">
+        <button type="button" data-device="mobile" aria-pressed="true">Mobile · slow 4G</button>
+        <button type="button" data-device="desktop" aria-pressed="false">Desktop</button>
       </div>
-
-      <div style="margin-top:1rem; color:var(--text-muted); font-size:.78rem; line-height:1.7;">
-        <strong>Important:</strong> this is a live diagnostic snapshot, not a full performance audit. Probe availability and network conditions can change between scans. We do not invent missing measurements.
-      </div>
+    </div>
+    <div id="scan-turnstile" class="scan-turnstile" hidden></div>
+    <p id="scan-note" class="scan-note">Only scan public websites you have permission to test. Mobile is the default and uses Lighthouse's simulated mobile throttling.</p>
+    <div id="scan-error" class="scan-error" role="alert"></div>
+  </form>
+  <section id="scan-work" class="scan-work" aria-live="polite">
+    <div class="scan-progress-head"><h2>Your scan is in progress</h2><span id="scan-queue-count" class="scan-progress-count"></span></div>
+    <div class="scan-segments" aria-hidden="true"><span data-scan-segment></span><span data-scan-segment></span><span data-scan-segment></span><span data-scan-segment></span><span data-scan-segment></span></div>
+    <h3 id="scan-stage" class="scan-stage">Adding job to queue...</h3>
+    <p id="scan-stage-copy" class="scan-stage-copy">Securing a place in the scan queue.</p>
+    <div id="scan-preview" class="scan-preview"><div class="scan-sweep" aria-hidden="true"></div><div class="scan-preview-placeholder">A preview of the page being tested will appear here.</div></div>
+    <p class="scan-tips"><strong>Did you know?</strong> <span id="scan-tip"></span></p>
+    <div class="scan-info">
+      <div class="scan-info-card"><span>Test location(s)</span><strong>African Globalping probes · availability varies by country</strong></div>
+      <div class="scan-info-card"><span>Browser engine</span><strong>Chrome + Lighthouse · versions shown in the report</strong></div>
     </div>
   </section>
+  <section style="margin-top:36px">
+    <h2 style="font-size:1.35rem">One report, two perspectives</h2>
+    <p class="scan-lead" style="font-size:.95rem">Lighthouse measures page quality in a controlled browser. Globalping adds point-in-time network latency from African locations where a probe is available. The results are shown separately so lab scores are not confused with network measurements.</p>
+    <p class="scan-note"><a href="/how-we-score">Read how Performance, Structure and the overall grade are calculated.</a></p>
+  </section>
 </main>
-
-<footer>
-  <div class="footer-inner">
-    <div class="footer-left"><img class="footer-wordmark" src="/images/africalatency-logo-dark.svg" alt="AfricaLatency" width="180" height="28"><span>© 2026 AfricaLatency</span></div>
-    <div class="footer-links">
-      <a href="https://github.com/cmwrxh" target="_blank" rel="noopener">GitHub</a>
-      <a href="https://www.linkedin.com/in/charles-mwaura-bb7814140/" target="_blank" rel="noopener">LinkedIn</a>
-    </div>
-  </div>
-</footer>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-  window.africaLatencySupabase = window.supabase.createClient(
-    'https://uzihwtxffklisczqvurf.supabase.co',
-    'sb_publishable_dGaR1jgofny7tGVWh0TK2w_haSVNyWv'
-  );
-</script>
-<script src="js/main.js?v=5"></script>
-<script src="js/scan.js?v=2"></script>
-<script>
-  // Keep every audit-intent CTA on the scanner on the canonical audit intake path.
-  const auditCtaObserver = new MutationObserver(() => {
-    document.querySelectorAll('a[href*="contact.html?service=latency-audit"], a[href*="/contact?service=latency-audit"]').forEach((link) => {
-      link.href = '/audit-intake';
-    });
-  });
-  auditCtaObserver.observe(document.body, { childList: true, subtree: true });
-</script>
-
-<script>
-(() => {
-  const button = document.getElementById('nairobi-probe-button');
-  const status = document.getElementById('nairobi-probe-status');
-  if (!button || !status) return;
-  button.addEventListener('click', async () => {
-    button.disabled = true;
-    status.textContent = 'Measuring from Nairobi…';
-    try {
-      const response = await fetch('/api/run-diagnostic', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: 'http', target: location.hostname, locations: [{ city: 'Nairobi', limit: 1 }] })
-      });
-      const data = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(data.error || `Diagnostic unavailable (HTTP ${response.status})`);
-      const result = data.results && data.results[0];
-      const timings = result && result.result && result.result.timings;
-      const total = timings && Number.isFinite(Number(timings.total)) ? Math.round(Number(timings.total)) : null;
-      const ttfb = timings && Number.isFinite(Number(timings.firstByte)) ? Math.round(Number(timings.firstByte)) : null;
-      if (total === null && ttfb === null) throw new Error('The probe returned no timing data.');
-      status.textContent = `Nairobi probe: ${total !== null ? total + ' ms total' : 'total unavailable'}${ttfb !== null ? ' · ' + ttfb + ' ms TTFB' : ''} · observed just now.`;
-    } catch (error) {
-      status.textContent = error.message || 'Live measurement failed. Try again later.';
-    } finally {
-      button.disabled = false;
-    }
-  });
-})();
-</script>
-</body>
-</html>
+<footer><div class="footer-inner"><div class="footer-left"><img class="footer-wordmark" src="/images/africalatency-logo-dark.svg" alt="AfricaLatency" width="180" height="28"><span>© 2026 AfricaLatency</span></div><div class="footer-links"><a href="/privacy-policy">Privacy</a><a href="/contact">Contact</a></div></div></footer>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="/js/scan-v2.js?v=1"></script>
+</body></html>

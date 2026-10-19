@@ -116,9 +116,10 @@
         </div>
       </div>
 
+      <button class="btn btn-secondary" id="google-login" type="button" style="width:100%;margin:14px 0;">Continue with Google</button>
       <div class="login-links">
         <a href="mailto:support@africalatency.dev?subject=Password%20reset">Forgot your password?</a>
-        <span>New to AfricaLatency? <a href="/contact">Sign up</a></span>
+        <span>New to AfricaLatency? <a id="signup-link" href="/signup">Sign up</a></span>
       </div>
       <button class="btn btn-primary" id="login-submit" type="submit">Sign in</button>
       <div id="login-status" class="login-status" role="status" aria-live="polite"></div>
@@ -190,6 +191,16 @@
   try { supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY); } catch (err) { console.error('Supabase failed to load', err); }
 
   const form = document.getElementById('login-form');
+  const params = new URLSearchParams(window.location.search);
+  const requestedNext = params.get('next') || '/dashboard';
+  const safeNext = requestedNext.startsWith('/') && !requestedNext.startsWith('//') ? requestedNext : '/dashboard';
+  document.getElementById('signup-link').href = '/signup?next=' + encodeURIComponent(safeNext);
+  document.getElementById('google-login').addEventListener('click', async () => {
+    if (!supabaseClient) { setStatus('Sign-in is temporarily unavailable.', true); return; }
+    setStatus('Opening Google sign-in…', false);
+    const { error } = await supabaseClient.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin + safeNext } });
+    if (error) setStatus(error.message, true);
+  });
   const status = document.getElementById('login-status');
   const submit = document.getElementById('login-submit');
   const password = document.getElementById('password');
@@ -221,7 +232,7 @@
       const email = document.getElementById('email').value.trim();
       const { error } = await supabaseClient.auth.signInWithPassword({ email, password: password.value });
       if (error) { setStatus(error.message, true); submit.disabled = false; return; }
-      window.location.href = '/dashboard';
+      window.location.href = safeNext;
     } catch (err) {
       setStatus('Could not reach the sign-in service. Check your connection and try again.', true);
       submit.disabled = false;
