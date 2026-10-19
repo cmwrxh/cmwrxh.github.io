@@ -51,7 +51,57 @@ app.use((req, res, next) => {
   next();
 });
 
-// Static site; extension fallback allows /contact to serve contact.html.
+// Preserve the clean URLs previously handled by vercel.json.
+// .html URLs redirect to their canonical paths; clean paths serve the matching HTML file.
+const cleanPageRoutes = {
+  '/about': 'about.html',
+  '/services': 'services.html',
+  '/scan': 'scan.html',
+  '/methodology': 'methodology.html',
+  '/work': 'work.html',
+  '/contact': 'contact.html',
+  '/audit-intake': 'audit-intake.html',
+  '/audit-report': 'audit-report.html',
+  '/labs': 'labs.html',
+  '/login': 'login.html',
+  '/dashboard': 'dashboard.html',
+  '/cases': 'cases.html',
+  '/terms-of-service': 'terms-of-service.html',
+  '/service-level-agreement': 'service-level-agreement.html',
+  '/acceptable-use-policy': 'acceptable-use-policy.html',
+  '/refund-policy': 'refund-policy.html',
+  '/help-centre': 'help-centre.html',
+  '/blog': 'blog.html',
+  '/audit-checkout': 'audit-checkout.html',
+  '/sitespeed-checkout': 'sitespeed-checkout.html',
+  '/monitoring': 'monitoring.html',
+  '/tools': 'tools.html',
+  '/sample-report': 'sample-report.html',
+  '/compare': 'compare.html',
+  '/security': 'security.html',
+  '/docs': 'docs.html',
+  '/changelog': 'changelog.html',
+  '/performance-index': 'internet-performance-index.html',
+};
+
+const canonicalHtmlRoutes = Object.fromEntries(
+  Object.keys(cleanPageRoutes).map((route) => [`${route}.html`, route])
+);
+
+app.use((req, res, next) => {
+  const destination = canonicalHtmlRoutes[req.path];
+  if (!destination) return next();
+  const query = req.url.includes('?') ? req.url.slice(req.url.indexOf('?')) : '';
+  return res.redirect(308, `${destination}${query}`);
+});
+
+app.use((req, res, next) => {
+  const file = cleanPageRoutes[req.path];
+  if (!file) return next();
+  return res.sendFile(path.join(__dirname, file));
+});
+
+// Static site; extension fallback allows other pages such as /rum-dashboard.
 app.use(express.static(__dirname, { extensions: ['html'] }));
 
 app.use((req, res) => {
