@@ -56,7 +56,7 @@ app.use((req, res, next) => {
   next();
 });
 
-// Preserve the clean URLs previously handled by vercel.json.
+// Preserve canonical clean URLs and legacy HTML redirects.
 // .html URLs redirect to their canonical paths; clean paths serve the matching HTML file.
 const cleanPageRoutes = {
   '/about': 'about.html',
