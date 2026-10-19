@@ -54,3 +54,22 @@ export async function validatePublicUrl(input) {
   url.hash = '';
   return url.toString();
 }
+
+export async function validateRedirectChain(input, maxRedirects = 5) {
+  let current = await validatePublicUrl(input);
+  for (let hop = 0; hop <= maxRedirects; hop += 1) {
+    let response;
+    try {
+      response = await fetch(current, { method: 'HEAD', redirect: 'manual', signal: AbortSignal.timeout(5000) });
+    } catch {
+      // A target may deny HEAD. DNS and URL checks still apply before Lighthouse.
+      return current;
+    }
+    if (![301,302,303,307,308].includes(response.status)) return current;
+    const location = response.headers.get('location');
+    if (!location) return current;
+    if (hop === maxRedirects) throw new Error('The website redirects too many times.');
+    current = await validatePublicUrl(new URL(location, current).toString());
+  }
+  throw new Error('The website redirects too many times.');
+}
