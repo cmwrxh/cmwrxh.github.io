@@ -29,7 +29,7 @@ async function sendToWorker(path, req, body, extraHeaders = {}) {
   const headers = { 'Content-Type': 'application/json', Authorization: 'Bearer ' + INTERNAL_TOKEN, ...extraHeaders };
   const userToken = String(req.headers.authorization || '').replace(/^Bearer\s+/i, '').trim();
   if (userToken) headers['x-user-token'] = userToken;
-  const ip = String(req.headers['cf-connecting-ip'] || req.headers['x-forwarded-for'] || req.socket?.remoteAddress || 'unknown').split(',')[0].trim();
+  const ip = String(req.headers['cf-connecting-ip'] || req.ip || req.socket?.remoteAddress || 'unknown').split(',')[0].trim();
   if (ip !== 'unknown') headers['x-forwarded-for'] = ip;
   try {
     const response = await fetch(base + path, {
