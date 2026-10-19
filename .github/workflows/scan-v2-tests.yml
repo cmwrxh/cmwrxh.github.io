@@ -5,12 +5,9 @@ on:
       - 'worker/**'
       - 'sql/scan-v2.sql'
       - '.github/workflows/scan-v2-tests.yml'
-  push:
-    branches: [feature/scan-v2]
-    paths:
-      - 'worker/**'
-      - 'sql/scan-v2.sql'
-      - '.github/workflows/scan-v2-tests.yml'
+concurrency:
+  group: scan-v2-tests-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 jobs:
   worker-tests:
     runs-on: ubuntu-latest
