@@ -17,6 +17,8 @@ const MAX_QUEUE = Math.max(1, Math.min(50, Number(process.env.SCAN_MAX_QUEUE) ||
 const RETENTION_DAYS = Math.max(1, Math.min(90, Number(process.env.SCAN_ANON_RETENTION_DAYS) || 7));
 const IP_HASH_SECRET = process.env.IP_HASH_SECRET;
 const API_KEY_PREFIX = 'al_live_';
+const signedUrlCache = new Map();
+let lastAlertAt = 0;
 let busy = false;
 let lastJobAt = Date.now();
 
@@ -77,8 +79,12 @@ function publicSummary(job, screenshotUrl = null) {
 }
 async function signedScreenshot(job) {
   if (!job.screenshot) return null;
+  const cached = signedUrlCache.get(job.screenshot);
+  if (cached && cached.expiresAt > Date.now()) return cached.url;
   const { data } = await supabase.storage.from('scan-screenshots').createSignedUrl(job.screenshot, 3600);
-  return data?.signedUrl || null;
+  if (!data?.signedUrl) return null;
+  signedUrlCache.set(job.screenshot, { url: data.signedUrl, expiresAt: Date.now() + 50 * 60 * 1000 });
+  return data.signedUrl;
 }
 async function findJob(id) {
   let { data } = await supabase.from('scan_jobs').select('*').eq('id', id).maybeSingle();
@@ -348,7 +354,14 @@ setInterval(async () => {
   const cutoff = new Date(Date.now() - 10 * 60 * 1000).toISOString();
   const { count: stuck } = await supabase.from('scan_jobs').select('id', { count: 'exact', head: true }).eq('status','processing').lt('updated_at', cutoff);
   const { count: queued } = await supabase.from('scan_jobs').select('id', { count: 'exact', head: true }).eq('status','queued');
-  if ((stuck || 0) > 0 || ((queued || 0) > 0 && Date.now() - lastJobAt > 10 * 60 * 1000)) console.error('[ALERT] scan queue stalled', { stuck: stuck || 0, queued: queued || 0, busy, lastJobAt });
+  if ((stuck || 0) > 0 || ((queued || 0) > 0 && Date.now() - lastJobAt > 10 * 60 * 1000)) {
+    const alert = { stuck: stuck || 0, queued: queued || 0, busy, lastJobAt };
+    console.error('[ALERT] scan queue stalled', alert);
+    if (process.env.SCAN_ALERT_WEBHOOK_URL && Date.now() - lastAlertAt > 10 * 60 * 1000) {
+      lastAlertAt = Date.now();
+      fetch(process.env.SCAN_ALERT_WEBHOOK_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text: 'AfricaLatency scan queue stalled', ...alert }), signal: AbortSignal.timeout(5000) }).catch(() => {});
+    }
+  }
 }, 60000).unref();
 setInterval(() => { retentionSweep().catch(e => console.warn('[scan-worker] retention sweep failed', e.message)); }, 60 * 60 * 1000).unref();
 app.listen(PORT, '0.0.0.0', () => console.log(`AfricaLatency Lighthouse worker listening on ${PORT}; concurrency=1`));
