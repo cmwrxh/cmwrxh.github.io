@@ -73,7 +73,7 @@ export function summarizeRun(lhr) {
   const requests = audits['network-requests']?.details?.items || [];
   const pageWeight = requests.reduce((sum, r) => sum + (Number(r.transferSize) || 0), 0);
   const ua = String(lhr.userAgent || lhr.environment?.networkUserAgent || '');
-  const chromeVersion = (ua.match(/Chrome\\/([0-9.]+)/) || [])[1] || null;
+  const chromeVersion = (ua.match(/Chrome\/([0-9.]+)/) || [])[1] || null;
   return {
     lighthouseVersion: lhr.lighthouseVersion || null,
     chromeVersion,
