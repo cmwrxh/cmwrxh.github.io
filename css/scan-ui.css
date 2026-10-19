@@ -56,10 +56,10 @@
 .scan-save-details { margin:0 clamp(16px,3vw,26px) 18px; padding:0 12px; border:1px solid var(--border); border-radius:10px; }
 .scan-save-details p { margin:0 0 12px; color:var(--text-muted); font-size:.78rem; }
 @media(max-width:620px) {
-  .scan-progress-card { grid-template-columns:auto minmax(0,1fr); padding:18px; }
-  .scan-progress-count { grid-column:2; grid-row:1; justify-self:start; margin-top:5px; }
-  .scan-progress-copy { grid-column:2; grid-row:1; padding-right:54px; }
-  .scan-loader { grid-row:1; }
+  .scan-progress-card { grid-template-columns:auto minmax(0,1fr) auto; padding:18px; }
+  .scan-progress-count { grid-column:3; grid-row:1; justify-self:end; align-self:start; }
+  .scan-progress-copy { grid-column:2; grid-row:1; min-width:0; }
+  .scan-loader { grid-column:1; grid-row:1; }
   .scan-summary-grid { grid-template-columns:1fr 1fr; gap:8px; }
   .scan-summary-card { padding:13px; }
   .scan-summary-card>strong { font-size:1.5rem; }
