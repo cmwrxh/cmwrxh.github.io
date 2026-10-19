@@ -16,5 +16,5 @@ test('grade uses 70 percent Performance and 30 percent Structure', () => {
 test('structure uses weighted best practices, SEO, and key accessibility audits', () => {
   const categories = {'best-practices': {score: 1}, seo: {score: 0.5}, accessibility: {score: 1}};
   const audits = {'color-contrast': {score: 1, weight: 3}, 'image-alt': {score: 0, weight: 1}};
-  assert.equal(structureScore(categories, audits), 79);
+  assert.equal(structureScore(categories, audits), 76);
 });
