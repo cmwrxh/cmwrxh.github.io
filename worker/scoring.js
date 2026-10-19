@@ -72,6 +72,27 @@ export function summarizeRun(lhr) {
   const screenshot = audits['final-screenshot']?.details?.data || null;
   const requests = audits['network-requests']?.details?.items || [];
   const pageWeight = requests.reduce((sum, r) => sum + (Number(r.transferSize) || 0), 0);
+  const auditList = Object.values(audits).filter(a => a && a.id).slice(0, 120).map(a => ({
+    id: String(a.id).slice(0, 100),
+    title: String(a.title || a.id).slice(0, 180),
+    description: String(a.description || '').slice(0, 600),
+    score: a.score == null ? null : Math.round(Number(a.score) * 100),
+    scoreDisplayMode: String(a.scoreDisplayMode || '').slice(0, 40),
+    displayValue: String(a.displayValue || '').slice(0, 180)
+  }));
+  const resourceDetails = requests.slice(0, 80).map(r => {
+    let safeUrl = '';
+    try { const u = new URL(r.url); safeUrl = u.origin + u.pathname; } catch {}
+    return {
+      url: safeUrl.slice(0, 300),
+      resourceType: String(r.resourceType || '').slice(0, 40),
+      statusCode: Number.isFinite(Number(r.statusCode)) ? Number(r.statusCode) : null,
+      transferSize: Number(r.transferSize) || 0,
+      resourceSize: Number(r.resourceSize) || 0,
+      startTime: Number.isFinite(Number(r.startTime)) ? Number(r.startTime) : null,
+      endTime: Number.isFinite(Number(r.endTime)) ? Number(r.endTime) : null
+    };
+  });
   const ua = String(lhr.userAgent || lhr.environment?.networkUserAgent || '');
   const chromeVersion = (ua.match(/Chrome\/([0-9.]+)/) || [])[1] || null;
   return {
@@ -91,6 +112,8 @@ export function summarizeRun(lhr) {
     requestCount: requests.length || null,
     pageWeightBytes: pageWeight || null,
     opportunities,
+    auditList,
+    resourceDetails,
     screenshotDataUrl: typeof screenshot === 'string' && screenshot.startsWith('data:image/') ? screenshot : null
   };
 }
