@@ -7,7 +7,12 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
 
 app.set('trust proxy', true); // behind Coolify's Traefik proxy
-app.use(express.json());
+app.use(express.json({
+  verify: (req, res, buf) => {
+    // Paystack signatures must be checked against the exact request bytes.
+    if (req.path === '/api/paystack-webhook') req.rawBody = Buffer.from(buf);
+  },
+}));
 app.use(express.urlencoded({ extended: true }));
 
 // Mount each api/*.js module as /api/<name>.
