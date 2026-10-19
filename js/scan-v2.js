@@ -53,7 +53,7 @@
     stageTitle.textContent = data.label;
     stageCopy.textContent = data.copy;
     segments.forEach((segment, i) => {
-      segment.classList.toggle('is-done', i < data.index);
+      segment.classList.toggle('is-done', i < data.index || stage === 'completed');
       segment.classList.toggle('is-active', i === data.index && stage !== 'completed' && stage !== 'failed');
     });
     count.textContent = stage === 'queued' && queuePosition ? 'You are #' + queuePosition + ' in the queue' : '';
