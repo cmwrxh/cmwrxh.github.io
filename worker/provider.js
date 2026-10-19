@@ -1,12 +1,12 @@
 import lighthouse from 'lighthouse';
 import chromeLauncher from 'chrome-launcher';
 import { summarizeRun } from './scoring.js';
-import { validatePublicUrl } from './url-safety.js';
+import { validateRedirectChain } from './url-safety.js';
 
 const timeoutMs = Math.max(60000, Math.min(90000, Number(process.env.LIGHTHOUSE_TIMEOUT_MS) || 75000));
 
 async function runLighthouseOnce(url, device) {
-  const safeUrl = await validatePublicUrl(url);
+  const safeUrl = await validateRedirectChain(url);
   const chrome = await chromeLauncher.launch({
     chromePath: process.env.CHROME_PATH || '/usr/bin/chromium',
     chromeFlags: ['--headless', '--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--disable-gpu']
