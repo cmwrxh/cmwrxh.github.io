@@ -15,6 +15,8 @@ test('rejects localhost and private literal IPs', async () => {
   await assert.rejects(validatePublicUrl('http://169.254.169.254'));
   await assert.rejects(validatePublicUrl('http://[::1]'));
   await assert.rejects(validatePublicUrl('http://[2001:db8::1]'));
+  await assert.rejects(validatePublicUrl('http://[::ffff:7f00:1]'));
+  await assert.rejects(validatePublicUrl('http://[::ffff:a9fe:a9fe]'));
 });
 test('rejects credentials and non-standard ports', async () => {
   await assert.rejects(validatePublicUrl('https://user:pass@example.com'));
