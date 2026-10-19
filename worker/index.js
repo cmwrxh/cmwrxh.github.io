@@ -210,6 +210,8 @@ async function executeJob(job) {
       requestCount: lighthouseResult.requestCount,
       pageWeightBytes: lighthouseResult.pageWeightBytes,
       opportunities: lighthouseResult.opportunities,
+      auditList: lighthouseResult.auditList || [],
+      resourceDetails: lighthouseResult.resourceDetails || [],
       runCount: lighthouseResult.runCount || 1,
       provider: lighthouseResult.provider || 'local Lighthouse',
       aggregation: lighthouseResult.aggregation || 'single Lighthouse run',
