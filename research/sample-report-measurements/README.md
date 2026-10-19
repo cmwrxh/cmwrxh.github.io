@@ -32,3 +32,7 @@ The workflow is **manual-dispatch only**. It has no cron schedule and will not s
 ## Approval gate
 
 This branch intentionally contains no public page implementation and no page links. The raw country summary table must be presented to Charles for review and explicit approval before these figures are incorporated into any public-facing page.
+
+## GitHub Actions activation constraint
+
+GitHub requires a `workflow_dispatch` workflow file to exist on the repository's default branch before it can be manually dispatched. This PR intentionally does not change the default branch. Therefore the workflow is prepared for review but will not be dispatchable until you explicitly approve putting this workflow file on the default branch (or choose another approved runner path). No measurements have been launched from this PR.
