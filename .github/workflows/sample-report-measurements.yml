@@ -46,7 +46,8 @@ jobs:
           PROBE_LIMIT: ${{ inputs.probe_limit }}
         run: node scripts/sample-report-measurement.mjs
 
-      - name: Upload raw measurement JSON
+      - name: Upload raw measurement JSON, including failure records
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: globalping-${{ inputs.country }}-${{ github.run_id }}
