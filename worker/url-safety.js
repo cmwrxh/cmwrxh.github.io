@@ -14,16 +14,23 @@ function isUnsafeIp(ip) {
     return [
       ['0.0.0.0',8],['10.0.0.0',8],['100.64.0.0',10],['127.0.0.0',8],
       ['169.254.0.0',16],['172.16.0.0',12],['192.0.0.0',24],['192.0.2.0',24],
-      ['192.168.0.0',16],['198.18.0.0',15],['198.51.100.0',24],['203.0.113.0',24],
+      ['192.168.0.0',16],['192.88.99.0',24],['198.18.0.0',15],['198.51.100.0',24],['203.0.113.0',24],
       ['224.0.0.0',4],['240.0.0.0',4]
     ].some(([base,bits]) => inV4(ip, base, bits));
   }
   if (version === 6) {
     const normalized = ip.toLowerCase().split('%')[0];
-    if (normalized === '::' || normalized === '::1' || normalized.startsWith('fe80:') || normalized.startsWith('fc') || normalized.startsWith('fd') || normalized.startsWith('ff') || normalized.startsWith('2001:db8:') || normalized.startsWith('2001:10:') || normalized.startsWith('2002:')) return true;
+    if (normalized === '::' || normalized === '::1' || normalized.startsWith('fe80:') || normalized.startsWith('fc') || normalized.startsWith('fd') || normalized.startsWith('ff') || normalized.startsWith('2001:db8:') || normalized.startsWith('2001:10:') || normalized.startsWith('2001:0:') || normalized.startsWith('2002:') || normalized.startsWith('64:ff9b:')) return true;
     if (normalized.startsWith('::ffff:')) {
       const mapped = normalized.slice(7);
       if (net.isIP(mapped) === 4) return isUnsafeIp(mapped);
+      const groups = mapped.split(':');
+      if (groups.length === 2 && groups.every(group => /^[0-9a-f]{1,4}$/.test(group))) {
+        const high = Number.parseInt(groups[0], 16), low = Number.parseInt(groups[1], 16);
+        const v4 = [high >> 8, high & 255, low >> 8, low & 255].join('.');
+        return isUnsafeIp(v4);
+      }
+      return true;
     }
     return false;
   }
