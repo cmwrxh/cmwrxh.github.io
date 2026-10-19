@@ -91,13 +91,21 @@ async function checkRateLimit(ip) {
   if (!supabaseUrl || !serviceKey) return true;
 
   const endpoint = `${supabaseUrl.replace(/\/$/, '')}/rest/v1/rpc/check_ip_rate_limit`;
+  const headers = {
+    apikey: serviceKey,
+    'Content-Type': 'application/json'
+  };
+
+  // Supabase's newer sb_secret_* API keys are not JWTs and must not be
+  // sent as Authorization: Bearer tokens. Keep the Authorization header
+  // only for legacy JWT-based service-role keys.
+  if (!serviceKey.startsWith('sb_secret_')) {
+    headers.Authorization = `Bearer ${serviceKey}`;
+  }
+
   const response = await fetch(endpoint, {
     method: 'POST',
-    headers: {
-      apikey: serviceKey,
-      Authorization: `Bearer ${serviceKey}`,
-      'Content-Type': 'application/json'
-    },
+    headers,
     body: JSON.stringify({
       p_ip_address: ip,
       p_endpoint: 'run-diagnostic',
