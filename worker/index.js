@@ -296,6 +296,13 @@ app.post('/internal/jobs', async (req, res) => {
     .eq('url', normalized).eq('device', device).eq('status', 'completed').eq('result->summary->>runCount', String(user || keyRecord ? 3 : 1)).gte('created_at', cacheSince)
     .order('completed_at', { ascending: false }).limit(1).maybeSingle();
   if (cached) return res.status(200).json({ jobId: cached.id, reportId: cached.public_id, queuePosition: 0, cacheHit: true });
+  let activeQuery = supabase.from('scan_jobs').select('id,public_id,created_at').eq('url', normalized).eq('device', device).in('status', ['queued','processing']).eq('result->summary->>runCount', String(user || keyRecord ? 3 : 1));
+  activeQuery = user || keyRecord ? activeQuery.eq('user_id', user?.id || keyRecord.user_id) : activeQuery.is('user_id', null);
+  const { data: activeJob } = await activeQuery.order('created_at', { ascending: true }).limit(1).maybeSingle();
+  if (activeJob) {
+    const { count: ahead } = await supabase.from('scan_jobs').select('id', { count: 'exact', head: true }).in('status',['queued','processing']).lt('created_at',activeJob.created_at);
+    return res.status(202).json({ jobId: activeJob.id, reportId: activeJob.public_id, queuePosition: (ahead || 0) + 1, cacheHit: false, reusedActiveJob: true });
+  }
   const { data: jobRows, error } = await supabase.rpc('enqueue_scan_job', {
     p_url: normalized, p_device: device, p_user_id: user?.id || keyRecord?.user_id || null,
     p_ip_hash: ipHash, p_max_queue: MAX_QUEUE
