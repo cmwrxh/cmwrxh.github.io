@@ -27,7 +27,7 @@ Worker only:
 - `LIGHTHOUSE_TIMEOUT_MS=75000`\n- `PAGESPEED_API_KEY` (optional; enables the Google PageSpeed Insights fallback)\n- `SCAN_ALERT_WEBHOOK_URL` (optional; receiver for queue-stall alert notifications)
 - `TEST_LOCATION_LABEL=Cloud worker`
 
-No service key or internal token belongs in browser code, repository files, screenshots, or public logs. The migration does not create or rotate secrets.
+No service key or internal token belongs in browser code, repository files, screenshots, or public logs. The migration does not create or rotate secrets. The Scan V2 main-app handlers do not use the Supabase service key; however, pre-existing legacy handlers such as the diagnostic and scan-history endpoints still reference the current server-side service-key environment variable. This PR does not remove or migrate those existing uses because doing so could change current runtime behavior. If 'worker alone' must apply to every legacy endpoint as well, that requires a separate reviewed refactor and explicit approval before changing the existing secret configuration.
 
 ## Before deployment
 
