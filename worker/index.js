@@ -95,7 +95,7 @@ async function reportFor(req, job) {
   const user = await userFromRequest(req);
   const rawApiKey = String(req.headers['x-api-key'] || '');
   const apiKeyRecord = rawApiKey ? await validateApiKey(rawApiKey) : null;
-  if (rawApiKey && !apiKeyRecord) return res.status(401).json({ error: 'Invalid API key.' });
+  if (rawApiKey && !apiKeyRecord) return null;
   let unlocked = Boolean(apiKeyRecord && apiKeyRecord.user_id === job.user_id);
   if (user && job.status === 'completed') {
     if (!job.user_id) {
@@ -316,7 +316,10 @@ app.get('/internal/jobs/:id', async (req, res) => {
   const job = await findJob(String(req.params.id).slice(0, 80));
   if (!job) return res.status(404).json({ error: 'Scan not found.' });
   const user = await userFromRequest(req);
-  let unlocked = false;
+  const rawApiKey = String(req.headers['x-api-key'] || '');
+  const apiKeyRecord = rawApiKey ? await validateApiKey(rawApiKey) : null;
+  if (rawApiKey && !apiKeyRecord) return res.status(401).json({ error: 'Invalid API key.' });
+  let unlocked = Boolean(apiKeyRecord && apiKeyRecord.user_id === job.user_id);
   if (user && job.status === 'completed') {
     if (!job.user_id) {
       const { data } = await supabase.from('scan_jobs').update({ user_id: user.id }).eq('id', job.id).is('user_id', null).select('*').maybeSingle();
