@@ -93,7 +93,10 @@ async function findJob(id) {
 }
 async function reportFor(req, job) {
   const user = await userFromRequest(req);
-  let unlocked = false;
+  const rawApiKey = String(req.headers['x-api-key'] || '');
+  const apiKeyRecord = rawApiKey ? await validateApiKey(rawApiKey) : null;
+  if (rawApiKey && !apiKeyRecord) return res.status(401).json({ error: 'Invalid API key.' });
+  let unlocked = Boolean(apiKeyRecord && apiKeyRecord.user_id === job.user_id);
   if (user && job.status === 'completed') {
     if (!job.user_id) {
       const { data } = await supabase.from('scan_jobs').update({ user_id: user.id }).eq('id', job.id).is('user_id', null).select('*').maybeSingle();
