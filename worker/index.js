@@ -307,7 +307,7 @@ app.post('/internal/jobs', async (req, res) => {
   }
   const job = Array.isArray(jobRows) ? jobRows[0] : jobRows;
   if (!job) return res.status(503).json({ error: 'Unable to queue the scan.' });
-  const { count: ahead } = await supabase.from('scan_jobs').select('id', { count: 'exact', head: true }).eq('status','queued').lt('created_at',job.created_at);
+  const { count: ahead } = await supabase.from('scan_jobs').select('id', { count: 'exact', head: true }).in('status',['queued','processing']).lt('created_at',job.created_at);
   return res.status(202).json({ jobId: job.id, reportId: job.public_id, queuePosition: (ahead || 0) + 1, cacheHit: false });
 });
 
@@ -357,7 +357,7 @@ async function retentionSweep() {
 }
 setInterval(() => { processQueue(); }, 2000).unref();
 setInterval(async () => {
-  if (!supabase || busy) return;
+  if (!supabase) return;
   const cutoff = new Date(Date.now() - 10 * 60 * 1000).toISOString();
   const { count: stuck } = await supabase.from('scan_jobs').select('id', { count: 'exact', head: true }).eq('status','processing').lt('updated_at', cutoff);
   const { count: queued } = await supabase.from('scan_jobs').select('id', { count: 'exact', head: true }).eq('status','queued');
