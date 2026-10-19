@@ -20,7 +20,7 @@ function isUnsafeIp(ip) {
   }
   if (version === 6) {
     const normalized = ip.toLowerCase().split('%')[0];
-    if (normalized === '::' || normalized === '::1' || normalized.startsWith('fe80:') || normalized.startsWith('fc') || normalized.startsWith('fd') || normalized.startsWith('ff')) return true;
+    if (normalized === '::' || normalized === '::1' || normalized.startsWith('fe80:') || normalized.startsWith('fc') || normalized.startsWith('fd') || normalized.startsWith('ff') || normalized.startsWith('2001:db8:') || normalized.startsWith('2001:10:') || normalized.startsWith('2002:')) return true;
     if (normalized.startsWith('::ffff:')) {
       const mapped = normalized.slice(7);
       if (net.isIP(mapped) === 4) return isUnsafeIp(mapped);
