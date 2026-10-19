@@ -10,7 +10,7 @@ app.set('trust proxy', true); // behind Coolify's Traefik proxy
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// 1. Auto-mount api/*.js as /api/<name> (Vercel-style handlers)
+// Mount each api/*.js module as /api/<name>.
 const apiDir = path.join(__dirname, 'api');
 if (fs.existsSync(apiDir)) {
   for (const file of fs.readdirSync(apiDir)) {
@@ -34,14 +34,13 @@ if (fs.existsSync(apiDir)) {
   }
 }
 
-// 2. Block server-side files and folders from being served as static
+// Prevent server-side files and folders from being served as static assets.
 const blockedFiles = [
   '/server.js',
   '/package.json',
   '/package-lock.json',
   '/Dockerfile',
   '/.dockerignore',
-  '/vercel.json',
 ];
 const blockedDirs = ['/api/', '/lib/', '/templates/', '/sql/', '/supabase/', '/node_modules/'];
 app.use((req, res, next) => {
@@ -52,10 +51,9 @@ app.use((req, res, next) => {
   next();
 });
 
-// 3. Static site, with extension fallback (/contact -> contact.html)
+// Static site; extension fallback allows /contact to serve contact.html.
 app.use(express.static(__dirname, { extensions: ['html'] }));
 
-// 4. Anything else -> your 404 page
 app.use((req, res) => {
   res.status(404).sendFile(path.join(__dirname, '404.html'));
 });
