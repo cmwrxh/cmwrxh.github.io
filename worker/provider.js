@@ -40,7 +40,7 @@ async function runPageSpeed(url, device) {
   if (!key) throw new Error('PageSpeed fallback is not configured.');
   const params = new URLSearchParams({ url, strategy: device === 'desktop' ? 'DESKTOP' : 'MOBILE', key });
   for (const category of ['PERFORMANCE','ACCESSIBILITY','BEST_PRACTICES','SEO']) params.append('category', category);
-  const response = await fetch('https://www.googleapis.com/pagespeedonline/v5/runPagespeed?' + params.toString(), { signal: AbortSignal.timeout(timeoutMs) });
+  const response = await fetch('https://www.googleapis.com/pagespeedonline/v5/runPagespeed?' + params.toString(), { signal: AbortSignal.timeout(Math.min(timeoutMs, 20000)) });
   const payload = await response.json().catch(() => ({}));
   if (!response.ok || !payload.lighthouseResult) throw new Error('PageSpeed Insights provider failed.');
   const result = summarizeRun(payload.lighthouseResult);
