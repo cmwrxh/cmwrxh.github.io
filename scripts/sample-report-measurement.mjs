@@ -1,7 +1,8 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 
 const API = 'https://api.globalping.io/v1';
-const TARGET = 'https://africalatency.dev/';
+const TARGET = 'africalatency.dev';
+const TARGET_URL = 'https://africalatency.dev/';
 const country = String(process.env.COUNTRY || '').toUpperCase();
 const allowed = new Set(['KE', 'ZA', 'NG', 'GH', 'EG', 'UG', 'TZ']);
 const probeLimit = Number(process.env.PROBE_LIMIT || 3);
@@ -34,7 +35,12 @@ let artifact;
 try {
   // Unauthenticated public API only: no tokens, account credits, or GitHub secrets.
   const limitCheck = await getJson(API + '/limits');
-  const request = { type: 'http', target: TARGET, locations: [{ country, limit: probeLimit }] };
+  const request = {
+    type: 'http',
+    target: TARGET,
+    locations: [{ country, limit: probeLimit }],
+    measurementOptions: { protocol: 'HTTPS', request: { method: 'GET', path: '/' } }
+  };
   const created = await getJson(API + '/measurements', {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
@@ -79,7 +85,7 @@ try {
     provider: 'Globalping',
     requestedAt,
     completedAt: new Date().toISOString(),
-    target: TARGET,
+    target: TARGET_URL,
     country,
     requestedProbeLimit: probeLimit,
     measurementId,
@@ -107,7 +113,7 @@ try {
     schemaVersion: 1,
     provider: 'Globalping',
     requestedAt,
-    target: TARGET,
+    target: TARGET_URL,
     country,
     requestedProbeLimit: probeLimit,
     status: 'unavailable-or-failed',
