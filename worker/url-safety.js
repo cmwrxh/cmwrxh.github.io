@@ -20,7 +20,8 @@ function isUnsafeIp(ip) {
   }
   if (version === 6) {
     const normalized = ip.toLowerCase().split('%')[0];
-    if (normalized === '::' || normalized === '::1' || normalized.startsWith('fe80:') || normalized.startsWith('fc') || normalized.startsWith('fd') || normalized.startsWith('ff') || normalized.startsWith('2001:db8:') || normalized.startsWith('2001:10:') || normalized.startsWith('2001:0:') || normalized.startsWith('2002:') || normalized.startsWith('64:ff9b:')) return true;
+    const firstGroup = Number.parseInt(normalized.split(':')[0] || '0', 16);
+    if (normalized === '::' || normalized === '::1' || (firstGroup >= 0xfe80 && firstGroup <= 0xfebf) || (firstGroup >= 0xfec0 && firstGroup <= 0xfeff) || normalized.startsWith('fc') || normalized.startsWith('fd') || normalized.startsWith('ff') || normalized.startsWith('2001:db8:') || normalized.startsWith('2001:10:') || normalized.startsWith('2001:0:') || normalized.startsWith('2001:2:') || normalized.startsWith('2001:20:') || normalized.startsWith('2002:') || normalized.startsWith('64:ff9b:')) return true;
     if (normalized.startsWith('::ffff:')) {
       const mapped = normalized.slice(7);
       if (net.isIP(mapped) === 4) return isUnsafeIp(mapped);
