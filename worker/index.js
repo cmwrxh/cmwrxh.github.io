@@ -1,7 +1,5 @@
 import express from 'express';
 import crypto from 'node:crypto';
-import dns from 'node:dns/promises';
-import net from 'node:net';
 import { createClient } from '@supabase/supabase-js';
 import { runLighthouse } from './provider.js';
 import { validatePublicUrl } from './url-safety.js';
@@ -49,7 +47,7 @@ function bearer(req) {
   return h.startsWith('Bearer ') ? h.slice(7).trim() : '';
 }
 async function userFromRequest(req) {
-  const token = bearer(req);
+  const token = String(req.headers['x-user-token'] || '').trim();
   if (!token || !supabase) return null;
   const { data, error } = await supabase.auth.getUser(token);
   return error ? null : data?.user || null;
@@ -68,6 +66,7 @@ function publicSummary(job, screenshotUrl = null) {
     createdAt: job.created_at,
     completedAt: job.completed_at,
     testedFrom: result.testedFrom || 'Cloud worker',
+    africaLatencySummary: result.africaLatencySummary || null,
     lighthouseVersion: result.lighthouseVersion || null,
     chromeVersion: result.chromeVersion || null,
     screenshotUrl,
@@ -256,6 +255,15 @@ app.post('/internal/jobs', async (req, res) => {
   if (apiKey && !keyRecord) return res.status(401).json({ error: 'Invalid API key.' });
   const ipHash = user || keyRecord ? null : hashIp(clientIp(req));
   const endpoint = keyRecord ? 'api-lighthouse' : 'scan';
+  if (keyRecord) {
+    const keyLimitHash = hashIp('api-key:' + keyRecord.id);
+    const { data: allowed, error } = await supabase.rpc('check_scan_rate_limit', {
+      p_ip_hash: keyLimitHash, p_endpoint: endpoint, p_max_requests: Math.max(1, Number(keyRecord.requests_per_hour) || 60), p_window_minutes: 60
+    });
+    if (error) return res.status(503).json({ error: 'Rate-limit service is temporarily unavailable.' });
+    if (allowed !== true) return res.status(429).json({ error: 'API rate limit reached.' });
+    await supabase.from('scan_api_keys').update({ last_used_at: new Date().toISOString() }).eq('id', keyRecord.id);
+  }
   if (!user && !keyRecord) {
     const { data: allowed, error } = await supabase.rpc('check_scan_rate_limit', {
       p_ip_hash: ipHash, p_endpoint: endpoint, p_max_requests: 3, p_window_minutes: 60
@@ -275,14 +283,17 @@ app.post('/internal/jobs', async (req, res) => {
     .eq('url', normalized).eq('device', device).eq('status', 'completed').gte('created_at', cacheSince)
     .order('completed_at', { ascending: false }).limit(1).maybeSingle();
   if (cached) return res.status(200).json({ jobId: cached.id, reportId: cached.public_id, queuePosition: 0, cacheHit: true });
-  const { count, error: countError } = await supabase.from('scan_jobs').select('id', { count: 'exact', head: true }).in('status', ['queued','processing']);
-  if (countError) return res.status(503).json({ error: 'Queue is temporarily unavailable.' });
-  if ((count || 0) >= MAX_QUEUE) return res.status(429).json({ error: 'The scan queue is full right now. Please try again shortly.' });
-  const { data: job, error } = await supabase.from('scan_jobs').insert({
-    url: normalized, device, status: 'queued', stage: 'queued', progress: 0,
-    user_id: user?.id || keyRecord?.user_id || null, ip_hash: ipHash
-  }).select('id,public_id,created_at').single();
-  if (error) return res.status(500).json({ error: 'Unable to queue the scan.' });
+  const { data: jobRows, error } = await supabase.rpc('enqueue_scan_job', {
+    p_url: normalized, p_device: device, p_user_id: user?.id || keyRecord?.user_id || null,
+    p_ip_hash: ipHash, p_max_queue: MAX_QUEUE
+  });
+  if (error) {
+    if (String(error.message || '').includes('SCAN_QUEUE_FULL')) return res.status(429).json({ error: 'The scan queue is full right now. Please try again shortly.' });
+    console.error('[scan-worker] enqueue failed:', String(error.message || error).slice(0,200));
+    return res.status(503).json({ error: 'Unable to queue the scan.' });
+  }
+  const job = Array.isArray(jobRows) ? jobRows[0] : jobRows;
+  if (!job) return res.status(503).json({ error: 'Unable to queue the scan.' });
   const { count: ahead } = await supabase.from('scan_jobs').select('id', { count: 'exact', head: true }).eq('status','queued').lt('created_at',job.created_at);
   return res.status(202).json({ jobId: job.id, reportId: job.public_id, queuePosition: (ahead || 0) + 1, cacheHit: false });
 });
@@ -332,5 +343,12 @@ async function retentionSweep() {
   }
 }
 setInterval(() => { processQueue(); }, 2000).unref();
+setInterval(async () => {
+  if (!supabase || busy) return;
+  const cutoff = new Date(Date.now() - 10 * 60 * 1000).toISOString();
+  const { count: stuck } = await supabase.from('scan_jobs').select('id', { count: 'exact', head: true }).eq('status','processing').lt('updated_at', cutoff);
+  const { count: queued } = await supabase.from('scan_jobs').select('id', { count: 'exact', head: true }).eq('status','queued');
+  if ((stuck || 0) > 0 || ((queued || 0) > 0 && Date.now() - lastJobAt > 10 * 60 * 1000)) console.error('[ALERT] scan queue stalled', { stuck: stuck || 0, queued: queued || 0, busy, lastJobAt });
+}, 60000).unref();
 setInterval(() => { retentionSweep().catch(e => console.warn('[scan-worker] retention sweep failed', e.message)); }, 60 * 60 * 1000).unref();
 app.listen(PORT, '0.0.0.0', () => console.log(`AfricaLatency Lighthouse worker listening on ${PORT}; concurrency=1`));
