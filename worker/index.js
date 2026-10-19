@@ -293,7 +293,7 @@ app.post('/internal/jobs', async (req, res) => {
   }
   const cacheSince = new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString();
   const { data: cached } = await supabase.from('scan_jobs').select('id,public_id,status,stage,progress,created_at')
-    .eq('url', normalized).eq('device', device).eq('status', 'completed').gte('created_at', cacheSince)
+    .eq('url', normalized).eq('device', device).eq('status', 'completed').eq('result->summary->>runCount', String(user || keyRecord ? 3 : 1)).gte('created_at', cacheSince)
     .order('completed_at', { ascending: false }).limit(1).maybeSingle();
   if (cached) return res.status(200).json({ jobId: cached.id, reportId: cached.public_id, queuePosition: 0, cacheHit: true });
   const { data: jobRows, error } = await supabase.rpc('enqueue_scan_job', {
@@ -333,11 +333,6 @@ app.get('/internal/jobs/:id', async (req, res) => {
   if (unlocked) payload.fullReport = job.result?.fullReport || null;
   if (job.status === 'failed') payload.error = job.error_message || 'Scan failed.';
   return res.json(payload);
-});
-
-app.post('/internal/api/lighthouse', async (req, res) => {
-  req.url = '/internal/jobs';
-  return app._router.handle(req, res, () => {});
 });
 
 app.get('/internal/health/queue', async (_req, res) => {
