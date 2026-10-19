@@ -1,5 +1,5 @@
 import lighthouse from 'lighthouse';
-import chromeLauncher from 'chrome-launcher';
+import * as chromeLauncher from 'chrome-launcher';
 import { summarizeRun, overallGrade } from './scoring.js';
 import { validateRedirectChain } from './url-safety.js';
 
