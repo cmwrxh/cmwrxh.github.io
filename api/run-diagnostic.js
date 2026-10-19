@@ -158,6 +158,20 @@ export default async function handler(req, res) {
     const result = await pollMeasurement(id);
     return res.status(200).json(result);
   } catch (error) {
+    // Globalping uses 422/no_probes_found when no eligible probe is online
+    // for the requested location. This is a normal coverage gap, not an
+    // application failure. Keep the location attached so the caller can
+    // mark that exact country unavailable without substituting another one.
+    if (error.status === 422 && error.raw?.error?.type === 'no_probes_found') {
+      console.warn('Globalping location unavailable (no matching probe):', locations[0]);
+      return res.status(422).json({
+        error: 'No live probe was available for this location.',
+        code: 'no_probes_found',
+        unavailable: true,
+        location: locations[0]
+      });
+    }
+
     console.error('run-diagnostic error:', error);
     return res.status(error.status || 500).json({
       error: error.message || 'Diagnostic failed.',
