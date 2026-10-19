@@ -1,0 +1,56 @@
+name: Sample report measurements
+
+on:
+  workflow_dispatch:
+    inputs:
+      country:
+        description: "One country per run. Repeat at different times of day to build the sample."
+        required: true
+        type: choice
+        options:
+          - KE
+          - ZA
+          - NG
+          - GH
+          - EG
+          - UG
+          - TZ
+      probe_limit:
+        description: "Maximum probes requested for this single country (max 5; one measurement per run)"
+        required: true
+        type: choice
+        options:
+          - "3"
+          - "5"
+        default: "3"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sample-report-measurements
+  cancel-in-progress: false
+
+jobs:
+  measure:
+    name: One-country Globalping HTTP measurement
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out this branch
+        uses: actions/checkout@v4
+
+      - name: Run one bounded measurement
+        env:
+          COUNTRY: ${{ inputs.country }}
+          PROBE_LIMIT: ${{ inputs.probe_limit }}
+        run: node scripts/sample-report-measurement.mjs
+
+      - name: Upload raw measurement JSON, including failure records
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: globalping-${{ inputs.country }}-${{ github.run_id }}
+          path: measurement-output/
+          if-no-files-found: error
+          retention-days: 30
