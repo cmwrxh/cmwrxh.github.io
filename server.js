@@ -34,6 +34,27 @@ if (fs.existsSync(apiDir)) {
   }
 }
 
+// Dynamic Scan V2 status route and versioned Lighthouse API alias.
+app.all('/api/scan/:jobId', async (req, res) => {
+  try {
+    const mod = await import(pathToFileURL(path.join(__dirname, 'api', 'scan-status.js')).href);
+    req.params.jobId = req.params.jobId;
+    await (mod.default || mod)(req, res);
+  } catch (e) {
+    console.error('Error in /api/scan/:jobId:', e);
+    if (!res.headersSent) res.status(500).json({ error: 'Server error' });
+  }
+});
+app.all('/api/v1/lighthouse', async (req, res) => {
+  try {
+    const mod = await import(pathToFileURL(path.join(__dirname, 'api', 'v1-lighthouse.js')).href);
+    await (mod.default || mod)(req, res);
+  } catch (e) {
+    console.error('Error in /api/v1/lighthouse:', e);
+    if (!res.headersSent) res.status(500).json({ error: 'Server error' });
+  }
+});
+
 // 2. Block server-side files and folders from being served as static
 const blockedFiles = [
   '/server.js',
