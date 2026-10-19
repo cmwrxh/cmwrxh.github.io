@@ -21,7 +21,7 @@ export default async function handler(req, res) {
     url = parsed.toString();
   } catch { return res.status(400).json({ error: 'Provide a valid public HTTP or HTTPS URL.' }); }
   const apiKey = String(req.headers['x-api-key'] || '');
-  const ip = String(req.headers['cf-connecting-ip'] || req.headers['x-forwarded-for'] || req.socket?.remoteAddress || 'unknown').split(',')[0].trim();
+  const ip = String(req.headers['cf-connecting-ip'] || req.ip || req.socket?.remoteAddress || 'unknown').split(',')[0].trim();
   let verified = false;
   if (!apiKey && !req.headers.authorization) {
     verified = await verifyTurnstile(body.turnstileToken, ip);
