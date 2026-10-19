@@ -113,3 +113,33 @@ on conflict (id) do nothing;
 
 -- Retention is performed by the worker: anonymous reports/screenshots default to 7 days.
 -- Account-owned reports are retained until a separate account retention policy is approved.
+
+create or replace function public.enqueue_scan_job(
+  p_url text,
+  p_device text,
+  p_user_id uuid,
+  p_ip_hash text,
+  p_max_queue integer default 12
+) returns setof public.scan_jobs
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare pending_count integer;
+begin
+  if p_device not in ('mobile','desktop') or p_url is null or length(p_url) > 2048 then
+    raise exception 'INVALID_SCAN_JOB';
+  end if;
+  perform pg_advisory_xact_lock(hashtext('africalatency_scan_v2_queue'));
+  select count(*) into pending_count from public.scan_jobs where status in ('queued','processing');
+  if pending_count >= greatest(1, p_max_queue) then
+    raise exception 'SCAN_QUEUE_FULL';
+  end if;
+  return query
+    insert into public.scan_jobs(url, device, status, stage, progress, user_id, ip_hash)
+    values (p_url, p_device, 'queued', 'queued', 0, p_user_id, p_ip_hash)
+    returning *;
+end;
+$$;
+revoke all on function public.enqueue_scan_job(text,text,uuid,text,integer) from public, anon, authenticated;
+grant execute on function public.enqueue_scan_job(text,text,uuid,text,integer) to service_role;
