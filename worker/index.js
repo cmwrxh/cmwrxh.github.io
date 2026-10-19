@@ -187,6 +187,7 @@ async function executeJob(job) {
     performance: lighthouseResult.performance,
     structure: lighthouseResult.structure,
     scores: lighthouseResult.scores,
+    provider: lighthouseResult.provider || 'local Lighthouse',
     metrics: lighthouseResult.metrics,
     requestCount: lighthouseResult.requestCount,
     pageWeightBytes: lighthouseResult.pageWeightBytes,
@@ -210,6 +211,7 @@ async function executeJob(job) {
       pageWeightBytes: lighthouseResult.pageWeightBytes,
       opportunities: lighthouseResult.opportunities,
       runCount: lighthouseResult.runCount || 1,
+      provider: lighthouseResult.provider || 'local Lighthouse',
       aggregation: lighthouseResult.aggregation || 'single Lighthouse run',
       runVariability: lighthouseResult.runVariability || null,
       testedFrom: process.env.TEST_LOCATION_LABEL || 'Cloud worker'
@@ -341,6 +343,8 @@ app.get('/internal/health/queue', async (_req, res) => {
 
 async function retentionSweep() {
   if (!supabase) return;
+  const rateCutoff = new Date(Date.now() - 2 * 86400000).toISOString();
+  await supabase.from('scan_rate_limits').delete().lt('window_started_at', rateCutoff);
   const cutoff = new Date(Date.now() - RETENTION_DAYS * 86400000).toISOString();
   const { data: expired } = await supabase.from('scan_jobs').select('id,screenshot').is('user_id', null).lt('created_at', cutoff).limit(100);
   for (const job of expired || []) {
