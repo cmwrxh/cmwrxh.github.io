@@ -213,25 +213,33 @@ async function runCityDiagnostic(cityConfig, domain) {
 
 function renderCityBlock(c) {
   if (!c.available) {
-    return `<div style="padding:1rem;border:1px solid var(--border);border-radius:6px;margin-bottom:1rem;opacity:.7;"><div style="font-weight:600;margin-bottom:.3rem;">${c.flag} ${c.label}</div><div style="color:var(--text-muted);font-size:.85rem;">⚪ ${c.reason || 'No measurement available.'}</div></div>`;
+    return `<div class="scan-country scan-country-unavailable">
+      <span class="scan-country-name">${c.flag} ${c.label}</span>
+      <span class="scan-country-state">Unavailable</span>
+    </div>`;
   }
 
-  return `<div style="padding:1rem;border:1px solid var(--border);border-radius:6px;margin-bottom:1rem;">
-    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem;margin-bottom:.65rem;">
-      <div style="font-weight:600;">${c.flag} ${c.label}</div>
-      <div style="color:var(--${c.overall.color});font-weight:600;font-size:.9rem;">${c.overall.symbol} ${c.overall.label}</div>
+  return `<article class="scan-country">
+    <div class="scan-country-main">
+      <div class="scan-country-name">${c.flag} ${c.label}</div>
+      <div class="scan-country-metrics">
+        <div><span>Total response</span><strong>${fmtMs(c.timings.total)}</strong></div>
+        <div><span>Time to first byte</span><strong>${fmtMs(c.timings.firstByte)}</strong></div>
+        <div><span>HTTP status</span><strong>${c.statusCode || 'n/a'}</strong></div>
+      </div>
     </div>
-    <div style="font-size:.75rem;color:var(--text-muted);margin-bottom:.75rem;">Probe: ${c.probeLocation}${c.probeNetwork ? ` — ${c.probeNetwork}` : ''}</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;font-size:.9rem;">
-      <div>DNS: ${metricDisplay(c.dnsVerdict, c.timings.dns)}</div>
-      <div>TLS: ${metricDisplay(c.tlsVerdict, c.timings.tls)}</div>
-      <div>TTFB: ${metricDisplay(c.ttfbVerdict, c.timings.firstByte)}</div>
-      <div>Total: ${metricDisplay(c.totalVerdict, c.timings.total)}</div>
-      ${c.hopCount ? `<div>Route hops: <span class="highlight">${c.hopCount}</span></div>` : ''}
-      ${c.statusCode ? `<div>HTTP: <span class="highlight">${c.statusCode}</span></div>` : ''}
-    </div>
-    ${c.pathSummary ? `<div style="margin-top:.6rem;font-size:.78rem;color:var(--text);opacity:.85;word-break:break-word;">Path: ${c.pathSummary}</div>` : ''}
-  </div>`;
+    <details class="scan-country-details">
+      <summary>More details</summary>
+      <div class="scan-detail-grid">
+        <div><span>DNS</span><strong>${fmtMs(c.timings.dns)}</strong></div>
+        <div><span>TLS</span><strong>${fmtMs(c.timings.tls)}</strong></div>
+        <div><span>Probe location</span><strong>${c.probeLocation || c.label}</strong></div>
+        ${c.probeNetwork ? `<div><span>Network</span><strong>${c.probeNetwork}</strong></div>` : ''}
+        ${c.hopCount ? `<div><span>Route hops</span><strong>${c.hopCount}</strong></div>` : ''}
+        ${c.pathSummary ? `<div class="scan-detail-path"><span>Observed route</span><strong>${c.pathSummary}</strong></div>` : ''}
+      </div>
+    </details>
+  </article>`;
 }
 
 function appendRawToggle(body, label, raw) {
@@ -313,82 +321,117 @@ async function runScan() {
   const status = document.getElementById('scan-status');
   const button = document.getElementById('scan-btn');
   const startedAt = new Date();
+  let completedLocations = 0;
 
   button.disabled = true;
-  button.textContent = 'Scanning...';
+  button.textContent = 'Scanning…';
   status.style.display = 'block';
-  status.style.margin = '1rem 0';
-  status.style.color = 'var(--text-muted)';
-  status.textContent = 'Running live measurements from selected African vantage points…';
+  status.className = 'scan-live-status';
+  status.textContent = `Checking ${domain} from available African network locations…`;
 
   output.style.display = 'block';
-  output.classList.add('terminal');
-  output.innerHTML = `<div class="terminal-header"><div class="terminal-dot red"></div><div class="terminal-dot yellow"></div><div class="terminal-dot green"></div><div class="terminal-title">africalatency-scan ~ ${domain}</div></div><div class="terminal-body" id="scan-body"></div>`;
+  output.className = 'scan-results-shell';
+  output.innerHTML = `
+    <div class="scan-progress-card" role="status" aria-live="polite">
+      <div class="scan-loader" aria-hidden="true"></div>
+      <div class="scan-progress-copy">
+        <strong>Measuring your endpoint</strong>
+        <p id="scan-progress-label">Checking available network locations…</p>
+      </div>
+      <div class="scan-progress-count" id="scan-progress-count">0 / ${AFRICA_PROBE_CITIES.length}</div>
+      <div class="scan-progress-track"><span id="scan-progress-bar"></span></div>
+      <p class="scan-progress-footnote">Only completed live measurements are included in your results.</p>
+    </div>`;
 
-  const body = document.getElementById('scan-body');
-  appendLine(body, `Requesting live measurements for ${domain} from up to 31 African countries…`);
-  appendLine(body, 'Only locations with available probes return live results. The 31-country list is a request scope, not a guarantee of probe availability.');
-
-  const results = await Promise.all(AFRICA_PROBE_CITIES.map(city =>
-    runCityDiagnostic(city, domain).then(result => {
-      appendResultLine(body, `${city.flag} ${city.label}: ${result.available ? `${result.overall.symbol} ${result.overall.label} · live result` : `⚪ unavailable · ${result.reason || 'no live result returned'}`}`);
-      return result;
-    })
-  ));
+  const results = await Promise.all(AFRICA_PROBE_CITIES.map(async city => {
+    const result = await runCityDiagnostic(city, domain);
+    completedLocations += 1;
+    const count = document.getElementById('scan-progress-count');
+    const label = document.getElementById('scan-progress-label');
+    const bar = document.getElementById('scan-progress-bar');
+    if (count) count.textContent = `${completedLocations} / ${AFRICA_PROBE_CITIES.length}`;
+    if (label) label.textContent = completedLocations === AFRICA_PROBE_CITIES.length
+      ? 'Preparing your results…'
+      : `Checking locations · ${completedLocations} of ${AFRICA_PROBE_CITIES.length} complete`;
+    if (bar) bar.style.width = `${Math.round(completedLocations / AFRICA_PROBE_CITIES.length * 100)}%`;
+    return result;
+  }));
 
   const completedAt = new Date();
   const worst = pickWorstCity(results);
-  const availableCount = results.filter(r => r.available).length;
+  const available = results.filter(r => r.available);
+  const availableCount = available.length;
+  const unavailable = results.filter(r => !r.available);
   const verdict = worst ? worst.overall : { label: 'UNKNOWN', color: 'warning', symbol: '⚪' };
+  const totals = available.map(r => Number(r.timings.total)).filter(Number.isFinite);
+  const fastest = totals.length
+    ? available.find(r => Number(r.timings.total) === Math.min(...totals))
+    : null;
 
-  await sleep(200);
-  appendLine(body, 'Compiling measured results…');
-  await sleep(200);
+  const unavailableDetails = unavailable.length ? `
+    <details class="scan-unavailable-list">
+      <summary>${unavailable.length} locations returned no completed result</summary>
+      <p>These locations are not counted as slow or healthy. A result was not available for this scan.</p>
+      <div class="scan-unavailable-grid">${unavailable.map(c => `
+        <div class="scan-unavailable-item"><span>${c.flag} ${c.label}</span><span>Unavailable</span></div>
+      `).join('')}</div>
+    </details>` : '';
 
-  const report = document.createElement('div');
-  report.style.marginTop = '1.25rem';
-  report.style.paddingTop = '1.25rem';
-  report.style.borderTop = '1px solid var(--border)';
-
-  report.innerHTML = `
-    <div style="display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;align-items:center;margin-bottom:1rem;">
-      <div><span style="color:var(--${verdict.color});font-weight:600;font-size:1.1rem;">${verdict.symbol} ${verdict.label}</span><div style="color:var(--text-muted);font-size:.78rem;margin-top:.25rem;">${availableCount} of ${AFRICA_PROBE_CITIES.length} requested country locations returned live HTTP measurements; ${AFRICA_PROBE_CITIES.length - availableCount} returned no live result. Unavailable locations are excluded from performance comparisons.</div></div>
-      <div style="color:var(--text-muted);font-size:.75rem;text-align:right;">Started ${startedAt.toLocaleString()}<br>Completed ${completedAt.toLocaleString()}</div>
-    </div>
-    ${buildSummary(results, completedAt)}
-    <div style="color:var(--text-muted);font-size:.8rem;line-height:1.6;margin-bottom:1rem;">We request measurements from up to 31 countries. Only locations with available probes return live results. “Unavailable” means this scan returned no completed live HTTP measurement for that country; it does not mean the country’s networks are universally unavailable. Request errors and rate limits are identified separately where returned.</div>
-    ${results.map(renderCityBlock).join('')}
-    <div style="padding:1.25rem;background:var(--bg);border-radius:6px;border:1px solid var(--border);margin-top:1rem;">
-      <div style="font-size:.95rem;font-weight:600;margin-bottom:.35rem;">Want to know why the results look this way?</div>
-      <div style="font-size:.8rem;color:var(--text-muted);margin-bottom:1rem;line-height:1.6;">The free scan shows a point-in-time snapshot. The Africa Latency Audit™ organizes available observations into a fuller report, compares responding locations, explains likely bottlenecks with appropriate caveats, and prioritizes practical next steps.</div>
-      <div class="scan-value-compare">
-        <div class="scan-value-column"><h4>Free scan</h4><ul><li>Snapshot of available live probe results</li><li>HTTP status and observed response timings</li><li>Basic route evidence where available</li><li>Useful starting point for investigation</li></ul></div>
-        <div class="scan-value-column scan-value-paid"><h4>Full audit · KES 3,500</h4><ul><li>Structured downloadable PDF report</li><li>Location-by-location result comparison</li><li>Clear limits and measurement context</li><li>Prioritized next steps based on observed patterns</li><li>Automated email delivery after payment</li></ul></div>
+  output.innerHTML = `
+    <section class="scan-report">
+      <div class="scan-report-heading">
+        <div>
+          <span class="scan-report-eyebrow">SCAN COMPLETE</span>
+          <h2>Results for <span>${domain}</span></h2>
+          <p>Live measurements returned for ${availableCount} of ${AFRICA_PROBE_CITIES.length} requested locations.</p>
+        </div>
+        <span class="scan-complete-mark" aria-label="Scan complete">✓</span>
       </div>
-      <div style="display:flex;gap:.75rem;flex-wrap:wrap;align-items:center;">
+
+      <div class="scan-summary-grid">
+        <div class="scan-summary-card scan-summary-primary">
+          <span>Locations measured</span>
+          <strong>${availableCount}<small> / ${AFRICA_PROBE_CITIES.length}</small></strong>
+        </div>
+        <div class="scan-summary-card">
+          <span>Fastest observed response</span>
+          <strong>${fastest ? fmtMs(fastest.timings.total) : 'n/a'}</strong>
+          <small>${fastest ? `${fastest.flag} ${fastest.label}` : 'No completed timing available'}</small>
+        </div>
+      </div>
+
+      <div class="scan-results-heading">
+        <div><h3>Measured locations</h3><p>Sorted in the order checked. Expand a location for technical details.</p></div>
+        <span class="scan-live-pill"><i></i> Live results</span>
+      </div>
+      ${available.length ? `<div class="scan-country-list">${available.map(renderCityBlock).join('')}</div>` : `
+        <div class="scan-empty-state"><strong>No completed measurements this time</strong><p>We couldn't obtain a live result from the requested locations. Try again later.</p></div>`}
+      ${unavailableDetails}
+
+      <p class="scan-measurement-note">This is a point-in-time snapshot, not a long-term benchmark. Unavailable locations are excluded from performance comparisons.</p>
+
+      <details class="scan-save-details" id="scan-save-details" hidden>
+        <summary>Scan history</summary>
+        <p id="scan-save-message"></p>
+      </details>
+
+      <div class="scan-audit-cta">
+        <div><span class="scan-report-eyebrow">NEED A CLEAR ACTION PLAN?</span><h3>Turn these measurements into next steps.</h3><p>The Africa Latency Audit organizes the available evidence into a structured report with comparisons and prioritized recommendations.</p></div>
         <a class="btn btn-primary" href="/audit-checkout.html">Get Full Audit · KES 3,500 →</a>
-        <a href="methodology.html" style="font-size:.82rem;color:var(--text-muted);">View our method</a>
       </div>
-    </div>
-  `;
+    </section>`;
 
-  body.appendChild(report);
-  const saveStatus = document.createElement('div');
-  saveStatus.style.cssText = 'margin-top:1rem;font-size:.85rem;color:var(--text-muted);';
-  saveStatus.textContent = 'Saving scan history…';
-  body.appendChild(saveStatus);
   const saveResult = await saveScanHistory(domain, results, verdict, startedAt, completedAt);
-  saveStatus.textContent = saveResult.saved
-    ? '✓ This scan has been saved to your Performance Dashboard under Recent scans.'
-    : saveResult.reason;
+  if (saveResult.saved) {
+    const saveDetails = document.getElementById('scan-save-details');
+    const saveMessage = document.getElementById('scan-save-message');
+    if (saveDetails && saveMessage) {
+      saveDetails.hidden = false;
+      saveMessage.textContent = 'This scan has been saved to your Performance Dashboard.';
+    }
+  }
 
-  results.forEach(result => {
-    if (!result.available) return;
-    appendRawToggle(body, `${result.label} HTTP`, result.httpMeasurement);
-    appendRawToggle(body, `${result.label} traceroute`, result.traceMeasurement);
-  });
-
-  status.textContent = `Scan completed at ${completedAt.toLocaleTimeString()}: ${availableCount} of ${AFRICA_PROBE_CITIES.length} requested countries returned live HTTP results; ${AFRICA_PROBE_CITIES.length - availableCount} did not. Only returned measurements are used in the performance summary.`;
+  status.textContent = `Scan complete. ${availableCount} of ${AFRICA_PROBE_CITIES.length} requested locations returned live results.`;
   button.disabled = false;
   button.textContent = 'Analyze Another Domain';
 }
