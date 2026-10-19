@@ -49,6 +49,7 @@ if(data.status==='failed'){setStatus(data.error||'The scan could not be complete
 status.hidden=true;content.hidden=false;
 document.getElementById('report-url').textContent=data.url||'Website';
 document.getElementById('report-date').textContent='Report generated '+(data.completedAt?new Date(data.completedAt).toLocaleString():'at an unknown time')+' · '+(data.device==='desktop'?'Desktop':'Mobile · simulated slow 4G');
+document.getElementById('report-location').textContent='Lighthouse tested from: '+(data.testedFrom||'Cloud worker')+' · African probe availability varies';
 document.getElementById('report-browser').textContent='Chrome '+(data.chromeVersion||'version unavailable')+' · Lighthouse '+(data.lighthouseVersion||'version unavailable');
 if(data.screenshotUrl&&/^https:\/\//i.test(data.screenshotUrl)){const img=document.getElementById('report-preview');img.src=data.screenshotUrl;img.hidden=false;}
 const s=data.summary||{},m=s.metrics||{};
