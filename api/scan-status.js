@@ -11,6 +11,7 @@ export default async function handler(req, res) {
   const headers = { Authorization: 'Bearer ' + INTERNAL_TOKEN };
   const userToken = String(req.headers.authorization || '').replace(/^Bearer\s+/i, '').trim();
   if (userToken) headers['x-user-token'] = userToken;
+  if (typeof req.headers['x-api-key'] === 'string') headers['x-api-key'] = req.headers['x-api-key'];
   try {
     const response = await fetch(workerUrl() + '/internal/jobs/' + encodeURIComponent(id), { headers, signal: AbortSignal.timeout(8000) });
     const payload = await response.json().catch(() => ({}));
