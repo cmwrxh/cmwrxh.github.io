@@ -141,7 +141,7 @@ async function globalpingCountry(url, country) {
       const result = item?.result || {};
       let avg = Number(result.stats?.rtt?.avg ?? result.stats?.avg ?? result.stats?.average ?? result.timings?.total);
       if (!Number.isFinite(avg) && typeof result.rawOutput === 'string') {
-        const match = result.rawOutput.match(/(?:rtt|round-trip).*?=\\s*[0-9.]+\\/([0-9.]+)/i);
+        const match = result.rawOutput.match(/(?:rtt|round-trip).*?=\s*[0-9.]+\/([0-9.]+)/i);
         if (match) avg = Number(match[1]);
       }
       if (item?.result?.status === 'finished' && Number.isFinite(avg) && avg >= 0) return { country: country.name, countryCode: country.code, status: 'measured', rttMs: Math.round(avg), probe: item.probe?.city || null };
