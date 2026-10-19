@@ -24,7 +24,7 @@ Worker only:
 - `WORKER_CONCURRENCY=1`
 - `SCAN_MAX_QUEUE=12`
 - `SCAN_ANON_RETENTION_DAYS=7`
-- `LIGHTHOUSE_TIMEOUT_MS=75000`
+- `LIGHTHOUSE_TIMEOUT_MS=75000`\n- `PAGESPEED_API_KEY` (optional; enables the Google PageSpeed Insights fallback)\n- `SCAN_ALERT_WEBHOOK_URL` (optional; receiver for queue-stall alert notifications)
 - `TEST_LOCATION_LABEL=Cloud worker`
 
 No service key or internal token belongs in browser code, repository files, screenshots, or public logs. The migration does not create or rotate secrets.
