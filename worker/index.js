@@ -292,9 +292,10 @@ app.post('/internal/jobs', async (req, res) => {
     if (allowed !== true) return res.status(429).json({ error: 'Scan limit reached. Please try again later.' });
   }
   const cacheSince = new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString();
-  const { data: cached } = await supabase.from('scan_jobs').select('id,public_id,status,stage,progress,created_at')
-    .eq('url', normalized).eq('device', device).eq('status', 'completed').eq('result->summary->>runCount', String(user || keyRecord ? 3 : 1)).gte('created_at', cacheSince)
-    .order('completed_at', { ascending: false }).limit(1).maybeSingle();
+  let cacheQuery = supabase.from('scan_jobs').select('id,public_id,status,stage,progress,created_at')
+    .eq('url', normalized).eq('device', device).eq('status', 'completed').eq('result->summary->>runCount', String(user || keyRecord ? 3 : 1)).gte('created_at', cacheSince);
+  cacheQuery = user || keyRecord ? cacheQuery.eq('user_id', user?.id || keyRecord.user_id) : cacheQuery.is('user_id', null);
+  const { data: cached } = await cacheQuery.order('completed_at', { ascending: false }).limit(1).maybeSingle();
   if (cached) return res.status(200).json({ jobId: cached.id, reportId: cached.public_id, queuePosition: 0, cacheHit: true });
   let activeQuery = supabase.from('scan_jobs').select('id,public_id,created_at').eq('url', normalized).eq('device', device).in('status', ['queued','processing']);
   activeQuery = user || keyRecord ? activeQuery.eq('user_id', user?.id || keyRecord.user_id) : activeQuery.is('user_id', null);
