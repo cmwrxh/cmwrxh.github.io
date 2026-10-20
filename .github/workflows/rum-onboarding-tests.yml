@@ -1,0 +1,32 @@
+name: RUM onboarding unit tests
+
+on:
+  pull_request:
+    paths:
+      - 'api/register-site.js'
+      - 'api/verify-domain.js'
+      - 'api/rum.js'
+      - 'lib/domain-verification.js'
+      - 'test/**'
+      - 'package.json'
+      - '.github/workflows/rum-onboarding-tests.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'api/register-site.js'
+      - 'api/verify-domain.js'
+      - 'api/rum.js'
+      - 'lib/domain-verification.js'
+      - 'test/**'
+      - 'package.json'
+      - '.github/workflows/rum-onboarding-tests.yml'
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm test
