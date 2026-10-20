@@ -1,6 +1,5 @@
 const { createClient } = require('@supabase/supabase-js');
 const { randomBytes } = require('node:crypto');
-const { isIP } = require('node:net');
 
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseSecretKey =
@@ -15,27 +14,7 @@ function bearerToken(req) {
   return header.startsWith('Bearer ') ? header.slice(7).trim() : '';
 }
 
-function parsePublicDomain(value) {
-  if (typeof value !== 'string') return null;
-  const raw = value.trim();
-  if (!raw || raw.length > 2048) return null;
-
-  let url;
-  try {
-    url = new URL(/^[a-z][a-z0-9+.-]*:\/\//i.test(raw) ? raw : 'https://' + raw);
-  } catch {
-    return null;
-  }
-
-  const hostname = url.hostname.toLowerCase().replace(/\.$/, '');
-  if (!['http:', 'https:'].includes(url.protocol)) return null;
-  if (url.username || url.password) return null;
-  if (!hostname || hostname.length > 253 || !hostname.includes('.')) return null;
-  if (hostname === 'localhost' || hostname.endsWith('.localhost') || isIP(hostname)) return null;
-  if (!/^(?=.{1,253}$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}$/i.test(hostname)) return null;
-
-  return hostname;
-}
+const { parsePublicDomain, verificationTxtRecord } = require('../lib/domain-verification');
 
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -93,12 +72,15 @@ module.exports = async function handler(req, res) {
   }
 
   const siteKey = 'rum_' + randomBytes(24).toString('hex');
+  const verificationToken = randomBytes(24).toString('hex');
   const { data: site, error: insertError } = await supabase
     .from('rum_sites')
     .insert({
       site_key: siteKey,
       name,
       domain,
+      domain_verification_token: verificationToken,
+      domain_verified_at: null,
       owner_id: user.id,
       owner_email: typeof user.email === 'string' ? user.email.toLowerCase() : null
     })
@@ -116,8 +98,8 @@ module.exports = async function handler(req, res) {
   }
 
   return res.status(201).json({
-    site: { id: site.id, site_key: site.site_key, name: site.name },
+    site: { id: site.id, name: site.name },
     domain,
-    snippet: '<script defer src="https://app.africalatency.dev/africalatency.js" data-al-key="' + site.site_key + '"></script>'
+    verification: verificationTxtRecord(domain, verificationToken)
   });
 };
