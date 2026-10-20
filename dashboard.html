@@ -350,6 +350,25 @@
 
     <div id="error" class="error hidden"></div>
 
+    <section id="site-onboarding" class="card hidden" style="max-width:680px;margin:0 auto 28px;">
+        <h2 style="margin:0 0 8px;font-size:22px;">Register your website</h2>
+        <p style="color:var(--muted);line-height:1.6;margin:0 0 20px;">Add the website you want to monitor. We will create a site key for your account and show you the snippet to install.</p>
+        <form id="site-onboarding-form">
+            <label for="site-domain" style="display:block;font-size:13px;font-weight:600;margin-bottom:7px;">Website domain</label>
+            <input id="site-domain" name="domain" type="text" required maxlength="253" autocomplete="url" placeholder="example.com" style="width:100%;padding:12px;border:1px solid var(--border);border-radius:8px;margin-bottom:16px;font:inherit;">
+            <label for="site-label" style="display:block;font-size:13px;font-weight:600;margin-bottom:7px;">Display name (optional)</label>
+            <input id="site-label" name="name" type="text" maxlength="100" placeholder="My website" style="width:100%;padding:12px;border:1px solid var(--border);border-radius:8px;margin-bottom:16px;font:inherit;">
+            <button id="site-onboarding-submit" type="submit" style="background:#175cd3;color:white;border:0;border-radius:8px;padding:11px 16px;font-weight:600;cursor:pointer;">Register website</button>
+            <p id="site-onboarding-status" role="status" aria-live="polite" style="color:var(--muted);font-size:13px;line-height:1.5;margin:14px 0 0;"></p>
+        </form>
+        <div id="site-install-instructions" class="hidden" style="margin-top:22px;">
+            <h3 style="font-size:17px;margin:0 0 8px;">Install the monitoring snippet</h3>
+            <p style="color:var(--muted);font-size:13px;line-height:1.6;">Add this snippet to your website before the closing <code>&lt;/body&gt;</code> tag. Real-user data will appear after visitors load pages with the snippet installed.</p>
+            <textarea id="site-install-snippet" readonly rows="3" aria-label="Monitoring installation snippet" style="width:100%;padding:12px;border:1px solid var(--border);border-radius:8px;font:12px ui-monospace,monospace;resize:vertical;"></textarea>
+            <button id="copy-site-snippet" type="button" style="margin-top:10px;border:1px solid var(--border);background:white;border-radius:8px;padding:9px 12px;font-weight:600;cursor:pointer;">Copy snippet</button>
+        </div>
+    </section>
+
     <section id="dashboard-content" class="hidden">
 
         <div class="toolbar">
@@ -502,6 +521,13 @@
     const loading = document.getElementById('loading');
     const errorBox = document.getElementById('error');
     const dashboardContent = document.getElementById('dashboard-content');
+    const onboarding = document.getElementById('site-onboarding');
+    const onboardingForm = document.getElementById('site-onboarding-form');
+    const onboardingStatus = document.getElementById('site-onboarding-status');
+    const onboardingSubmit = document.getElementById('site-onboarding-submit');
+    const installInstructions = document.getElementById('site-install-instructions');
+    const installSnippet = document.getElementById('site-install-snippet');
+    const copySnippetButton = document.getElementById('copy-site-snippet');
 
     const siteName = document.getElementById('site-name');
     const userEmail = document.getElementById('user-email');
@@ -526,6 +552,7 @@
     function showError(message) {
         loading.classList.add('hidden');
         dashboardContent.classList.add('hidden');
+        onboarding.classList.add('hidden');
 
         errorBox.textContent = message;
         errorBox.classList.remove('hidden');
@@ -592,13 +619,7 @@
             throw new Error('Unable to load your monitoring sites.');
         }
 
-        if (!data || data.length === 0) {
-            throw new Error(
-                'No monitoring site is associated with this account yet.'
-            );
-        }
-
-        return data;
+        return Array.isArray(data) ? data : [];
     }
 
     async function loadStats() {
@@ -783,12 +804,20 @@
 
             const sites = await loadSites(session.user);
 
+            if (sites.length === 0) {
+                loading.classList.add('hidden');
+                errorBox.classList.add('hidden');
+                onboarding.classList.remove('hidden');
+                dashboardContent.classList.add('hidden');
+                return;
+            }
+
             /*
-             * First dashboard version supports the first site associated
-             * with the account. Multi-site switching can be added later.
+             * First dashboard version supports one site per account.
              */
             const site = sites[0];
 
+            onboarding.classList.add('hidden');
             currentSiteKey = site.site_key;
             siteName.textContent = site.name;
 
@@ -807,6 +836,70 @@
             );
         }
     }
+
+    onboardingForm.addEventListener('submit', async function (event) {
+        event.preventDefault();
+        onboardingStatus.textContent = '';
+        installInstructions.classList.add('hidden');
+
+        const domain = document.getElementById('site-domain').value.trim();
+        const name = document.getElementById('site-label').value.trim();
+        if (!domain) {
+            onboardingStatus.textContent = 'Enter your website domain.';
+            return;
+        }
+
+        onboardingSubmit.disabled = true;
+        onboardingSubmit.textContent = 'Registering…';
+
+        try {
+            const { data: { session }, error: sessionError } = await client.auth.getSession();
+            if (sessionError || !session) {
+                window.location.href = '/login.html';
+                return;
+            }
+
+            const response = await fetch('/api/register-site', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: 'Bearer ' + session.access_token
+                },
+                body: JSON.stringify({ domain, name })
+            });
+
+            const result = await response.json().catch(() => ({}));
+            if (!response.ok) {
+                throw new Error(result.error || 'Unable to register this website.');
+            }
+
+            const site = result.site;
+            if (!site || !site.site_key) {
+                throw new Error('The site was registered, but its installation key was not returned. Refresh the dashboard.');
+            }
+
+            installSnippet.value = '<script defer src="https://app.africalatency.dev/africalatency.js" data-al-key="' + site.site_key + '"><\\/script>';
+            installInstructions.classList.remove('hidden');
+            onboardingStatus.textContent = 'Website registered successfully. Install the snippet to begin collecting real-user measurements.';
+            onboardingForm.reset();
+            onboardingSubmit.textContent = 'Registered';
+        } catch (error) {
+            onboardingStatus.textContent = error.message || 'Unable to register this website. Please try again.';
+            onboardingSubmit.disabled = false;
+            onboardingSubmit.textContent = 'Register website';
+        }
+    });
+
+    copySnippetButton.addEventListener('click', async function () {
+        try {
+            await navigator.clipboard.writeText(installSnippet.value);
+            copySnippetButton.textContent = 'Copied';
+        } catch {
+            installSnippet.focus();
+            installSnippet.select();
+            onboardingStatus.textContent = 'Clipboard access was blocked. The snippet is selected so you can copy it manually.';
+        }
+    });
 
     daysSelect.addEventListener('change', async function () {
         await loadStats();
