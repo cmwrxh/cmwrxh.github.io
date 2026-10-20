@@ -35,32 +35,11 @@ function rateOk(ip) {
   return true;
 }
 
-async function geoFor(ip) {
-  // Do not persist raw client IP addresses in our database. The address is
-  // used transiently for rate limiting and, when configured, a geolocation
-  // lookup. Only coarse network metadata is returned to the event writer.
-  if (!process.env.IPINFO_TOKEN) return null;
-
-  try {
-    const r = await fetch(
-      `https://ipinfo.io/${encodeURIComponent(ip)}/json?token=${process.env.IPINFO_TOKEN}`
-    );
-
-    if (!r.ok) return null;
-
-    const j = await r.json();
-    const mm = String(j.org || '').match(/^(AS\d+)\s*(.*)$/);
-
-    return {
-      country: j.country || null,
-      region: j.region || null,
-      city: j.city || null,
-      asn: mm ? mm[1] : null,
-      isp: mm && mm[2] ? mm[2].trim() : (j.org || null),
-    };
-  } catch {
-    return null;
-  }
+async function geoFor(_ip) {
+  // Privacy-first beta: do not persist raw IPs or send them to a geolocation
+  // provider. Coarse location enrichment is disabled until we can use a
+  // privacy-preserving source that does not receive the client's raw address.
+  return null;
 }
 
 function deviceType(ua) {
