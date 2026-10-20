@@ -98,6 +98,7 @@ module.exports = async function handler(req, res) {
     .insert({
       site_key: siteKey,
       name,
+      domain,
       owner_id: user.id,
       owner_email: typeof user.email === 'string' ? user.email.toLowerCase() : null
     })
