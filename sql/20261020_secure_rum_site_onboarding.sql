@@ -7,7 +7,9 @@
 -- the application branch.
 
 ALTER TABLE public.rum_sites
-  ADD COLUMN IF NOT EXISTS domain text;
+  ADD COLUMN IF NOT EXISTS domain text,
+  ADD COLUMN IF NOT EXISTS domain_verification_token text,
+  ADD COLUMN IF NOT EXISTS domain_verified_at timestamptz;
 
 CREATE UNIQUE INDEX IF NOT EXISTS rum_sites_one_owned_site_per_user
   ON public.rum_sites (owner_id)
