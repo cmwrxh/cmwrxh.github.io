@@ -362,10 +362,19 @@
             <p id="site-onboarding-status" role="status" aria-live="polite" style="color:var(--muted);font-size:13px;line-height:1.5;margin:14px 0 0;"></p>
         </form>
         <div id="site-install-instructions" class="hidden" style="margin-top:22px;">
+            <div id="site-domain-verification">
+                <h3 style="font-size:17px;margin:0 0 8px;">Verify domain ownership</h3>
+                <p style="color:var(--muted);font-size:13px;line-height:1.6;">Add this DNS TXT record to your domain. Once DNS publishes it, click Verify domain. We will not issue the installation snippet until verification succeeds.</p>
+                <p><strong>TXT name:</strong> <code id="site-verification-name"></code></p>
+                <p><strong>TXT value:</strong> <code id="site-verification-value"></code></p>
+                <button id="verify-site-domain" type="button" style="border:1px solid var(--border);background:white;border-radius:8px;padding:9px 12px;font-weight:600;cursor:pointer;">Verify domain</button>
+            </div>
+            <div id="site-snippet-section" class="hidden" style="margin-top:22px;">
             <h3 style="font-size:17px;margin:0 0 8px;">Install the monitoring snippet</h3>
             <p style="color:var(--muted);font-size:13px;line-height:1.6;">Add this snippet to your website before the closing <code>&lt;/body&gt;</code> tag. Real-user data will appear after visitors load pages with the snippet installed.</p>
             <textarea id="site-install-snippet" readonly rows="3" aria-label="Monitoring installation snippet" style="width:100%;padding:12px;border:1px solid var(--border);border-radius:8px;font:12px ui-monospace,monospace;resize:vertical;"></textarea>
             <button id="copy-site-snippet" type="button" style="margin-top:10px;border:1px solid var(--border);background:white;border-radius:8px;padding:9px 12px;font-weight:600;cursor:pointer;">Copy snippet</button>
+            </div>
         </div>
     </section>
 
@@ -528,6 +537,12 @@
     const installInstructions = document.getElementById('site-install-instructions');
     const installSnippet = document.getElementById('site-install-snippet');
     const copySnippetButton = document.getElementById('copy-site-snippet');
+    const verificationName = document.getElementById('site-verification-name');
+    const verificationValue = document.getElementById('site-verification-value');
+    const verifyDomainButton = document.getElementById('verify-site-domain');
+    const domainVerification = document.getElementById('site-domain-verification');
+    const snippetSection = document.getElementById('site-snippet-section');
+    let registeredDomainForVerification = '';
 
     const siteName = document.getElementById('site-name');
     const userEmail = document.getElementById('user-email');
@@ -873,20 +888,57 @@
                 throw new Error(result.error || 'Unable to register this website.');
             }
 
-            const site = result.site;
-            if (!site || !site.site_key) {
-                throw new Error('The site was registered, but its installation key was not returned. Refresh the dashboard.');
+            if (!result.verification || !result.verification.name || !result.verification.value) {
+                throw new Error('Registration succeeded but DNS verification details were not returned. Refresh the dashboard.');
             }
 
-            installSnippet.value = '<script defer src="https://app.africalatency.dev/africalatency.js" data-al-key="' + site.site_key + '"><\/script>';
+            registeredDomainForVerification = result.domain;
+            verificationName.textContent = result.verification.name;
+            verificationValue.textContent = result.verification.value;
+            domainVerification.classList.remove('hidden');
+            snippetSection.classList.add('hidden');
             installInstructions.classList.remove('hidden');
-            onboardingStatus.textContent = 'Website registered successfully. Install the snippet to begin collecting real-user measurements.';
+            onboardingStatus.textContent = 'Website registered. Add the DNS TXT record above, wait for DNS to update, then verify ownership.';
             onboardingForm.reset();
             onboardingSubmit.textContent = 'Registered';
         } catch (error) {
             onboardingStatus.textContent = error.message || 'Unable to register this website. Please try again.';
             onboardingSubmit.disabled = false;
             onboardingSubmit.textContent = 'Register website';
+        }
+    });
+
+
+    verifyDomainButton.addEventListener('click', async function () {
+        verifyDomainButton.disabled = true;
+        verifyDomainButton.textContent = 'Checking DNS…';
+        onboardingStatus.textContent = '';
+        try {
+            const { data: { session }, error: sessionError } = await client.auth.getSession();
+            if (sessionError || !session) {
+                window.location.href = '/login.html';
+                return;
+            }
+            const response = await fetch('/api/verify-domain', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: 'Bearer ' + session.access_token
+                },
+                body: JSON.stringify({ domain: registeredDomainForVerification })
+            });
+            const result = await response.json().catch(() => ({}));
+            if (!response.ok) throw new Error(result.error || 'Domain verification failed.');
+            if (!result.site || !result.site.site_key) throw new Error('Verification passed but no installation key was returned.');
+            installSnippet.value = '<script defer src="https://app.africalatency.dev/africalatency.js" data-al-key="' + result.site.site_key + '"><\\/script>';
+            domainVerification.classList.add('hidden');
+            snippetSection.classList.remove('hidden');
+            onboardingStatus.textContent = 'Domain verified. Install the snippet to begin collecting real-user measurements.';
+            verifyDomainButton.textContent = 'Verified';
+        } catch (error) {
+            onboardingStatus.textContent = error.message || 'Could not verify the domain yet. Check the TXT record and try again.';
+            verifyDomainButton.disabled = false;
+            verifyDomainButton.textContent = 'Verify domain';
         }
     });
 
