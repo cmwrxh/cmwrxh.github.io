@@ -147,13 +147,35 @@ export default async function handler(req, res) {
 
   const { data: site } = await db
     .from('rum_sites')
-    .select('id')
+    .select('id, domain')
     .eq('site_key', siteKey)
     .maybeSingle();
 
   // Fail silently so public requests cannot discover valid site keys.
   if (!site) {
     return res.status(204).end();
+  }
+
+  // For newly registered sites, accept browser beacons only from the
+  // registered hostname or one of its subdomains. Legacy sites without a
+  // domain keep their existing behaviour until they are migrated manually.
+  if (site.domain) {
+    const origin = String(req.headers.origin || '').trim();
+    const referer = String(req.headers.referer || req.headers.referrer || '').trim();
+    let sourceHost = '';
+
+    try {
+      if (origin && origin !== 'null') sourceHost = new URL(origin).hostname.toLowerCase();
+      else if (referer) sourceHost = new URL(referer).hostname.toLowerCase();
+    } catch {
+      return res.status(204).end();
+    }
+
+    const registeredDomain = String(site.domain).toLowerCase();
+    const allowedSource = sourceHost === registeredDomain ||
+      sourceHost.endsWith('.' + registeredDomain);
+
+    if (!allowedSource) return res.status(204).end();
   }
 
   const geo = await geoFor(ip);
