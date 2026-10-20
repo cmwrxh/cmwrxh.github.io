@@ -36,20 +36,9 @@ function rateOk(ip) {
 }
 
 async function geoFor(ip) {
-  const db = supa();
-
-  const { data: cached } = await db
-    .from('ip_geo_cache')
-    .select('data')
-    .eq('ip', ip)
-    .gt(
-      'fetched_at',
-      new Date(Date.now() - 7 * 864e5).toISOString()
-    )
-    .maybeSingle();
-
-  if (cached) return cached.data;
-
+  // Do not persist raw client IP addresses in our database. The address is
+  // used transiently for rate limiting and, when configured, a geolocation
+  // lookup. Only coarse network metadata is returned to the event writer.
   if (!process.env.IPINFO_TOKEN) return null;
 
   try {
@@ -60,24 +49,15 @@ async function geoFor(ip) {
     if (!r.ok) return null;
 
     const j = await r.json();
+    const mm = String(j.org || '').match(/^(AS\\d+)\\s*(.*)$/);
 
-    const mm = String(j.org || '').match(/^(AS\d+)\s*(.*)$/);
-
-    const data = {
+    return {
       country: j.country || null,
       region: j.region || null,
       city: j.city || null,
       asn: mm ? mm[1] : null,
-      isp: mm && mm[2]
-        ? mm[2].trim()
-        : (j.org || null),
+      isp: mm && mm[2] ? mm[2].trim() : (j.org || null),
     };
-
-    await db
-      .from('ip_geo_cache')
-      .upsert({ ip, data });
-
-    return data;
   } catch {
     return null;
   }
