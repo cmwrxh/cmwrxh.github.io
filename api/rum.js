@@ -49,7 +49,7 @@ async function geoFor(ip) {
     if (!r.ok) return null;
 
     const j = await r.json();
-    const mm = String(j.org || '').match(/^(AS\\d+)\\s*(.*)$/);
+    const mm = String(j.org || '').match(/^(AS\d+)\s*(.*)$/);
 
     return {
       country: j.country || null,
