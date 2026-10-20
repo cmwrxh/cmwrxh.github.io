@@ -19,6 +19,7 @@
   <div class="scan-eyebrow">Free website performance report</div>
   <h1>How does your website perform for visitors in Africa?</h1>
   <p class="scan-lead">Get a Lighthouse report alongside live latency measurements from available African network probes. Start with a URL. No account required for the free summary.</p>
+  <div class="scan-resource-links"><a href="/sample-report">Preview a sample audit report <span aria-hidden="true">↗</span></a><a href="/methodology">How measurements work</a></div>
   <form id="scan-form-v2" class="scan-form" novalidate>
     <label for="scan-url"><strong>Website URL</strong></label>
     <div class="scan-url-row" style="margin-top:8px">
@@ -37,13 +38,14 @@
     <div id="scan-error" class="scan-error" role="alert"></div>
   </form>
   <section id="scan-work" class="scan-work" aria-live="polite">
-    <div class="scan-progress-head"><h2>Your scan is in progress</h2><span id="scan-queue-count" class="scan-progress-count"></span></div>
+    <div class="scan-progress-head"><h2>Your scan is in progress</h2><div class="scan-progress-meta"><span id="scan-queue-count" class="scan-progress-count"></span><span id="scan-elapsed" class="scan-progress-count">Typical duration: 1–3 minutes</span></div></div>
     <div class="scan-segments" aria-hidden="true"><span data-scan-segment></span><span data-scan-segment></span><span data-scan-segment></span><span data-scan-segment></span><span data-scan-segment></span></div>
     <h3 id="scan-stage" class="scan-stage">Adding job to queue...</h3>
     <p id="scan-stage-copy" class="scan-stage-copy">Securing a place in the scan queue.</p>
     <div id="scan-preview" class="scan-preview"><div class="scan-sweep" aria-hidden="true"></div><div class="scan-preview-placeholder">A preview of the page being tested will appear here.</div></div>
     <p class="scan-tips"><strong>Did you know?</strong> <span id="scan-tip"></span></p>
     <div class="scan-info">
+      <div class="scan-info-card"><span>Measurement status</span><strong>Live probe availability is checked during the scan; unavailable locations are disclosed.</strong></div>
       <div class="scan-info-card"><span>Test location(s)</span><strong>African Globalping probes · availability varies by country</strong></div>
       <div class="scan-info-card"><span>Browser engine</span><strong>Chrome + Lighthouse · versions shown in the report</strong></div>
     </div>
@@ -51,7 +53,7 @@
   <section style="margin-top:36px">
     <h2 style="font-size:1.35rem">One report, two perspectives</h2>
     <p class="scan-lead" style="font-size:.95rem">Lighthouse measures page quality in a controlled browser. Globalping adds point-in-time network latency from African locations where a probe is available. The results are shown separately so lab scores are not confused with network measurements.</p>
-    <p class="scan-note"><a href="/how-we-score">Read how Performance, Structure and the overall grade are calculated.</a></p>
+    <p class="scan-note"><a href="/how-we-score">Read how Performance, Structure and the overall grade are calculated.</a> · <a href="/methodology">Review measurement methodology</a> · <a href="/sample-report">View sample audit report</a></p>
   </section>
 </main>
 <footer><div class="footer-inner"><div class="footer-left"><img class="footer-wordmark" src="/images/africalatency-logo-dark.svg" alt="AfricaLatency" width="180" height="28"><span>© 2026 AfricaLatency</span></div><div class="footer-links"><a href="/privacy-policy">Privacy</a><a href="/contact">Contact</a></div></div></footer>

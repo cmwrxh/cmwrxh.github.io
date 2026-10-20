@@ -38,3 +38,15 @@
 @keyframes scan-sweep{0%{transform:translateY(0);opacity:.3}50%{opacity:1}100%{transform:translateY(100%);opacity:.3}}
 @media(max-width:640px){.scan-url-row{flex-direction:column}.scan-run{width:100%}.scan-form{padding:14px}.scan-info{grid-template-columns:1fr}.scan-preview{aspect-ratio:4/3}.scan-progress-head h2{font-size:1.15rem}}
 @media(prefers-reduced-motion:reduce){.scan-sweep{animation:none}.scan-segments span{transition:none}}
+
+/* Product confidence and conversion improvements */
+.scan-resource-links{display:flex;gap:16px;flex-wrap:wrap;margin:16px 0 8px;font-size:.9rem;font-weight:650}
+.scan-resource-links a{color:#1746a2;text-decoration:none}
+.scan-resource-links a:hover{text-decoration:underline}
+.scan-resource-links a:focus-visible{outline:3px solid #7db2ff;outline-offset:3px;border-radius:4px}
+.scan-info-card{min-width:0}
+.scan-info-card strong{line-height:1.5}
+.scan-work[aria-busy=true] .scan-stage:before{content:"";display:inline-block;width:9px;height:9px;margin-right:10px;border-radius:50%;background:#2c67c7;box-shadow:0 0 0 4px #2c67c71c;vertical-align:middle;animation:scan-pulse 1.5s ease-in-out infinite}
+@keyframes scan-pulse{50%{opacity:.45;box-shadow:0 0 0 7px #2c67c70b}}
+@media(max-width:640px){.scan-resource-links{gap:10px 16px}.scan-resource-links a{padding:4px 0}}
+@media(prefers-reduced-motion:reduce){.scan-work[aria-busy=true] .scan-stage:before{animation:none}}
