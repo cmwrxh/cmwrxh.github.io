@@ -55,7 +55,7 @@ module.exports = async function handler(req, res) {
   // choose owner_id or claim an existing site by supplying a site key.
   const { data: existing, error: existingError } = await supabase
     .from('rum_sites')
-    .select('id, name')
+    .select('id, name, domain, domain_verification_token, domain_verified_at')
     .eq('owner_id', user.id)
     .limit(1)
     .maybeSingle();
@@ -66,9 +66,14 @@ module.exports = async function handler(req, res) {
   }
 
   if (existing) {
-    return res.status(409).json({
-      error: 'A monitoring site is already registered for this account. Refresh your dashboard to open it.'
-    });
+    if (existing.domain && !existing.domain_verified_at && existing.domain_verification_token) {
+      return res.status(200).json({
+        pending: true,
+        domain: existing.domain,
+        verification: verificationTxtRecord(existing.domain, existing.domain_verification_token)
+      });
+    }
+    return res.status(409).json({ error: 'A monitoring site is already registered for this account. Refresh your dashboard to open it.' });
   }
 
   const siteKey = 'rum_' + randomBytes(24).toString('hex');
