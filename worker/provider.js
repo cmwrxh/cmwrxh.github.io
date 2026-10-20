@@ -31,7 +31,11 @@ async function runLighthouseOnce(url, device) {
     return summarizeRun(result.lhr);
   } finally {
     clearTimeout(timer);
-    await chrome.kill().catch(() => {});
+    try {
+      await chrome.kill();
+    } catch {
+      // Ignore cleanup errors so they do not mask the Lighthouse result or original failure.
+    }
   }
 }
 
