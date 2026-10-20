@@ -878,7 +878,7 @@
                 throw new Error('The site was registered, but its installation key was not returned. Refresh the dashboard.');
             }
 
-            installSnippet.value = '<script defer src="https://app.africalatency.dev/africalatency.js" data-al-key="' + site.site_key + '"><\\/script>';
+            installSnippet.value = '<script defer src="https://app.africalatency.dev/africalatency.js" data-al-key="' + site.site_key + '"><\/script>';
             installInstructions.classList.remove('hidden');
             onboardingStatus.textContent = 'Website registered successfully. Install the snippet to begin collecting real-user measurements.';
             onboardingForm.reset();
