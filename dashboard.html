@@ -625,7 +625,7 @@
     async function loadSites(user) {
         const { data, error } = await client
             .from('rum_sites')
-            .select('id, site_key, name')
+            .select('id, site_key, name, domain, domain_verified_at')
             .eq('owner_id', user.id)
             .order('created_at', { ascending: true });
 
@@ -819,11 +819,16 @@
 
             const sites = await loadSites(session.user);
 
-            if (sites.length === 0) {
+            if (sites.length === 0 || (sites[0].domain && !sites[0].domain_verified_at)) {
                 loading.classList.add('hidden');
                 errorBox.classList.add('hidden');
                 onboarding.classList.remove('hidden');
                 dashboardContent.classList.add('hidden');
+                if (sites.length && sites[0].domain && !sites[0].domain_verified_at) {
+                    document.getElementById('site-domain').value = sites[0].domain;
+                    onboardingStatus.textContent = 'Domain verification is pending. Submit the domain below to retrieve your DNS TXT instructions again.';
+                    onboardingSubmit.textContent = 'Resume verification';
+                }
                 return;
             }
 
