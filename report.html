@@ -76,8 +76,9 @@ coverage.innerHTML='<span class="coverage-chip is-measured"><span class="coverag
 const chart=document.getElementById('latency-chart');
 if(measuredRows.length){const max=Math.max(...measuredRows.map(r=>Number(r.rttMs)),1);chart.innerHTML=measuredRows.map(r=>'<div class="latency-bar-row"><span class="latency-bar-label">'+esc(r.country||'Unknown location')+'</span><div class="latency-bar-track" aria-hidden="true"><div class="latency-bar-fill" style="width:'+Math.max(2,Number(r.rttMs)/max*100)+'%"></div></div><span class="latency-bar-value">'+esc(fmt(r.rttMs))+'</span></div>').join('');}else{chart.innerHTML='<p class="latency-chart-empty">No completed probe measurements were returned for this scan, so there is no latency chart to display.</p>';}
 document.getElementById('africa-table').innerHTML=rows.map(r=>{const valid=hasValidRtt(r);return '<tr><td>'+esc(r.country||'Unknown location')+'</td><td>'+esc(r.probe||'—')+'</td><td>'+(valid?esc(fmt(r.rttMs)):'—')+'</td><td>'+esc(valid?'Measured':'Unavailable / incomplete')+'</td></tr>';}).join('')||'<tr><td colspan="4">No completed African probe results were returned.</td></tr>';
-const am=data.africaLatencySummary;
-document.getElementById('africa-summary').textContent=am?(am.medianRttMs===null?'No country returned a completed ping result.':('Median observed RTT: '+am.medianRttMs+' ms across '+am.measuredCountries+' of '+am.requestedCountries+' requested countries.')):'Country summary unavailable.';
+const observedRtts=measuredRows.map(r=>Number(r.rttMs)).sort((a,b)=>a-b);
+const medianObservedRtt=observedRtts.length?(observedRtts.length%2?observedRtts[(observedRtts.length-1)/2]:(observedRtts[observedRtts.length/2-1]+observedRtts[observedRtts.length/2])/2):null;
+document.getElementById('africa-summary').textContent=medianObservedRtt===null?'No valid completed ping measurements were returned for this scan.':('Median observed RTT: '+Math.round(medianObservedRtt)+' ms across '+measuredRows.length+' measured location'+(measuredRows.length===1?'':'s')+' of '+rows.length+' returned locations. This is a single-scan snapshot, not a long-term benchmark.');
 if(data.fullReport){
 document.getElementById('locked-overlay').hidden=true;document.getElementById('full-report-content').hidden=true;
 const f=data.fullReport, scores=f.scores||{}, metrics=f.metrics||{}, opp=f.opportunities||[];
