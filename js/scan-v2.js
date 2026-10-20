@@ -1,4 +1,10 @@
 (() => {
+  // Keep Scan V2 on its configured canonical host so Turnstile site keys and API
+  // environment match. Only redirect the scan route, not the marketing site.
+  if (['africalatency.dev', 'www.africalatency.dev'].includes(window.location.hostname) && /^\/scan\/?$/.test(window.location.pathname)) {
+    window.location.replace('https://app.africalatency.dev' + window.location.pathname + window.location.search + window.location.hash);
+    return;
+  }
   const form = document.getElementById('scan-form-v2');
   if (!form) return;
   const input = document.getElementById('scan-url');
