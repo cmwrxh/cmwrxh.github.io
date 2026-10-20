@@ -14,6 +14,16 @@
   const stageTitle = document.getElementById('scan-stage');
   const stageCopy = document.getElementById('scan-stage-copy');
   const count = document.getElementById('scan-queue-count');
+  const elapsedLabel = document.getElementById('scan-elapsed');
+  let scanStartedAt = 0, elapsedTimer = null;
+  function updateElapsed() {
+    if (!elapsedLabel || !scanStartedAt) return;
+    const seconds = Math.floor((Date.now() - scanStartedAt) / 1000);
+    const mm = String(Math.floor(seconds / 60)).padStart(2, '0');
+    const ss = String(seconds % 60).padStart(2, '0');
+    elapsedLabel.textContent = 'Elapsed ' + mm + ':' + ss + ' · typical duration 1–3 min';
+  }
+  function stopElapsed() { if (elapsedTimer) clearInterval(elapsedTimer); elapsedTimer = null; }
   const segments = [...document.querySelectorAll('[data-scan-segment]')];
   const preview = document.getElementById('scan-preview');
   const tips = [
@@ -90,6 +100,9 @@
       if (payload.stage !== lastStage) { lastStage = payload.stage; setStage(payload.stage, payload.stage === 'queued' ? (payload.queuePosition || initialPosition) : null); }
       if (payload.status === 'failed') throw new Error(payload.error || 'Site unreachable or scan timed out.');
       if (payload.status === 'completed') {
+        stopElapsed();
+        if (elapsedLabel) elapsedLabel.textContent = 'Completed in ' + elapsedLabel.textContent.replace(/^Elapsed /,'').replace(/ · typical duration.*$/,'');
+        work.setAttribute('aria-busy','false');
         setStage('completed');
         stageCopy.textContent = 'Opening the shareable report…';
         window.location.href = '/report.html?id=' + encodeURIComponent(reportId || payload.reportId || jobId);
@@ -138,6 +151,11 @@
     try { url = normalizeUrl(input.value); } catch (e) { setError(e.message); input.focus(); return; }
     button.disabled = true;
     button.textContent = 'Starting scan…';
+    scanStartedAt = Date.now();
+    stopElapsed();
+    updateElapsed();
+    elapsedTimer = setInterval(updateElapsed, 1000);
+    work.setAttribute('aria-busy','true');
     work.style.display = 'block';
     work.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
     setStage('queued');
@@ -158,6 +176,8 @@
       setStage('queued', data.queuePosition);
       await poll(data.jobId, data.reportId, data.queuePosition);
     } catch (e) {
+      stopElapsed();
+      work.setAttribute('aria-busy','false');
       setError(e.message || 'The scan could not be started.');
       stageTitle.textContent = 'Scan paused';
       stageCopy.textContent = 'Correct the issue above and try again.';
@@ -166,5 +186,5 @@
       if (window.turnstile && turnstileWidget !== null) { window.turnstile.reset(turnstileWidget); turnstileToken = ''; }
     }
   });
-  window.addEventListener('pagehide', () => { if (tipTimer) clearInterval(tipTimer); });
+  window.addEventListener('pagehide', () => { if (tipTimer) clearInterval(tipTimer); stopElapsed(); });
 })();
