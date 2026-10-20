@@ -106,7 +106,7 @@ export default async function handler(req, res) {
 
   const { data: site } = await db
     .from('rum_sites')
-    .select('id, domain')
+    .select('id, domain, domain_verified_at')
     .eq('site_key', siteKey)
     .maybeSingle();
 
@@ -118,6 +118,9 @@ export default async function handler(req, res) {
   // For newly registered sites, accept browser beacons only from the
   // registered hostname or one of its subdomains. Legacy sites without a
   // domain keep their existing behaviour until they are migrated manually.
+  if (site.domain && !site.domain_verified_at) return res.status(204).end();
+
+  // Origin/Referer filtering is defense-in-depth only; DNS TXT ownership is the trust gate.
   if (site.domain) {
     const origin = String(req.headers.origin || '').trim();
     const referer = String(req.headers.referer || req.headers.referrer || '').trim();
