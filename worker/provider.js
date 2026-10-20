@@ -21,8 +21,8 @@ async function runLighthouseOnce(url, device) {
       emulatedFormFactor: device === 'desktop' ? 'desktop' : 'mobile',
       throttlingMethod: device === 'desktop' ? 'provided' : 'simulate',
       screenEmulation: device === 'desktop'
-        ? { mobile: false, width: 1350, height: 940, deviceScaleFactor: 1, disabled: true }
-        : { mobile: true, width: 360, height: 800, deviceScaleFactor: 2, disabled: false }
+        ? { mobile: false, width: 1440, height: 1000, deviceScaleFactor: 1, disabled: true }
+        : { mobile: true, width: 390, height: 844, deviceScaleFactor: 3, disabled: false }
     });
     const timeout = new Promise((_, reject) => {
       timer = setTimeout(() => reject(new Error('Timed out')), timeoutMs);
