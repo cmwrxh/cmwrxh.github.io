@@ -400,3 +400,9 @@ main .faq-question { color: #f4f8ff; }
 
 .pilot-invitation { margin: 32px 0 0; padding: 18px 0 0; border-top: 1px solid rgba(166,199,228,.2); color: #9aa7bd; font-size: 16px; line-height: 1.6; }
 .pilot-invitation a { color: #8bcaff !important; text-decoration: underline; text-underline-offset: 4px; }
+
+
+/* About hero: preserve the existing dark rounded frame while giving the landscape photo room. */
+.about-team-photo { aspect-ratio: 4 / 3; min-width: 0; overflow: hidden; border: 1px solid rgba(145, 177, 211, .22); border-radius: 16px; background: #070b14; }
+.about-team-photo img { display: block; width: 100%; height: 100%; aspect-ratio: 4 / 3; object-fit: cover; object-position: center; border-radius: inherit; }
+@media (max-width: 767px) { .about-team-photo { width: 100%; max-width: 640px; margin: 24px auto 0; } }
