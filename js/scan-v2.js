@@ -1,9 +1,21 @@
 (() => {
-  // Keep Scan V2 on its configured canonical host so Turnstile site keys and API
-  // environment match. Only redirect the scan route, not the marketing site.
+  // Anonymous scans use the configured app host (Turnstile/API environment).
+  // Authenticated customers stay on their current host so Supabase's host-scoped
+  // browser session survives the scan and the report redirect.
   if (['africalatency.dev', 'www.africalatency.dev'].includes(window.location.hostname) && /^\/scan\/?$/.test(window.location.pathname)) {
-    window.location.replace('https://app.africalatency.dev' + window.location.pathname + window.location.search + window.location.hash);
-    return;
+    let hasSession = false;
+    try {
+      const key = 'sb-uzihwtxffklisczqvurf-auth-token';
+      const stored = localStorage.getItem(key);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        hasSession = Boolean(parsed?.access_token || parsed?.currentSession?.access_token);
+      }
+    } catch (_) {}
+    if (!hasSession) {
+      window.location.replace('https://app.africalatency.dev' + window.location.pathname + window.location.search + window.location.hash);
+      return;
+    }
   }
   const form = document.getElementById('scan-form-v2');
   if (!form) return;
