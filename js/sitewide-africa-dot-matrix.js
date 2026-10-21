@@ -21,7 +21,7 @@
       toggle.setAttribute('aria-haspopup', 'true'); toggle.setAttribute('aria-expanded', 'false'); toggle.setAttribute('aria-controls', 'dashboard-account-menu');
       toggle.style.cssText = 'display:flex;align-items:center;gap:12px;border:1px solid rgba(255,255,255,.14);border-radius:10px;background:#0D131D;color:#fff;padding:9px 12px;cursor:pointer;text-align:left;font:inherit;';
       var identity = document.createElement('span'); identity.style.cssText = 'display:grid;gap:2px;';
-      var business = document.createElement('strong'); business.textContent = 'Brilliant Unicorn'; business.style.cssText = 'font-size:13px;line-height:1.3;';
+      var business = document.createElement('strong'); business.id = 'dashboard-account-name'; business.textContent = document.documentElement.dataset.accountDisplayName || 'Account'; business.style.cssText = 'font-size:13px;line-height:1.3;';
       var accountType = document.createElement('span'); accountType.textContent = 'Personal Account (Basic)'; accountType.style.cssText = 'font-size:11px;color:#A0AEC0;line-height:1.3;';
       identity.append(business, accountType);
       var chevron = document.createElement('span'); chevron.setAttribute('aria-hidden', 'true'); chevron.textContent = '⌄'; chevron.style.cssText = 'font-size:18px;color:#A0AEC0;';
@@ -29,9 +29,15 @@
       var menu = document.createElement('div'); menu.id = 'dashboard-account-menu'; menu.hidden = true; menu.setAttribute('role', 'menu');
       menu.style.cssText = 'position:absolute;right:0;top:calc(100% + 10px);z-index:1000;width:min(320px,calc(100vw - 28px));padding:8px;background:#0D131D;border:1px solid rgba(255,255,255,.14);border-radius:12px;box-shadow:0 18px 48px rgba(0,0,0,.42);color:#fff;';
       var profile = document.createElement('div'); profile.style.cssText = 'padding:12px;border-bottom:1px solid rgba(255,255,255,.1);display:grid;gap:5px;';
-      var profileName = document.createElement('strong'); profileName.textContent = 'Brilliant Unicorn'; profileName.style.cssText = 'font-size:14px;';
+      var profileName = document.createElement('strong'); profileName.id = 'dashboard-account-profile-name'; profileName.textContent = document.documentElement.dataset.accountDisplayName || 'Account'; profileName.style.cssText = 'font-size:14px;';
       email.style.cssText = 'display:block!important;color:#A0AEC0;font-size:12px;overflow-wrap:anywhere;';
       profile.append(profileName, email);
+      window.africaLatencySetAccountName = function (name) {
+        var safeName = String(name || '').trim() || 'Account';
+        document.documentElement.dataset.accountDisplayName = safeName;
+        business.textContent = safeName;
+        profileName.textContent = safeName;
+      };
       var tier = document.createElement('div'); tier.textContent = 'Personal Account (Basic)'; tier.style.cssText = 'padding:10px 12px 8px;color:#A0AEC0;font-size:12px;';
       var accountLink = document.createElement('a'); accountLink.href = '/dashboard.html'; accountLink.textContent = 'Account'; accountLink.setAttribute('role', 'menuitem');
       accountLink.style.cssText = 'display:block;padding:10px 12px;border-radius:7px;color:#fff;text-decoration:none;font-size:14px;';
