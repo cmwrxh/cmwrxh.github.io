@@ -12,9 +12,9 @@
     adaptiveFrameMs: 21,
     adaptiveAfterFrames: 24,
     adaptiveSpacingIncrease: 2,
-    colors: { dot: '56,161,224', background: '#000000' },
-    land: { baseAlpha: 0.05, baseRadius: 1.3, alphaBoost: 0.30, radiusBoost: 1.4, brightnessScale: 1, twinkleScale: 1 },
-    ocean: { baseAlpha: 0.05, baseRadius: 1, alphaBoost: 0.30, brightnessScale: 1, twinkleScale: 1 },
+    colors: { dot: '56,161,224', background: '#000000', blue: '43,128,197', cyan: '56,161,224', indigo: '99,102,241', purple: '139,92,246' },
+    land: { baseAlpha: 0.045, baseRadius: 0.85, alphaBoost: 0.34, radiusBoost: 0.30, brightnessScale: 1, twinkleScale: 1 },
+    ocean: { baseAlpha: 0.025, baseRadius: 0.8, alphaBoost: 0.22, brightnessScale: 0.8, twinkleScale: 0.9 },
     sweepSpeed: 1.8,
     sweepWidth: 0.012,
     sweepXFactor: 0.9,
@@ -48,12 +48,12 @@
     casablanca: [-7.5898, 33.5731]
   };
   var PAN_AFRICAN_NODES = [
-    { lon: 3.3792, lat: 6.5244, color: '46,204,113' },
-    { lon: 31.2357, lat: 30.0444, color: '255,193,7' },
-    { lon: 28.0473, lat: -26.2041, color: '255,77,77' },
-    { lon: 36.8219, lat: -1.2921, color: '46,204,113' },
-    { lon: -7.5898, lat: 33.5731, color: '255,193,7' },
-    { lon: -0.187, lat: 5.6037, color: '255,77,77' }
+    { lon: 3.3792, lat: 6.5244, color: '56,161,224' },
+    { lon: 31.2357, lat: 30.0444, color: '99,102,241' },
+    { lon: 28.0473, lat: -26.2041, color: '139,92,246' },
+    { lon: 36.8219, lat: -1.2921, color: '43,128,197' },
+    { lon: -7.5898, lat: 33.5731, color: '99,102,241' },
+    { lon: -0.187, lat: 5.6037, color: '56,161,224' }
   ];
 
   var section = document.querySelector('[data-africa-dot-hero]');
@@ -143,7 +143,7 @@
     var t = time * 0.001, color = CONFIG.colors.dot;
     for (var i = 0; i < dotCount; i++) {
       var dot = dots[i];
-      var dotColor = dot.accent || color;
+      var dotColor = color;
       var sweep = Math.pow(Math.max(0, Math.sin((dot.x * CONFIG.sweepXFactor + dot.y * CONFIG.sweepYFactor) * CONFIG.sweepWidth - t * CONFIG.sweepSpeed)), CONFIG.sharpness.sweep);
       var dx = dot.x - originX, dy = dot.y - originY;
       var distance = Math.sqrt(dx * dx + dy * dy);
@@ -153,8 +153,20 @@
         twinkle * (dot.land ? CONFIG.land.twinkleScale : CONFIG.ocean.twinkleScale);
       if (brightness > 1) brightness = 1;
       if (brightness < 0) brightness = 0;
+      /* Blend the travelling sweep through the approved blue-to-indigo palette. */
+      var blend = Math.max(0, Math.min(1, brightness));
+      var blueRgb = blend < 0.5 ? CONFIG.colors.blue.split(',') : CONFIG.colors.indigo.split(',');
+      var startRgb = blend < 0.5 ? CONFIG.colors.blue.split(',') : CONFIG.colors.indigo.split(',');
+      var endRgb = blend < 0.5 ? CONFIG.colors.cyan.split(',') : CONFIG.colors.purple.split(',');
+      var localBlend = blend < 0.5 ? blend * 2 : (blend - 0.5) * 2;
+      dotColor = startRgb.map(function (channel, index) { return Math.round(Number(channel) + (Number(endRgb[index]) - Number(channel)) * localBlend); }).join(',');
+      if (dot.accent && brightness < 0.25) dotColor = dot.accent;
       var alphaBoost = dot.land ? CONFIG.land.alphaBoost : CONFIG.ocean.alphaBoost;
       var alpha = dot.baseAlpha + brightness * alphaBoost;
+      /* Radial fade keeps the dot field delicate at its outer edges. */
+      var radialDistance = Math.sqrt(Math.pow((dot.x - width * 0.5) / Math.max(1, width * 0.5), 2) + Math.pow((dot.y - height * 0.5) / Math.max(1, height * 0.5), 2));
+      var edgeFade = Math.max(0, Math.min(1, (1.18 - radialDistance) / 0.52));
+      alpha *= edgeFade;
       var radius = dot.baseRadius + (dot.land ? brightness * CONFIG.land.radiusBoost : 0);
       if (dot.land && brightness > CONFIG.haloThreshold) {
         ctx.beginPath();
