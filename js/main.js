@@ -1,6 +1,23 @@
 // Shared site interactions
 
 document.addEventListener('DOMContentLoaded', () => {
+  // Shared site-wide canvas layer for standalone marketing routes.
+  if (!document.querySelector('[data-africa-dot-hero]')) {
+    if (!document.querySelector('link[data-al-sitewide-canvas]')) {
+      const canvasStyle = document.createElement('link');
+      canvasStyle.rel = 'stylesheet';
+      canvasStyle.href = '/css/sitewide-africa-dot-matrix.css?v=1';
+      canvasStyle.setAttribute('data-al-sitewide-canvas', 'true');
+      document.head.appendChild(canvasStyle);
+    }
+    if (!document.querySelector('script[data-al-sitewide-canvas]')) {
+      const canvasScript = document.createElement('script');
+      canvasScript.src = '/js/sitewide-africa-dot-matrix.js?v=1';
+      canvasScript.defer = true;
+      canvasScript.setAttribute('data-al-sitewide-canvas', 'true');
+      document.body.appendChild(canvasScript);
+    }
+  }
   if (!document.querySelector('link[href*="/css/brand.css"]')) {
     const brandStyles = document.createElement('link');
     brandStyles.rel = 'stylesheet';
