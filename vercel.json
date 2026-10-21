@@ -144,6 +144,11 @@
       "source": "/internet-performance-index.html",
       "destination": "/performance-index",
       "permanent": true
+    },
+    {
+      "source": "/pricing.html",
+      "destination": "/pricing",
+      "permanent": true
     }
   ],
   "rewrites": [
@@ -258,6 +263,10 @@
     {
       "source": "/performance-index",
       "destination": "/internet-performance-index.html"
+    },
+    {
+      "source": "/pricing",
+      "destination": "/pricing.html"
     }
   ]
 }
