@@ -191,7 +191,7 @@
   const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_dGaR1jgofny7tGVWh0TK2w_haSVNyWv';
 
   let supabaseClient = null;
-  try { supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY); } catch (err) { console.error('Supabase failed to load', err); }
+  try { supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, storage: window.localStorage } }); } catch (err) { console.error('Supabase failed to load', err); }
 
   const form = document.getElementById('login-form');
   const params = new URLSearchParams(window.location.search);
@@ -228,22 +228,38 @@
       setStatus('Google sign-in is temporarily unavailable. Please try again.', true);
       return;
     }
-    setStatus('Verifying Google sign-in…', false);
+    setStatus('Google verified. Completing AfricaLatency sign-in…', false);
+    const googleButton = document.getElementById('google-login');
+    if (googleButton) googleButton.setAttribute('aria-busy', 'true');
     try {
-      const { data, error } = await supabaseClient.auth.signInWithIdToken({
-        provider: 'google',
-        token: response.credential
-      });
-      if (error) { setStatus(error.message, true); return; }
-      if (data && data.session) {
-        window.location.href = safeNext;
-        return;
-      }
-      setStatus('Google sign-in completed without an active session. Please try again.', true);
+      await exchangeGoogleCredential(response.credential);
+      setStatus('Signed in. Opening your dashboard…', false);
+      window.location.replace(new URL(safeNext, window.location.origin).href);
     } catch (err) {
       console.error('Google sign-in failed', err);
-      setStatus('Could not complete Google sign-in. Please try again.', true);
+      setStatus(err && err.message ? err.message : 'Could not complete Google sign-in. Please try again.', true);
+      if (googleButton) googleButton.removeAttribute('aria-busy');
     }
+  }
+
+  async function exchangeGoogleCredential(token) {
+    // Give users actionable feedback instead of leaving the button spinning forever.
+    const timeout = new Promise((_, reject) => {
+      window.setTimeout(() => reject(new Error('Google sign-in timed out while connecting to AfricaLatency. Check your connection and try again.')), 25000);
+    });
+    const exchange = (async () => {
+      const { data, error } = await supabaseClient.auth.signInWithIdToken({ provider: 'google', token });
+      if (error) throw error;
+      let session = data && data.session;
+      if (!session) {
+        const result = await supabaseClient.auth.getSession();
+        if (result.error) throw result.error;
+        session = result.data && result.data.session;
+      }
+      if (!session) throw new Error('Google verified your account, but AfricaLatency could not save the session. Please try again.');
+      return session;
+    })();
+    return Promise.race([exchange, timeout]);
   }
 
   function initializeGoogleSignIn() {
