@@ -465,3 +465,140 @@ main > section .section-lead,
   .hero-africa-dot-hero .hero-scan-form { gap: 0.5rem; }
   .hero-africa-dot-hero .hero-scan-form .btn { white-space: nowrap; }
 }
+
+
+/* Site-wide standardization pass: flat matte canvas, shared type scale, no overlays. */
+:root {
+  --al-canvas: #0A0E17 !important;
+  --al-rule: rgba(148,163,184,0.18) !important;
+  --text: #FFFFFF !important;
+  --text-muted: #A0AEC0 !important;
+  --text-dim: #A0AEC0 !important;
+  --accent: #38A1E0 !important;
+  --blue: #38A1E0 !important;
+}
+html, body, body::before, main, main > section, main > div,
+.section, .compact-section, .section-band-how, .section-band-audit,
+.section-band-audience, .section-band-stats, .pricing-band, .cta-section,
+.about-page, .about-hero, .about-section, .contact-page, .contact-gradient,
+.contact-page-hero, .contact-page-form, .login-page, .login-card,
+.audit-page, .audit-section, .audit-checkout, .audit-buy-section,
+.methodology-page, .methodology-summary, .homepage-footer, .contact-footer,
+footer, .footer-inner {
+  background-color: #0A0E17 !important;
+  background-image: none !important;
+  box-shadow: none !important;
+}
+main > section + section,
+main > .section + .section,
+main > .compact-section + .compact-section {
+  border-top: 1px solid rgba(148,163,184,0.18) !important;
+}
+.section-heading > .label,
+.section-heading > .eyebrow,
+.section-heading .section-eyebrow,
+.regional-panel-kicker,
+.methodology-summary .label,
+.cta-section .label,
+.label,
+.eyebrow,
+.section-eyebrow,
+.section-kicker,
+.section-label {
+  display: block !important;
+  width: fit-content;
+  margin: 0 0 0.5rem !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  color: #38A1E0 !important;
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+  line-height: 1.4 !important;
+  letter-spacing: 0.14em !important;
+  text-transform: uppercase !important;
+}
+.label::before, .eyebrow::before, .section-eyebrow::before { content: none !important; display: none !important; }
+.section-heading h2,
+.section-heading .section-title,
+.regional-insight-panel > h2,
+.cta-section h2,
+main > section > .container > h2,
+.page-title {
+  margin-bottom: 1rem !important;
+  color: #FFFFFF !important;
+  font-size: clamp(1.875rem, 3.2vw, 2.25rem) !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.025em !important;
+  line-height: 1.15 !important;
+}
+.section-heading > p,
+.section-heading .section-lead,
+main > section .section-lead,
+main > section .section-description,
+main > section .lead-copy {
+  max-width: 42rem;
+  color: #A0AEC0 !important;
+  font-size: 1rem !important;
+  line-height: 1.625 !important;
+}
+.card, .process-card, .product-card, .pricing-card, .price-card, .audit-buy-card,
+.audit-include, .audit-card, .feature-card, .audience-card, .use-case-card,
+.methodology-card, .faq-item, .principle, .about-card, .founder-card,
+.report-card, .metric-card, .contact-card, .contact-panel, .service-card,
+.service-item, .product-ladder-card, .who-card, .what-we-do-card, .value-card,
+.mission-card, .coverage-card, .step-card, .custom-scope-note, .regional-map-panel,
+.regional-insight-panel, .founder-photo-placeholder, .founder-copy,
+.contact-form-wrapper, .contact-form-card, .login-card, .audit-buy-grid,
+.pricing-grid, .product-grid, .process-cards, .audience-grid {
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+.card, .process-card, .product-card, .pricing-card, .price-card, .audit-buy-card,
+.audit-include, .audit-card, .feature-card, .audience-card, .use-case-card,
+.methodology-card, .faq-item, .principle, .about-card, .founder-card,
+.report-card, .metric-card, .contact-card, .contact-panel, .service-card,
+.service-item, .product-ladder-card, .who-card, .what-we-do-card, .value-card,
+.mission-card, .coverage-card, .step-card {
+  background: transparent !important;
+  border-top: 0 !important;
+  border-right: 0 !important;
+  border-left: 0 !important;
+  border-bottom: 1px solid rgba(148,163,184,0.18) !important;
+}
+input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]),
+select, textarea, .form-input, .contact-form input, .contact-form select,
+.contact-form textarea {
+  background: #0D131D !important;
+  border: 1px solid #293447 !important;
+  border-radius: 4px !important;
+  color: #FFFFFF !important;
+  box-shadow: none !important;
+}
+.login-card, .contact-card, .contact-panel, .contact-form-wrapper, .contact-form-card,
+.audit-buy-card, .audit-checkout-card {
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+.homepage-footer, .contact-footer, footer {
+  border-top: 1px solid rgba(148,163,184,0.18) !important;
+}
+.mobile-sticky-cta, .sticky-bottom-cta, .sticky-scan-bar, .fixed-bottom-banner,
+.bottom-sticky-banner, .mobile-scan-banner, .mobile-scan-sticky, .sticky-scan-cta,
+[data-sticky-scan-banner], [data-mobile-sticky-cta],
+[class*="sticky-scan"], [class*="mobile-sticky"], [class*="sticky-bottom"],
+[class*="fixed-bottom-cta"], [class*="bottom-scan-banner"] {
+  display: none !important;
+}
+.hero-africa-dot-hero + .regional-performance-section {
+  border-top: 0 !important;
+  background: #0A0E17 !important;
+}
+@media (max-width: 759px) {
+  .section, .compact-section, .hero-section { padding-block: 3.5rem !important; }
+  .hero-africa-dot-hero { padding-bottom: 3rem !important; }
+}
