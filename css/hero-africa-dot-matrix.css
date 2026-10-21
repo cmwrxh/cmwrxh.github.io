@@ -19,7 +19,7 @@
   inset: 0;
   z-index: 1;
   pointer-events: none;
-  background: radial-gradient(ellipse at 48% 47%, rgba(0, 0, 0, .30) 0%, rgba(0, 0, 0, .58) 35%, rgba(0, 0, 0, .12) 72%, rgba(0, 0, 0, .2) 100%);
+  background: radial-gradient(ellipse at 48% 47%, rgba(0, 0, 0, .04) 0%, rgba(0, 0, 0, .10) 35%, rgba(0, 0, 0, .04) 72%, rgba(0, 0, 0, .12) 100%);
 }
 .hero-africa-dot-content {
   position: relative;
