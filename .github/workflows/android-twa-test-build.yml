@@ -73,8 +73,8 @@ jobs:
             signingKey: { path: './android.keystore', alias: 'africalatency' },
             fingerprints: [],
             shortcuts: [
-              { name: 'Run a free scan', shortName: 'Free scan', url: '/scan', iconUrl: 'https://africalatency.dev/images/web-app-manifest-192x192.png' },
-              { name: 'Sign in', shortName: 'Sign in', url: '/login', iconUrl: 'https://africalatency.dev/images/web-app-manifest-192x192.png' }
+              { name: 'Run a free scan', shortName: 'Free scan', url: '/scan', chosenIconUrl: 'https://africalatency.dev/images/web-app-manifest-192x192.png' },
+              { name: 'Sign in', shortName: 'Sign in', url: '/login', chosenIconUrl: 'https://africalatency.dev/images/web-app-manifest-192x192.png' }
             ]
           };
           fs.writeFileSync('android/twa-manifest.json', JSON.stringify(config, null, 2) + '\n');
