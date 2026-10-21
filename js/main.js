@@ -96,7 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('.nav-brand').forEach((brand) => {
     brand.classList.add('brand-lockup');
     brand.setAttribute('aria-label', 'AfricaLatency');
-    brand.innerHTML = '<img class="brand-wordmark" src="/images/africalatency-logo-light.svg" alt="AfricaLatency" width="180" height="28">';
+    brand.innerHTML = '<img class="brand-wordmark" src="/images/africalatency-logo-dark.svg" alt="AfricaLatency" width="180" height="28">';
   });
 
   const serviceLinks = [
