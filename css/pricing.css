@@ -52,3 +52,23 @@
 @media(max-width:1000px){.pricing-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.plan-card:nth-child(2){border-right:1px solid var(--pricing-line)}.plan-card:nth-child(n+3){border-top:1px solid var(--pricing-line)}.included-section{grid-template-columns:1fr;gap:24px}}
 @media(max-width:600px){.pricing-nav-inner{padding:0 18px;min-height:68px}.pricing-nav-links{gap:13px}.pricing-nav-links a{font-size:.78rem}.pricing-nav-links a:nth-child(2),.pricing-nav-links a:nth-child(3){display:none}.pricing-main{padding:48px 16px 38px}.pricing-heading{margin-bottom:32px}.pricing-intro{font-size:.9rem}.billing-control{gap:8px;flex-wrap:wrap}.billing-savings{font-size:.65rem}.pricing-grid{grid-template-columns:minmax(0,1fr)}.plan-card,.plan-card:last-child{padding:25px 20px;border-left:1px solid var(--pricing-line);border-right:1px solid var(--pricing-line);border-top:1px solid var(--pricing-line)}.plan-card:first-child{border-top:0}.plan-card-recommended .plan-card-top{padding-top:24px}.plan-description{min-height:0}.plan-price{margin:21px 0}.price-primary{font-size:1.8rem}.included-section{margin-top:45px}.included-grid{grid-template-columns:1fr}.pricing-footer{gap:14px;padding:20px 18px 28px}.pricing-footer span{width:100%;order:3}}
 @media(prefers-reduced-motion:reduce){.billing-switch-knob,.plan-cta{transition:none}}
+
+/* Standalone services live on Pricing so subscriptions and one-time offers share one destination. */
+.one-time-section{margin-top:74px;padding-top:38px;border-top:1px solid var(--pricing-line)}
+.one-time-heading{max-width:760px;margin:0 0 28px}
+.one-time-heading h2{margin:0;font-size:clamp(1.6rem,3vw,2.25rem);letter-spacing:-.035em;line-height:1.16}
+.one-time-heading>p:last-child{max-width:680px;margin:13px 0 0;color:#A9B4C5;font-size:.94rem;line-height:1.75}
+.one-time-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid var(--pricing-line);border-bottom:1px solid var(--pricing-line)}
+.one-time-item{display:flex;flex-direction:column;min-width:0;padding:25px 22px 27px;border-left:1px solid var(--pricing-line)}
+.one-time-item:last-child{border-right:1px solid var(--pricing-line)}
+.one-time-item-featured{background:rgba(43,128,197,.055)}
+.one-time-type{margin:0 0 13px;color:#78BDF0;font-size:.68rem;font-weight:700;letter-spacing:.11em;text-transform:uppercase}
+.one-time-item h3{margin:0;font-size:1.12rem;line-height:1.35}
+.one-time-price{margin:18px 0 13px;font-size:1.45rem;font-weight:700;letter-spacing:-.035em}
+.one-time-price span{display:block;margin-top:5px;color:#8592A6;font-size:.75rem;font-weight:500;letter-spacing:0}
+.one-time-item>p:not(.one-time-type):not(.one-time-price){margin:0 0 22px;color:#A9B4C5;font-size:.86rem;line-height:1.7}
+.one-time-link{display:inline-flex;align-items:center;gap:8px;margin-top:auto;color:#8DC9F5;text-decoration:none;font-size:.84rem;font-weight:700}
+.one-time-link:hover{color:#fff}
+.one-time-note{margin:18px 0 0;color:#8592A6;font-size:.76rem;line-height:1.65}
+@media(max-width:1000px){.one-time-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.one-time-item:nth-child(2){border-right:1px solid var(--pricing-line)}.one-time-item:nth-child(n+3){border-top:1px solid var(--pricing-line)}}
+@media(max-width:600px){.one-time-section{margin-top:52px;padding-top:30px}.one-time-grid{grid-template-columns:minmax(0,1fr)}.one-time-item,.one-time-item:last-child{padding:23px 20px;border-left:1px solid var(--pricing-line);border-right:1px solid var(--pricing-line);border-top:1px solid var(--pricing-line)}.one-time-item:first-child{border-top:0}.one-time-price{font-size:1.35rem}}
