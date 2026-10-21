@@ -7,6 +7,10 @@
   <title>AfricaLatency — Infrastructure Performance &amp; Latency Intelligence</title>
   <meta name="description" content="AfricaLatency measures the real-world performance of applications, APIs and infrastructure across African networks.">
   <meta name="theme-color" content="#000000">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="AfricaLatency">
   <link rel="canonical" href="https://www.africalatency.dev/">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="AfricaLatency">
@@ -39,6 +43,11 @@
   <link rel="stylesheet" href="/css/unified-matte-layout.css?v=5">
   <link rel="stylesheet" href="/css/marketing-infrastructure-banner.css?v=1">
   <link rel="stylesheet" href="/css/homepage-mobile-cleanup.css?v=1">
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => navigator.serviceWorker.register("/service-worker.js").catch((error) => console.warn("AfricaLatency offline support unavailable", error)));
+    }
+  </script>
 </head>
 <body>
 
