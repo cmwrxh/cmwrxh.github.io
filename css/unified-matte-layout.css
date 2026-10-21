@@ -546,3 +546,8 @@ main .section-lead, main .section-heading > p, main .hero-subtitle, main .region
   .telemetry-preview { padding:.85rem; }
   .telemetry-preview-rows dt { font-size:.78rem; }
 }
+
+
+/* Homepage hero now transitions directly to regional performance. */
+.hero-africa-dot-hero { padding-bottom: 5rem !important; }
+.hero-africa-dot-hero + .regional-performance-section { padding-top: 5rem !important; }
