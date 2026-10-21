@@ -182,3 +182,54 @@ select, textarea, .form-input, .contact-form input, .contact-form select,
 /* Direct-on-canvas login and checkout forms. */
 .login-page .login-card { background: transparent !important; border: 0 !important; border-radius: 0 !important; box-shadow: none !important; }
 .audit-buy-card { background: transparent !important; border: 0 !important; border-bottom: 1px solid rgba(255,255,255,.08) !important; border-radius: 0 !important; box-shadow: none !important; }
+
+
+/* GTmetrix-aligned exact palette overrides. Keep these last to beat legacy component rules. */
+:root {
+  --bg: #0A0E17 !important;
+  --bg-elevated: #0A0E17 !important;
+  --bg-card: transparent !important;
+  --border: rgba(255,255,255,0.08) !important;
+  --border-strong: rgba(255,255,255,0.12) !important;
+  --text: #FFFFFF !important;
+  --text-muted: #A0AEC0 !important;
+  --text-dim: #A0AEC0 !important;
+  --accent: #38A1E0 !important;
+  --blue: #38A1E0 !important;
+  --al-canvas: #0A0E17 !important;
+  --al-rule: rgba(255,255,255,0.08) !important;
+}
+html, body { background: #0A0E17 !important; color: #A0AEC0 !important; }
+h1, h2, h3, h4, .page-title, .hero-title { color: #FFFFFF !important; }
+.city-rotator-word, .hero-africa-title-accent, .hero-title .city-rotator-slot {
+  color: #38A1E0 !important;
+  background: none !important;
+  -webkit-background-clip: initial !important;
+  background-clip: initial !important;
+  -webkit-text-fill-color: #38A1E0 !important;
+}
+.btn-primary, button.btn-primary, input.btn-primary {
+  background: #2B80C5 !important;
+  color: #FFFFFF !important;
+  border-color: #2B80C5 !important;
+  box-shadow: none !important;
+}
+.btn-primary:hover, button.btn-primary:hover, input.btn-primary:hover {
+  background: #226AA5 !important;
+  border-color: #226AA5 !important;
+  color: #FFFFFF !important;
+  box-shadow: none !important;
+}
+input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]),
+select, textarea, .form-input, .contact-form input, .contact-form select,
+.contact-form textarea {
+  background: #0D131D !important;
+  border: 1px solid rgba(255,255,255,0.12) !important;
+  color: #FFFFFF !important;
+  box-shadow: none !important;
+}
+input:focus, select:focus, textarea:focus, .form-input:focus {
+  border-color: #38A1E0 !important;
+  outline: 2px solid rgba(56,161,224,0.16) !important;
+  outline-offset: 1px;
+}
