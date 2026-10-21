@@ -310,6 +310,44 @@
                 font-size: 26px;
             }
         }
+
+        .dashboard-actions {
+            display: flex; flex-wrap: wrap; gap: 9px; margin: 0 0 16px;
+            padding: 14px; border: 1px solid var(--border); border-radius: 12px;
+            background: var(--card);
+        }
+        .dashboard-action {
+            display: inline-flex; align-items: center; justify-content: center;
+            min-height: 38px; padding: 9px 12px; border: 1px solid var(--border);
+            border-radius: 8px; background: #fff; color: var(--text);
+            font-size: 13px; font-weight: 650; text-decoration: none; cursor: pointer;
+        }
+        .dashboard-action.primary { background: #172033; color: #fff; border-color: #172033; }
+        .dashboard-action:hover { border-color: #98a2b3; }
+        .dashboard-action:focus-visible { outline: 3px solid #84caff; outline-offset: 2px; }
+        .dashboard-action-status, .dashboard-compare-panel {
+            margin: 0 0 16px; padding: 14px 16px; border: 1px solid var(--border);
+            border-radius: 10px; background: var(--card); color: var(--muted); font-size: 13px;
+        }
+        .dashboard-compare-panel h3 { color: var(--text); margin: 0 0 10px; font-size: 16px; }
+        .dashboard-compare-panel table { min-width: 520px; }
+        .more-africa { margin-top: 28px; }
+        .more-africa-intro { margin: 7px 0 16px; color: var(--muted); font-size: 14px; line-height: 1.6; }
+        .more-africa-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 14px; }
+        .more-africa-card { display: flex; flex-direction: column; align-items: flex-start; gap: 9px;
+            padding: 20px; border: 1px solid var(--border); border-radius: 12px; background: var(--card); }
+        .more-africa-card .tip-icon { display: inline-grid; place-items: center; width: 34px; height: 34px;
+            border-radius: 9px; background: var(--soft); color: var(--text); font-weight: 800; }
+        .more-africa-card h3 { margin: 0; font-size: 16px; }
+        .more-africa-card p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.6; }
+        .more-africa-card a { margin-top: auto; padding-top: 4px; font-size: 13px; font-weight: 700; color: var(--text); }
+        .dashboard-section-note { color: var(--muted); font-size: 12px; margin: 10px 0 0; }
+        @media (max-width: 600px) {
+            .more-africa-grid { grid-template-columns: 1fr; }
+            .dashboard-actions { padding: 10px; }
+            .dashboard-action { flex: 1 1 42%; }
+        }
+
     </style>
 <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
 <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
@@ -473,9 +511,62 @@
             <p style="color:var(--muted);font-size:14px;margin:0 0 16px;">
                 One-time diagnostic snapshots from African probe locations. These are separate from real-user monitoring (RUM).
             </p>
+            <div class="dashboard-actions" aria-label="Report actions">
+                <a id="dashboard-retest" class="dashboard-action primary" href="/scan">Re-Test</a>
+                <button id="dashboard-compare" class="dashboard-action" type="button">Compare</button>
+                <a id="dashboard-page-settings" class="dashboard-action" href="/scan">Page Settings</a>
+                <a class="dashboard-action" href="/monitoring">Monitor</a>
+                <button id="dashboard-alerts" class="dashboard-action" type="button">Set Up Alerts</button>
+                <button id="dashboard-tags" class="dashboard-action" type="button">Tags</button>
+            </div>
+            <div id="dashboard-action-status" class="dashboard-action-status" role="status" aria-live="polite" hidden></div>
+            <div id="dashboard-compare-panel" class="dashboard-compare-panel" hidden></div>
             <div id="scan-history" style="display:grid;gap:12px;">
                 <div class="empty">Loading saved scans…</div>
             </div>
+            <section class="more-africa" aria-labelledby="more-africa-heading">
+                <div class="section-header"><h2 id="more-africa-heading">More from AfricaLatency</h2></div>
+                <p class="more-africa-intro">Practical next steps for improving website and infrastructure performance. These are general guides, not findings inferred from scans that do not include page-audit data.</p>
+                <div class="more-africa-grid">
+                    <article class="more-africa-card">
+                        <span class="tip-icon" aria-hidden="true">JS</span>
+                        <h3>JavaScript can delay page rendering</h3>
+                        <p>Review large bundles, remove unused code, defer non-critical scripts and measure the effect before and after each change.</p>
+                        <a href="/docs">Explore performance guidance →</a>
+                    </article>
+                    <article class="more-africa-card">
+                        <span class="tip-icon" aria-hidden="true">↗</span>
+                        <h3>Review third-party requests</h3>
+                        <p>Analytics, chat widgets, ads and embedded tools can add network round trips. Keep only what the page needs and load optional scripts carefully.</p>
+                        <a href="/methodology">Understand our measurements →</a>
+                    </article>
+                    <article class="more-africa-card">
+                        <span class="tip-icon" aria-hidden="true">◷</span>
+                        <h3>Consider continuous monitoring</h3>
+                        <p>One scan is a snapshot. Repeated measurements help reveal changes over time, regional differences and regressions after releases.</p>
+                        <a href="/monitoring">Explore monitoring / join the pilot →</a>
+                    </article>
+                    <article class="more-africa-card">
+                        <span class="tip-icon" aria-hidden="true">↗</span>
+                        <h3>Need deeper optimization advice?</h3>
+                        <p>Get a structured review of the evidence, prioritized next steps and a clearer view of what needs further testing.</p>
+                        <a href="/audit-checkout">Explore the Africa Latency Audit →</a>
+                    </article>
+                    <article class="more-africa-card">
+                        <span class="tip-icon" aria-hidden="true">AF</span>
+                        <h3>Go beyond a single location</h3>
+                        <p>Compare available network observations carefully. Missing probe results remain unavailable, not proof of poor or healthy performance.</p>
+                        <a href="/sample-report">See the report format →</a>
+                    </article>
+                    <article class="more-africa-card">
+                        <span class="tip-icon" aria-hidden="true">↗</span>
+                        <h3>Need an enterprise performance review?</h3>
+                        <p>Discuss multi-site, API or broader infrastructure questions and agree on scope before any work begins.</p>
+                        <a href="/contact">Talk to AfricaLatency →</a>
+                    </article>
+                </div>
+                <p class="dashboard-section-note">Monitoring, alert delivery and report tags are not enabled from this dashboard yet. No alerts or tags are saved by these controls.</p>
+            </section>
         </div>
 
     </section>
@@ -523,6 +614,8 @@
     const logoutButton = document.getElementById('logout-button');
 
     let currentSiteKey = null;
+    let latestScanDomain = '';
+    let recentScans = [];
 
     function showError(message) {
         loading.classList.add('hidden');
@@ -725,6 +818,18 @@
             if (!response.ok) throw new Error('Unable to load saved scans.');
             const payload = await response.json();
             const scans = Array.isArray(payload.scans) ? payload.scans : [];
+            recentScans = scans;
+            latestScanDomain = scans[0]?.domain || '';
+            const retestLink = document.getElementById('dashboard-retest');
+            const settingsLink = document.getElementById('dashboard-page-settings');
+            if (latestScanDomain) {
+                const target = '/scan?url=' + encodeURIComponent(latestScanDomain);
+                retestLink.href = target;
+                settingsLink.href = target;
+            } else {
+                retestLink.href = '/scan';
+                settingsLink.href = '/scan';
+            }
             if (!scans.length) {
                 const empty = document.createElement('div');
                 empty.className = 'empty';
@@ -767,6 +872,79 @@
             scanHistory.appendChild(message);
         }
     }
+    function showDashboardActionStatus(message) {
+        const box = document.getElementById('dashboard-action-status');
+        if (!box) return;
+        box.textContent = message;
+        box.hidden = false;
+    }
+
+    function compareRecentScans() {
+        const panel = document.getElementById('dashboard-compare-panel');
+        panel.hidden = false;
+        panel.innerHTML = '';
+        if (recentScans.length < 2) {
+            panel.textContent = 'Comparison needs at least two saved scans. Run another scan, then compare the latest results here.';
+            return;
+        }
+        const newest = recentScans[0];
+        const older = recentScans.slice(1).find(scan => scan.domain === newest.domain) || recentScans[1];
+        const heading = document.createElement('h3');
+        heading.textContent = 'Recent scan comparison';
+        panel.appendChild(heading);
+        const intro = document.createElement('p');
+        intro.textContent = newest.domain === older.domain
+            ? 'Comparing the two most recent saved scans for ' + newest.domain + '.'
+            : 'Comparing the two most recent saved scans. The domains differ, so compare them as separate endpoints.';
+        panel.appendChild(intro);
+        const tableWrap = document.createElement('div');
+        tableWrap.className = 'table-wrapper';
+        const table = document.createElement('table');
+        const thead = document.createElement('thead');
+        const headRow = document.createElement('tr');
+        ['Location', newest.domain + ' · latest TTFB', older.domain + ' · previous TTFB', 'Change'].forEach(label => {
+            const th = document.createElement('th'); th.textContent = label; headRow.appendChild(th);
+        });
+        thead.appendChild(headRow); table.appendChild(thead);
+        const body = document.createElement('tbody');
+        const latestRows = Array.isArray(newest.results) ? newest.results : [];
+        const olderRows = Array.isArray(older.results) ? older.results : [];
+        const labels = [...new Set([...latestRows, ...olderRows].map(row => row.label || 'Unknown location'))];
+        for (const label of labels) {
+            const current = latestRows.find(row => (row.label || 'Unknown location') === label);
+            const previous = olderRows.find(row => (row.label || 'Unknown location') === label);
+            const a = current?.available && current.timings?.firstByte !== null && current.timings?.firstByte !== undefined && current.timings?.firstByte !== '' && Number.isFinite(Number(current.timings.firstByte)) ? Number(current.timings.firstByte) : null;
+            const b = previous?.available && previous.timings?.firstByte !== null && previous.timings?.firstByte !== undefined && previous.timings?.firstByte !== '' && Number.isFinite(Number(previous.timings.firstByte)) ? Number(previous.timings.firstByte) : null;
+            const tr = document.createElement('tr');
+            const values = [
+                label,
+                a === null ? 'Unavailable' : Math.round(a) + ' ms',
+                b === null ? 'Unavailable' : Math.round(b) + ' ms',
+                a === null || b === null ? 'Not comparable' : (a === b ? 'No change' : (a < b ? Math.round(b-a) + ' ms faster' : Math.round(a-b) + ' ms slower'))
+            ];
+            values.forEach(value => { const td = document.createElement('td'); td.textContent = value; tr.appendChild(td); });
+            body.appendChild(tr);
+        }
+        if (!labels.length) {
+            const tr = document.createElement('tr'); const td = document.createElement('td');
+            td.colSpan = 4; td.textContent = 'No probe timing rows were returned for these scans.';
+            tr.appendChild(td); body.appendChild(tr);
+        }
+        table.appendChild(body); tableWrap.appendChild(table); panel.appendChild(tableWrap);
+        const note = document.createElement('p');
+        note.className = 'dashboard-section-note';
+        note.textContent = 'Comparison uses only returned first-byte timing values from saved probe scans. Missing values are not estimated.';
+        panel.appendChild(note);
+    }
+
+    document.getElementById('dashboard-compare')?.addEventListener('click', compareRecentScans);
+    document.getElementById('dashboard-alerts')?.addEventListener('click', () => {
+        showDashboardActionStatus('Alert setup is not connected yet. No alert has been created or enabled. Monitoring pilot access is available from the Monitor link.');
+    });
+    document.getElementById('dashboard-tags')?.addEventListener('click', () => {
+        showDashboardActionStatus('Saved report tags are not connected yet. No tag has been created or stored.');
+    });
+
     async function initialiseDashboard() {
         try {
             const {
