@@ -64,7 +64,7 @@ jobs:
             webManifestUrl: 'https://africalatency.dev/manifest.json',
             appVersionCode: 1,
             appVersionName: '1.0.0',
-            minSdkVersion: 23,
+            minSdkVersion: 24,
             enableNotifications: false,
             enableSiteSettingsShortcut: true,
             splashScreenFadeOutDuration: 300,
