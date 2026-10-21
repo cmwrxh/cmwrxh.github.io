@@ -1,6 +1,7 @@
 /* Animated dot-matrix Africa map. Illustration only, never live telemetry. */
 (function () {
   'use strict';
+  // Timing units: waveSpeed, shimmerSpeed, and packetSpeed are per millisecond; pulse intervals and pulseDuration are milliseconds.
   var CONFIG = {
     dotSpacing: 9, maxDotSpacing: 21, dotRadius: 1.2, dotColor: '100,168,245', dotAlpha: 0.48,
     waveGlow: 0.42, waveWidth: 115, waveSpeed: 0.00016, shimmerAmount: 0.22, shimmerSpeed: 0.00045,

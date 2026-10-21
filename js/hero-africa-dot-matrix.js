@@ -2,6 +2,7 @@
 (function () {
   'use strict';
 
+  // Timing units: sweepSpeed, rippleSpeed, and per-dot dotSpeed are per second; drawFrame converts its RAF timestamp to seconds.
   var CONFIG = {
     dotSpacing: 13,
     wideScreenBreakpoint: 1200,
