@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
   <title>AfricaLatency — Infrastructure Performance &amp; Latency Intelligence</title>
   <meta name="description" content="AfricaLatency measures the real-world performance of applications, APIs and infrastructure across African networks.">
-  <meta name="theme-color" content="#070b14">
+  <meta name="theme-color" content="#0A0E17">
   <link rel="canonical" href="https://www.africalatency.dev/">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="AfricaLatency">
@@ -26,7 +26,7 @@
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/marketing.css?v=7">
   <link rel="stylesheet" href="/css/hero-africa-dot-matrix.css?v=3">
-  <link rel="stylesheet" href="/css/brand.css?v=6">
+  <link rel="stylesheet" href="/css/brand.css?v=7">
   <link rel="stylesheet" href="/css/product-pages.css?v=1">
   <link rel="stylesheet" href="/css/regional-performance.css?v=6">
 
@@ -105,7 +105,7 @@
       <div class="hero-grid hero-action-layout">
         <div class="hero-action-copy">
           <div class="label">Infrastructure Performance &amp; Latency Intelligence</div>
-          <h1 class="hero-title">See how your website responds from <span class="hero-africa-title-accent">Nairobi, Lagos, Johannesburg and Cairo.</span></h1>
+          <h1 class="hero-title">See how your website responds from <span class="hero-africa-title-accent city-rotator-slot" aria-label="Nairobi, Lagos, Johannesburg, Cairo, Accra and Casablanca"><span class="city-rotator-word" aria-live="polite">Nairobi</span></span>.</h1>
           <p class="hero-subtitle">Compare public website and API response behavior from available African network probes, then use the evidence to decide what to investigate. Results depend on probe availability.</p>
           <form class="hero-scan-form" id="homepage-scan-form" action="/scan" method="get">
             <label class="visually-hidden" for="homepage-scan-url">Website URL to scan</label>
@@ -296,6 +296,25 @@
   });
 
 
+
+  var cityRotator = document.querySelector('.city-rotator-word');
+  if (cityRotator) {
+    var cities = ['Nairobi', 'Lagos', 'Johannesburg', 'Cairo', 'Accra', 'Casablanca'];
+    var cityIndex = 0;
+    var reduceCityMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!reduceCityMotion) {
+      window.setInterval(function () {
+        cityIndex = (cityIndex + 1) % cities.length;
+        cityRotator.classList.remove('is-entering');
+        cityRotator.textContent = cities[cityIndex];
+        void cityRotator.offsetWidth;
+        cityRotator.classList.add('is-entering');
+      }, 2800);
+    } else {
+      cityRotator.textContent = cities[0];
+    }
+    cityRotator.classList.add('is-entering');
+  }
 
   var homepageScanForm = document.getElementById('homepage-scan-form');
   if (homepageScanForm) homepageScanForm.addEventListener('submit', function (event) {

@@ -153,3 +153,32 @@ input:focus, select:focus, textarea:focus, .form-input:focus {
   background: transparent !important;
   box-shadow: none !important;
 }
+
+/* Exact dark palette tokens for the shared matte canvas. */
+:root {
+  --bg: #0A0E17 !important;
+  --bg-elevated: #0A0E17 !important;
+  --bg-card: transparent !important;
+  --border: rgba(255,255,255,.08) !important;
+  --border-strong: rgba(255,255,255,.12) !important;
+  --text: #FFFFFF !important;
+  --text-muted: #A0AEC0 !important;
+  --text-dim: #A0AEC0 !important;
+  --accent: #38A1E0 !important;
+  --blue: #38A1E0 !important;
+  --al-canvas: #0A0E17 !important;
+  --al-rule: rgba(255,255,255,.08) !important;
+}
+html, body { background: #0A0E17 !important; color: #A0AEC0 !important; }
+h1, h2, h3, h4, .page-title, .hero-title { color: #FFFFFF !important; }
+input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]),
+select, textarea, .form-input, .contact-form input, .contact-form select,
+.contact-form textarea {
+  background: #0D131D !important;
+  border: 1px solid rgba(255,255,255,.12) !important;
+  color: #FFFFFF !important;
+}
+
+/* Direct-on-canvas login and checkout forms. */
+.login-page .login-card { background: transparent !important; border: 0 !important; border-radius: 0 !important; box-shadow: none !important; }
+.audit-buy-card { background: transparent !important; border: 0 !important; border-bottom: 1px solid rgba(255,255,255,.08) !important; border-radius: 0 !important; box-shadow: none !important; }

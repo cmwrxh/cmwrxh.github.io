@@ -3,7 +3,7 @@
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  background: #000 !important;
+  background: #0A0E17 !important;
 }
 .hero-africa-dot-canvas {
   position: absolute;
@@ -19,7 +19,7 @@
   inset: 0;
   z-index: 1;
   pointer-events: none;
-  background: radial-gradient(ellipse at 48% 47%, rgba(0, 0, 0, .86) 0%, rgba(0, 0, 0, .58) 35%, rgba(0, 0, 0, .12) 72%, rgba(0, 0, 0, .2) 100%);
+  background: linear-gradient(180deg, rgba(10,14,23,.08), rgba(10,14,23,.16));
 }
 .hero-africa-dot-content {
   position: relative;

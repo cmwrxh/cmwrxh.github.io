@@ -326,3 +326,280 @@ main .use-case-card,main .secondary-offer,main .proof-metric,main .case-card,mai
 main .card .card{background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important}
 .data-centers-callout a,.contact-form-note a{color:#1769AA!important}
 .footer-social a:hover{border-color:rgba(255,255,255,.55)!important;color:#FFFFFF!important}
+
+
+/* GTmetrix-aligned dark palette: shared site-wide color tokens and controls. */
+:root {
+  color-scheme: dark;
+  --bg: #0A0E17;
+  --bg-elevated: #0A0E17;
+  --bg-card: transparent;
+  --border: rgba(255,255,255,.08);
+  --border-strong: rgba(255,255,255,.12);
+  --text: #FFFFFF;
+  --text-muted: #A0AEC0;
+  --text-dim: #A0AEC0;
+  --accent: #38A1E0;
+  --blue: #38A1E0;
+  --accent-soft: rgba(56,161,224,.10);
+  --accent-line: rgba(56,161,224,.18);
+  --neutral-highlight: rgba(255,255,255,.04);
+  --al-canvas: #0A0E17;
+  --al-rule: rgba(255,255,255,.08);
+}
+html, body {
+  background: #0A0E17 !important;
+  color: #A0AEC0 !important;
+}
+body::before { display: none !important; }
+h1, h2, h3, h4, .page-title, .hero-title {
+  color: #FFFFFF !important;
+}
+p, .section-lead, .hero-subtitle, .card p, .principle p,
+.proof-strip-item span, .proof-strip > p, .pricing-card > p:not(.price),
+.faq-section .faq-answer, .contact-form-note, .audit-path-note {
+  color: #A0AEC0 !important;
+}
+.hero-africa-title-accent, .rotating-word, .rotating-text,
+.rotator-word, [data-rotating-word] {
+  color: #38A1E0 !important;
+  background: none !important;
+  -webkit-text-fill-color: #38A1E0 !important;
+}
+a { color: #38A1E0; }
+main a:not(.btn):not(.btn-primary), footer a:not(.btn),
+.legal-content a, .help-content a,
+.data-centers-callout a, .contact-form-note a {
+  color: #38A1E0 !important;
+}
+main a:not(.btn):not(.btn-primary):hover, footer a:not(.btn):hover,
+.legal-content a:hover, .help-content a:hover {
+  color: #FFFFFF !important;
+}
+.btn-primary, button.btn-primary, .btn.btn-primary,
+input[type="submit"], button[type="submit"] {
+  background: #2B80C5 !important;
+  border-color: #2B80C5 !important;
+  color: #FFFFFF !important;
+}
+.btn-primary:hover, button.btn-primary:hover, .btn.btn-primary:hover,
+input[type="submit"]:hover, button[type="submit"]:hover {
+  background: #226AA5 !important;
+  border-color: #226AA5 !important;
+}
+.btn-secondary {
+  background: transparent !important;
+  border-color: rgba(255,255,255,.12) !important;
+  color: #FFFFFF !important;
+}
+nav {
+  background: rgba(10,14,23,.96) !important;
+  border-color: rgba(255,255,255,.08) !important;
+}
+main > section + section, main > .section + .section,
+main > .compact-section + .compact-section,
+.homepage-footer, .contact-footer, footer, .footer-follow, .footer-copy {
+  border-color: rgba(255,255,255,.08) !important;
+}
+.card, .principle, .privacy-card, .contact-choice,
+.process-cards .process-card, .tier4-home-proof-card, .tier4-proof-card,
+.tier4-topology-card, .dogfood-card, .tier4-live-card,
+main .use-case-card, main .secondary-offer, main .proof-metric,
+main .case-card, main .service-card, main .feature-card,
+main .choice-card, main .audience-card, .faq-item, .pricing-card,
+.audit-scope-list li, .custom-scope-note, .nairobi-probe-card {
+  background: transparent !important;
+  border-color: rgba(255,255,255,.08) !important;
+  box-shadow: none !important;
+}
+.section-elevated, .section[style*="background:var(--bg-elevated)"],
+.section[style*="background: var(--bg-elevated)"],
+.hero-highlight, .contact-gradient, .cta-section, .compact-band,
+.homepage-footer, .contact-footer, footer {
+  background: #0A0E17 !important;
+  background-image: none !important;
+}
+.hero-highlight .hero-subtitle, .contact-gradient .section-lead,
+.cta-section .section-lead, .homepage-footer p, .contact-footer p, footer p,
+.homepage-footer a:not(.btn), .contact-footer a:not(.btn), footer a:not(.btn) {
+  color: #A0AEC0 !important;
+}
+input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]),
+select, textarea, .form-input, .contact-form input, .contact-form select,
+.contact-form textarea, .contact-page-form input, .contact-page-form select,
+.contact-page-form textarea {
+  background: #0D131D !important;
+  border: 1px solid rgba(255,255,255,.12) !important;
+  color: #FFFFFF !important;
+  box-shadow: none !important;
+}
+input::placeholder, textarea::placeholder {
+  color: #A0AEC0 !important;
+  opacity: .8;
+}
+input:focus, select:focus, textarea:focus, .form-input:focus {
+  border-color: #38A1E0 !important;
+  outline-color: rgba(56,161,224,.24) !important;
+}
+:where(a,button,input,select,textarea,[tabindex]):focus-visible {
+  outline-color: #38A1E0 !important;
+}
+.site-menu { background: #0A0E17 !important; }
+.site-menu .menu-column > a:hover, .site-menu .menu-group-title:hover {
+  color: #38A1E0 !important;
+}
+.site-menu .menu-toggle, .menu-toggle {
+  border-color: rgba(255,255,255,.12) !important;
+  color: #FFFFFF !important;
+}
+.proof-strip, .footer-follow, .footer-copy, .menu-footer {
+  border-color: rgba(255,255,255,.08) !important;
+}
+
+
+/* Higher-specificity resets for legacy selectors that used hard-coded light surfaces. */
+.faq-section .faq-item, .faq-section .faq-question,
+main .audit-scope-list li, main .custom-scope-note,
+main .nairobi-probe-card, main .pricing-card,
+main .principles-grid .principle, main .process-cards .process-card,
+main .tier4-home-proof-card, main .card, main .contact-choice {
+  background: transparent !important;
+  border-color: rgba(255,255,255,.08) !important;
+  box-shadow: none !important;
+}
+.faq-section .faq-question { color: #FFFFFF !important; }
+.faq-section .faq-answer, main .custom-scope-note p,
+main .audit-scope-list li { color: #A0AEC0 !important; }
+.faq-section .faq-item { overflow: visible; }
+.regional-image { background: transparent !important; border-color: rgba(255,255,255,.08) !important; }
+.pricing-card .price { color: #FFFFFF !important; }
+.pricing-card-featured { border-color: rgba(255,255,255,.12) !important; box-shadow: none !important; }
+.nairobi-probe-card button {
+  background: #2B80C5 !important;
+  border-color: #2B80C5 !important;
+  color: #FFFFFF !important;
+}
+.nairobi-probe-card button:hover {
+  background: #226AA5 !important;
+  border-color: #226AA5 !important;
+}
+
+
+/* Structural cleanup: GTmetrix-inspired continuous canvas and divider-led sections. */
+ .city-rotator-slot {
+  display: inline-block !important;
+  width: 14ch;
+  min-width: 14ch;
+  max-width: 100%;
+  vertical-align: baseline;
+  color: #3B82F6 !important;
+  text-decoration: underline;
+  text-decoration-color: rgba(59,130,246,.4);
+  text-decoration-thickness: 2px;
+  text-underline-offset: .22em;
+  background: none !important;
+  -webkit-text-fill-color: #3B82F6 !important;
+}
+.city-rotator-word { display: inline-block; white-space: nowrap; }
+.city-rotator-word.is-entering { animation: city-slide-fade-in .32s ease both; }
+@keyframes city-slide-fade-in {
+  from { opacity: 0; transform: translateY(.28em); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.hero-scan-form { background: transparent !important; border: 0 !important; box-shadow: none !important; }
+.hero-scan-form input {
+  background: #0D131D !important;
+  border: 1px solid rgba(255,255,255,.12) !important;
+}
+.hero-africa-dot-hero { background: #0A0E17 !important; }
+.hero-africa-dot-overlay {
+  background: linear-gradient(180deg, rgba(10,14,23,.10), rgba(10,14,23,.18)) !important;
+}
+.process-cards, .product-grid, .pricing-grid, .principles-grid,
+.audience-grid, .feature-grid, .methodology-grid, .audit-buy-grid,
+.audit-trust, .faq-grid, .service-grid {
+  gap: 0 !important;
+}
+.process-cards .process-card, .product-grid .product-card,
+.pricing-grid .pricing-card, .principles-grid .principle,
+.audience-grid .audience-card, .feature-grid > *,
+.methodology-grid > *, .audit-buy-grid .audit-buy-card,
+.audit-trust > *, .service-grid .service-card, .faq-section .faq-item,
+main .card, main .contact-choice, main .trust-card, main .testimonial,
+main .about-signal, main .terminal, main .regional-image,
+main .audit-include, main .audit-scope-list li,
+main .custom-scope-note, main .nairobi-probe-card {
+  background: transparent !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+.process-cards .process-card, .product-grid .product-card,
+.pricing-grid .pricing-card, .principles-grid .principle,
+.audience-grid .audience-card, .feature-grid > *,
+.methodology-grid > *, .audit-buy-grid .audit-buy-card,
+.audit-trust > *, .service-grid .service-card, .faq-section .faq-item,
+main .card, main .contact-choice, main .trust-card, main .testimonial,
+main .audit-include, main .audit-scope-list li {
+  border: 0 !important;
+  border-bottom: 1px solid rgba(255,255,255,.08) !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+.product-grid .product-card:last-child, .audience-grid .audience-card:last-child,
+.process-cards .process-card:last-child, .pricing-grid .pricing-card:last-child {
+  border-bottom: 0 !important;
+}
+.product-card-featured, .pricing-card-featured {
+  border-color: rgba(255,255,255,.08) !important;
+  box-shadow: none !important;
+}
+.login-page { background: #0A0E17 !important; }
+.login-page .login-card {
+  width: min(460px, 100%);
+  padding: 28px 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+.audit-buy-card {
+  background: transparent !important;
+  border: 0 !important;
+  border-bottom: 1px solid rgba(255,255,255,.08) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+.audit-buy-grid { border-top: 1px solid rgba(255,255,255,.08); }
+.methodology-summary, .methodology-tags, .methodology-grid .card,
+.methodology-grid .principle, .methodology-grid .methodology-card {
+  background: transparent !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+@media (max-width: 767px) {
+  .mobile-sticky-cta, .sticky-scan-cta, .sticky-bottom-banner,
+  .sticky-bottom-cta, .mobile-scan-banner, .fixed-bottom-cta,
+  [data-sticky-scan-cta], [data-mobile-sticky-cta] {
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+  }
+  .city-rotator-slot { min-width: 13ch; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .city-rotator-word.is-entering { animation: none !important; }
+}
+
+.hero-africa-dot-hero .hero-africa-title-accent.city-rotator-slot {
+  display: inline-block !important;
+  width: 14ch !important;
+  min-width: 14ch !important;
+  max-width: 100% !important;
+  color: #3B82F6 !important;
+  background: none !important;
+  -webkit-background-clip: border-box !important;
+  background-clip: border-box !important;
+  -webkit-text-fill-color: #3B82F6 !important;
+}
