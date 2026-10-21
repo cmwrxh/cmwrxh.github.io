@@ -195,7 +195,8 @@
   const form = document.getElementById('login-form');
   const params = new URLSearchParams(window.location.search);
   const requestedNext = params.get('next') || '/dashboard';
-  const safeNext = requestedNext.startsWith('/') && !requestedNext.startsWith('//') ? requestedNext : '/dashboard';
+  // Authentication should always land in the dashboard, never send users back to the public homepage.
+  const safeNext = ['/dashboard', '/dashboard.html'].includes(requestedNext) ? requestedNext : '/dashboard';
   document.getElementById('signup-link').href = '/signup?next=' + encodeURIComponent(safeNext);
   const status = document.getElementById('login-status');
   const submit = document.getElementById('login-submit');
