@@ -370,7 +370,7 @@
                     <a class="card" href="#dashboard-single-test" style="text-decoration:none;color:inherit;padding:18px;">
                         <strong>1. Analyze a Page</strong><p style="color:var(--muted);font-size:13px;line-height:1.5;margin:8px 0 0;">Run a scan with the supported test profile and review the results.</p>
                     </a>
-                    <a class="card" href="/reports" style="text-decoration:none;color:inherit;padding:18px;">
+                    <a class="card" href="#scan-history" style="text-decoration:none;color:inherit;padding:18px;">
                         <strong>2. Understand Reports</strong><p style="color:var(--muted);font-size:13px;line-height:1.5;margin:8px 0 0;">Learn to read performance metrics and audit findings.</p>
                     </a>
                     <a class="card" href="#monitoring-overview" style="text-decoration:none;color:inherit;padding:18px;">
@@ -894,8 +894,6 @@
 
     skipToursButton?.addEventListener('click', () => {
         try {
-            const currentUserId = client.auth.getUser ? null : null;
-            // The authenticated user ID is captured during dashboard initialization below.
             const key = window.africaLatencyTourUserId || 'user';
             localStorage.setItem('africalatency-tours-skipped:' + key, '1');
         } catch (_) {}
