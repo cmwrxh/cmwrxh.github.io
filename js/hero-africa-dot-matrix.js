@@ -10,7 +10,10 @@
     adaptiveSpacingCeiling: 28,
     maxDevicePixelRatio: 2,
     maxDots: 18000,
-    radius: 1,
+    radius: 1.45,
+    glowRadius: 3.4,
+    glowAlphaFactor: 0.30,
+    initialLevelRange: { min: 0.25, max: 0.85 },
     color: '80,135,210',
     peakAlpha: 0.85,
     buckets: 8,
@@ -18,7 +21,7 @@
     targetRanges: {
       high: { min: 0.85, max: 1.0 },
       mid: { min: 0.40, max: 0.60 },
-      low: { min: 0.12, max: 0.22 }
+      low: { min: 0.25, max: 0.40 }
     },
     fadeMs: { min: 1000, max: 3500 },
     holdMs: { min: 300, max: 2600 },
@@ -50,9 +53,11 @@
   var lastFrame = 0, slowFrames = 0, mapLeft = 0, mapTop = 0, mapWidth = 0, mapHeight = 0;
   var dotBuckets = new Uint8Array(0);
   var bucketColors = new Array(CONFIG.buckets);
+  var glowBucketColors = new Array(CONFIG.buckets);
   for (var colorBucket = 0; colorBucket < CONFIG.buckets; colorBucket++) {
     var colorAlpha = (colorBucket / (CONFIG.buckets - 1)) * CONFIG.peakAlpha;
     bucketColors[colorBucket] = 'rgba(' + CONFIG.color + ',' + colorAlpha.toFixed(3) + ')';
+    glowBucketColors[colorBucket] = 'rgba(' + CONFIG.color + ',' + (colorAlpha * CONFIG.glowAlphaFactor).toFixed(3) + ')';
   }
 
   function randomBetween(range) {
@@ -106,15 +111,25 @@
       dotBuckets[i] = Math.min(CONFIG.buckets - 1, Math.floor((alpha / CONFIG.peakAlpha) * CONFIG.buckets));
     }
 
-    // Eight shared paths, one per alpha bucket; no per-frame arrays or per-dot draw calls.
+    // Two batched passes: soft outer glow first, crisp dot cores second. No per-dot draw calls.
     for (var bucketIndex = 0; bucketIndex < CONFIG.buckets; bucketIndex++) {
       ctx.beginPath();
       for (var j = 0; j < dotCount; j++) {
         if (dotBuckets[j] !== bucketIndex) continue;
-        ctx.moveTo(xs[j] + CONFIG.radius, ys[j]);
-        ctx.arc(xs[j], ys[j], CONFIG.radius, 0, Math.PI * 2);
+        ctx.moveTo(xs[j] + CONFIG.glowRadius, ys[j]);
+        ctx.arc(xs[j], ys[j], CONFIG.glowRadius, 0, Math.PI * 2);
       }
-      ctx.fillStyle = bucketColors[bucketIndex];
+      ctx.fillStyle = glowBucketColors[bucketIndex];
+      ctx.fill();
+    }
+    for (var coreBucket = 0; coreBucket < CONFIG.buckets; coreBucket++) {
+      ctx.beginPath();
+      for (var k = 0; k < dotCount; k++) {
+        if (dotBuckets[k] !== coreBucket) continue;
+        ctx.moveTo(xs[k] + CONFIG.radius, ys[k]);
+        ctx.arc(xs[k], ys[k], CONFIG.radius, 0, Math.PI * 2);
+      }
+      ctx.fillStyle = bucketColors[coreBucket];
       ctx.fill();
     }
   }
@@ -166,7 +181,7 @@
         var i = dotCount++;
         xs[i] = x;
         ys[i] = y;
-        var initial = 0.12 + Math.random() * 0.88;
+        var initial = randomBetween(CONFIG.initialLevelRange);
         var target = pickTarget();
         var fade = randomBetween(CONFIG.fadeMs);
         var hold = randomBetween(CONFIG.holdMs);
