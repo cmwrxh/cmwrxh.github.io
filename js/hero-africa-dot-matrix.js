@@ -12,7 +12,7 @@
     adaptiveFrameMs: 21,
     adaptiveAfterFrames: 24,
     adaptiveSpacingIncrease: 2,
-    colors: { dot: '56,161,224', background: '#0A0E17' },
+    colors: { dot: '56,161,224', background: '#000000' },
     land: { baseAlpha: 0.05, baseRadius: 1.3, alphaBoost: 0.30, radiusBoost: 1.4, brightnessScale: 1, twinkleScale: 1 },
     ocean: { baseAlpha: 0.05, baseRadius: 1, alphaBoost: 0.30, brightnessScale: 1, twinkleScale: 1 },
     sweepSpeed: 1.8,
@@ -44,8 +44,17 @@
   var CITY_COORDS = {
     nairobi: [36.8219, -1.2921], lagos: [3.3792, 6.5244],
     johannesburg: [28.0473, -26.2041], cairo: [31.2357, 30.0444],
-    accra: [-0.187, 5.6037], kampala: [32.5825, 0.3476]
+    accra: [-0.187, 5.6037], kampala: [32.5825, 0.3476],
+    casablanca: [-7.5898, 33.5731]
   };
+  var PAN_AFRICAN_NODES = [
+    { lon: 3.3792, lat: 6.5244, color: '46,204,113' },
+    { lon: 31.2357, lat: 30.0444, color: '255,193,7' },
+    { lon: 28.0473, lat: -26.2041, color: '255,77,77' },
+    { lon: 36.8219, lat: -1.2921, color: '46,204,113' },
+    { lon: -7.5898, lat: 33.5731, color: '255,193,7' },
+    { lon: -0.187, lat: 5.6037, color: '255,77,77' }
+  ];
 
   var section = document.querySelector('[data-africa-dot-hero]');
   var canvas = section && section.querySelector('[data-africa-dot-canvas]');
@@ -103,13 +112,20 @@
     for (var row = 0; row < rows; row++) {
       var y = row * spacing;
       for (var col = 0; col < cols; col++) {
-        var x = col * spacing, land = false;
+        var x = col * spacing, land = false, accent = null;
         if (x >= mapLeft && x <= mapLeft + mapWidth && y >= mapTop && y <= mapTop + mapHeight) {
           var geo = SHARED.unproject(x, y, { left: mapLeft, top: mapTop, width: mapWidth, height: mapHeight }, CONFIG.mapBounds);
           land = SHARED.pointInPolygon(geo.lon, geo.lat);
+          if (land) {
+            for (var nodeIndex = 0; nodeIndex < PAN_AFRICAN_NODES.length; nodeIndex++) {
+              var node = PAN_AFRICAN_NODES[nodeIndex];
+              var lonDelta = geo.lon - node.lon, latDelta = geo.lat - node.lat;
+              if (lonDelta * lonDelta + latDelta * latDelta < 18) { accent = node.color; break; }
+            }
+          }
         }
         dots[k++] = {
-          x: x, y: y, land: land, phase: Math.random() * Math.PI * 2,
+          x: x, y: y, land: land, accent: accent, phase: Math.random() * Math.PI * 2,
           speed: CONFIG.dotSpeedMin + Math.random() * CONFIG.dotSpeedRange,
           baseAlpha: land ? CONFIG.land.baseAlpha : CONFIG.ocean.baseAlpha,
           baseRadius: land ? CONFIG.land.baseRadius : CONFIG.ocean.baseRadius
@@ -127,6 +143,7 @@
     var t = time * 0.001, color = CONFIG.colors.dot;
     for (var i = 0; i < dotCount; i++) {
       var dot = dots[i];
+      var dotColor = dot.accent || color;
       var sweep = Math.pow(Math.max(0, Math.sin((dot.x * CONFIG.sweepXFactor + dot.y * CONFIG.sweepYFactor) * CONFIG.sweepWidth - t * CONFIG.sweepSpeed)), CONFIG.sharpness.sweep);
       var dx = dot.x - originX, dy = dot.y - originY;
       var distance = Math.sqrt(dx * dx + dy * dy);
@@ -141,12 +158,12 @@
       var radius = dot.baseRadius + (dot.land ? brightness * CONFIG.land.radiusBoost : 0);
       if (dot.land && brightness > CONFIG.haloThreshold) {
         ctx.beginPath();
-        ctx.fillStyle = 'rgba(' + color + ',' + (brightness * CONFIG.haloAlpha) + ')';
+        ctx.fillStyle = 'rgba(' + dotColor + ',' + (brightness * CONFIG.haloAlpha) + ')';
         ctx.arc(dot.x, dot.y, CONFIG.haloRadius, 0, Math.PI * 2);
         ctx.fill();
       }
       ctx.beginPath();
-      ctx.fillStyle = 'rgba(' + color + ',' + alpha + ')';
+      ctx.fillStyle = 'rgba(' + dotColor + ',' + alpha + ')';
       ctx.arc(dot.x, dot.y, radius, 0, Math.PI * 2);
       ctx.fill();
     }
