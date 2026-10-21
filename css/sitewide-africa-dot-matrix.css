@@ -1,0 +1,18 @@
+html, body { background: #000000 !important; }
+body { isolation: isolate; }
+#al-sitewide-dot-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  width: 100vw;
+  height: 100vh;
+  display: block;
+  pointer-events: none;
+  background: #000000;
+}
+main, main > section, .section, .hero-section, footer, .homepage-footer,
+.contact-gradient, .contact-page-hero, .login-page, .pricing-main,
+.included-section, .pricing-heading {
+  background-color: transparent !important;
+  background-image: none !important;
+}
