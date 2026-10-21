@@ -81,3 +81,125 @@
 @media (prefers-reduced-motion: reduce) {
   .hero-africa-dot-hero .hero-city-rotator { transition: none; }
 }
+
+
+/* GTmetrix-inspired hero alignment: one action bar, no surrounding card. */
+.hero-africa-dot-hero {
+  width: 100%;
+  max-width: none;
+  background-color: #05080f !important;
+}
+
+.hero-africa-dot-hero::before,
+.hero-africa-dot-hero::after {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+}
+
+.hero-africa-dot-hero .hero-africa-dot-content {
+  width: 100%;
+}
+
+.hero-africa-dot-hero .hero-grid.hero-action-layout {
+  max-width: 900px;
+}
+
+.hero-africa-dot-hero .hero-title {
+  max-width: 24ch;
+  margin-bottom: 20px;
+}
+
+.hero-africa-dot-hero .hero-city-prefix {
+  display: inline;
+}
+
+.hero-africa-dot-hero .hero-city-rotator {
+  display: inline-block !important;
+  min-height: 0;
+  margin-top: 0;
+  white-space: normal;
+  vertical-align: baseline;
+}
+
+.hero-africa-dot-hero .hero-scan-form {
+  display: flex;
+  align-items: stretch;
+  width: min(100%, 700px);
+  gap: 10px;
+  margin: 0 auto;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.hero-africa-dot-hero .hero-scan-form input {
+  min-height: 58px;
+  padding: 0 18px;
+  border: 1px solid rgba(148, 174, 207, .34);
+  border-radius: 10px;
+  background: rgba(9, 15, 27, .92);
+}
+
+.hero-africa-dot-hero .hero-scan-form .btn {
+  min-height: 58px;
+  padding-inline: 22px;
+  border-radius: 10px;
+  white-space: nowrap;
+}
+
+.hero-africa-dot-hero .hero-support-links {
+  margin: 12px auto 0;
+  width: min(100%, 700px);
+  text-align: left;
+}
+
+.hero-africa-dot-hero .hero-sample-report-link {
+  color: #b7d9ff;
+  font-size: 14px;
+  text-decoration: underline;
+  text-decoration-color: rgba(183, 217, 255, .62);
+  text-underline-offset: 4px;
+}
+
+.hero-africa-dot-hero .hero-sample-report-link:hover {
+  color: #fff;
+  text-decoration-color: #fff;
+}
+
+.hero-africa-dot-hero .hero-scan-note {
+  margin-top: 14px;
+}
+
+@media (max-width: 600px) {
+  .hero-africa-dot-hero .hero-title {
+    max-width: 17ch;
+  }
+
+  .hero-africa-dot-hero .hero-scan-form {
+    flex-direction: row;
+    gap: 8px;
+  }
+
+  .hero-africa-dot-hero .hero-scan-form input {
+    width: 0;
+    flex: 1 1 auto;
+    min-width: 0;
+    min-height: 54px;
+    padding-inline: 12px;
+  }
+
+  .hero-africa-dot-hero .hero-scan-form .btn {
+    width: auto;
+    flex: 0 0 auto;
+    min-height: 54px;
+    padding-inline: 14px;
+    font-size: 14px;
+  }
+
+  .hero-africa-dot-hero .hero-support-links {
+    margin-top: 10px;
+  }
+}
