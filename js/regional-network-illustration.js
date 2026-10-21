@@ -4,7 +4,7 @@
   var CONFIG = {
     dotSpacing: 9, maxDotSpacing: 21, dotRadius: 1.2, dotColor: '100,168,245', dotAlpha: 0.48,
     waveGlow: 0.42, waveWidth: 115, waveSpeed: 0.00016, shimmerAmount: 0.22, shimmerSpeed: 0.00045,
-    nodeColor: '#64caff', nodeGlow: 'rgba(70,175,255,0.78)', nodeRadius: 2.1,
+    nodeColor: '#64a8f5', nodeGlow: 'rgba(80,165,245,0.78)', nodeRadius: 2.1,
     pulseIntervalMin: 800, pulseIntervalMax: 1500, pulseDuration: 2600, pulseRingCount: 3, pulseSpeed: 1,
     packetSpeedMin: 0.00007, packetSpeedRange: 0.00007, maxDpr: 2,
     adaptiveFrameMs: 21, adaptiveAfterFrames: 24, adaptiveSpacingIncrease: 2,
