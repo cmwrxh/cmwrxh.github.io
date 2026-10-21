@@ -1,0 +1,14 @@
+# Android signing material and local build outputs
+*.keystore
+*.jks
+*.pem
+*.p12
+*.key
+local.properties
+.gradle/
+build/
+app/build/
+app-release-signed.apk
+app-release-bundle.aab
+*.iml
+.idea/
