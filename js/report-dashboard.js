@@ -65,7 +65,40 @@ const performanceMetrics=[
 const metricVerdictLabel=(metric)=>{if(!finite(metric.value))return 'Unavailable';const n=Number(metric.value);if(metric.unit==='cls')return n<=metric.good?'Good - Nothing to do here':'Needs improvement';if(n<=metric.good)return 'Good - Nothing to do here';if(n<=metric.good*1.5)return 'OK, but consider improvement';return 'Much longer than recommended';};
 const metricValue=(metric)=>!finite(metric.value)?'Unavailable':metric.unit==='cls'?Number(metric.value).toFixed(3):ms(metric.value);
 document.getElementById('rd-performance').innerHTML='<details class="rd-metric-details"><summary>Metric details</summary><p class="rd-muted">These are Lighthouse lab metrics, not CrUX field data. Values appear only when returned by the completed scan.</p><div class="rd-metric-detail-list">'+performanceMetrics.map(metric=>'<article class="rd-metric-detail"><div class="rd-metric-detail-heading"><h3>'+esc(metric.name)+'</h3><strong>'+esc(metricValue(metric))+'</strong></div><p>'+esc(metric.description)+'</p><p class="rd-metric-verdict">'+esc(metricVerdictLabel(metric))+'</p><small>'+esc(metric.threshold)+'</small></article>').join('')+'</div></details>'+table(['Metric','Value','Source'],[['LCP',esc(ms(m.lcpMs)),'Lighthouse'],['TBT',esc(ms(m.tbtMs)),'Lighthouse'],['CLS',esc(finite(m.cls)?Number(m.cls).toFixed(3):'Unavailable'),'Lighthouse'],['FCP',esc(ms(m.fcpMs)),'Lighthouse'],['Speed Index',esc(ms(fm.speedIndexMs)),'Lighthouse'],['TTFB',esc(ms(m.ttfbMs)),'Lighthouse'],['Performance score',esc(score(summary.performance)),'Lighthouse'],['Structure score',esc(score(summary.structure)),'AfricaLatency composite'],['Page weight',esc(bytes(full.pageWeightBytes)),'Returned resource totals'],['Requests',esc(finite(full.requestCount)?String(full.requestCount):'Unavailable'),'Returned resource totals']]);
-document.getElementById('rd-structure').innerHTML=audits.length?table(['Audit','Score','Finding'],audits.map(a=>[esc(a.title||a.id||'Audit'),esc(finite(a.score)?Math.round(Number(a.score)*100)+'%':a.scoreDisplayMode==='notApplicable'?'N/A':'—'),esc(a.displayValue||a.description||a.scoreDisplayMode||'No finding text')])):'<div class="rd-empty">No full audit list was returned. This is not evidence that the site passed every audit.</div>';
+const structureAuditCatalog=[
+ {id:'bootup-time',title:'Reduce JavaScript execution time',impact:'High',metrics:['TBT']},
+ {id:'long-tasks',title:'Avoid long main-thread tasks',impact:'Low',metrics:['TBT']},
+ {id:'back-forward-cache',title:'Allow back/forward cache restoration',impact:'Low',metrics:[]},
+ {id:'redirects',title:'Avoid multiple page redirects',impact:'Low',metrics:['FCP','LCP']},
+ {id:'render-blocking-resources',title:'Eliminate render-blocking resources',impact:'Low',metrics:['FCP','LCP']},
+ {id:'uses-long-cache-ttl',title:'Avoid enormous network payloads',impact:'Low',metrics:['LCP'],match:['total-byte-weight','network-payloads']},
+ {id:'critical-request-chains',title:'Avoid chaining critical requests',impact:'Low',metrics:['FCP','LCP']},
+ {id:'non-composited-animations',title:'Avoid non-composited animations',impact:'Low',metrics:['CLS']},
+ {id:'unused-css-rules',title:'Reduce unused CSS',impact:'Low',metrics:['FCP','LCP']},
+ {id:'unused-javascript',title:'Reduce unused JavaScript',impact:'Low',metrics:['LCP']},
+ {id:'dom-size',title:'Avoid an excessive DOM size',impact:'N/A',metrics:['TBT']},
+ {id:'largest-contentful-paint-element',title:'Largest Contentful Paint element',impact:'N/A',metrics:['LCP']},
+ {id:'legacy-javascript',title:'Avoid serving legacy JavaScript to modern browsers',impact:'N/A',metrics:['TBT']},
+ {id:'mainthread-work-breakdown',title:'Minimize main-thread work',impact:'N/A',metrics:['TBT']},
+ {id:'server-response-time',title:'Reduce initial server response time',impact:'N/A',metrics:['FCP','LCP']},
+ {id:'third-party-summary',title:'Reduce the impact of third-party code',impact:'N/A',metrics:['TBT']},
+ {id:'user-timings',title:'User Timing marks and measures',impact:'N/A',metrics:[]}
+];
+const structureAuditById=new Map(audits.filter(a=>a&&a.id).map(a=>[String(a.id),a]));
+const structureAuditRows=structureAuditCatalog.map(item=>{
+ const audit=structureAuditById.get(item.id)||(item.match||[]).map(id=>structureAuditById.get(id)).find(Boolean);
+ const available=!!audit;
+ const notApplicable=available&&(audit.scoreDisplayMode==='notApplicable'||audit.scoreDisplayMode==='manual'||audit.scoreDisplayMode==='informative');
+ const passed=available&&!notApplicable&&finite(audit.score)&&Number(audit.score)>=0.9;
+ const status=!available?'Not returned by Lighthouse':notApplicable?'N/A':passed?'Passed':'Needs improvement';
+ const scoreText=!available?'Unavailable':notApplicable?'N/A':finite(audit.score)?Math.round(Number(audit.score)*100)+'%':'—';
+ const finding=available?(audit.displayValue||audit.explanation||audit.description||status):'This audit was not included in the returned scan data.';
+ return '<tr class="rd-audit-row" data-impact="'+esc(item.impact)+'" data-no-impact="'+(!item.metrics.length||item.impact==='N/A')+'"><td><strong>'+esc(item.title)+'</strong><small class="rd-audit-finding">'+esc(finding)+'</small></td><td><span class="rd-impact rd-impact-'+item.impact.toLowerCase().replace(/[^a-z]/g,'')+'">'+esc(item.impact)+'</span></td><td><div class="rd-audit-metric-tags">'+(item.metrics.length?item.metrics.map(tag=>'<span class="rd-audit-metric rd-audit-metric-'+tag.toLowerCase()+'">'+tag+'</span>').join(''):'<span class="rd-audit-metric rd-audit-metric-none">—</span>')+'</div></td><td><span class="rd-audit-status rd-audit-status-'+(passed?'pass':notApplicable?'na':available?'fail':'unknown')+'">'+esc(status)+'</span></td><td>'+esc(scoreText)+'</td></tr>';
+}).join('');
+document.getElementById('rd-structure').innerHTML='<div class="rd-structure-toolbar"><label class="rd-audit-toggle"><input id="rd-show-no-impact" type="checkbox"> Show No Impact</label><span class="rd-muted">Audit status and scores are taken from this scan. Missing audits are marked unavailable.</span></div><div class="rd-table-wrap"><table class="rd-table rd-structure-table"><thead><tr><th>Audit</th><th>Impact</th><th>Metrics</th><th>Status</th><th>Score</th></tr></thead><tbody>'+structureAuditRows+'</tbody></table></div>';
+const showNoImpact=document.getElementById('rd-show-no-impact');
+if(showNoImpact)showNoImpact.addEventListener('change',()=>{document.querySelectorAll('.rd-audit-row[data-no-impact="true"]').forEach(row=>{row.hidden=!showNoImpact.checked;});});
+if(showNoImpact)document.querySelectorAll('.rd-audit-row[data-no-impact="true"]').forEach(row=>{row.hidden=true;});
 const resources=Array.isArray(full.resourceDetails)?full.resourceDetails:(Array.isArray(summary.resourceDetails)?summary.resourceDetails:[]);
 const detailEl=document.getElementById('rd-page-details');
 if(detailEl){
