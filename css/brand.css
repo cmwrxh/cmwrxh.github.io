@@ -591,3 +591,15 @@ main .audit-include, main .audit-scope-list li {
 @media (prefers-reduced-motion: reduce) {
   .city-rotator-word.is-entering { animation: none !important; }
 }
+
+.hero-africa-dot-hero .hero-africa-title-accent.city-rotator-slot {
+  display: inline-block !important;
+  width: 14ch !important;
+  min-width: 14ch !important;
+  max-width: 100% !important;
+  color: #3B82F6 !important;
+  background: none !important;
+  -webkit-background-clip: border-box !important;
+  background-clip: border-box !important;
+  -webkit-text-fill-color: #3B82F6 !important;
+}
