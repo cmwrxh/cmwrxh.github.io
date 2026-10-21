@@ -150,7 +150,7 @@
   .regional-insight-icon { width: 32px; height: 32px; }
 }
 
-/* Decorative network motion layered over the regional map. It never displays fabricated measurements. */
+/* Decorative routes and pulsing nodes span the map. They are illustrative, not measurements. */
 .regional-map-panel { position: relative; isolation: isolate; }
 .regional-map-panel > img { display: block; }
 .regional-map-visual {
@@ -193,34 +193,6 @@
   transform-origin: center;
   opacity: 0;
 }
-.regional-map-panel .network-illustration-label {
-  position: absolute;
-  z-index: 2;
-  top: 16px;
-  left: 16px;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  max-width: calc(100% - 32px);
-  padding: 8px 11px;
-  border: 1px solid rgba(199,245,255,.27);
-  border-radius: 999px;
-  color: #E8F9FF;
-  background: rgba(7,27,43,.78);
-  backdrop-filter: blur(8px);
-  font-size: .72rem;
-  font-weight: 650;
-  line-height: 1.25;
-}
-.network-illustration-label::before {
-  content: "";
-  width: 7px;
-  height: 7px;
-  flex: 0 0 7px;
-  border-radius: 50%;
-  background: #7ADCF7;
-  box-shadow: 0 0 0 3px rgba(122,220,247,.15);
-}
 .regional-map-panel.network-illustration-active .network-route {
   animation: regional-route-flow 8s linear infinite;
 }
@@ -242,7 +214,4 @@
   .regional-map-panel .network-route,
   .regional-map-panel .network-pulse { animation: none !important; }
   .regional-map-panel .network-pulse { opacity: .2; }
-}
-@media (max-width: 480px) {
-  .regional-map-panel .network-illustration-label { top: 10px; left: 10px; font-size: .65rem; padding: 7px 9px; }
 }
