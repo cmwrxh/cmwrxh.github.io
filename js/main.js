@@ -140,13 +140,7 @@ document.addEventListener('DOMContentLoaded', () => {
   updateNavScrollState();
   window.addEventListener('scroll', updateNavScrollState, { passive: true });
 
-  if (!document.querySelector('script[src="/africalatency.js"]')) {
-    const rum = document.createElement('script');
-    rum.defer = true;
-    rum.src = '/africalatency.js';
-    rum.setAttribute('data-al-key', 'test-site-001');
-    document.head.appendChild(rum);
-  }
+  // Analytics is loaded only by setupCookieConsent() after explicit acceptance.
 
   document.querySelectorAll('.nav-brand').forEach((brand) => {
     brand.classList.add('brand-lockup');
