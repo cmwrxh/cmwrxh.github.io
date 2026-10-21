@@ -3,7 +3,7 @@
   'use strict';
   // Timing units: waveSpeed, shimmerSpeed, and packetSpeed are per millisecond; pulse intervals and pulseDuration are milliseconds.
   var CONFIG = {
-    dotSpacing: 9, maxDotSpacing: 21, dotRadius: 1.2, dotColor: '100,168,245', dotAlpha: 0.48,
+    dotSpacing: 6, maxDotSpacing: 21, dotRadius: 1.2, dotColor: '100,168,245', dotAlpha: 0.6,
     waveGlow: 0.42, waveWidth: 115, waveSpeed: 0.00016, shimmerAmount: 0.22, shimmerSpeed: 0.00045,
     nodeColor: '#64a8f5', nodeGlow: 'rgba(80,165,245,0.78)', nodeRadius: 2.1,
     pulseIntervalMin: 800, pulseIntervalMax: 1500, pulseDuration: 2600, pulseRingCount: 3, pulseSpeed: 1,
@@ -38,7 +38,7 @@
     canvas.width = Math.round(width * scale); canvas.height = Math.round(height * scale);
     ctx.setTransform(scale, 0, 0, scale, 0, 0);
     spacing = spacingOverride || CONFIG.dotSpacing;
-    var mapW = Math.min(width * 0.92, height * 0.98);
+    var mapW = Math.min(width * 0.99, height * 0.99);
     var mapH = Math.min(height * 0.98, mapW * (76 / 75));
     var ratio = (SHARED.bounds.maxLon - SHARED.bounds.minLon) / (SHARED.bounds.maxLat - SHARED.bounds.minLat);
     if (mapW / mapH > ratio) mapW = mapH * ratio; else mapH = mapW / ratio;
@@ -55,7 +55,7 @@
       n.px = p.x; n.py = p.y;
     });
     packets = [];
-    for (var p = 0; p < 7; p++) packets.push({ from: p % CONFIG.nodes.length, to: (p * 5 + 4) % CONFIG.nodes.length, t: Math.random(),
+    for (var p = 0; p < 4; p++) packets.push({ from: p % CONFIG.nodes.length, to: (p * 5 + 4) % CONFIG.nodes.length, t: Math.random(),
       speed: CONFIG.packetSpeedMin + Math.random() * CONFIG.packetSpeedRange });
     if (reduceMotion) drawStatic();
   }
@@ -93,7 +93,7 @@
       var a = point(CONFIG.nodes[p.from]), b = point(CONFIG.nodes[p.to]), mid = curve(p.from, p.to, 0.5);
       ctx.beginPath(); ctx.moveTo(a.x, a.y);
       ctx.quadraticCurveTo(mid.x * 2 - (a.x + b.x) / 2, mid.y * 2 - (a.y + b.y) / 2, b.x, b.y);
-      ctx.strokeStyle = 'rgba(80,165,240,.13)'; ctx.lineWidth = 0.8; ctx.stroke();
+      ctx.strokeStyle = 'rgba(80,165,240,.12)'; ctx.lineWidth = 0.8; ctx.stroke();
       p.t += p.speed * (now - (lastTime || now)) * CONFIG.pulseSpeed; if (p.t > 1) p.t = 0;
       var pos = curve(p.from, p.to, p.t);
       ctx.beginPath(); ctx.arc(pos.x, pos.y, 1.65, 0, Math.PI * 2);
