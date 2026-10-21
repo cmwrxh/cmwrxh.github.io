@@ -766,3 +766,45 @@ footer {
 @media (prefers-reduced-motion: reduce) {
   .al-hero .al-scan-form button { transition: none; }
 }
+
+
+/* Final GTmetrix-inspired cleanup: no fixed mobile banner, continuous canvas. */
+.mobile-sticky-cta,
+a.mobile-sticky-cta {
+  display: none !important;
+}
+body {
+  padding-bottom: 0 !important;
+}
+.al-hero .al-city-slot {
+  display: inline-block;
+  min-width: 7.8em;
+  color: #3b82f6 !important;
+  -webkit-text-fill-color: #3b82f6 !important;
+  background: none !important;
+  background-clip: initial !important;
+  text-decoration: underline;
+  text-decoration-color: rgba(59, 130, 246, .42);
+  text-underline-offset: .22em;
+  text-decoration-thickness: 2px;
+  vertical-align: baseline;
+  transition: opacity .18s ease, transform .18s ease;
+}
+.al-hero .al-city-slot.is-changing {
+  opacity: 0;
+  transform: translateY(-.28em);
+}
+.al-hero .al-hero-canvas {
+  width: 100%;
+  max-width: none;
+}
+.al-hero .al-scan-form {
+  box-shadow: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .al-hero .al-city-slot {
+    transition: none;
+  }
+}
