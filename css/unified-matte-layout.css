@@ -178,3 +178,7 @@ select, textarea, .form-input, .contact-form input, .contact-form select,
   border: 1px solid rgba(255,255,255,.12) !important;
   color: #FFFFFF !important;
 }
+
+/* Direct-on-canvas login and checkout forms. */
+.login-page .login-card { background: transparent !important; border: 0 !important; border-radius: 0 !important; box-shadow: none !important; }
+.audit-buy-card { background: transparent !important; border: 0 !important; border-bottom: 1px solid rgba(255,255,255,.08) !important; border-radius: 0 !important; box-shadow: none !important; }
