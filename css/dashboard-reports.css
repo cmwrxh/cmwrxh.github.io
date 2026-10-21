@@ -1,0 +1,121 @@
+/* GTmetrix-inspired customer report history, using AfricaLatency's own design tokens. */
+.report-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin: 16px 0 14px;
+}
+.report-tabs {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 10px;
+}
+.report-tab {
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--muted);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.report-tab:hover { background: var(--soft); color: var(--text); }
+.report-tab[aria-pressed="true"] {
+  color: var(--text);
+  background: var(--soft);
+  border-color: var(--border);
+}
+.report-search {
+  width: min(100%, 320px);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--text);
+  padding: 10px 12px;
+  font: inherit;
+  font-size: 13px;
+}
+.report-list { display: grid; gap: 10px; }
+.report-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 18px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  transition: border-color .15s ease, background .15s ease;
+}
+.report-row:hover { border-color: #c5ccd6; background: #fcfcfd; }
+.report-row-main { min-width: 0; }
+.report-url {
+  display: inline-block;
+  max-width: 100%;
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+  text-decoration: none;
+}
+.report-url:hover { text-decoration: underline; }
+.report-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px 12px;
+  color: var(--muted);
+  font-size: 12px;
+  margin-top: 7px;
+}
+.report-metrics {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+  color: var(--muted);
+  font-size: 12px;
+}
+.report-metrics strong { color: var(--text); font-weight: 700; }
+.report-grade {
+  min-width: 42px;
+  min-height: 42px;
+  display: inline-grid;
+  place-items: center;
+  padding: 0 8px;
+  border-radius: 9px;
+  background: var(--soft);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-size: 16px;
+  font-weight: 800;
+}
+.report-grade[data-grade="A"], .report-grade[data-grade="B"] { color: #027a48; background: #ecfdf3; border-color: #abefc6; }
+.report-grade[data-grade="D"], .report-grade[data-grade="E"], .report-grade[data-grade="F"] { color: #b42318; background: #fef3f2; border-color: #fecdca; }
+.report-open {
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 9px 11px;
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.report-open:hover { background: var(--soft); }
+.report-history-note {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+  margin: 12px 0 0;
+}
+@media (max-width: 620px) {
+  .report-row { grid-template-columns: minmax(0, 1fr); }
+  .report-row-action { display: flex; justify-content: flex-start; }
+  .report-search { width: 100%; }
+}
