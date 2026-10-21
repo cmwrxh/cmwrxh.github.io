@@ -54,7 +54,7 @@
   var motionQuery = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
   var reducedMotion = !!(motionQuery && motionQuery.matches);
   var width = 0, height = 0, dpr = 1, spacing = CONFIG.dotSpacing, spacingOverride = 0;
-  var dots = [], dotCount = 0, rafId = 0, running = false, visible = true, pageVisible = !document.hidden;
+  var dots = [], dotCount = 0, rafId = 0, running = false, visible = false, pageVisible = !document.hidden;
   var lastFrame = 0, slowFrames = 0, startTime = 0, mapLeft = 0, mapTop = 0, mapWidth = 0, mapHeight = 0;
   var originX = 0, originY = 0;
 
