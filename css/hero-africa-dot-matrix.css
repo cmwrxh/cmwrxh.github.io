@@ -1,9 +1,9 @@
-/* Full-bleed static dotted field: CSS-only, crisp, and motion-free. */
+/* Full-bleed static dotted field: denser, brighter CSS-only texture. */
 .hero-africa-dot-hero {
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  background: #0a0e17 !important;
+  background: #05080f !important;
 }
 
 .hero-africa-dot-hero::before {
@@ -12,12 +12,12 @@
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  background-image: radial-gradient(circle, rgba(59, 130, 246, 0.66) 1.05px, transparent 1.4px);
-  background-size: 20px 20px;
+  background-image: radial-gradient(circle, rgba(0, 163, 255, 0.88) 1.35px, transparent 1.8px);
+  background-size: 16px 16px;
   background-position: center center;
-  opacity: 0.68;
-  -webkit-mask-image: radial-gradient(ellipse at center, transparent 0%, rgba(0, 0, 0, 0.08) 26%, rgba(0, 0, 0, 0.48) 57%, #000 100%);
-  mask-image: radial-gradient(ellipse at center, transparent 0%, rgba(0, 0, 0, 0.08) 26%, rgba(0, 0, 0, 0.48) 57%, #000 100%);
+  opacity: 0.82;
+  -webkit-mask-image: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.24) 0%, rgba(0, 0, 0, 0.40) 28%, rgba(0, 0, 0, 0.72) 60%, #000 100%);
+  mask-image: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.24) 0%, rgba(0, 0, 0, 0.40) 28%, rgba(0, 0, 0, 0.72) 60%, #000 100%);
 }
 
 .hero-africa-dot-hero::after {
@@ -26,7 +26,7 @@
   inset: 0;
   z-index: 1;
   pointer-events: none;
-  background: linear-gradient(90deg, rgba(10, 14, 23, 0.20) 0%, rgba(10, 14, 23, 0.04) 50%, rgba(10, 14, 23, 0.16) 100%);
+  background: linear-gradient(90deg, rgba(5, 8, 15, 0.08) 0%, rgba(5, 8, 15, 0.02) 50%, rgba(5, 8, 15, 0.06) 100%);
 }
 
 .hero-africa-dot-content {
