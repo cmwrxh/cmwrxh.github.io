@@ -33,7 +33,7 @@ jobs:
         uses: android-actions/setup-android@v4
 
       - name: Install Android build tools
-        run: sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
+        run: sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0" "build-tools;36.1.0"
 
       - name: Install Bubblewrap
         run: npm install --global @bubblewrap/cli
@@ -104,10 +104,11 @@ jobs:
           test -x "$ANDROID_HOME/platform-tools/adb"
           test -x "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
 
-          # Bubblewrap expects the SDK root to contain a top-level tools/ or bin/.
-          # Provide a valid sdkmanager entry under bin/ for its SDK-root validation.
-          mkdir -p "$ANDROID_HOME/bin"
+          # Bubblewrap SDK validation checks for a top-level tools/ or bin/ directory.
+          # Support both its legacy tools/bin lookup and its newer bin lookup.
+          mkdir -p "$ANDROID_HOME/bin" "$ANDROID_HOME/tools/bin"
           ln -sf "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "$ANDROID_HOME/bin/sdkmanager"
+          ln -sf "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "$ANDROID_HOME/tools/bin/sdkmanager"
 
           # Write Bubblewrap's config directly. updateConfig calls loadOrCreateConfig()
           # before applying flags in some CLI versions, which triggers an interactive JDK prompt
@@ -115,14 +116,25 @@ jobs:
           mkdir -p "$HOME/.bubblewrap"
           printf '{"jdkPath":"%s","androidSdkPath":"%s"}\n' "$JAVA_HOME" "$ANDROID_HOME" > "$HOME/.bubblewrap/config.json"
 
-          echo "Android SDK root: $ANDROID_HOME"
-          ls -la "$ANDROID_HOME/bin"
+          echo "Android SDK root: $(realpath "$ANDROID_HOME")"
+          ls -la "$ANDROID_HOME/bin" "$ANDROID_HOME/tools/bin"
           cat "$HOME/.bubblewrap/config.json"
+          node -e 'const fs=require("node:fs");const path=require("node:path");const c=JSON.parse(fs.readFileSync(process.env.HOME+"/.bubblewrap/config.json","utf8"));if(!c.androidSdkPath||!fs.existsSync(c.androidSdkPath)||(!fs.existsSync(path.join(c.androidSdkPath,"tools"))&&!fs.existsSync(path.join(c.androidSdkPath,"bin"))))throw new Error("Bubblewrap SDK config points to an invalid SDK root: "+c.androidSdkPath);console.log("Validated Bubblewrap SDK path:",c.androidSdkPath)'
           bubblewrap doctor
 
       - name: Generate Android project
         working-directory: android
         run: CI=true bubblewrap update --skipVersionUpgrade --manifest=twa-manifest.json
+
+      - name: Reassert Bubblewrap SDK configuration
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$ANDROID_HOME/bin" "$ANDROID_HOME/tools/bin" "$HOME/.bubblewrap"
+          ln -sf "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "$ANDROID_HOME/bin/sdkmanager"
+          ln -sf "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "$ANDROID_HOME/tools/bin/sdkmanager"
+          printf '{"jdkPath":"%s","androidSdkPath":"%s"}\n' "$JAVA_HOME" "$(realpath "$ANDROID_HOME")" > "$HOME/.bubblewrap/config.json"
+          node -e 'const fs=require("node:fs");const path=require("node:path");const c=JSON.parse(fs.readFileSync(process.env.HOME+"/.bubblewrap/config.json","utf8"));if(!fs.existsSync(path.join(c.androidSdkPath,"platform-tools","adb")))throw new Error("ADB missing under "+c.androidSdkPath);if(!fs.existsSync(path.join(c.androidSdkPath,"build-tools","36.1.0")))throw new Error("Android build-tools 36.1.0 missing under "+c.androidSdkPath);console.log("Bubblewrap SDK validated:",c.androidSdkPath)'
 
       - name: Build signed test APK and AAB
         working-directory: android
