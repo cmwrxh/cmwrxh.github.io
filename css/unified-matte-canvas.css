@@ -112,6 +112,8 @@ p,
 main .process-card,
 main .audience-card,
 main .product-card,
+main .card,
+main .sample-card,
 main .regional-insight-row,
 main .custom-scope-note,
 main .methodology-summary,
@@ -176,8 +178,38 @@ main .product-card p {
 }
 
 main .process-card::before,
-main .audience-card::before {
+main .audience-card::before,
+main .section-heading::before {
+  content: none !important;
+  display: none !important;
   background: transparent !important;
+}
+
+main .card,
+main .audit-include,
+main .audit-trust,
+main .audit-scope-note,
+main .contact-form,
+main .contact-image-form,
+main .contact-page-form,
+.editorial-grid > * {
+  border: 0 !important;
+}
+
+.editorial-grid {
+  gap: 0 !important;
+  border-top: 1px solid var(--canvas-line-strong);
+  border-bottom: 1px solid var(--canvas-line-strong);
+}
+
+.editorial-grid > * {
+  padding-top: 22px;
+  padding-bottom: 22px;
+}
+
+.editorial-grid .editorial-number {
+  color: var(--canvas-accent);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
 /* Product ladder: flat, connected pricing matrix. */
