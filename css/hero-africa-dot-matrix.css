@@ -1,45 +1,33 @@
-/* Full-bleed static dotted field: CSS-only, crisp, and motion-free. */
+/* Edge-to-edge animated telemetry dot matrix, isolated to the homepage hero. */
 .hero-africa-dot-hero {
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  background: #0a0e17 !important;
+  background: #080d1a !important;
 }
-
-.hero-africa-dot-hero::before {
-  content: "";
+.hero-africa-dot-hero [data-africa-dot-canvas] {
   position: absolute;
   inset: 0;
   z-index: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
   pointer-events: none;
-  background-image: radial-gradient(circle, rgba(59, 130, 246, 0.66) 1.05px, transparent 1.4px);
-  background-size: 20px 20px;
-  background-position: center center;
-  opacity: 0.68;
-  -webkit-mask-image: radial-gradient(ellipse at center, transparent 0%, rgba(0, 0, 0, 0.08) 26%, rgba(0, 0, 0, 0.48) 57%, #000 100%);
-  mask-image: radial-gradient(ellipse at center, transparent 0%, rgba(0, 0, 0, 0.08) 26%, rgba(0, 0, 0, 0.48) 57%, #000 100%);
 }
-
+.hero-africa-dot-hero::before,
 .hero-africa-dot-hero::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-  background: linear-gradient(90deg, rgba(10, 14, 23, 0.20) 0%, rgba(10, 14, 23, 0.04) 50%, rgba(10, 14, 23, 0.16) 100%);
+  content: none !important;
+  display: none !important;
 }
-
 .hero-africa-dot-content {
   position: relative;
-  z-index: 2;
+  z-index: 1;
 }
-
 .hero-africa-dot-hero .hero-title {
   color: #fff;
   font-weight: 800;
   text-wrap: balance;
 }
-
 .hero-africa-dot-hero .hero-africa-title-accent {
   display: block;
   color: #5fb4ff;
@@ -48,13 +36,8 @@
   background-clip: text;
   -webkit-text-fill-color: transparent;
 }
-
-/* Keep the new canvas matte: no blurred ambient blobs or competing static grid. */
 .hero-africa-dot-hero .hero-ambient-glow,
-.hero-africa-dot-hero .hero-dot-grid {
-  display: none !important;
-}
-
+.hero-africa-dot-hero .hero-dot-grid { display: none !important; }
 .hero-africa-dot-hero .hero-city-prefix { display: block; }
 .hero-africa-dot-hero .hero-city-rotator {
   display: block !important;
@@ -73,11 +56,9 @@
   opacity: 0;
   transform: translate3d(0, 8px, 0);
 }
-
 @media (max-width: 480px) {
   .hero-africa-dot-hero .hero-city-rotator { white-space: normal; }
 }
-
 @media (prefers-reduced-motion: reduce) {
   .hero-africa-dot-hero .hero-city-rotator { transition: none; }
 }
