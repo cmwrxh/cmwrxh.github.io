@@ -25,7 +25,7 @@
 
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/marketing.css?v=7">
-  <link rel="stylesheet" href="/css/hero-africa-dot-matrix.css?v=5">
+  <link rel="stylesheet" href="/css/hero-africa-dot-matrix.css?v=6">
   <link rel="stylesheet" href="/css/brand.css?v=6">
   <link rel="stylesheet" href="/css/product-pages.css?v=1">
   <link rel="stylesheet" href="/css/regional-performance.css?v=6">
@@ -100,11 +100,14 @@
   <section class="section hero-highlight hero-africa-dot-hero" data-africa-dot-hero>
     <canvas class="hero-africa-dot-canvas" data-africa-dot-canvas aria-hidden="true"></canvas>
     <div class="hero-africa-dot-overlay" aria-hidden="true"></div>
+    <div class="hero-ambient-glow hero-ambient-glow-one" aria-hidden="true"></div>
+    <div class="hero-ambient-glow hero-ambient-glow-two" aria-hidden="true"></div>
+    <div class="hero-dot-grid" aria-hidden="true"></div>
     <div class="container hero-africa-dot-content">
       <div class="hero-grid hero-action-layout">
         <div class="hero-action-copy">
           <div class="label">Infrastructure Performance &amp; Latency Intelligence</div>
-          <h1 class="hero-title">See how your website responds from <span class="hero-africa-title-accent">Nairobi, Lagos, Johannesburg and Cairo.</span></h1>
+          <h1 class="hero-title"><span class="hero-city-prefix">See how your website responds from</span> <span class="hero-africa-title-accent hero-city-rotator" data-city-rotator aria-label="Nairobi">Nairobi</span></h1>
           <p class="hero-subtitle">Compare public website and API response behavior from available African network probes, then use the evidence to decide what to investigate. Results depend on probe availability.</p>
           <form class="hero-scan-form" id="homepage-scan-form" action="/scan" method="get">
             <label class="visually-hidden" for="homepage-scan-url">Website URL to scan</label>
@@ -310,6 +313,7 @@
 <script src="/js/africa-dot-matrix-shared.js?v=2" defer></script>
 <script src="/js/regional-network-illustration.js?v=6" defer></script>
 <script src="/js/hero-africa-dot-matrix.js?v=5" defer></script>
+<script src="/js/hero-city-rotator.js?v=1" defer></script>
 <script src="/js/product-pages.js?v=1"></script>
 </body>
 </html>
