@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "test": "node --check api/register-site.js && node --check api/verify-domain.js && node --check lib/domain-verification.js && node --test"
   },
   "dependencies": {
     "@sparticuz/chromium": "^138.0.0",

@@ -35,52 +35,11 @@ function rateOk(ip) {
   return true;
 }
 
-async function geoFor(ip) {
-  const db = supa();
-
-  const { data: cached } = await db
-    .from('ip_geo_cache')
-    .select('data')
-    .eq('ip', ip)
-    .gt(
-      'fetched_at',
-      new Date(Date.now() - 7 * 864e5).toISOString()
-    )
-    .maybeSingle();
-
-  if (cached) return cached.data;
-
-  if (!process.env.IPINFO_TOKEN) return null;
-
-  try {
-    const r = await fetch(
-      `https://ipinfo.io/${encodeURIComponent(ip)}/json?token=${process.env.IPINFO_TOKEN}`
-    );
-
-    if (!r.ok) return null;
-
-    const j = await r.json();
-
-    const mm = String(j.org || '').match(/^(AS\d+)\s*(.*)$/);
-
-    const data = {
-      country: j.country || null,
-      region: j.region || null,
-      city: j.city || null,
-      asn: mm ? mm[1] : null,
-      isp: mm && mm[2]
-        ? mm[2].trim()
-        : (j.org || null),
-    };
-
-    await db
-      .from('ip_geo_cache')
-      .upsert({ ip, data });
-
-    return data;
-  } catch {
-    return null;
-  }
+async function geoFor(_ip) {
+  // Privacy-first beta: do not persist raw IPs or send them to a geolocation
+  // provider. Coarse location enrichment is disabled until we can use a
+  // privacy-preserving source that does not receive the client's raw address.
+  return null;
 }
 
 function deviceType(ua) {
@@ -147,13 +106,38 @@ export default async function handler(req, res) {
 
   const { data: site } = await db
     .from('rum_sites')
-    .select('id')
+    .select('id, domain, domain_verified_at')
     .eq('site_key', siteKey)
     .maybeSingle();
 
   // Fail silently so public requests cannot discover valid site keys.
   if (!site) {
     return res.status(204).end();
+  }
+
+  // For newly registered sites, accept browser beacons only from the
+  // registered hostname or one of its subdomains. Legacy sites without a
+  // domain keep their existing behaviour until they are migrated manually.
+  if (site.domain && !site.domain_verified_at) return res.status(204).end();
+
+  // Origin/Referer filtering is defense-in-depth only; DNS TXT ownership is the trust gate.
+  if (site.domain) {
+    const origin = String(req.headers.origin || '').trim();
+    const referer = String(req.headers.referer || req.headers.referrer || '').trim();
+    let sourceHost = '';
+
+    try {
+      if (origin && origin !== 'null') sourceHost = new URL(origin).hostname.toLowerCase();
+      else if (referer) sourceHost = new URL(referer).hostname.toLowerCase();
+    } catch {
+      return res.status(204).end();
+    }
+
+    const registeredDomain = String(site.domain).toLowerCase();
+    const allowedSource = sourceHost === registeredDomain ||
+      sourceHost.endsWith('.' + registeredDomain);
+
+    if (!allowedSource) return res.status(204).end();
   }
 
   const geo = await geoFor(ip);
