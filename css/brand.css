@@ -483,3 +483,111 @@ main .audit-scope-list li { color: #A0AEC0 !important; }
   background: #226AA5 !important;
   border-color: #226AA5 !important;
 }
+
+
+/* Structural cleanup: GTmetrix-inspired continuous canvas and divider-led sections. */
+.city-rotator-slot {
+  display: inline-grid !important;
+  grid-template-columns: minmax(13ch, max-content);
+  min-width: 13ch;
+  max-width: 100%;
+  vertical-align: baseline;
+  color: #3B82F6 !important;
+  text-decoration: underline;
+  text-decoration-color: rgba(59,130,246,.4);
+  text-decoration-thickness: 2px;
+  text-underline-offset: .22em;
+  background: none !important;
+  -webkit-text-fill-color: #3B82F6 !important;
+}
+.city-rotator-word { display: inline-block; white-space: nowrap; }
+.city-rotator-word.is-entering { animation: city-slide-fade-in .32s ease both; }
+@keyframes city-slide-fade-in {
+  from { opacity: 0; transform: translateY(.28em); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.hero-scan-form { background: transparent !important; border: 0 !important; box-shadow: none !important; }
+.hero-scan-form input {
+  background: #0D131D !important;
+  border: 1px solid rgba(255,255,255,.12) !important;
+}
+.hero-africa-dot-hero { background: #0A0E17 !important; }
+.hero-africa-dot-overlay {
+  background: linear-gradient(180deg, rgba(10,14,23,.10), rgba(10,14,23,.18)) !important;
+}
+.process-cards, .product-grid, .pricing-grid, .principles-grid,
+.audience-grid, .feature-grid, .methodology-grid, .audit-buy-grid,
+.audit-trust, .faq-grid, .service-grid {
+  gap: 0 !important;
+}
+.process-cards .process-card, .product-grid .product-card,
+.pricing-grid .pricing-card, .principles-grid .principle,
+.audience-grid .audience-card, .feature-grid > *,
+.methodology-grid > *, .audit-buy-grid .audit-buy-card,
+.audit-trust > *, .service-grid .service-card, .faq-section .faq-item,
+main .card, main .contact-choice, main .trust-card, main .testimonial,
+main .about-signal, main .terminal, main .regional-image,
+main .audit-include, main .audit-scope-list li,
+main .custom-scope-note, main .nairobi-probe-card {
+  background: transparent !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+.process-cards .process-card, .product-grid .product-card,
+.pricing-grid .pricing-card, .principles-grid .principle,
+.audience-grid .audience-card, .feature-grid > *,
+.methodology-grid > *, .audit-buy-grid .audit-buy-card,
+.audit-trust > *, .service-grid .service-card, .faq-section .faq-item,
+main .card, main .contact-choice, main .trust-card, main .testimonial,
+main .audit-include, main .audit-scope-list li {
+  border: 0 !important;
+  border-bottom: 1px solid rgba(255,255,255,.08) !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+.product-grid .product-card:last-child, .audience-grid .audience-card:last-child,
+.process-cards .process-card:last-child, .pricing-grid .pricing-card:last-child {
+  border-bottom: 0 !important;
+}
+.product-card-featured, .pricing-card-featured {
+  border-color: rgba(255,255,255,.08) !important;
+  box-shadow: none !important;
+}
+.login-page { background: #0A0E17 !important; }
+.login-page .login-card {
+  width: min(460px, 100%);
+  padding: 28px 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+.audit-buy-card {
+  background: transparent !important;
+  border: 0 !important;
+  border-bottom: 1px solid rgba(255,255,255,.08) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+.audit-buy-grid { border-top: 1px solid rgba(255,255,255,.08); }
+.methodology-summary, .methodology-tags, .methodology-grid .card,
+.methodology-grid .principle, .methodology-grid .methodology-card {
+  background: transparent !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+@media (max-width: 767px) {
+  .mobile-sticky-cta, .sticky-scan-cta, .sticky-bottom-banner,
+  .sticky-bottom-cta, .mobile-scan-banner, .fixed-bottom-cta,
+  [data-sticky-scan-cta], [data-mobile-sticky-cta] {
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+  }
+  .city-rotator-slot { min-width: 13ch; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .city-rotator-word.is-entering { animation: none !important; }
+}
