@@ -1,35 +1,45 @@
-/* AfricaLatency hero-only dot-matrix Africa background. */
+/* Full-bleed static dotted field: denser, brighter CSS-only texture. */
 .hero-africa-dot-hero {
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  background: #000 !important;
+  background: #05080f !important;
 }
-.hero-africa-dot-canvas {
+
+.hero-africa-dot-hero::before {
+  content: "";
   position: absolute;
   inset: 0;
   z-index: 0;
-  display: block;
-  width: 100%;
-  height: 100%;
   pointer-events: none;
+  background-image: radial-gradient(circle, rgba(0, 163, 255, 0.88) 1.35px, transparent 1.8px);
+  background-size: 16px 16px;
+  background-position: center center;
+  opacity: 0.82;
+  -webkit-mask-image: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.24) 0%, rgba(0, 0, 0, 0.40) 28%, rgba(0, 0, 0, 0.72) 60%, #000 100%);
+  mask-image: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.24) 0%, rgba(0, 0, 0, 0.40) 28%, rgba(0, 0, 0, 0.72) 60%, #000 100%);
 }
-.hero-africa-dot-overlay {
+
+.hero-africa-dot-hero::after {
+  content: "";
   position: absolute;
   inset: 0;
   z-index: 1;
   pointer-events: none;
-  background: radial-gradient(ellipse at 48% 47%, rgba(0, 0, 0, .86) 0%, rgba(0, 0, 0, .58) 35%, rgba(0, 0, 0, .12) 72%, rgba(0, 0, 0, .2) 100%);
+  background: linear-gradient(90deg, rgba(5, 8, 15, 0.08) 0%, rgba(5, 8, 15, 0.02) 50%, rgba(5, 8, 15, 0.06) 100%);
 }
+
 .hero-africa-dot-content {
   position: relative;
   z-index: 2;
 }
+
 .hero-africa-dot-hero .hero-title {
   color: #fff;
   font-weight: 800;
   text-wrap: balance;
 }
+
 .hero-africa-dot-hero .hero-africa-title-accent {
   display: block;
   color: #5fb4ff;
@@ -37,4 +47,159 @@
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
+}
+
+/* Keep the new canvas matte: no blurred ambient blobs or competing static grid. */
+.hero-africa-dot-hero .hero-ambient-glow,
+.hero-africa-dot-hero .hero-dot-grid {
+  display: none !important;
+}
+
+.hero-africa-dot-hero .hero-city-prefix { display: block; }
+.hero-africa-dot-hero .hero-city-rotator {
+  display: block !important;
+  min-height: 1.12em;
+  margin-top: .06em;
+  white-space: nowrap;
+  color: #00a3ff;
+  background: linear-gradient(100deg, #00a3ff 0%, #3b82f6 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  transition: opacity 180ms ease, transform 180ms ease;
+  will-change: opacity, transform;
+}
+.hero-africa-dot-hero .hero-city-rotator.is-changing {
+  opacity: 0;
+  transform: translate3d(0, 8px, 0);
+}
+
+@media (max-width: 480px) {
+  .hero-africa-dot-hero .hero-city-rotator { white-space: normal; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-africa-dot-hero .hero-city-rotator { transition: none; }
+}
+
+
+/* GTmetrix-inspired hero alignment: one action bar, no surrounding card. */
+.hero-africa-dot-hero {
+  width: 100%;
+  max-width: none;
+  background-color: #05080f !important;
+}
+
+.hero-africa-dot-hero::before,
+.hero-africa-dot-hero::after {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+}
+
+.hero-africa-dot-hero .hero-africa-dot-content {
+  width: 100%;
+}
+
+.hero-africa-dot-hero .hero-grid.hero-action-layout {
+  max-width: 900px;
+}
+
+.hero-africa-dot-hero .hero-title {
+  max-width: 24ch;
+  margin-bottom: 20px;
+}
+
+.hero-africa-dot-hero .hero-city-prefix {
+  display: inline;
+}
+
+.hero-africa-dot-hero .hero-city-rotator {
+  display: inline-block !important;
+  min-height: 0;
+  margin-top: 0;
+  white-space: normal;
+  vertical-align: baseline;
+}
+
+.hero-africa-dot-hero .hero-scan-form {
+  display: flex;
+  align-items: stretch;
+  width: min(100%, 700px);
+  gap: 10px;
+  margin: 0 auto;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.hero-africa-dot-hero .hero-scan-form input {
+  min-height: 58px;
+  padding: 0 18px;
+  border: 1px solid rgba(148, 174, 207, .34);
+  border-radius: 10px;
+  background: rgba(9, 15, 27, .92);
+}
+
+.hero-africa-dot-hero .hero-scan-form .btn {
+  min-height: 58px;
+  padding-inline: 22px;
+  border-radius: 10px;
+  white-space: nowrap;
+}
+
+.hero-africa-dot-hero .hero-support-links {
+  margin: 12px auto 0;
+  width: min(100%, 700px);
+  text-align: left;
+}
+
+.hero-africa-dot-hero .hero-sample-report-link {
+  color: #b7d9ff;
+  font-size: 14px;
+  text-decoration: underline;
+  text-decoration-color: rgba(183, 217, 255, .62);
+  text-underline-offset: 4px;
+}
+
+.hero-africa-dot-hero .hero-sample-report-link:hover {
+  color: #fff;
+  text-decoration-color: #fff;
+}
+
+.hero-africa-dot-hero .hero-scan-note {
+  margin-top: 14px;
+}
+
+@media (max-width: 600px) {
+  .hero-africa-dot-hero .hero-title {
+    max-width: 17ch;
+  }
+
+  .hero-africa-dot-hero .hero-scan-form {
+    flex-direction: row;
+    gap: 8px;
+  }
+
+  .hero-africa-dot-hero .hero-scan-form input {
+    width: 0;
+    flex: 1 1 auto;
+    min-width: 0;
+    min-height: 54px;
+    padding-inline: 12px;
+  }
+
+  .hero-africa-dot-hero .hero-scan-form .btn {
+    width: auto;
+    flex: 0 0 auto;
+    min-height: 54px;
+    padding-inline: 14px;
+    font-size: 14px;
+  }
+
+  .hero-africa-dot-hero .hero-support-links {
+    margin-top: 10px;
+  }
 }
