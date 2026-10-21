@@ -580,7 +580,14 @@
 
     const client = createClient(
         SUPABASE_URL,
-        SUPABASE_ANON_KEY
+        SUPABASE_ANON_KEY,
+        {
+            auth: {
+                persistSession: true,
+                autoRefreshToken: true,
+                detectSessionInUrl: true
+            }
+        }
     );
 
     const loading = document.getElementById('loading');
@@ -722,9 +729,9 @@
             );
 
             if (response.status === 401) {
-                await client.auth.signOut();
-                window.location.href = '/login.html';
-                return;
+                throw new Error(
+                    'The statistics request was rejected. You are still signed in. Please refresh and try again, or use Log Out if you want to end your session.'
+                );
             }
 
             if (response.status === 404) {
