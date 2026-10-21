@@ -87,6 +87,35 @@
     cta.textContent = 'Run a free latency scan →';
     cta.setAttribute('aria-label', 'Run a free latency scan');
     document.body.appendChild(cta);
+
+    const hero = document.querySelector('[data-africa-dot-hero], main .hero-highlight, main .hero-section, main .about-hero');
+    const footer = document.querySelector('footer, .homepage-footer, .contact-footer');
+    const syncVisibility = () => {
+      const heroVisible = hero && (() => { const rect = hero.getBoundingClientRect(); return rect.bottom > 0 && rect.top < window.innerHeight; })();
+      const footerVisible = footer && (() => { const rect = footer.getBoundingClientRect(); return rect.top < window.innerHeight && rect.bottom > 0; })();
+      const hidden = !!heroVisible || !!footerVisible;
+      cta.classList.toggle('is-hidden', hidden);
+      cta.setAttribute('aria-hidden', String(hidden));
+    };
+    if ('IntersectionObserver' in window && (hero || footer)) {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.target === hero) cta.dataset.heroInView = String(entry.isIntersecting);
+          if (entry.target === footer) cta.dataset.footerInView = String(entry.isIntersecting);
+        });
+        const hidden = cta.dataset.heroInView === 'true' || cta.dataset.footerInView === 'true';
+        cta.classList.toggle('is-hidden', hidden);
+        cta.setAttribute('aria-hidden', String(hidden));
+      }, { threshold: 0.01 });
+      if (hero) observer.observe(hero);
+      if (footer) observer.observe(footer);
+      window.addEventListener('resize', syncVisibility, { passive: true });
+      syncVisibility();
+    } else {
+      window.addEventListener('scroll', syncVisibility, { passive: true });
+      window.addEventListener('resize', syncVisibility, { passive: true });
+      syncVisibility();
+    }
   }
 
   function addStyles() {
@@ -97,6 +126,7 @@
       .ux-field-message { margin-top: .4rem; color: var(--error, #ff6b6b); font-size: .8rem; line-height: 1.4; }
       .ux-field-error { outline: 2px solid var(--error, #ff6b6b) !important; outline-offset: 1px; }
       .mobile-sticky-cta { display: none; }
+      .mobile-sticky-cta.is-hidden { display: none !important; }
       @media (max-width: 899px) {
         .mobile-sticky-cta { position: fixed; left: 12px; right: 12px; bottom: calc(12px + env(safe-area-inset-bottom)); z-index: 9998; display: flex; min-height: 48px; align-items: center; justify-content: center; padding: 10px 16px; border: 1px solid #1769AA; border-radius: 8px; background: #1769AA; color: #fff; text-decoration: none; font: 600 .9rem/1.2 Inter, sans-serif; box-shadow: none; }
         body { padding-bottom: 76px; }
