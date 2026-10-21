@@ -22,6 +22,7 @@
 
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/marketing.css?v=6">
+  <link rel="stylesheet" href="/css/hero-africa-dot-matrix.css?v=1">
   <link rel="stylesheet" href="/css/brand.css?v=6">
   <link rel="stylesheet" href="/css/product-pages.css?v=1">
   <link rel="stylesheet" href="/css/regional-performance.css?v=1">
@@ -93,12 +94,14 @@
 </div>
 
 <main>
-  <section class="section hero-highlight">
-    <div class="container">
+  <section class="section hero-highlight hero-africa-dot-hero" data-africa-dot-hero>
+    <canvas class="hero-africa-dot-canvas" data-africa-dot-canvas aria-hidden="true"></canvas>
+    <div class="hero-africa-dot-overlay" aria-hidden="true"></div>
+    <div class="container hero-africa-dot-content">
       <div class="hero-grid">
         <div>
           <div class="label">Infrastructure Performance &amp; Latency Intelligence</div>
-          <h1 class="hero-title">See how your website responds from Nairobi, Lagos, Johannesburg and Cairo.</h1>
+          <h1 class="hero-title">See how your website responds from <span class="hero-africa-title-accent">Nairobi, Lagos, Johannesburg and Cairo.</span></h1>
           <p class="hero-subtitle">Compare public website and API response behavior from available African network probes, then use the evidence to decide what to investigate. Results depend on probe availability.</p>
           <div class="btn-group">
             <a class="btn btn-primary" href="/scan">Run free scan <i data-lucide="arrow-right" aria-hidden="true"></i></a>
@@ -324,5 +327,6 @@
 </script>
 <script src="/js/regional-network-illustration.js?v=1" defer></script>
 <script src="/js/product-pages.js?v=1"></script>
+<script src="/js/hero-africa-dot-matrix.js?v=1" defer></script>
 </body>
 </html>
