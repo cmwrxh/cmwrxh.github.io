@@ -113,7 +113,7 @@ jobs:
           # before applying flags in some CLI versions, which triggers an interactive JDK prompt
           # on a clean GitHub Actions runner.
           mkdir -p "$HOME/.bubblewrap"
-          node -e 'const fs=require("node:fs"); fs.writeFileSync(process.env.HOME+"/.bubblewrap/config.json", JSON.stringify({jdkPath:process.env.JAVA_HOME,androidSdkPath:process.env.ANDROID_HOME}, null, 2)+"\\n")'
+          printf '{"jdkPath":"%s","androidSdkPath":"%s"}\n' "$JAVA_HOME" "$ANDROID_HOME" > "$HOME/.bubblewrap/config.json"
 
           echo "Android SDK root: $ANDROID_HOME"
           ls -la "$ANDROID_HOME/bin"
