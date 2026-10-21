@@ -1,7 +1,7 @@
 /* Regional performance canvas: transparent map, no card, frame, or image. */
 .regional-performance-section.regional-network-atmosphere {
   position: relative; isolation: isolate; overflow: hidden; color: #edf6ff;
-  background: linear-gradient(180deg, #000000 0%, #07172b 22%, #0d2a4a 58%, #070b14 100%);
+  background: linear-gradient(180deg, #070b14 0%, #0a1422 12%, #07172b 28%, #0d2a4a 58%, #070b14 100%);
   border: 0;
 }
 .regional-performance-section.regional-network-atmosphere::before {
