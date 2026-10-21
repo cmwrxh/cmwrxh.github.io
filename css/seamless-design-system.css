@@ -144,7 +144,7 @@ table th, table td {
   background: transparent !important;
   color: #cbd5e1;
 }
-.status-badge, .badge-measured, .measured-example {
+.status-badge, .badge-measured, .measured-example, .sample-pill {
   display: inline-flex;
   align-items: center;
   border: 1px solid rgba(16,185,129,.20);
@@ -165,4 +165,31 @@ table th, table td {
   main .proof-strip { border-radius: 16px; gap: 6px 16px; }
   main .proof-strip-item { flex: 1 1 130px; }
   .section-heading::before { left: -24px; height: 140px; }
+}
+
+/* Use editorial dividers for the four-step process instead of floating cards. */
+main .process-cards {
+  gap: 0 !important;
+  border-top: 1px solid rgba(255,255,255,.10);
+  border-bottom: 1px solid rgba(255,255,255,.10);
+}
+main .process-cards .process-card {
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  padding: 24px 22px;
+}
+main .process-cards .process-card + .process-card {
+  border-left: 1px solid rgba(255,255,255,.10) !important;
+}
+main .process-cards .process-card:hover {
+  background: rgba(255,255,255,.02) !important;
+}
+@media (max-width: 760px) {
+  main .process-cards { border-bottom: 0; }
+  main .process-cards .process-card + .process-card {
+    border-left: 0 !important;
+    border-top: 1px solid rgba(255,255,255,.10) !important;
+  }
+  main .process-cards .process-card { padding: 20px 4px; }
 }
