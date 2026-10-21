@@ -5,6 +5,19 @@ const params=new URLSearchParams(location.search);const next=params.get('next')|
 document.getElementById('login-link').href='/login?next='+encodeURIComponent(safeNext);
 const status=document.getElementById('signup-status');const submit=document.getElementById('signup-submit');
 const GOOGLE_CLIENT_ID='949269030986-972e78l4lhk99h16h3t9i4aqm8cheebq.apps.googleusercontent.com';
+async function exchangeGoogleCredential(token){
+ const timeout=new Promise((_,reject)=>{window.setTimeout(()=>reject(new Error('Google sign-in timed out while connecting to AfricaLatency. Check your connection and try again.')),25000);});
+ const exchange=(async()=>{
+  const {data,error}=await client.auth.signInWithIdToken({provider:'google',token});
+  if(error)throw error;
+  let session=data&&data.session;
+  if(!session){const result=await client.auth.getSession();if(result.error)throw result.error;session=result.data&&result.data.session;}
+  if(!session)throw new Error('Google verified your account, but AfricaLatency could not save the session. Please try again.');
+  return session;
+ })();
+ return Promise.race([exchange,timeout]);
+}
+
 function initializeGoogleSignIn(){
  const container=document.getElementById('google-signup');
  if(!window.google||!window.google.accounts||!window.google.accounts.id){status.textContent='Google sign-in could not load. Check your connection and try again.';return;}
@@ -12,11 +25,10 @@ function initializeGoogleSignIn(){
   if(!response||!response.credential){status.textContent='Google did not return a credential. Please try again.';return;}
   status.textContent='Verifying Google sign-in…';
   try{
-   const {data,error}=await client.auth.signInWithIdToken({provider:'google',token:response.credential});
-   if(error){status.textContent=error.message;return;}
-   if(data&&data.session){location.href=safeNext;return;}
-   status.textContent='Google sign-in completed without an active session. Please try again.';
-  }catch(err){console.error('Google sign-in failed',err);status.textContent='Could not complete Google sign-in. Please try again.';}
+   await exchangeGoogleCredential(response.credential);
+   status.textContent='Signed in. Opening your dashboard…';
+   location.replace(new URL(safeNext,location.origin).href);
+  }catch(err){console.error('Google sign-in failed',err);status.textContent=err&&err.message?err.message:'Could not complete Google sign-in. Please try again.';}
  },auto_select:false,cancel_on_tap_outside:true});
  window.google.accounts.id.renderButton(container,{type:'standard',theme:'outline',size:'large',text:'continue_with',shape:'rectangular',width:Math.min(400,Math.max(200,container.clientWidth||400)),logo_alignment:'left'});
 }
