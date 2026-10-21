@@ -233,3 +233,154 @@ input:focus, select:focus, textarea:focus, .form-input:focus {
   outline: 2px solid rgba(56,161,224,0.16) !important;
   outline-offset: 1px;
 }
+
+
+/* Strict GTmetrix structural pass: inline rotator, full-bleed telemetry, flat sections. */
+:root {
+  --bg: #0A0E17 !important;
+  --bg-elevated: #0A0E17 !important;
+  --bg-card: transparent !important;
+  --border: rgba(255,255,255,0.08) !important;
+  --border-strong: rgba(255,255,255,0.12) !important;
+  --text: #FFFFFF !important;
+  --text-muted: #A0AEC0 !important;
+  --text-dim: #A0AEC0 !important;
+  --accent: #38A1E0 !important;
+  --blue: #38A1E0 !important;
+  --al-canvas: #0A0E17 !important;
+  --al-rule: rgba(255,255,255,0.08) !important;
+}
+html, body, main, main > section, .section, .compact-section, .hero-section,
+.homepage-footer, .contact-footer, footer, .login-page, .login-card,
+.audit-buy-card, .methodology-summary {
+  background-color: #0A0E17 !important;
+  background-image: none !important;
+  color: #A0AEC0;
+  box-shadow: none !important;
+}
+h1, h2, h3, h4, .page-title, .hero-title { color: #FFFFFF !important; }
+main p, main li, main .section-lead, main .hero-subtitle, main .faq-answer,
+.homepage-footer p, footer p { color: #A0AEC0 !important; }
+
+/* Single inline city word with stable mobile width and GTmetrix-blue underline. */
+.city-rotator-slot, .hero-africa-title-accent.city-rotator-slot {
+  display: inline-block !important;
+  width: 14ch;
+  min-width: 14ch;
+  max-width: min(14ch, 100%);
+  vertical-align: baseline;
+  color: #38A1E0 !important;
+  text-decoration: underline !important;
+  text-decoration-color: rgba(56,161,224,0.55) !important;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.22em;
+  background: none !important;
+  -webkit-text-fill-color: #38A1E0 !important;
+}
+.city-rotator-word {
+  display: inline-block;
+  white-space: nowrap;
+  color: #38A1E0 !important;
+  -webkit-text-fill-color: #38A1E0 !important;
+  will-change: transform, opacity;
+}
+.city-rotator-word.is-entering { animation: city-slide-fade-in 320ms ease both; }
+@keyframes city-slide-fade-in {
+  from { opacity: 0; transform: translateY(0.28em); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Full-bleed animated canvas; radial mask feathers the edges into the same canvas. */
+.hero-africa-dot-hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  width: 100%;
+  background: #0A0E17 !important;
+}
+.hero-africa-dot-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  -webkit-mask-image: radial-gradient(ellipse at center, #000 42%, rgba(0,0,0,0.82) 68%, transparent 100%);
+  mask-image: radial-gradient(ellipse at center, #000 42%, rgba(0,0,0,0.82) 68%, transparent 100%);
+}
+.hero-africa-dot-overlay {
+  background: linear-gradient(180deg, rgba(10,14,23,0.04), rgba(10,14,23,0.12)) !important;
+}
+.hero-africa-dot-hero .hero-africa-title-accent,
+.hero-africa-dot-hero .city-rotator-word {
+  color: #38A1E0 !important;
+  background: none !important;
+  -webkit-background-clip: initial !important;
+  background-clip: initial !important;
+  -webkit-text-fill-color: #38A1E0 !important;
+}
+
+/* Remove elevated card surfaces; use only quiet divider-led document structure. */
+.card, .process-card, .tier4-home-proof-card, .product-card, .pricing-card,
+.price-card, .audit-buy-card, .audit-include, .audit-card, .feature-card,
+.audience-card, .use-case-card, .methodology-card, .faq-item, .principle,
+.about-card, .founder-card, .login-card, .report-card, .metric-card,
+.contact-card, .contact-panel, .service-card, .service-item,
+.product-ladder-card, .who-card, .what-we-do-card, .value-card,
+.mission-card, .coverage-card, .step-card {
+  background: transparent !important;
+  border: 0 !important;
+  border-bottom: 1px solid rgba(255,255,255,0.08) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+.process-cards, .tier4-home-proof, .product-ladder, .pricing-grid, .product-grid,
+.audience-grid, .who-grid, .what-we-do-grid, .principles-grid, .editorial-grid,
+.founder-grid, .audit-buy-grid, .process-grid, .audit-trust, .methodology-grid,
+.faq-grid, .service-grid, .feature-grid { gap: 0 !important; }
+
+/* Forms sit directly on the canvas. */
+.login-page .login-card, .login-card, .audit-buy-card {
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]),
+select, textarea, .form-input, .contact-form input, .contact-form select,
+.contact-form textarea {
+  background: #0D131D !important;
+  border: 1px solid rgba(255,255,255,0.12) !important;
+  color: #FFFFFF !important;
+  box-shadow: none !important;
+}
+input:focus, select:focus, textarea:focus, .form-input:focus {
+  border-color: #38A1E0 !important;
+  outline: 2px solid rgba(56,161,224,0.16) !important;
+  outline-offset: 1px;
+}
+.btn-primary, button.btn-primary, .btn.btn-primary, input[type="submit"], button[type="submit"] {
+  background: #2B80C5 !important;
+  border-color: #2B80C5 !important;
+  color: #FFFFFF !important;
+  box-shadow: none !important;
+}
+.btn-primary:hover, button.btn-primary:hover, .btn.btn-primary:hover,
+input[type="submit"]:hover, button[type="submit"]:hover {
+  background: #226AA5 !important;
+  border-color: #226AA5 !important;
+}
+
+/* No fixed blue scan bar over content on mobile or desktop. */
+.mobile-sticky-cta, .sticky-bottom-cta, .sticky-scan-bar,
+.fixed-bottom-banner, .bottom-sticky-banner, .mobile-scan-banner,
+.mobile-scan-sticky, .sticky-scan-cta, [data-sticky-scan-banner],
+[data-mobile-sticky-cta] { display: none !important; }
+@media (max-width: 767px) {
+  .mobile-sticky-cta, .sticky-bottom-cta, .sticky-scan-bar,
+  .fixed-bottom-banner, .bottom-sticky-banner, .mobile-scan-banner,
+  .mobile-scan-sticky, .sticky-scan-cta, [data-sticky-scan-banner],
+  [data-mobile-sticky-cta] { display: none !important; }
+  .city-rotator-slot { width: 14ch; min-width: 14ch; }
+}
