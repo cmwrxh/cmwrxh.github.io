@@ -38,7 +38,7 @@ main > .compact-section + .compact-section {
 }
 /* Flatten card shells while preserving layout and functional controls. */
 .card, .process-card, .process-cards .process-card,
-.tier4-home-proof-card, .product-card, .pricing-card, .price-card,
+.tier4-home-proof-card, .product-card, .pricing-card, .price-card, .audit-buy-card, .audit-include,
 .audit-card, .feature-card, .audience-card, .use-case-card,
 .methodology-card, .faq-item, .principle, .about-card,
 .founder-card, .login-card, .report-card, .metric-card,
@@ -50,7 +50,7 @@ main > .compact-section + .compact-section {
   border-radius: 0 !important;
 }
 .card, .process-cards .process-card, .tier4-home-proof-card,
-.product-card, .pricing-card, .price-card, .audit-card,
+.product-card, .pricing-card, .price-card, .audit-card, .audit-buy-card, .audit-include,
 .feature-card, .audience-card, .use-case-card, .methodology-card,
 .faq-item, .principle, .about-card, .founder-card, .report-card,
 .metric-card, .contact-card, .contact-panel, .service-card,
@@ -60,9 +60,10 @@ main > .compact-section + .compact-section {
   border-bottom: 1px solid var(--al-rule) !important;
   padding: clamp(1.25rem, 2.6vw, 2rem) 0 !important;
 }
-.process-cards, .tier4-home-proof, .product-ladder, .pricing-grid,
-.audience-grid, .who-grid, .what-we-do-grid, .principles-grid,
-.methodology-grid, .faq-grid, .service-grid, .feature-grid {
+.process-cards, .tier4-home-proof, .product-ladder, .pricing-grid, .product-grid,
+.audience-grid, .who-grid, .what-we-do-grid, .principles-grid, .editorial-grid,
+.founder-grid, .audit-buy-grid, .process-grid, .audit-trust, .methodology-grid,
+.faq-grid, .service-grid, .feature-grid {
   gap: 0 !important;
 }
 .process-cards .process-card + .process-card,
@@ -114,9 +115,10 @@ input:focus, select:focus, textarea:focus, .form-input:focus {
   .tier4-home-proof { grid-template-columns: repeat(3, minmax(0,1fr)); }
 }
 @media (max-width: 759px) {
-  .process-cards, .tier4-home-proof, .product-ladder, .pricing-grid,
-  .audience-grid, .who-grid, .what-we-do-grid, .principles-grid,
-  .methodology-grid, .faq-grid, .service-grid, .feature-grid {
+  .process-cards, .tier4-home-proof, .product-ladder, .pricing-grid, .product-grid,
+  .audience-grid, .who-grid, .what-we-do-grid, .principles-grid, .editorial-grid,
+  .founder-grid, .audit-buy-grid, .process-grid, .audit-trust, .methodology-grid,
+  .faq-grid, .service-grid, .feature-grid {
     grid-template-columns: minmax(0,1fr) !important;
   }
   .process-cards .process-card + .process-card,
@@ -124,4 +126,30 @@ input:focus, select:focus, textarea:focus, .form-input:focus {
     border-left: 0 !important;
     padding-left: 0 !important;
   }
+}
+
+/* Route-specific structural grids remain open and flush with the page canvas. */
+.product-grid, .audience-grid, .principles-grid, .editorial-grid,
+.founder-grid, .audit-buy-grid, .process-grid {
+  align-items: stretch;
+}
+.product-grid .product-card,
+.audience-grid .audience-card,
+.principles-grid .principle,
+.founder-grid > *,
+.editorial-grid > *,
+.audit-buy-grid .audit-buy-card,
+.process-grid > * {
+  min-width: 0;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+.about-metrics > div,
+.founder-photo-placeholder,
+.founder-copy,
+.about-signal,
+.audit-scope-layout,
+.methodology-summary {
+  background: transparent !important;
+  box-shadow: none !important;
 }
