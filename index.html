@@ -24,7 +24,7 @@
   <link rel="stylesheet" href="/css/marketing.css?v=6">
   <link rel="stylesheet" href="/css/brand.css?v=6">
   <link rel="stylesheet" href="/css/product-pages.css?v=1">
-  <link rel="stylesheet" href="/css/regional-performance.css?v=1">
+  <link rel="stylesheet" href="/css/regional-performance.css?v=2">
 
   <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
   <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
@@ -136,7 +136,6 @@
       <div class="regional-performance-layout">
         <figure class="regional-map-panel" data-network-illustration>
           <img src="/images/Africa%20map%20latency%20image.jfif" alt="Map of Africa at night, illustrating the varied regions and connectivity environments where website performance can differ" width="1200" height="700" loading="lazy" decoding="async">
-          <div class="network-illustration-label">Animated network illustration · not live telemetry</div>
           <svg class="regional-map-visual" viewBox="0 0 1000 580" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
             <defs>
               <linearGradient id="regional-route-gradient" x1="0" y1="0" x2="1" y2="1">
@@ -145,23 +144,41 @@
               </linearGradient>
             </defs>
             <g stroke="url(#regional-route-gradient)">
-              <path class="network-route" d="M430 255 Q520 190 625 180"/>
-              <path class="network-route route-secondary" d="M430 255 Q555 260 650 350"/>
-              <path class="network-route" d="M430 255 Q475 365 570 470"/>
-              <path class="network-route route-secondary" d="M625 180 Q710 250 650 350"/>
-              <path class="network-route" d="M650 350 Q635 430 570 470"/>
-              <path class="network-route route-secondary" d="M430 255 Q360 300 390 325"/>
-              <path class="network-route" d="M390 325 Q490 400 570 470"/>
+              <path class="network-route" d="M475 105 Q430 155 365 175"/>
+              <path class="network-route route-secondary" d="M365 175 Q300 205 270 265"/>
+              <path class="network-route" d="M365 175 Q405 235 450 290"/>
+              <path class="network-route route-secondary" d="M270 265 Q350 280 450 290"/>
+              <path class="network-route" d="M450 290 Q525 235 600 230"/>
+              <path class="network-route route-secondary" d="M600 230 Q665 190 715 205"/>
+              <path class="network-route" d="M600 230 Q625 295 615 355"/>
+              <path class="network-route route-secondary" d="M450 290 Q470 355 515 395"/>
+              <path class="network-route" d="M515 395 Q555 440 565 490"/>
+              <path class="network-route route-secondary" d="M615 355 Q585 420 565 490"/>
+              <path class="network-route" d="M450 290 Q385 345 400 405"/>
+              <path class="network-route route-secondary" d="M400 405 Q455 455 565 490"/>
+              <path class="network-route" d="M365 175 Q420 120 475 105"/>
+              <path class="network-route route-secondary" d="M270 265 Q245 320 285 365"/>
+              <path class="network-route" d="M285 365 Q345 390 400 405"/>
+              <path class="network-route route-secondary" d="M515 395 Q570 335 615 355"/>
+              <path class="network-route" d="M475 105 Q560 135 600 230"/>
+              <path class="network-route route-secondary" d="M285 365 Q315 420 350 455"/>
             </g>
             <g>
-              <g transform="translate(430 255)"><circle class="network-node-halo" r="20"/><circle class="network-pulse" r="12"/><circle class="network-node" r="5"/></g>
-              <g transform="translate(625 180)"><circle class="network-node-halo" r="17"/><circle class="network-pulse pulse-delay-1" r="11"/><circle class="network-node" r="4.5"/></g>
-              <g transform="translate(650 350)"><circle class="network-node-halo" r="21"/><circle class="network-pulse pulse-delay-2" r="12"/><circle class="network-node" r="5.5"/></g>
-              <g transform="translate(570 470)"><circle class="network-node-halo" r="18"/><circle class="network-pulse pulse-delay-1" r="11"/><circle class="network-node" r="4.5"/></g>
-              <g transform="translate(390 325)"><circle class="network-node-halo" r="13"/><circle class="network-pulse pulse-delay-2" r="9"/><circle class="network-node" r="4"/></g>
+              <g transform="translate(475 105)"><circle class="network-node-halo" r="18"/><circle class="network-pulse pulse-delay-1" r="11"/><circle class="network-node" r="4.5"/></g>
+              <g transform="translate(365 175)"><circle class="network-node-halo" r="16"/><circle class="network-pulse" r="10"/><circle class="network-node" r="4"/></g>
+              <g transform="translate(270 265)"><circle class="network-node-halo" r="18"/><circle class="network-pulse pulse-delay-2" r="11"/><circle class="network-node" r="4.5"/></g>
+              <g transform="translate(285 365)"><circle class="network-node-halo" r="15"/><circle class="network-pulse pulse-delay-1" r="9"/><circle class="network-node" r="4"/></g>
+              <g transform="translate(350 455)"><circle class="network-node-halo" r="13"/><circle class="network-pulse pulse-delay-2" r="8"/><circle class="network-node" r="3.5"/></g>
+              <g transform="translate(450 290)"><circle class="network-node-halo" r="22"/><circle class="network-pulse" r="13"/><circle class="network-node" r="5.5"/></g>
+              <g transform="translate(400 405)"><circle class="network-node-halo" r="16"/><circle class="network-pulse pulse-delay-2" r="10"/><circle class="network-node" r="4.5"/></g>
+              <g transform="translate(515 395)"><circle class="network-node-halo" r="18"/><circle class="network-pulse pulse-delay-1" r="11"/><circle class="network-node" r="4.5"/></g>
+              <g transform="translate(600 230)"><circle class="network-node-halo" r="20"/><circle class="network-pulse pulse-delay-2" r="12"/><circle class="network-node" r="5"/></g>
+              <g transform="translate(715 205)"><circle class="network-node-halo" r="15"/><circle class="network-pulse pulse-delay-1" r="9"/><circle class="network-node" r="4"/></g>
+              <g transform="translate(615 355)"><circle class="network-node-halo" r="18"/><circle class="network-pulse" r="11"/><circle class="network-node" r="4.5"/></g>
+              <g transform="translate(565 490)"><circle class="network-node-halo" r="21"/><circle class="network-pulse pulse-delay-2" r="12"/><circle class="network-node" r="5.5"/></g>
             </g>
           </svg>
-          <figcaption><span class="regional-map-dot" aria-hidden="true"></span> Illustrative routes only. Run a free scan for returned measurements.</figcaption>
+          <figcaption><span class="regional-map-dot" aria-hidden="true"></span> illustrative routes only. Run a free scan for live measurements</figcaption>
         </figure>
         <div class="regional-insight-panel">
           <p class="regional-panel-kicker">What changes the experience</p>
@@ -322,7 +339,7 @@
 
 
 </script>
-<script src="/js/regional-network-illustration.js?v=1" defer></script>
+<script src="/js/regional-network-illustration.js?v=2" defer></script>
 <script src="/js/product-pages.js?v=1"></script>
 </body>
 </html>
