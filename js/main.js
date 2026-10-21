@@ -8,6 +8,29 @@ document.addEventListener('DOMContentLoaded', () => {
     document.head.appendChild(brandStyles);
   }
 
+
+  // Hide only the legacy mobile sticky scan banner, including banners injected after load.
+  function removeMobileStickyScanBanner() {
+    if (!window.matchMedia || !window.matchMedia('(max-width: 767px)').matches) return;
+    document.querySelectorAll('body *').forEach(function (el) {
+      if (!el || el.children.length > 2) return;
+      var text = (el.textContent || '').replace(/\\s+/g, ' ').trim().toLowerCase();
+      if (!text.includes('run a free latency scan')) return;
+      var style = window.getComputedStyle(el);
+      var rect = el.getBoundingClientRect();
+      if (style.position === 'fixed' && (style.bottom !== 'auto' || rect.top > window.innerHeight * 0.65)) {
+        el.style.setProperty('display', 'none', 'important');
+        el.style.setProperty('visibility', 'hidden', 'important');
+        el.style.setProperty('pointer-events', 'none', 'important');
+      }
+    });
+  }
+  removeMobileStickyScanBanner();
+  if ('MutationObserver' in window) {
+    var stickyScanObserver = new MutationObserver(removeMobileStickyScanBanner);
+    stickyScanObserver.observe(document.body, { childList: true, subtree: true });
+  }
+
   const menuStyle = document.createElement('style');
   menuStyle.textContent = `
     .site-menu { position: fixed !important; inset: 0 !important; z-index: 99999 !important; display: flex !important; opacity: 0 !important; visibility: hidden !important; pointer-events: none !important; background: #0A0E17 !important; transition: opacity .2s ease, visibility .2s ease !important; }
