@@ -486,10 +486,10 @@ main .audit-scope-list li { color: #A0AEC0 !important; }
 
 
 /* Structural cleanup: GTmetrix-inspired continuous canvas and divider-led sections. */
-.city-rotator-slot {
-  display: inline-grid !important;
-  grid-template-columns: minmax(13ch, max-content);
-  min-width: 13ch;
+ .city-rotator-slot {
+  display: inline-block !important;
+  width: 14ch;
+  min-width: 14ch;
   max-width: 100%;
   vertical-align: baseline;
   color: #3B82F6 !important;
