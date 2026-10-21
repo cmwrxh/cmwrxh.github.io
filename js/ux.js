@@ -99,7 +99,6 @@
       .mobile-sticky-cta { display: none; }
       @media (max-width: 899px) {
         .mobile-sticky-cta { position: fixed; left: 12px; right: 12px; bottom: calc(12px + env(safe-area-inset-bottom)); z-index: 9998; display: flex; min-height: 48px; align-items: center; justify-content: center; padding: 10px 16px; border: 1px solid #1769AA; border-radius: 8px; background: #1769AA; color: #fff; text-decoration: none; font: 600 .9rem/1.2 Inter, sans-serif; box-shadow: none; }
-        body { padding-bottom: 76px; }
         .site-menu.open ~ .mobile-sticky-cta { display: none; }
       }
       @media (min-width: 900px) { .mobile-sticky-cta { display: none !important; } }
