@@ -155,7 +155,6 @@
       if (brightness < 0) brightness = 0;
       /* Blend the travelling sweep through the approved blue-to-indigo palette. */
       var blend = Math.max(0, Math.min(1, brightness));
-      var blueRgb = blend < 0.5 ? CONFIG.colors.blue.split(',') : CONFIG.colors.indigo.split(',');
       var startRgb = blend < 0.5 ? CONFIG.colors.blue.split(',') : CONFIG.colors.indigo.split(',');
       var endRgb = blend < 0.5 ? CONFIG.colors.cyan.split(',') : CONFIG.colors.purple.split(',');
       var localBlend = blend < 0.5 ? blend * 2 : (blend - 0.5) * 2;
