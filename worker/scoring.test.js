@@ -27,8 +27,8 @@ test('summarizeRun exposes aggregates and normalizes Lighthouse network timings'
     categories: { performance: { score: 0.8 }, 'best-practices': { score: 0.9 }, seo: { score: 0.9 }, accessibility: { score: 0.9 } },
     audits: {
       'network-requests': { details: { items: [
-        { url: 'https://example.com/', resourceType: 'Document', mimeType: 'text/html', transferSize: 1000, networkRequestTime: 0.1, networkEndTime: 1.25 },
-        { url: 'https://example.com/app.js', resourceType: 'Other', mimeType: 'application/javascript', transferSize: 250, networkRequestTime: 0.2, networkEndTime: 1.4 }
+        { url: 'https://example.com/', resourceType: 'Document', mimeType: 'text/html', transferSize: 1000, networkRequestTime: 100, networkEndTime: 1250 },
+        { url: 'https://example.com/app.js', resourceType: 'Other', mimeType: 'application/javascript', transferSize: 250, networkRequestTime: 200, networkEndTime: 1400 }
       ] } },
       'largest-contentful-paint': { numericValue: 800 },
       'first-contentful-paint': { numericValue: 300 },
