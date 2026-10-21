@@ -100,6 +100,11 @@ jobs:
         run: |
           test -x "$JAVA_HOME/bin/java"
           test -x "$ANDROID_HOME/platform-tools/adb"
+          test -x "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          # Bubblewrap validates SDK roots for a top-level tools/ or bin/ directory.
+          # Current Android SDKs put sdkmanager under cmdline-tools/latest/bin instead.
+          mkdir -p "$ANDROID_HOME/bin"
+          ln -sf "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "$ANDROID_HOME/bin/sdkmanager"
           mkdir -p "$HOME/.bubblewrap"
           node -e 'const fs=require("node:fs"); fs.writeFileSync(process.env.HOME+"/.bubblewrap/config.json", JSON.stringify({jdkPath:process.env.JAVA_HOME,androidSdkPath:process.env.ANDROID_HOME}, null, 2)+"\n")'
           cat "$HOME/.bubblewrap/config.json"
