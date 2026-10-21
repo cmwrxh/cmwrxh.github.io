@@ -2,6 +2,7 @@ import express from 'express';
 import crypto from 'node:crypto';
 import { createClient } from '@supabase/supabase-js';
 import { runLighthouse } from './provider.js';
+import { buildRequestAnalysis } from './scoring.js';
 import { validatePublicUrl } from './url-safety.js';
 
 const app = express();
@@ -56,6 +57,15 @@ async function userFromRequest(req) {
 }
 function publicSummary(job, screenshotUrl = null) {
   const result = job.result || {};
+  const savedSummary = result.summary || {};
+  const savedFullReport = result.fullReport || {};
+  const legacyResources = Array.isArray(savedFullReport.resourceDetails) ? savedFullReport.resourceDetails : [];
+  const requestAnalysis = savedSummary.requestAnalysis || savedFullReport.requestAnalysis || buildRequestAnalysis(legacyResources, {
+    requestCount: savedSummary.requestCount ?? savedFullReport.requestCount,
+    pageWeightBytes: savedSummary.pageWeightBytes ?? savedFullReport.pageWeightBytes,
+    fullyLoadedTimeMs: savedSummary.metrics?.fullyLoadedTimeMs ?? savedFullReport.metrics?.fullyLoadedTimeMs,
+    resourceDataAvailable: legacyResources.length > 0
+  });
   return {
     jobId: job.id,
     reportId: job.public_id,
@@ -72,7 +82,7 @@ function publicSummary(job, screenshotUrl = null) {
     lighthouseVersion: result.lighthouseVersion || null,
     chromeVersion: result.chromeVersion || null,
     screenshotUrl,
-    summary: result.summary || null,
+    summary: result.summary ? { ...result.summary, requestAnalysis } : { requestAnalysis },
     africaLatency: result.africaLatency || countries.map(c => ({ country: c.name, countryCode: c.code, status: 'unavailable', rttMs: null })),
     locked: true
   };
@@ -198,6 +208,7 @@ async function executeJob(job) {
     metrics: lighthouseResult.metrics,
     requestCount: lighthouseResult.requestCount,
     pageWeightBytes: lighthouseResult.pageWeightBytes,
+    requestAnalysis: lighthouseResult.requestAnalysis || null,
     runCount: lighthouseResult.runCount || 1,
     aggregation: lighthouseResult.aggregation || 'single Lighthouse run'
   };
@@ -216,6 +227,7 @@ async function executeJob(job) {
       metrics: lighthouseResult.metrics,
       requestCount: lighthouseResult.requestCount,
       pageWeightBytes: lighthouseResult.pageWeightBytes,
+      requestAnalysis: lighthouseResult.requestAnalysis || null,
       opportunities: lighthouseResult.opportunities,
       auditList: lighthouseResult.auditList || [],
       resourceDetails: lighthouseResult.resourceDetails || [],

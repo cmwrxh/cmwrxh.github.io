@@ -4,7 +4,7 @@ const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 const finite=v=>v!==null&&v!==undefined&&v!==''&&Number.isFinite(Number(v));
 const ms=v=>finite(v)?(Number(v)>=1000?(Number(v)/1000).toFixed(2)+' s':Math.round(Number(v))+' ms'):'Unavailable';
 const score=v=>finite(v)?Math.round(Number(v))+'%':'Unavailable';
-const bytes=v=>finite(v)?(Number(v)>=1048576?(Number(v)/1048576).toFixed(2)+' MB':Math.round(Number(v)/1024)+' KB'):'Unavailable';
+const bytes=v=>finite(v)?(Number(v)===0?'0 B':Number(v)>=1048576?(Number(v)/1048576).toFixed(2)+' MB':Number(v)>=1024?(Number(v)/1024).toFixed(1)+' KB':Math.round(Number(v))+' B'):'Unavailable';
 const fmtDate=v=>v?new Date(v).toLocaleString():'Timestamp unavailable';
 const setStatus=t=>{status.hidden=false;status.textContent=t};
 const table=(headers,rows)=>'<div class="rd-table-wrap"><table class="rd-table"><thead><tr>'+headers.map(h=>'<th>'+esc(h)+'</th>').join('')+'</tr></thead><tbody>'+(rows.length?rows.map(row=>'<tr>'+row.map(c=>'<td>'+c+'</td>').join('')+'</tr>').join(''):'<tr><td colspan="'+headers.length+'">No data returned by this scan.</td></tr>')+'</tbody></table></div>';
@@ -100,14 +100,41 @@ const showNoImpact=document.getElementById('rd-show-no-impact');
 if(showNoImpact)showNoImpact.addEventListener('change',()=>{document.querySelectorAll('.rd-audit-row[data-no-impact="true"]').forEach(row=>{row.hidden=!showNoImpact.checked;});});
 if(showNoImpact)document.querySelectorAll('.rd-audit-row[data-no-impact="true"]').forEach(row=>{row.hidden=true;});
 const resources=Array.isArray(full.resourceDetails)?full.resourceDetails:(Array.isArray(summary.resourceDetails)?summary.resourceDetails:[]);
+const requestAnalysis=full.requestAnalysis||data.requestAnalysis||summary.requestAnalysis||null;
 const detailEl=document.getElementById('rd-page-details');
 if(detailEl){
- const totals={};let totalBytes=0;
- resources.forEach(r=>{const n=Number(r.transferSize);if(Number.isFinite(n)&&n>=0){const type=String(r.resourceType||'Other').toLowerCase();const bucket=/script|javascript/.test(type)?'JavaScript':/stylesheet|css/.test(type)?'CSS':/font/.test(type)?'Fonts':/image/.test(type)?'Images':/document|html/.test(type)?'HTML':'Other';totals[bucket]=(totals[bucket]||0)+n;totalBytes+=n;}});
- const labels=[['Fully loaded time',ms(fm.fullyLoadedTimeMs??m.fullyLoadedTimeMs),'Timing returned by scan'],['Total page size',bytes(finite(full.pageWeightBytes)?full.pageWeightBytes:(totalBytes||null)),'Returned resource transfer sizes'],['Total page requests',finite(full.requestCount)?String(full.requestCount):String(resources.length||'Unavailable'),'Returned resource rows'],['JavaScript',bytes(totals['JavaScript']||null),'Classified from returned resource types'],['Images',bytes(totals['Images']||null),'Classified from returned resource types'],['CSS',bytes(totals['CSS']||null),'Classified from returned resource types'],['Fonts',bytes(totals['Fonts']||null),'Classified from returned resource types'],['HTML / Other',bytes((totals['HTML']||0)+(totals['Other']||0)||null),'Remaining classified resource types']];
+ const buckets=requestAnalysis?.categories||{};
+ const localTotals={javascript:0,images:0,css:0,fonts:0,htmlOther:0};
+ const classify=(r)=>{
+   const type=String(r.resourceType||'').toLowerCase();
+   const mime=String(r.mimeType||r.contentType||'').toLowerCase().split(';')[0].trim();
+   const url=String(r.url||'').toLowerCase().split(/[?#]/)[0];
+   if(/script|javascript|ecmascript/.test(type)||/javascript|ecmascript/.test(mime)||/\.(?:mjs|cjs|js)$/.test(url))return 'javascript';
+   if(/stylesheet|css/.test(type)||mime==='text/css'||/\.css$/.test(url))return 'css';
+   if(/font/.test(type)||/font|woff|truetype|opentype/.test(mime)||/\.(?:woff2?|ttf|otf|eot)$/.test(url))return 'fonts';
+   if(/image/.test(type)||mime.startsWith('image/')||/\.(?:avif|bmp|gif|jpe?g|png|svg|webp|ico)$/.test(url))return 'images';
+   return 'htmlOther';
+ };
+ resources.forEach(r=>{const bucket=classify(r),n=Number(r.transferSize);if(Number.isFinite(n)&&n>=0)localTotals[bucket]+=n;});
+ const hasAggregate=Boolean(requestAnalysis?.resourceDataAvailable);
+ const completeAggregate=hasAggregate&&(!finite(requestAnalysis?.classifiedResourceCount)||!finite(requestAnalysis?.requestCount)||Number(requestAnalysis.classifiedResourceCount)>=Number(requestAnalysis.requestCount));
+ const bucketBytes=(key)=>completeAggregate&&buckets[key]&&finite(buckets[key].transferSizeBytes)?Number(buckets[key].transferSizeBytes):(hasAggregate&&!completeAggregate?null:(resources.length?localTotals[key]:null));
+ const pageBytes=finite(full.pageWeightBytes)?Number(full.pageWeightBytes):finite(summary.pageWeightBytes)?Number(summary.pageWeightBytes):finite(requestAnalysis?.pageWeightBytes)?Number(requestAnalysis.pageWeightBytes):null;
+ const requestCount=finite(full.requestCount)?Number(full.requestCount):finite(summary.requestCount)?Number(summary.requestCount):finite(requestAnalysis?.requestCount)?Number(requestAnalysis.requestCount):(resources.length?resources.length:null);
+ const loadedMs=fm.fullyLoadedTimeMs??m.fullyLoadedTimeMs??requestAnalysis?.fullyLoadedTimeMs;
+ const labels=[
+  ['Fully loaded time',ms(loadedMs),finite(loadedMs)?'Last returned resource completion time':'Timing not returned by this scan'],
+  ['Total page size',bytes(pageBytes),'Total transferred bytes returned by Lighthouse'],
+  ['Total page requests',finite(requestCount)?String(requestCount):'Unavailable','Total requests returned by Lighthouse'],
+  ['JavaScript',bytes(bucketBytes('javascript')),'Classified by resource type, MIME type, or URL extension'],
+  ['Images',bytes(bucketBytes('images')),'Classified by resource type, MIME type, or URL extension'],
+  ['CSS',bytes(bucketBytes('css')),'Classified by resource type, MIME type, or URL extension'],
+  ['Fonts',bytes(bucketBytes('fonts')),'Classified by resource type, MIME type, or URL extension'],
+  ['HTML / Other',bytes(bucketBytes('htmlOther')),'Unclassified and document resources']
+ ];
  detailEl.innerHTML=labels.map(([label,value,source])=>'<div class="rd-page-detail"><span>'+esc(label)+'</span><strong>'+esc(value)+'</strong><span>'+esc(source)+'</span></div>').join('');
  const note=document.getElementById('rd-page-details-note');
- if(note)note.textContent=resources.length?'Breakdown is derived from '+resources.length+' resource record(s) returned by the scan. Resource-type classification depends on provider metadata.':'This scan did not return resource-level totals, so the breakdown is unavailable.';
+ if(note)note.textContent=completeAggregate?'Breakdown uses aggregate totals from all '+esc(requestAnalysis.requestCount??resources.length)+' returned resource request(s).':hasAggregate?'Category breakdown is incomplete for this saved report; total size and request count still use the complete Lighthouse totals.':'This report does not include resource aggregates; displayed categories use only resource rows available to this report.';
 }
 
 const timedResources=resources.filter(r=>finite(r.startTime)&&finite(r.endTime)&&Number(r.endTime)>=Number(r.startTime));

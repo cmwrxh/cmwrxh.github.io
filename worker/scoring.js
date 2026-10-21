@@ -57,6 +57,55 @@ export function overallGrade(performance, structure) {
   return 'F';
 }
 
+
+function numericValue(value) {
+  return value !== null && value !== undefined && value !== '' && Number.isFinite(Number(value)) ? Number(value) : null;
+}
+
+export function classifyResource(resource = {}) {
+  const type = String(resource.resourceType || '').toLowerCase();
+  const mime = String(resource.mimeType || resource.contentType || '').toLowerCase().split(';')[0].trim();
+  const url = String(resource.url || '').toLowerCase().split(/[?#]/)[0];
+  if (/script|javascript|ecmascript/.test(type) || /javascript|ecmascript/.test(mime) || /\.(?:mjs|cjs|js)$/.test(url)) return 'javascript';
+  if (/stylesheet|css/.test(type) || mime === 'text/css' || /\.css$/.test(url)) return 'css';
+  if (/font/.test(type) || /font|woff|truetype|opentype/.test(mime) || /\.(?:woff2?|ttf|otf|eot)$/.test(url)) return 'fonts';
+  if (/image/.test(type) || mime.startsWith('image/') || /\.(?:avif|bmp|gif|jpe?g|png|svg|webp|ico)$/.test(url)) return 'images';
+  if (/document|html/.test(type) || /text\/html|application\/xhtml\+xml/.test(mime) || /\.html?$/.test(url)) return 'htmlOther';
+  return 'htmlOther';
+}
+
+export function buildRequestAnalysis(resources, options = {}) {
+  const rows = Array.isArray(resources) ? resources : [];
+  const categories = {
+    javascript: { requestCount: 0, transferSizeBytes: 0 },
+    images: { requestCount: 0, transferSizeBytes: 0 },
+    css: { requestCount: 0, transferSizeBytes: 0 },
+    fonts: { requestCount: 0, transferSizeBytes: 0 },
+    htmlOther: { requestCount: 0, transferSizeBytes: 0 }
+  };
+  let measuredBytes = 0;
+  for (const resource of rows) {
+    const bucket = classifyResource(resource);
+    const size = numericValue(resource?.transferSize);
+    categories[bucket].requestCount += 1;
+    if (size !== null && size >= 0) {
+      categories[bucket].transferSizeBytes += size;
+      measuredBytes += size;
+    }
+  }
+  const suppliedCount = numericValue(options.requestCount);
+  const suppliedBytes = numericValue(options.pageWeightBytes);
+  const suppliedLoaded = numericValue(options.fullyLoadedTimeMs);
+  return {
+    resourceDataAvailable: options.resourceDataAvailable !== undefined ? Boolean(options.resourceDataAvailable) : Array.isArray(resources),
+    requestCount: suppliedCount !== null && suppliedCount >= 0 ? suppliedCount : rows.length,
+    pageWeightBytes: suppliedBytes !== null && suppliedBytes >= 0 ? suppliedBytes : measuredBytes,
+    fullyLoadedTimeMs: suppliedLoaded !== null && suppliedLoaded >= 0 ? suppliedLoaded : null,
+    categories,
+    classifiedResourceCount: rows.length
+  };
+}
+
 export function summarizeRun(lhr) {
   const audits = lhr?.audits || {};
   const categories = lhr?.categories || {};
@@ -70,8 +119,35 @@ export function summarizeRun(lhr) {
     .slice(0, 8)
     .map(a => ({ id: a.id, title: String(a.title || a.id).slice(0, 180), description: String(a.description || '').slice(0, 500), savingsMs: Number(a.details?.overallSavingsMs) || null }));
   const screenshot = audits['final-screenshot']?.details?.data || null;
-  const requests = audits['network-requests']?.details?.items || [];
-  const pageWeight = requests.reduce((sum, r) => sum + (Number(r.transferSize) || 0), 0);
+  const requestItems = audits['network-requests']?.details?.items;
+  const hasRequestItems = Array.isArray(requestItems);
+  const requests = hasRequestItems ? requestItems : [];
+  const normalizedResources = requests.map(r => {
+    let safeUrl = '';
+    try { const u = new URL(r.url); safeUrl = u.origin + u.pathname; } catch {}
+    const networkStartMs = numericValue(r.networkRequestTime);
+    const networkEndMs = numericValue(r.networkEndTime);
+    const startTime = numericValue(r.startTime);
+    const endTime = numericValue(r.endTime);
+    return {
+      url: safeUrl.slice(0, 300),
+      resourceType: String(r.resourceType || '').slice(0, 40),
+      mimeType: String(r.mimeType || '').slice(0, 100),
+      statusCode: numericValue(r.statusCode),
+      transferSize: Math.max(0, numericValue(r.transferSize) ?? 0),
+      resourceSize: Math.max(0, numericValue(r.resourceSize) ?? 0),
+      startTime: startTime !== null ? startTime : networkStartMs,
+      endTime: endTime !== null ? endTime : networkEndMs
+    };
+  });
+  const observedEndTimes = normalizedResources.map(r => r.endTime).filter(v => Number.isFinite(v) && v >= 0);
+  const fullyLoadedTimeMs = observedEndTimes.length ? Math.max(...observedEndTimes) : numericValue(audits['fully-loaded']?.numericValue);
+  const requestAnalysis = buildRequestAnalysis(normalizedResources, {
+    requestCount: hasRequestItems ? requests.length : null,
+    pageWeightBytes: hasRequestItems ? normalizedResources.reduce((sum, r) => sum + r.transferSize, 0) : null,
+    fullyLoadedTimeMs,
+    resourceDataAvailable: hasRequestItems
+  });
   const auditList = Object.values(audits).filter(a => a && a.id).slice(0, 120).map(a => ({
     id: String(a.id).slice(0, 100),
     title: String(a.title || a.id).slice(0, 180),
@@ -80,19 +156,7 @@ export function summarizeRun(lhr) {
     scoreDisplayMode: String(a.scoreDisplayMode || '').slice(0, 40),
     displayValue: String(a.displayValue || '').slice(0, 180)
   }));
-  const resourceDetails = requests.slice(0, 80).map(r => {
-    let safeUrl = '';
-    try { const u = new URL(r.url); safeUrl = u.origin + u.pathname; } catch {}
-    return {
-      url: safeUrl.slice(0, 300),
-      resourceType: String(r.resourceType || '').slice(0, 40),
-      statusCode: Number.isFinite(Number(r.statusCode)) ? Number(r.statusCode) : null,
-      transferSize: Number(r.transferSize) || 0,
-      resourceSize: Number(r.resourceSize) || 0,
-      startTime: Number.isFinite(Number(r.startTime)) ? Number(r.startTime) : null,
-      endTime: Number.isFinite(Number(r.endTime)) ? Number(r.endTime) : null
-    };
-  });
+  const resourceDetails = normalizedResources.slice(0, 80);
   const ua = String(lhr.userAgent || lhr.environment?.networkUserAgent || '');
   const chromeVersion = (ua.match(/Chrome\/([0-9.]+)/) || [])[1] || null;
   return {
@@ -107,10 +171,12 @@ export function summarizeRun(lhr) {
       tbtMs: ms('total-blocking-time'),
       cls: ms('cumulative-layout-shift'),
       speedIndexMs: ms('speed-index'),
-      ttfbMs: ms('server-response-time')
+      ttfbMs: ms('server-response-time'),
+      fullyLoadedTimeMs: requestAnalysis.fullyLoadedTimeMs
     },
-    requestCount: requests.length || null,
-    pageWeightBytes: pageWeight || null,
+    requestCount: requestAnalysis.resourceDataAvailable ? requestAnalysis.requestCount : null,
+    pageWeightBytes: requestAnalysis.resourceDataAvailable ? requestAnalysis.pageWeightBytes : null,
+    requestAnalysis,
     opportunities,
     auditList,
     resourceDetails,
