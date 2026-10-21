@@ -21,3 +21,27 @@
 .rd-metric-detail .rd-metric-verdict{color:var(--rd-text);font-weight:600;margin-bottom:6px}
 .rd-metric-detail small{color:var(--rd-muted)}
 @media(max-width:620px){.rd-metric-detail-list{grid-template-columns:1fr}.rd-metric-detail-heading{flex-wrap:wrap}}
+
+/* Colored structure audit table */
+.rd-structure-toolbar{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin:0 0 12px}
+.rd-audit-toggle{display:inline-flex;align-items:center;gap:8px;font-weight:700;cursor:pointer}
+.rd-audit-toggle input{accent-color:var(--rd-blue);width:16px;height:16px}
+.rd-structure-table{min-width:760px}
+.rd-structure-table td{vertical-align:top}
+.rd-structure-table tr[hidden]{display:none}
+.rd-audit-finding{display:block;color:var(--rd-muted);font-size:.78rem;line-height:1.45;margin-top:5px;max-width:620px}
+.rd-impact,.rd-audit-status,.rd-audit-metric{display:inline-flex;align-items:center;white-space:nowrap;border:1px solid transparent;border-radius:999px;padding:4px 8px;font-size:.72rem;font-weight:750}
+.rd-impact-high{color:#FCA5A5;background:rgba(239,68,68,.14);border-color:rgba(239,68,68,.4)}
+.rd-impact-low{color:#FCD34D;background:rgba(245,158,11,.12);border-color:rgba(245,158,11,.35)}
+.rd-impact-na{color:#AAB7C8;background:rgba(148,163,184,.1);border-color:rgba(148,163,184,.25)}
+.rd-audit-metric-tags{display:flex;gap:5px;flex-wrap:wrap;min-width:74px}
+.rd-audit-metric-fcp{color:#93C5FD;background:rgba(59,130,246,.14);border-color:rgba(59,130,246,.38)}
+.rd-audit-metric-lcp{color:#C4B5FD;background:rgba(139,92,246,.14);border-color:rgba(139,92,246,.38)}
+.rd-audit-metric-tbt{color:#FDA4AF;background:rgba(244,63,94,.13);border-color:rgba(244,63,94,.38)}
+.rd-audit-metric-cls{color:#6EE7B7;background:rgba(16,185,129,.13);border-color:rgba(16,185,129,.38)}
+.rd-audit-metric-none{color:var(--rd-muted);background:rgba(148,163,184,.08);border-color:var(--rd-border)}
+.rd-audit-status-pass{color:#6EE7B7;background:rgba(16,185,129,.13);border-color:rgba(16,185,129,.35)}
+.rd-audit-status-fail{color:#FCA5A5;background:rgba(239,68,68,.13);border-color:rgba(239,68,68,.35)}
+.rd-audit-status-na{color:#AAB7C8;background:rgba(148,163,184,.1);border-color:rgba(148,163,184,.25)}
+.rd-audit-status-unknown{color:#FCD34D;background:rgba(245,158,11,.1);border-color:rgba(245,158,11,.3)}
+@media(max-width:760px){.rd-structure-toolbar{align-items:flex-start}.rd-structure-table{min-width:760px}}
