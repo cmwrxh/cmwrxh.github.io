@@ -1,30 +1,18 @@
-/* Adds the common public marketing infrastructure strip and clear desktop actions. */
-(function(){
+/* Public marketing header cleanup: keep conversion actions inside the hamburger drawer. */
+(function () {
   'use strict';
-  function mount(){
-    if(document.body.classList.contains('dashboard-page')) return;
-    var nav=document.querySelector('nav');
-    if(!nav || document.querySelector('.infra-status-banner')) return;
-    var banner=document.createElement('div');
-    banner.className='infra-status-banner';
-    banner.setAttribute('role','note');
-    banner.innerHTML='<span class="infra-status-label">African network peering</span><div class="infra-status-peers" aria-label="Peering networks"><span class="infra-status-peer">Safaricom IXP</span><span class="infra-status-peer">MainOne</span><span class="infra-status-peer">KIXP</span><span class="infra-status-peer">JINX</span></div>';
-    nav.parentNode.insertBefore(banner,nav);
-    var pricingLinks=nav.querySelector('.pricing-nav-links');
-    if(pricingLinks){
-      if(!pricingLinks.querySelector('.infra-header-cta')){
-        var cta=document.createElement('a'); cta.className='infra-header-cta'; cta.href='/scan'; cta.textContent='Try for FREE'; pricingLinks.appendChild(cta);
-      }
-      return;
-    }
-    var actions=nav.querySelector('.nav-actions');
-    if(actions && !actions.querySelector('.infra-header-actions')){
-      var group=document.createElement('div'); group.className='infra-header-actions';
-      var login=document.createElement('a'); login.className='infra-header-login'; login.href='/login'; login.textContent='Log In';
-      var cta=document.createElement('a'); cta.className='infra-header-cta'; cta.href='/scan'; cta.textContent='Try for FREE';
-      group.append(login,cta);
-      actions.insertBefore(group,actions.firstChild);
-    }
+  function cleanHeader() {
+    if (document.body.classList.contains('dashboard-page')) return;
+    document.querySelectorAll('.infra-status-banner, .infra-header-actions, .infra-header-cta, .infra-header-login')
+      .forEach(function (element) { element.remove(); });
+    document.querySelectorAll('.site-menu').forEach(function (menu) {
+      menu.querySelectorAll('.menu-column a[href="/login"], .menu-column a[href="/login.html"]')
+        .forEach(function (link) { link.remove(); });
+      var footer = menu.querySelector('.menu-footer');
+      if (!footer) return;
+      footer.innerHTML = '<a class="btn btn-secondary" href="/login">Log In</a><a class="btn btn-primary" href="/scan">Try for FREE</a>';
+    });
   }
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',mount,{once:true}); else mount();
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', cleanHeader, { once: true });
+  else cleanHeader();
 }());
