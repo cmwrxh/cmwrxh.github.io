@@ -1,32 +1,32 @@
-/* Edge-to-edge matte network wave grid behind the AfricaLatency hero content. */
+/* Full-bleed static dotted field: CSS-only, crisp, and motion-free. */
 .hero-africa-dot-hero {
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  background: #090d16 !important;
+  background: #0a0e17 !important;
 }
 
-.hero-africa-dot-canvas {
+.hero-africa-dot-hero::before {
+  content: "";
   position: absolute;
-  top: 0;
-  left: 50%;
+  inset: 0;
   z-index: 0;
-  display: block;
-  width: 100vw;
-  height: 100%;
-  transform: translateX(-50%);
   pointer-events: none;
-  opacity: 1;
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 19%, #000 81%, transparent 100%);
-  mask-image: linear-gradient(to bottom, transparent 0%, #000 19%, #000 81%, transparent 100%);
+  background-image: radial-gradient(circle, rgba(59, 130, 246, 0.66) 1.05px, transparent 1.4px);
+  background-size: 20px 20px;
+  background-position: center center;
+  opacity: 0.68;
+  -webkit-mask-image: radial-gradient(ellipse at center, transparent 0%, rgba(0, 0, 0, 0.08) 26%, rgba(0, 0, 0, 0.48) 57%, #000 100%);
+  mask-image: radial-gradient(ellipse at center, transparent 0%, rgba(0, 0, 0, 0.08) 26%, rgba(0, 0, 0, 0.48) 57%, #000 100%);
 }
 
-.hero-africa-dot-overlay {
+.hero-africa-dot-hero::after {
+  content: "";
   position: absolute;
   inset: 0;
   z-index: 1;
   pointer-events: none;
-  background: linear-gradient(90deg, rgba(9, 13, 22, .46) 0%, rgba(9, 13, 22, .15) 48%, rgba(9, 13, 22, .30) 100%);
+  background: linear-gradient(90deg, rgba(10, 14, 23, 0.20) 0%, rgba(10, 14, 23, 0.04) 50%, rgba(10, 14, 23, 0.16) 100%);
 }
 
 .hero-africa-dot-content {
