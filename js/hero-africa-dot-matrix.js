@@ -1,2 +1,142 @@
-/* Reusable lightweight hero particles. Adjust DOT_COUNT for density and SPEED for drift. */
-(function(){'use strict';var s=document.querySelector('[data-africa-dot-hero]'),c=s&&s.querySelector('[data-africa-dot-canvas]');if(!s||!c||!c.getContext)return;var x=c.getContext('2d',{alpha:false});if(!x)return;var DOT_COUNT=100,SPEED=.12,MAX_DPR=1.5,p=[],w=1,h=1,d=1,raf=0,visible=false,active=false,last=0,reduced=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)'),rm=!!(reduced&&reduced.matches),page=!document.hidden;function setup(){var r=s.getBoundingClientRect();w=Math.max(1,r.width);h=Math.max(1,r.height);d=Math.min(devicePixelRatio||1,MAX_DPR);c.width=Math.round(w*d);c.height=Math.round(h*d);x.setTransform(d,0,0,d,0,0);var old=p;p=[];for(var i=0;i<DOT_COUNT;i++){var q=old[i];p.push(q?{x:q.x%w,y:q.y%h,r:q.r,a:q.a,phase:q.phase,speed:q.speed,glow:q.glow}:{x:Math.random()*w,y:Math.random()*h,r:.65+Math.random()*1.2,a:.12+Math.random()*.34,phase:Math.random()*6.28,speed:.25+Math.random()*.75,glow:Math.random()<.09})}paint()}function paint(){x.fillStyle='#05080f';x.fillRect(0,0,w,h);var cx=w/2,cy=h*.43,rx=w*.56,ry=h*.75;for(var i=0;i<p.length;i++){var q=p[i],dx=(q.x-cx)/rx,dy=(q.y-cy)/ry,fade=Math.max(.08,1-Math.min(1,Math.sqrt(dx*dx+dy*dy))*.88),a=q.a*fade;if(q.glow){var g=x.createRadialGradient(q.x,q.y,0,q.x,q.y,10);g.addColorStop(0,'rgba(96,165,250,'+(a*.42)+')');g.addColorStop(1,'rgba(96,165,250,0)');x.fillStyle=g;x.beginPath();x.arc(q.x,q.y,10,0,6.28);x.fill()}x.beginPath();x.arc(q.x,q.y,q.glow?q.r*1.45:q.r,0,6.28);x.fillStyle='rgba(96,165,250,'+a+')';x.fill()}}function frame(t){raf=0;if(!active||rm||!page||!visible)return;var dt=last?Math.min(32,t-last):16;last=t;for(var i=0;i<p.length;i++){var q=p[i];q.phase+=dt*.00035*q.speed*SPEED*8;q.x+=Math.cos(q.phase)*.12*SPEED;q.y+=Math.sin(q.phase*.8)*.1*SPEED;if(q.x<0)q.x=w;if(q.x>w)q.x=0;if(q.y<0)q.y=h;if(q.y>h)q.y=0;q.a=.13+.25*(.5+.5*Math.sin(q.phase*1.7))}paint();raf=requestAnimationFrame(frame)}function start(){if(active||rm||!page||!visible)return;active=true;last=0;raf=requestAnimationFrame(frame)}function stop(){active=false;if(raf)cancelAnimationFrame(raf);raf=0;last=0}setup();if('ResizeObserver'in window){var ro=new ResizeObserver(setup);ro.observe(s)}else addEventListener('resize',setup,{passive:true});if('IntersectionObserver'in window){var io=new IntersectionObserver(function(e){visible=!!(e[0]&&e[0].isIntersecting);if(visible)start();else stop()},{threshold:.01});io.observe(s)}else{visible=true;start()}document.addEventListener('visibilitychange',function(){page=!document.hidden;if(page)start();else stop()});if(reduced){var change=function(){rm=reduced.matches;stop();if(rm)paint();else start()};if(reduced.addEventListener)reduced.addEventListener('change',change);else if(reduced.addListener)reduced.addListener(change)}if(rm)paint()})();
+/* AfricaLatency live hero particle field. Decorative only; never represents live telemetry. */
+(function () {
+  'use strict';
+  var hero = document.querySelector('[data-africa-dot-hero]');
+  var canvas = hero && hero.querySelector('[data-africa-dot-canvas]');
+  if (!hero || !canvas || !canvas.getContext) return;
+  var ctx = canvas.getContext('2d', { alpha: false });
+  if (!ctx) return;
+
+  var COUNT = window.matchMedia && window.matchMedia('(max-width: 640px)').matches ? 115 : 230;
+  var LINK_DISTANCE = 108;
+  var MAX_DPR = 1.5;
+  var dots = [], width = 1, height = 1, dpr = 1, raf = 0;
+  var inView = false, running = false, pageVisible = !document.hidden, lastTime = 0;
+  var motion = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
+  var reduced = !!(motion && motion.matches);
+
+  function resize() {
+    var rect = hero.getBoundingClientRect();
+    width = Math.max(1, rect.width);
+    height = Math.max(1, rect.height);
+    dpr = Math.min(window.devicePixelRatio || 1, MAX_DPR);
+    canvas.width = Math.round(width * dpr);
+    canvas.height = Math.round(height * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    dots = [];
+    for (var i = 0; i < COUNT; i++) {
+      var angle = Math.random() * Math.PI * 2;
+      dots.push({
+        x: Math.random() * width, y: Math.random() * height,
+        vx: Math.cos(angle) * (.09 + Math.random() * .2),
+        vy: Math.sin(angle) * (.07 + Math.random() * .16),
+        r: .75 + Math.random() * 1.35,
+        base: .24 + Math.random() * .48,
+        phase: Math.random() * Math.PI * 2,
+        twinkle: .004 + Math.random() * .009,
+        bright: Math.random() < .13
+      });
+    }
+    draw(0, false);
+  }
+
+  function draw(time, move) {
+    ctx.fillStyle = '#05080f';
+    ctx.fillRect(0, 0, width, height);
+    var step = move ? Math.min(32, time - (lastTime || time)) : 0;
+    if (move) lastTime = time;
+
+    for (var i = 0; i < dots.length; i++) {
+      var p = dots[i];
+      if (move) {
+        p.phase += p.twinkle * step;
+        p.x += p.vx * step;
+        p.y += p.vy * step;
+        if (p.x < -4) p.x = width + 4;
+        if (p.x > width + 4) p.x = -4;
+        if (p.y < -4) p.y = height + 4;
+        if (p.y > height + 4) p.y = -4;
+      }
+    }
+
+    /* Short, faint links suggest network paths without becoming a web of lines. */
+    for (var a = 0; a < dots.length; a++) {
+      var one = dots[a];
+      for (var b = a + 1; b < dots.length; b++) {
+        var two = dots[b], dx = one.x - two.x, dy = one.y - two.y;
+        var dist2 = dx * dx + dy * dy;
+        if (dist2 < LINK_DISTANCE * LINK_DISTANCE) {
+          var dist = Math.sqrt(dist2);
+          var alpha = (1 - dist / LINK_DISTANCE) * .13;
+          ctx.strokeStyle = 'rgba(56, 161, 255,' + alpha.toFixed(3) + ')';
+          ctx.lineWidth = .65;
+          ctx.beginPath(); ctx.moveTo(one.x, one.y); ctx.lineTo(two.x, two.y); ctx.stroke();
+        }
+      }
+    }
+
+    var cx = width * .5, cy = height * .45;
+    var rx = Math.max(1, width * .72), ry = Math.max(1, height * .9);
+    for (var j = 0; j < dots.length; j++) {
+      var q = dots[j];
+      var nx = (q.x - cx) / rx, ny = (q.y - cy) / ry;
+      var edgeFade = Math.max(.18, 1 - Math.min(1, Math.sqrt(nx * nx + ny * ny)) * .72);
+      var shimmer = move ? .68 + .32 * Math.sin(q.phase) : .85;
+      var alphaDot = q.base * edgeFade * shimmer;
+      if (q.bright) {
+        var glow = ctx.createRadialGradient(q.x, q.y, 0, q.x, q.y, 12);
+        glow.addColorStop(0, 'rgba(56, 189, 248,' + (alphaDot * .6) + ')');
+        glow.addColorStop(1, 'rgba(59, 130, 246, 0)');
+        ctx.fillStyle = glow; ctx.beginPath(); ctx.arc(q.x, q.y, 12, 0, Math.PI * 2); ctx.fill();
+      }
+      ctx.fillStyle = 'rgba(96, 180, 255,' + alphaDot.toFixed(3) + ')';
+      ctx.beginPath(); ctx.arc(q.x, q.y, q.bright ? q.r * 1.5 : q.r, 0, Math.PI * 2); ctx.fill();
+    }
+
+    /* Radial vignette: dense center, softly disappearing edges. */
+    var vignette = ctx.createRadialGradient(cx, cy, Math.min(width, height) * .08, cx, cy, Math.max(width, height) * .72);
+    vignette.addColorStop(0, 'rgba(3,7,18,0)');
+    vignette.addColorStop(.62, 'rgba(3,7,18,.08)');
+    vignette.addColorStop(1, 'rgba(3,7,18,.68)');
+    ctx.fillStyle = vignette; ctx.fillRect(0, 0, width, height);
+  }
+
+  function frame(t) {
+    raf = 0;
+    if (!running || reduced || !pageVisible || !inView) return;
+    draw(t, true);
+    raf = requestAnimationFrame(frame);
+  }
+  function start() {
+    if (running || reduced || !pageVisible || !inView) return;
+    running = true; lastTime = 0; raf = requestAnimationFrame(frame);
+  }
+  function stop() {
+    running = false;
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0; lastTime = 0;
+  }
+
+  resize();
+  if ('ResizeObserver' in window) new ResizeObserver(resize).observe(hero);
+  else window.addEventListener('resize', resize, { passive: true });
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(function (entries) {
+      inView = !!(entries[0] && entries[0].isIntersecting);
+      if (inView) start(); else stop();
+    }, { threshold: .01 }).observe(hero);
+  } else { inView = true; start(); }
+  document.addEventListener('visibilitychange', function () {
+    pageVisible = !document.hidden;
+    if (pageVisible) start(); else stop();
+  });
+  if (motion) {
+    var onMotion = function () {
+      reduced = motion.matches; stop();
+      if (reduced) draw(0, false); else start();
+    };
+    if (motion.addEventListener) motion.addEventListener('change', onMotion);
+    else if (motion.addListener) motion.addListener(onMotion);
+  }
+  if (!reduced) start();
+}());
