@@ -95,19 +95,26 @@ jobs:
             -keyalg RSA -keysize 2048 -validity 10000 \
             -dname "CN=AfricaLatency Test, OU=Android, O=Brilliant Unicorn, L=Nairobi, ST=Kenya, C=KE"
 
-      - name: Configure Bubblewrap for non-interactive CI
+      - name: Configure and verify Bubblewrap SDK
         shell: bash
         run: |
+          set -euxo pipefail
+
           test -x "$JAVA_HOME/bin/java"
           test -x "$ANDROID_HOME/platform-tools/adb"
           test -x "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
-          # Bubblewrap validates SDK roots for a top-level tools/ or bin/ directory.
-          # Current Android SDKs put sdkmanager under cmdline-tools/latest/bin instead.
+
+          # Bubblewrap expects the SDK root to contain a top-level tools/ or bin/.
+          # Provide a valid sdkmanager entry under bin/ for its SDK-root validation.
           mkdir -p "$ANDROID_HOME/bin"
           ln -sf "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "$ANDROID_HOME/bin/sdkmanager"
-          mkdir -p "$HOME/.bubblewrap"
-          node -e 'const fs=require("node:fs"); fs.writeFileSync(process.env.HOME+"/.bubblewrap/config.json", JSON.stringify({jdkPath:process.env.JAVA_HOME,androidSdkPath:process.env.ANDROID_HOME}, null, 2)+"\n")'
+
+          bubblewrap updateConfig --jdkPath="$JAVA_HOME" --androidSdkPath="$ANDROID_HOME"
+
+          echo "Android SDK root: $ANDROID_HOME"
+          ls -la "$ANDROID_HOME/bin"
           cat "$HOME/.bubblewrap/config.json"
+          bubblewrap doctor
 
       - name: Generate Android project
         working-directory: android
