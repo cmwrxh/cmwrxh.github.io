@@ -125,8 +125,8 @@ export function summarizeRun(lhr) {
   const normalizedResources = requests.map(r => {
     let safeUrl = '';
     try { const u = new URL(r.url); safeUrl = u.origin + u.pathname; } catch {}
-    const startSeconds = numericValue(r.networkRequestTime);
-    const endSeconds = numericValue(r.networkEndTime);
+    const networkStartMs = numericValue(r.networkRequestTime);
+    const networkEndMs = numericValue(r.networkEndTime);
     const startTime = numericValue(r.startTime);
     const endTime = numericValue(r.endTime);
     return {
@@ -136,8 +136,8 @@ export function summarizeRun(lhr) {
       statusCode: numericValue(r.statusCode),
       transferSize: Math.max(0, numericValue(r.transferSize) ?? 0),
       resourceSize: Math.max(0, numericValue(r.resourceSize) ?? 0),
-      startTime: startTime !== null ? startTime : (startSeconds !== null ? startSeconds * 1000 : null),
-      endTime: endTime !== null ? endTime : (endSeconds !== null ? endSeconds * 1000 : null)
+      startTime: startTime !== null ? startTime : networkStartMs,
+      endTime: endTime !== null ? endTime : networkEndMs
     };
   });
   const observedEndTimes = normalizedResources.map(r => r.endTime).filter(v => Number.isFinite(v) && v >= 0);
