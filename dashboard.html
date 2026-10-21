@@ -269,6 +269,12 @@
             display: none !important;
         }
 
+        @media (max-width: 850px) {
+            #dashboard-onboarding .card > div[style*="grid-template-columns:repeat(3"] {
+                grid-template-columns: 1fr !important;
+            }
+        }
+
         footer {
             width: min(1180px, calc(100% - 40px));
             margin: 0 auto;
@@ -661,13 +667,7 @@
             throw new Error('Unable to load your monitoring sites.');
         }
 
-        if (!data || data.length === 0) {
-            throw new Error(
-                'No monitoring site is associated with this account yet.'
-            );
-        }
-
-        return data;
+        return Array.isArray(data) ? data : [];
     }
 
     async function loadStats() {
@@ -847,24 +847,39 @@
                 return;
             }
 
-            userEmail.textContent =
-                session.user.email || '';
+            userEmail.textContent = session.user.email || '';
+            window.africaLatencyTourUserId = session.user.id;
+            const displayName = session.user.user_metadata?.full_name
+                || session.user.user_metadata?.name
+                || session.user.user_metadata?.given_name
+                || (session.user.email ? session.user.email.split('@')[0] : '');
+            welcomeHeading.textContent = displayName
+                ? 'Welcome, ' + displayName + '!'
+                : 'Welcome to AfricaLatency!';
+
+            try {
+                if (localStorage.getItem('africalatency-tours-skipped:' + session.user.id) === '1') {
+                    onboarding?.classList.add('hidden');
+                }
+            } catch (_) {}
 
             const sites = await loadSites(session.user);
-
-            /*
-             * First dashboard version supports the first site associated
-             * with the account. Multi-site switching can be added later.
-             */
             const site = sites[0];
-
-            currentSiteKey = site.site_key;
-            siteName.textContent = site.name;
 
             loading.classList.add('hidden');
             dashboardContent.classList.remove('hidden');
 
-            await loadStats();
+            if (site) {
+                currentSiteKey = site.site_key;
+                siteName.textContent = site.name;
+                await loadStats();
+            } else {
+                siteName.textContent = 'No monitoring site configured';
+                document.querySelector('.toolbar')?.classList.add('hidden');
+                document.querySelector('#dashboard-content > .grid')?.classList.add('hidden');
+                document.getElementById('monitoring-overview')?.classList.add('hidden');
+            }
+
             await loadScanHistory(session);
 
         } catch (error) {
@@ -876,6 +891,16 @@
             );
         }
     }
+
+    skipToursButton?.addEventListener('click', () => {
+        try {
+            const currentUserId = client.auth.getUser ? null : null;
+            // The authenticated user ID is captured during dashboard initialization below.
+            const key = window.africaLatencyTourUserId || 'user';
+            localStorage.setItem('africalatency-tours-skipped:' + key, '1');
+        } catch (_) {}
+        onboarding?.classList.add('hidden');
+    });
 
     daysSelect.addEventListener('change', async function () {
         await loadStats();
