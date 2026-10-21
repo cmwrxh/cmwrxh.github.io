@@ -1,0 +1,571 @@
+/* Unified matte canvas refactor — cross-page visual layer.
+   Deliberately presentation-only: no form, checkout, scan, or measurement logic changes. */
+:root {
+  --canvas-matte: #090d16;
+  --canvas-line: rgba(148, 163, 184, .16);
+  --canvas-line-strong: rgba(148, 163, 184, .23);
+  --canvas-copy: #f1f5f9;
+  --canvas-muted: #a5b2c5;
+  --canvas-accent: #60a5fa;
+  --bg: var(--canvas-matte);
+  --bg-elevated: var(--canvas-matte);
+  --bg-card: transparent;
+  --border: var(--canvas-line);
+  --border-strong: var(--canvas-line-strong);
+}
+
+html,
+body {
+  background: var(--canvas-matte) !important;
+  color: var(--canvas-copy);
+}
+
+body::before {
+  content: none !important;
+  display: none !important;
+}
+
+main {
+  background: var(--canvas-matte) !important;
+}
+
+nav,
+.homepage-footer,
+footer,
+main > .section,
+main > section.section,
+main > section.pricing-band,
+main > section[style*="background"],
+.contact-gradient,
+.contact-stack,
+.contact-page-hero,
+.audit-buy-hero,
+.login-page {
+  background-color: transparent !important;
+  background-image: none;
+}
+
+nav {
+  border-bottom: 1px solid var(--canvas-line);
+}
+
+main > .section,
+main > section.section,
+main > section.pricing-band {
+  padding-top: clamp(64px, 7vw, 96px);
+  padding-bottom: clamp(64px, 7vw, 96px);
+  border-top: 1px solid var(--canvas-line);
+}
+
+main > .hero-africa-dot-hero,
+main > .hero-section:first-child,
+main > .contact-page-hero:first-child,
+main > .audit-buy-hero:first-child {
+  border-top: 0;
+}
+
+main > .compact-section,
+main > .section.compact-section {
+  padding-top: clamp(40px, 5vw, 64px);
+  padding-bottom: clamp(40px, 5vw, 64px);
+}
+
+.section-heading {
+  margin-bottom: clamp(28px, 4vw, 42px);
+}
+
+.label,
+.section-heading .label,
+main .regional-panel-kicker {
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+  color: var(--canvas-accent) !important;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: .74rem;
+  font-weight: 650;
+  letter-spacing: .12em;
+}
+
+.label::before {
+  content: none !important;
+  display: none !important;
+}
+
+h1, h2, h3, h4,
+main .section-heading h2,
+main #regional-performance-title,
+main .cta-section h2 {
+  color: var(--canvas-copy);
+}
+
+p,
+.section-lead,
+.hero-subtitle,
+.pricing-note,
+.form-note {
+  color: var(--canvas-muted);
+}
+
+/* Flatten content modules into open editorial layouts. */
+main .process-card,
+main .audience-card,
+main .product-card,
+main .card,
+main .sample-card,
+main .regional-insight-row,
+main .custom-scope-note,
+main .methodology-summary,
+main .methodology-tags span,
+main .faq-item,
+main .card,
+main .sample-card,
+.about-metrics,
+.about-signal,
+.about-signal-single,
+.principles-grid > *,
+.founder-photo-placeholder,
+.founder-placeholder,
+.audit-buy-card,
+.audit-trust,
+.audit-include,
+.audit-scope-note,
+.contact-form,
+.contact-image-form,
+.contact-page-form,
+.login-card,
+.preview-wireframe,
+.report-preview,
+.empty-state,
+.data-article-chart {
+  background: transparent !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+}
+
+/* Four-step rows: one connected grid, not individual boxes. */
+main .process-cards {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0 !important;
+  border-top: 1px solid var(--canvas-line-strong);
+  border-bottom: 1px solid var(--canvas-line-strong);
+}
+
+main .process-cards .process-card {
+  min-width: 0;
+  padding: 24px 22px;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+}
+
+main .process-cards .process-card + .process-card {
+  border-left: 1px solid var(--canvas-line) !important;
+}
+
+main .process-card h3,
+main .audience-card h3,
+main .product-card h3 {
+  color: var(--canvas-copy);
+}
+
+main .process-card p,
+main .audience-card p,
+main .product-card p {
+  color: var(--canvas-muted);
+}
+
+main .process-card::before,
+main .audience-card::before,
+main .section-heading::before {
+  content: none !important;
+  display: none !important;
+  background: transparent !important;
+}
+
+main .card,
+main .audit-include,
+main .audit-trust,
+main .audit-scope-note,
+main .contact-form,
+main .contact-image-form,
+main .contact-page-form,
+.editorial-grid > * {
+  border: 0 !important;
+}
+
+.editorial-grid {
+  gap: 0 !important;
+  border-top: 1px solid var(--canvas-line-strong);
+  border-bottom: 1px solid var(--canvas-line-strong);
+}
+
+.editorial-grid > * {
+  padding-top: 22px;
+  padding-bottom: 22px;
+}
+
+.editorial-grid .editorial-number {
+  color: var(--canvas-accent);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+/* Product ladder: flat, connected pricing matrix. */
+main .product-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0 !important;
+  border-top: 1px solid var(--canvas-line-strong);
+  border-bottom: 1px solid var(--canvas-line-strong);
+}
+
+main .product-grid .product-card {
+  display: flex;
+  min-width: 0;
+  padding: 26px 22px;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+}
+
+main .product-grid .product-card + .product-card {
+  border-left: 1px solid var(--canvas-line) !important;
+}
+
+main .product-grid .product-card-featured,
+main .product-grid .product-card-featured:hover {
+  background: transparent !important;
+  border-color: var(--canvas-line) !important;
+  box-shadow: none !important;
+}
+
+main .product-card .product-price {
+  color: var(--canvas-copy);
+  font-size: 1.08rem;
+  line-height: 1.5;
+}
+
+main .currency-switch {
+  color: var(--canvas-muted);
+}
+
+main .currency-switch button {
+  border-radius: 3px;
+  border-color: var(--canvas-line-strong);
+  background: transparent;
+  color: var(--canvas-muted);
+}
+
+main .currency-switch button[aria-pressed="true"] {
+  border-color: var(--canvas-accent);
+  background: rgba(96, 165, 250, .10);
+  color: #dbeafe;
+}
+
+/* Audience and principles grids use structural rules, not floating shells. */
+main .audience-grid,
+.about-metrics,
+.principles-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0 !important;
+  border-top: 1px solid var(--canvas-line-strong);
+  border-bottom: 1px solid var(--canvas-line-strong);
+}
+
+main .audience-grid .audience-card,
+.about-metrics > *,
+.principles-grid > * {
+  min-width: 0;
+  padding: 24px 22px;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+}
+
+main .audience-grid .audience-card + .audience-card,
+.about-metrics > * + *,
+.principles-grid > * + * {
+  border-left: 1px solid var(--canvas-line) !important;
+}
+
+main .audience-card > i {
+  color: var(--canvas-accent);
+  background: transparent !important;
+  border: 0 !important;
+}
+
+/* Methodology and FAQ become plain editorial content with fine rules. */
+main .methodology-summary {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 32px;
+  margin-top: 44px;
+  padding: 26px 0 !important;
+  border-top: 1px solid var(--canvas-line);
+  border-bottom: 1px solid var(--canvas-line);
+}
+
+main .methodology-tags span {
+  padding: 6px 0;
+  margin: 0 12px 8px 0;
+  border: 0 !important;
+  border-radius: 0 !important;
+  color: var(--canvas-muted);
+}
+
+main .faq-item {
+  border: 0 !important;
+  border-bottom: 1px solid var(--canvas-line) !important;
+}
+
+main .faq-question {
+  padding: 20px 0;
+  background: transparent !important;
+  color: var(--canvas-copy);
+}
+
+main .faq-answer {
+  color: var(--canvas-muted);
+}
+
+main .custom-scope-note {
+  padding: 0 0 0 24px;
+  border: 0 !important;
+  border-left: 1px solid var(--canvas-line-strong) !important;
+}
+
+/* About: image and founder content sit directly in the layout. */
+.about-team-photo {
+  border: 0 !important;
+  border-radius: 4px !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  overflow: hidden;
+}
+
+.about-team-photo img {
+  border-radius: 4px !important;
+}
+
+.founder-grid {
+  gap: clamp(28px, 5vw, 64px);
+  align-items: start;
+}
+
+.founder-photo-placeholder,
+.founder-placeholder {
+  border: 0 !important;
+  padding: 0 !important;
+}
+
+.founder-copy {
+  border: 0 !important;
+  background: transparent !important;
+  padding: 0 !important;
+}
+
+/* Contact, audit checkout, and login: forms remain functional, not card-shaped. */
+.contact-form,
+.contact-image-form,
+.contact-page-form,
+.audit-buy-card,
+.login-card {
+  border: 0 !important;
+  padding: 0 !important;
+}
+
+.contact-page-hero,
+.audit-buy-hero {
+  padding-top: clamp(56px, 7vw, 88px);
+  padding-bottom: clamp(56px, 7vw, 88px);
+}
+
+.audit-buy-grid {
+  gap: clamp(28px, 5vw, 64px);
+}
+
+.audit-buy-card + .audit-buy-card {
+  border-left: 1px solid var(--canvas-line);
+  padding-left: clamp(24px, 4vw, 48px) !important;
+}
+
+input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]),
+select,
+textarea,
+.form-input,
+.email-capture-row input {
+  color: var(--canvas-copy) !important;
+  background: rgba(15, 23, 42, .48) !important;
+  border: 1px solid rgba(148, 163, 184, .24) !important;
+  border-radius: 4px !important;
+  box-shadow: none !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #8190a5 !important;
+}
+
+input:focus,
+select:focus,
+textarea:focus,
+.form-input:focus {
+  border-color: #3b82f6 !important;
+  outline: 0;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, .14) !important;
+}
+
+.login-page {
+  min-height: 0;
+  padding-top: clamp(56px, 8vw, 96px);
+  padding-bottom: clamp(72px, 10vw, 120px);
+}
+
+.login-card {
+  width: min(460px, 100%);
+}
+
+.login-card .google-signin-btn {
+  background: #fff !important;
+  color: #202124 !important;
+  border: 1px solid #dadce0 !important;
+  border-radius: 4px !important;
+}
+
+/* Footer is part of the same canvas, separated by one quiet rule. */
+.homepage-footer,
+footer {
+  margin-top: 0 !important;
+  border-top: 1px solid var(--canvas-line-strong) !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.homepage-footer .footer-inner,
+.homepage-footer .footer-inner::before,
+.homepage-footer .footer-inner::after {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.homepage-footer .footer-inner {
+  padding-top: clamp(40px, 5vw, 64px);
+}
+
+.footer-wordmark {
+  margin-bottom: 20px;
+}
+
+.footer-links a,
+.tier4-footer-links a {
+  color: var(--canvas-muted);
+}
+
+.footer-links a:hover,
+.tier4-footer-links a:hover {
+  color: var(--canvas-copy);
+}
+
+/* Keep the hero's established map/ambient illustration, but not section color bands. */
+.hero-africa-dot-hero {
+  background-color: transparent;
+}
+
+@media (max-width: 900px) {
+  main .product-grid,
+  main .audience-grid,
+  .about-metrics,
+  .principles-grid,
+  main .process-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  main .product-grid .product-card:nth-child(3),
+  main .audience-grid .audience-card:nth-child(3),
+  .about-metrics > :nth-child(3),
+  .principles-grid > :nth-child(3),
+  main .process-cards .process-card:nth-child(3) {
+    border-left: 0 !important;
+  }
+
+  main .product-grid .product-card:nth-child(n+3),
+  main .audience-grid .audience-card:nth-child(n+3),
+  .about-metrics > :nth-child(n+3),
+  .principles-grid > :nth-child(n+3),
+  main .process-cards .process-card:nth-child(n+3) {
+    border-top: 1px solid var(--canvas-line) !important;
+  }
+}
+
+@media (max-width: 640px) {
+  main > .section,
+  main > section.section,
+  main > section.pricing-band {
+    padding-top: 56px;
+    padding-bottom: 56px;
+  }
+
+  main .product-grid,
+  main .audience-grid,
+  .about-metrics,
+  .principles-grid,
+  main .process-cards {
+    grid-template-columns: 1fr;
+  }
+
+  main .product-grid .product-card,
+  main .audience-grid .audience-card,
+  .about-metrics > *,
+  .principles-grid > *,
+  main .process-cards .process-card {
+    padding: 22px 4px;
+    border-left: 0 !important;
+  }
+
+  main .product-grid .product-card + .product-card,
+  main .audience-grid .audience-card + .audience-card,
+  .about-metrics > * + *,
+  .principles-grid > * + *,
+  main .process-cards .process-card + .process-card {
+    border-top: 1px solid var(--canvas-line) !important;
+  }
+
+  main .methodology-summary {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  main .custom-scope-note {
+    padding: 20px 0 0 !important;
+    border-left: 0 !important;
+    border-top: 1px solid var(--canvas-line) !important;
+  }
+
+  .audit-buy-card + .audit-buy-card {
+    padding-left: 0 !important;
+    border-left: 0;
+    border-top: 1px solid var(--canvas-line);
+    padding-top: 28px !important;
+  }
+
+  .contact-page-hero,
+  .audit-buy-hero {
+    padding-top: 48px;
+    padding-bottom: 48px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: .01ms !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
