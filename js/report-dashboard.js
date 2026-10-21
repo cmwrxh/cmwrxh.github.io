@@ -118,7 +118,7 @@ if(detailEl){
  resources.forEach(r=>{const bucket=classify(r),n=Number(r.transferSize);if(Number.isFinite(n)&&n>=0)localTotals[bucket]+=n;});
  const hasAggregate=Boolean(requestAnalysis?.resourceDataAvailable);
  const completeAggregate=hasAggregate&&(!finite(requestAnalysis?.classifiedResourceCount)||!finite(requestAnalysis?.requestCount)||Number(requestAnalysis.classifiedResourceCount)>=Number(requestAnalysis.requestCount));
- const bucketBytes=(key)=>completeAggregate&&buckets[key]&&finite(buckets[key].transferSizeBytes)?Number(buckets[key].transferSizeBytes):(resources.length?localTotals[key]:null);
+ const bucketBytes=(key)=>completeAggregate&&buckets[key]&&finite(buckets[key].transferSizeBytes)?Number(buckets[key].transferSizeBytes):(hasAggregate&&!completeAggregate?null:(resources.length?localTotals[key]:null));
  const pageBytes=finite(full.pageWeightBytes)?Number(full.pageWeightBytes):finite(summary.pageWeightBytes)?Number(summary.pageWeightBytes):finite(requestAnalysis?.pageWeightBytes)?Number(requestAnalysis.pageWeightBytes):null;
  const requestCount=finite(full.requestCount)?Number(full.requestCount):finite(summary.requestCount)?Number(summary.requestCount):finite(requestAnalysis?.requestCount)?Number(requestAnalysis.requestCount):(resources.length?resources.length:null);
  const loadedMs=fm.fullyLoadedTimeMs??m.fullyLoadedTimeMs??requestAnalysis?.fullyLoadedTimeMs;
