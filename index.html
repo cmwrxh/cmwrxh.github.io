@@ -125,79 +125,29 @@
   </section>
 
   <section class="section regional-performance-section regional-network-atmosphere" aria-labelledby="regional-performance-title">
-    <div class="container">
-      <div class="regional-performance-heading">
-        <div class="section-heading">
-          <div class="label">Regional performance view</div>
-          <h2 id="regional-performance-title">One continent. Many paths.</h2>
-          <p class="section-lead">A website can respond differently across African networks. Country, ISP routing, cloud region and edge coverage all shape the route between a customer and your service.</p>
-        </div>
-        <a class="regional-method-link" href="/methodology">How we measure <i data-lucide="arrow-up-right" aria-hidden="true"></i></a>
-      </div>
+    <div class="container regional-performance-container">
       <div class="regional-performance-layout">
         <figure class="regional-map-panel" data-network-illustration>
-          <img src="/images/Africa%20map%20latency%20image.jfif" alt="Map of Africa at night, illustrating the varied regions and connectivity environments where website performance can differ" width="1200" height="700" loading="lazy" decoding="async">
-          <svg class="regional-map-visual" viewBox="0 0 1000 580" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
-            <defs>
-              <linearGradient id="regional-route-gradient" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0" stop-color="#A4F0FF"/>
-                <stop offset="1" stop-color="#36B9F0"/>
-              </linearGradient>
-            </defs>
-            <g stroke="url(#regional-route-gradient)">
-              <path class="network-route" d="M475 105 Q430 155 365 175"/>
-              <path class="network-route route-secondary" d="M365 175 Q300 205 270 265"/>
-              <path class="network-route" d="M365 175 Q405 235 450 290"/>
-              <path class="network-route route-secondary" d="M270 265 Q350 280 450 290"/>
-              <path class="network-route" d="M450 290 Q525 235 600 230"/>
-              <path class="network-route route-secondary" d="M600 230 Q665 190 715 205"/>
-              <path class="network-route" d="M600 230 Q625 295 615 355"/>
-              <path class="network-route route-secondary" d="M450 290 Q470 355 515 395"/>
-              <path class="network-route" d="M515 395 Q555 440 565 490"/>
-              <path class="network-route route-secondary" d="M615 355 Q585 420 565 490"/>
-              <path class="network-route" d="M450 290 Q385 345 400 405"/>
-              <path class="network-route route-secondary" d="M400 405 Q455 455 565 490"/>
-              <path class="network-route" d="M365 175 Q420 120 475 105"/>
-              <path class="network-route route-secondary" d="M270 265 Q245 320 285 365"/>
-              <path class="network-route" d="M285 365 Q345 390 400 405"/>
-              <path class="network-route route-secondary" d="M515 395 Q570 335 615 355"/>
-              <path class="network-route" d="M475 105 Q560 135 600 230"/>
-              <path class="network-route route-secondary" d="M285 365 Q315 420 350 455"/>
-            </g>
-            <g>
-              <g transform="translate(475 105)"><circle class="network-node-halo" r="18"/><circle class="network-pulse pulse-delay-1" r="11"/><circle class="network-node" r="4.5"/></g>
-              <g transform="translate(365 175)"><circle class="network-node-halo" r="16"/><circle class="network-pulse" r="10"/><circle class="network-node" r="4"/></g>
-              <g transform="translate(270 265)"><circle class="network-node-halo" r="18"/><circle class="network-pulse pulse-delay-2" r="11"/><circle class="network-node" r="4.5"/></g>
-              <g transform="translate(285 365)"><circle class="network-node-halo" r="15"/><circle class="network-pulse pulse-delay-1" r="9"/><circle class="network-node" r="4"/></g>
-              <g transform="translate(350 455)"><circle class="network-node-halo" r="13"/><circle class="network-pulse pulse-delay-2" r="8"/><circle class="network-node" r="3.5"/></g>
-              <g transform="translate(450 290)"><circle class="network-node-halo" r="22"/><circle class="network-pulse" r="13"/><circle class="network-node" r="5.5"/></g>
-              <g transform="translate(400 405)"><circle class="network-node-halo" r="16"/><circle class="network-pulse pulse-delay-2" r="10"/><circle class="network-node" r="4.5"/></g>
-              <g transform="translate(515 395)"><circle class="network-node-halo" r="18"/><circle class="network-pulse pulse-delay-1" r="11"/><circle class="network-node" r="4.5"/></g>
-              <g transform="translate(600 230)"><circle class="network-node-halo" r="20"/><circle class="network-pulse pulse-delay-2" r="12"/><circle class="network-node" r="5"/></g>
-              <g transform="translate(715 205)"><circle class="network-node-halo" r="15"/><circle class="network-pulse pulse-delay-1" r="9"/><circle class="network-node" r="4"/></g>
-              <g transform="translate(615 355)"><circle class="network-node-halo" r="18"/><circle class="network-pulse" r="11"/><circle class="network-node" r="4.5"/></g>
-              <g transform="translate(565 490)"><circle class="network-node-halo" r="21"/><circle class="network-pulse pulse-delay-2" r="12"/><circle class="network-node" r="5.5"/></g>
-            </g>
-          </svg>
-          <figcaption><span class="regional-map-dot" aria-hidden="true"></span> illustrative routes only. Run a free scan for live measurements</figcaption>
+          <canvas class="regional-map-canvas" data-africa-dot-map aria-hidden="true"></canvas>
+          <figcaption>Animated illustration, not live telemetry.</figcaption>
         </figure>
         <div class="regional-insight-panel">
-          <p class="regional-panel-kicker">What changes the experience</p>
-          <article class="regional-insight-row">
-            <span class="regional-insight-icon" aria-hidden="true"><i data-lucide="route"></i></span>
-            <div><h3>Network path</h3><p>Traffic may take different routes between ISPs, exchange points and your service.</p></div>
-          </article>
-          <article class="regional-insight-row">
-            <span class="regional-insight-icon" aria-hidden="true"><i data-lucide="cloud"></i></span>
-            <div><h3>Infrastructure location</h3><p>Origin region, DNS answers and edge coverage can affect connection and response time.</p></div>
-          </article>
-          <article class="regional-insight-row">
-            <span class="regional-insight-icon" aria-hidden="true"><i data-lucide="activity"></i></span>
-            <div><h3>Available evidence</h3><p>We show returned measurements separately from locations where a probe is unavailable.</p></div>
-          </article>
+          <div class="label regional-panel-kicker">Regional performance view</div>
+          <h2 id="regional-performance-title">One continent. Many paths.</h2>
+          <p class="section-lead">A website can respond differently across African networks. Country, ISP routing, cloud region and edge coverage all shape the route between a customer and your service.</p>
           <div class="regional-performance-cta">
-            <p>Get a point-in-time view of your public website or API from available probes.</p>
             <a class="btn btn-primary" href="/scan">Run a free scan <i data-lucide="arrow-right" aria-hidden="true"></i></a>
+          </div>
+          <div class="regional-insight-list">
+            <article class="regional-insight-row">
+              <div><h3>Network path</h3><p>Traffic may take different routes between ISPs, exchange points and your service.</p></div>
+            </article>
+            <article class="regional-insight-row">
+              <div><h3>Infrastructure location</h3><p>Origin region, DNS answers and edge coverage can affect connection and response time.</p></div>
+            </article>
+            <article class="regional-insight-row">
+              <div><h3>Available evidence</h3><p>We show returned measurements separately from locations where a probe is unavailable.</p></div>
+            </article>
           </div>
         </div>
       </div>
