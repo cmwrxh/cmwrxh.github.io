@@ -38,3 +38,70 @@
   background-clip: text;
   -webkit-text-fill-color: transparent;
 }
+
+
+/* City rotator and ambient treatment: an additive refinement of the existing hero. */
+.hero-africa-dot-hero .hero-ambient-glow {
+  position: absolute;
+  z-index: 1;
+  width: clamp(260px, 42vw, 620px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  filter: blur(100px);
+  opacity: .15;
+  pointer-events: none;
+  transform: translate3d(0, 0, 0);
+  animation: hero-ambient-drift 12s ease-in-out infinite alternate;
+}
+.hero-africa-dot-hero .hero-ambient-glow-one {
+  top: -32%;
+  left: 5%;
+  background: #006dff;
+}
+.hero-africa-dot-hero .hero-ambient-glow-two {
+  right: 3%;
+  bottom: -52%;
+  background: #00a3ff;
+  opacity: .12;
+  animation-delay: -6s;
+}
+.hero-africa-dot-hero .hero-dot-grid {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  pointer-events: none;
+  background-image: radial-gradient(circle, rgba(255,255,255,.05) .8px, transparent 1px);
+  background-size: 18px 18px;
+  -webkit-mask-image: radial-gradient(ellipse at center, #000 8%, transparent 78%);
+  mask-image: radial-gradient(ellipse at center, #000 8%, transparent 78%);
+}
+.hero-africa-dot-hero .hero-city-prefix { display: block; }
+.hero-africa-dot-hero .hero-city-rotator {
+  display: block !important;
+  min-height: 1.12em;
+  margin-top: .06em;
+  white-space: nowrap;
+  color: #00a3ff;
+  background: linear-gradient(100deg, #00a3ff 0%, #3b82f6 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  transition: opacity 180ms ease, transform 180ms ease;
+  will-change: opacity, transform;
+}
+.hero-africa-dot-hero .hero-city-rotator.is-changing {
+  opacity: 0;
+  transform: translate3d(0, 8px, 0);
+}
+@keyframes hero-ambient-drift {
+  from { opacity: .10; transform: translate3d(-2%, 1%, 0) scale(.96); }
+  to { opacity: .19; transform: translate3d(3%, -2%, 0) scale(1.04); }
+}
+@media (max-width: 480px) {
+  .hero-africa-dot-hero .hero-city-rotator { white-space: normal; }
+  .hero-africa-dot-hero .hero-ambient-glow { filter: blur(80px); opacity: .12; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-africa-dot-hero .hero-ambient-glow { animation: none; }
+  .hero-africa-dot-hero .hero-city-rotator { transition: none; }
+}
