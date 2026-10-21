@@ -175,7 +175,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     const renderDropdown = (label, items, extraClass) => `<li class="nav-dropdown"><button class="nav-dropdown-trigger" type="button" aria-haspopup="true" aria-expanded="false">${label}</button><div class="nav-dropdown-menu ${extraClass}">${items.map(([href, text]) => `<a href="${href}">${text}</a>`).join('')}</div></li>`;
     navLinks.innerHTML = [
-      renderDropdown('Services', serviceLinks, 'nav-services'),
+      `<li><a href="/pricing.html">Pricing</a></li>`,
       renderDropdown('Resources', resourceLinks, 'nav-resources'),
       ...topLinks.map(([href, text]) => `<li><a href="${href}">${text}</a></li>`)
     ].join('');
@@ -206,7 +206,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const socialIcons = existingSocialIcons ? existingSocialIcons.cloneNode(true) : null;
     grid.innerHTML = `
       <div class="menu-column">
-        <div class="menu-group"><a href="/services" class="menu-group-title">Services</a><div class="menu-subitems"><a href="/scan">Free Scan</a><a href="/audit-checkout">Africa Latency Audit</a><a href="/monitoring">Continuous Monitoring</a><a href="/services">Custom Deep Dive</a></div></div>
+        <div class="menu-group"><a href="/pricing.html" class="menu-group-title">Pricing</a></div>
         <a href="/about" class="menu-item">About</a>
         <div class="menu-group"><div class="menu-label menu-group-title">Resources</div><div class="menu-subitems"><a href="/tools">Tools</a><a href="/sample-report">Sample report</a><a href="/compare">Compare</a><a href="/performance-index">Performance Index</a><a href="/methodology">Methodology</a><a href="/security">Security</a><a href="/docs">Docs</a><a href="/changelog">Changelog</a><a href="/blog">Blog</a><a href="/cases">Case studies</a></div></div>
         <a href="/contact" class="menu-item">Contact</a><a href="/login.html" class="menu-item">Login</a>
@@ -223,7 +223,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const menu = document.createElement('div'); menu.className = 'site-menu legacy-menu'; menu.id = 'site-menu'; menu.setAttribute('aria-hidden', 'true');
       menu.innerHTML = `<div class="site-menu-inner"><div class="menu-head"><img class="menu-wordmark" src="/images/africalatency-logo-dark.svg" alt="AfricaLatency" width="180" height="28"><button id="menu-close" class="menu-close" type="button" aria-label="Close menu">×</button></div><div class="menu-grid legacy-menu-grid"><div class="menu-column legacy-menu-links"></div><div class="legacy-menu-bottom"><div class="menu-label">Follow</div><div class="social-icons"><a href="https://www.linkedin.com/in/charles-mwaura-bb7814140/" target="_blank" rel="noopener" aria-label="LinkedIn"><i data-lucide="linkedin" aria-hidden="true"></i></a><a href="https://github.com/cmwrxh/cmwrxh.github.io" target="_blank" rel="noopener" aria-label="GitHub"><i data-lucide="github" aria-hidden="true"></i></a><a href="mailto:support@africalatency.dev" aria-label="Email"><i data-lucide="mail" aria-hidden="true"></i></a></div></div></div><div class="menu-footer"><a class="btn btn-primary" href="/scan.html">Run a free scan</a><a class="btn btn-secondary" href="/contact.html">Contact</a></div></div>`;
       const linkContainer = menu.querySelector('.legacy-menu-links');
-      [...serviceLinks, ...topLinks, ...resourceLinks].forEach(([href, text]) => { const a = document.createElement('a'); a.href = href; a.textContent = text; linkContainer.appendChild(a); });
+      [['/pricing.html', 'Pricing'], ...topLinks, ...resourceLinks].forEach(([href, text]) => { const a = document.createElement('a'); a.href = href; a.textContent = text; linkContainer.appendChild(a); });
       document.body.appendChild(menu); buildMobileMenu(menu); wireMenu(menu, toggle);
     }
   } else {
