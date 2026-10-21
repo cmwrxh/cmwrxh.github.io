@@ -256,6 +256,59 @@ document.addEventListener('DOMContentLoaded', () => {
 
   normalizeFooter();
 
+  // Interactive API snippet preview. This is documentation UI only; it does not call the API.
+  (function setupDeveloperPreview() {
+    const preview = document.querySelector('.developer-preview');
+    if (!preview || preview.dataset.wired === 'true') return;
+    preview.dataset.wired = 'true';
+    const tabs = Array.from(preview.querySelectorAll('[data-code-tab]'));
+    const samples = Array.from(preview.querySelectorAll('[data-code-sample]'));
+    const copyButton = preview.querySelector('[data-code-copy]');
+    const feedback = preview.querySelector('.developer-copy-feedback');
+    let activeLanguage = 'curl';
+    function setLanguage(language) {
+      activeLanguage = language;
+      tabs.forEach((tab) => {
+        const active = tab.dataset.codeTab === language;
+        tab.classList.toggle('is-active', active);
+        tab.setAttribute('aria-selected', String(active));
+      });
+      samples.forEach((sample) => { sample.hidden = sample.dataset.codeSample !== language; });
+      if (feedback) feedback.textContent = '';
+    }
+    tabs.forEach((tab) => tab.addEventListener('click', () => setLanguage(tab.dataset.codeTab)));
+    if (copyButton) {
+      copyButton.addEventListener('click', async () => {
+        const sample = samples.find((item) => item.dataset.codeSample === activeLanguage);
+        if (!sample) return;
+        try {
+          if (navigator.clipboard && window.isSecureContext) {
+            await navigator.clipboard.writeText(sample.textContent);
+          } else {
+            const temporary = document.createElement('textarea');
+            temporary.value = sample.textContent;
+            temporary.setAttribute('readonly', '');
+            temporary.style.position = 'fixed';
+            temporary.style.opacity = '0';
+            document.body.appendChild(temporary);
+            temporary.select();
+            const copied = document.execCommand('copy');
+            temporary.remove();
+            if (!copied) throw new Error('Copy unavailable');
+          }
+          if (feedback) feedback.textContent = 'Copied!';
+          copyButton.textContent = 'Copied!';
+          window.setTimeout(() => {
+            if (feedback) feedback.textContent = '';
+            copyButton.textContent = 'Copy';
+          }, 1600);
+        } catch (_) {
+          if (feedback) feedback.textContent = 'Select code to copy';
+        }
+      });
+    }
+    setLanguage('curl');
+  })();
   const calcForm = document.getElementById('impact-calculator-form');
   if (calcForm) {
     calcForm.addEventListener('submit', (e) => {
