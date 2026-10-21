@@ -215,3 +215,185 @@
   .regional-map-panel .network-pulse { animation: none !important; }
   .regional-map-panel .network-pulse { opacity: .2; }
 }
+
+
+/* GTmetrix-inspired network atmosphere: visual-only, no external services or telemetry. */
+.hero-highlight[data-hero-network-section] {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse at 78% 42%, rgba(15, 91, 160, .28), transparent 47%),
+    radial-gradient(ellipse at 12% 90%, rgba(0, 137, 210, .12), transparent 42%),
+    #07172b;
+}
+.hero-highlight[data-hero-network-section]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: linear-gradient(rgba(65, 152, 211, .045) 1px, transparent 1px), linear-gradient(90deg, rgba(65, 152, 211, .045) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: linear-gradient(to bottom, transparent, #000 15%, #000 82%, transparent);
+}
+.hero-network-canvas {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  opacity: .82;
+}
+.hero-network-content { position: relative; z-index: 1; }
+.hero-highlight .hero-title,
+.hero-highlight .hero-subtitle { text-wrap: balance; }
+.hero-highlight .latency-collage { position: relative; }
+.hero-highlight .latency-collage::before {
+  content: "";
+  position: absolute;
+  inset: -18px;
+  z-index: 0;
+  border-radius: 28px;
+  background: radial-gradient(ellipse, rgba(37, 159, 232, .19), transparent 68%);
+  pointer-events: none;
+}
+.hero-highlight .latency-collage > img { z-index: 1; }
+.hero-highlight .latency-collage::after { z-index: 2; }
+
+/* Make the Africa network illustration feel native to the section, not like a card widget. */
+.regional-network-atmosphere {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  color: #edf7ff;
+  background:
+    radial-gradient(ellipse at 50% 44%, rgba(12, 70, 119, .4), transparent 57%),
+    linear-gradient(180deg, #06172a 0%, #071c32 52%, #06172a 100%);
+  border: 0;
+}
+.regional-network-atmosphere::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: .42;
+  background-image: radial-gradient(circle at 1px 1px, rgba(91, 180, 235, .2) 1px, transparent 0);
+  background-size: 26px 26px;
+  mask-image: radial-gradient(ellipse at center, #000 10%, transparent 78%);
+}
+.regional-network-atmosphere .label,
+.regional-network-atmosphere .section-heading h2 { color: #f3f9ff; }
+.regional-network-atmosphere .section-lead { color: #b8cde0; }
+.regional-network-atmosphere .regional-method-link { color: #8edbff; }
+.regional-network-atmosphere .regional-method-link:hover { color: #fff; }
+.regional-network-atmosphere .regional-performance-layout {
+  grid-template-columns: minmax(0, 1.25fr) minmax(290px, .75fr);
+  gap: clamp(24px, 4vw, 58px);
+  align-items: center;
+}
+.regional-network-atmosphere .regional-map-panel {
+  min-height: 420px;
+  position: relative;
+  display: block;
+  overflow: visible;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+.regional-network-atmosphere .regional-map-panel > img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  object-fit: contain;
+  object-position: center;
+  opacity: .76;
+  mix-blend-mode: screen;
+  filter: saturate(1.18) contrast(1.12);
+}
+.regional-network-atmosphere .regional-map-visual {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  opacity: 1;
+  mix-blend-mode: screen;
+}
+.regional-network-atmosphere .regional-map-visual .network-route {
+  stroke: #55cfff;
+  stroke-width: 2;
+  opacity: .8;
+  filter: drop-shadow(0 0 4px rgba(49, 190, 255, .65));
+}
+.regional-network-atmosphere .regional-map-visual .network-route.route-secondary {
+  stroke: #b1efff;
+  stroke-width: 1.25;
+  opacity: .5;
+}
+.regional-network-atmosphere .regional-map-visual .network-node-halo {
+  fill: #31bfff;
+  opacity: .22;
+  filter: drop-shadow(0 0 10px rgba(45, 182, 255, .9));
+}
+.regional-network-atmosphere .regional-map-visual .network-node {
+  fill: #e3fbff;
+  stroke: #50cfff;
+  stroke-width: 2.3;
+  filter: drop-shadow(0 0 6px rgba(45, 182, 255, .95));
+}
+.regional-network-atmosphere .regional-map-visual .network-pulse {
+  stroke: #78e0ff;
+  stroke-width: 2;
+  filter: drop-shadow(0 0 4px rgba(45, 182, 255, .9));
+}
+.regional-network-atmosphere .regional-map-panel figcaption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -4px;
+  padding: 12px 0 0;
+  color: #a8c6dd;
+  background: transparent;
+  border-top: 1px solid rgba(134, 202, 242, .2);
+  font-size: .76rem;
+}
+.regional-network-atmosphere .regional-map-dot {
+  background: #76dfff;
+  box-shadow: 0 0 12px rgba(71, 198, 255, .8);
+}
+.regional-network-atmosphere .regional-insight-panel {
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+.regional-network-atmosphere .regional-panel-kicker { color: #80c8ed; }
+.regional-network-atmosphere .regional-insight-row { border-color: rgba(151, 197, 226, .16); }
+.regional-network-atmosphere .regional-insight-row h3 { color: #edf7ff; }
+.regional-network-atmosphere .regional-insight-row p,
+.regional-network-atmosphere .regional-performance-cta p { color: #b2c8da; }
+.regional-network-atmosphere .regional-insight-icon {
+  color: #7edbff;
+  background: rgba(21, 100, 153, .2);
+  border-color: rgba(105, 200, 247, .22);
+}
+.regional-network-atmosphere .regional-performance-cta { border-color: rgba(151, 197, 226, .16); }
+@media (max-width: 820px) {
+  .regional-network-atmosphere .regional-performance-layout { grid-template-columns: minmax(0, 1fr); gap: 30px; }
+  .regional-network-atmosphere .regional-map-panel { min-height: clamp(290px, 74vw, 440px); }
+  .regional-network-atmosphere .regional-map-panel figcaption { bottom: -2px; }
+}
+@media (max-width: 480px) {
+  .hero-network-canvas { opacity: .6; }
+  .regional-network-atmosphere .regional-map-panel { min-height: 280px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-network-canvas { display: none; }
+}
