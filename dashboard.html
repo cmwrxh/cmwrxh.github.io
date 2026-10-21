@@ -913,8 +913,8 @@
         for (const label of labels) {
             const current = latestRows.find(row => (row.label || 'Unknown location') === label);
             const previous = olderRows.find(row => (row.label || 'Unknown location') === label);
-            const a = current?.available && Number.isFinite(Number(current.timings?.firstByte)) ? Number(current.timings.firstByte) : null;
-            const b = previous?.available && Number.isFinite(Number(previous.timings?.firstByte)) ? Number(previous.timings.firstByte) : null;
+            const a = current?.available && current.timings?.firstByte !== null && current.timings?.firstByte !== undefined && current.timings?.firstByte !== '' && Number.isFinite(Number(current.timings.firstByte)) ? Number(current.timings.firstByte) : null;
+            const b = previous?.available && previous.timings?.firstByte !== null && previous.timings?.firstByte !== undefined && previous.timings?.firstByte !== '' && Number.isFinite(Number(previous.timings.firstByte)) ? Number(previous.timings.firstByte) : null;
             const tr = document.createElement('tr');
             const values = [
                 label,
