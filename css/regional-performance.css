@@ -51,3 +51,8 @@
   .regional-map-canvas { aspect-ratio: 1.08 / 1; }
   .regional-network-atmosphere #regional-performance-title { font-size: clamp(1.9rem, 8vw, 2.25rem); }
 }
+
+
+/* The regional map sits directly on the same pure-black page canvas. */
+.regional-performance-section.regional-network-atmosphere { background: #000000 !important; }
+.regional-performance-section.regional-network-atmosphere::before { background-image: none !important; opacity: 0 !important; }
