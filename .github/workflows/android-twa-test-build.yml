@@ -95,6 +95,15 @@ jobs:
             -keyalg RSA -keysize 2048 -validity 10000 \
             -dname "CN=AfricaLatency Test, OU=Android, O=Brilliant Unicorn, L=Nairobi, ST=Kenya, C=KE"
 
+      - name: Configure Bubblewrap for non-interactive CI
+        shell: bash
+        run: |
+          test -x "$JAVA_HOME/bin/java"
+          test -x "$ANDROID_HOME/platform-tools/adb"
+          mkdir -p "$HOME/.bubblewrap"
+          node -e 'const fs=require("node:fs"); fs.writeFileSync(process.env.HOME+"/.bubblewrap/config.json", JSON.stringify({jdkPath:process.env.JAVA_HOME,androidSdkPath:process.env.ANDROID_HOME}, null, 2)+"\n")'
+          cat "$HOME/.bubblewrap/config.json"
+
       - name: Generate Android project
         working-directory: android
         run: CI=true bubblewrap update --skipVersionUpgrade --manifest=twa-manifest.json
