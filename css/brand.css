@@ -455,3 +455,31 @@ input:focus, select:focus, textarea:focus, .form-input:focus {
 .proof-strip, .footer-follow, .footer-copy, .menu-footer {
   border-color: rgba(255,255,255,.08) !important;
 }
+
+
+/* Higher-specificity resets for legacy selectors that used hard-coded light surfaces. */
+.faq-section .faq-item, .faq-section .faq-question,
+main .audit-scope-list li, main .custom-scope-note,
+main .nairobi-probe-card, main .pricing-card,
+main .principles-grid .principle, main .process-cards .process-card,
+main .tier4-home-proof-card, main .card, main .contact-choice {
+  background: transparent !important;
+  border-color: rgba(255,255,255,.08) !important;
+  box-shadow: none !important;
+}
+.faq-section .faq-question { color: #FFFFFF !important; }
+.faq-section .faq-answer, main .custom-scope-note p,
+main .audit-scope-list li { color: #A0AEC0 !important; }
+.faq-section .faq-item { overflow: visible; }
+.regional-image { background: transparent !important; border-color: rgba(255,255,255,.08) !important; }
+.pricing-card .price { color: #FFFFFF !important; }
+.pricing-card-featured { border-color: rgba(255,255,255,.12) !important; box-shadow: none !important; }
+.nairobi-probe-card button {
+  background: #2B80C5 !important;
+  border-color: #2B80C5 !important;
+  color: #FFFFFF !important;
+}
+.nairobi-probe-card button:hover {
+  background: #226AA5 !important;
+  border-color: #226AA5 !important;
+}
