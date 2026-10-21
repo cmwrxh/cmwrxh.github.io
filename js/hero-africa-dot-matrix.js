@@ -49,21 +49,23 @@
     canvas.style.height = '100%';
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-    cols = Math.ceil(width / CONFIG.spacingX) + 2;
-    rows = Math.ceil(height / CONFIG.spacingY) + 2;
+    var spacingX = CONFIG.spacingX;
+    var spacingY = CONFIG.spacingY;
+    cols = Math.ceil(width / spacingX) + 2;
+    rows = Math.ceil(height / spacingY) + 2;
     while (cols * rows > CONFIG.maxDots) {
-      CONFIG.spacingX += 2;
-      CONFIG.spacingY += 1;
-      cols = Math.ceil(width / CONFIG.spacingX) + 2;
-      rows = Math.ceil(height / CONFIG.spacingY) + 2;
+      spacingX += 2;
+      spacingY += 1;
+      cols = Math.ceil(width / spacingX) + 2;
+      rows = Math.ceil(height / spacingY) + 2;
     }
 
     points = new Array(cols * rows);
     for (var row = 0; row < rows; row++) {
       for (var col = 0; col < cols; col++) {
         points[row * cols + col] = {
-          x: (col - 1) * CONFIG.spacingX,
-          y: (row - 1) * CONFIG.spacingY,
+          x: (col - 1) * spacingX,
+          y: (row - 1) * spacingY,
           row: row,
           col: col
         };
