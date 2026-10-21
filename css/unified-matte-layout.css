@@ -559,3 +559,11 @@ main .section-lead, main .section-heading > p, main .hero-subtitle, main .region
 .regional-probe-status a { color:inherit; text-decoration:none; }
 .regional-probe-status a:hover { color:#cbd5e1; text-decoration:underline; text-underline-offset:3px; }
 @media(max-width:600px){.regional-map-panel .regional-probe-status{font-size:.7rem;gap:.4rem}}
+
+
+/* Homepage header and mobile menu: black canvas, minimal two-line hamburger. */
+nav { background: #000000 !important; }
+#menu-toggle.menu-toggle { width: 44px; height: 40px; padding: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; border: 0 !important; border-radius: 0 !important; background: transparent !important; box-shadow: none !important; }
+#menu-toggle.menu-toggle::after { content: none !important; display: none !important; }
+#menu-toggle.menu-toggle span { display: block; width: 24px; height: 2px; border-radius: 0; background: #FFFFFF; }
+#menu-toggle.menu-toggle:hover span, #menu-toggle.menu-toggle:focus-visible span { background: #38A1E0; }
