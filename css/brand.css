@@ -326,3 +326,132 @@ main .use-case-card,main .secondary-offer,main .proof-metric,main .case-card,mai
 main .card .card{background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important}
 .data-centers-callout a,.contact-form-note a{color:#1769AA!important}
 .footer-social a:hover{border-color:rgba(255,255,255,.55)!important;color:#FFFFFF!important}
+
+
+/* GTmetrix-aligned dark palette: shared site-wide color tokens and controls. */
+:root {
+  color-scheme: dark;
+  --bg: #0A0E17;
+  --bg-elevated: #0A0E17;
+  --bg-card: transparent;
+  --border: rgba(255,255,255,.08);
+  --border-strong: rgba(255,255,255,.12);
+  --text: #FFFFFF;
+  --text-muted: #A0AEC0;
+  --text-dim: #A0AEC0;
+  --accent: #38A1E0;
+  --blue: #38A1E0;
+  --accent-soft: rgba(56,161,224,.10);
+  --accent-line: rgba(56,161,224,.18);
+  --neutral-highlight: rgba(255,255,255,.04);
+  --al-canvas: #0A0E17;
+  --al-rule: rgba(255,255,255,.08);
+}
+html, body {
+  background: #0A0E17 !important;
+  color: #A0AEC0 !important;
+}
+body::before { display: none !important; }
+h1, h2, h3, h4, .page-title, .hero-title {
+  color: #FFFFFF !important;
+}
+p, .section-lead, .hero-subtitle, .card p, .principle p,
+.proof-strip-item span, .proof-strip > p, .pricing-card > p:not(.price),
+.faq-section .faq-answer, .contact-form-note, .audit-path-note {
+  color: #A0AEC0 !important;
+}
+.hero-africa-title-accent, .rotating-word, .rotating-text,
+.rotator-word, [data-rotating-word] {
+  color: #38A1E0 !important;
+  background: none !important;
+  -webkit-text-fill-color: #38A1E0 !important;
+}
+a { color: #38A1E0; }
+main a:not(.btn):not(.btn-primary), footer a:not(.btn),
+.legal-content a, .help-content a,
+.data-centers-callout a, .contact-form-note a {
+  color: #38A1E0 !important;
+}
+main a:not(.btn):not(.btn-primary):hover, footer a:not(.btn):hover,
+.legal-content a:hover, .help-content a:hover {
+  color: #FFFFFF !important;
+}
+.btn-primary, button.btn-primary, .btn.btn-primary,
+input[type="submit"], button[type="submit"] {
+  background: #2B80C5 !important;
+  border-color: #2B80C5 !important;
+  color: #FFFFFF !important;
+}
+.btn-primary:hover, button.btn-primary:hover, .btn.btn-primary:hover,
+input[type="submit"]:hover, button[type="submit"]:hover {
+  background: #226AA5 !important;
+  border-color: #226AA5 !important;
+}
+.btn-secondary {
+  background: transparent !important;
+  border-color: rgba(255,255,255,.12) !important;
+  color: #FFFFFF !important;
+}
+nav {
+  background: rgba(10,14,23,.96) !important;
+  border-color: rgba(255,255,255,.08) !important;
+}
+main > section + section, main > .section + .section,
+main > .compact-section + .compact-section,
+.homepage-footer, .contact-footer, footer, .footer-follow, .footer-copy {
+  border-color: rgba(255,255,255,.08) !important;
+}
+.card, .principle, .privacy-card, .contact-choice,
+.process-cards .process-card, .tier4-home-proof-card, .tier4-proof-card,
+.tier4-topology-card, .dogfood-card, .tier4-live-card,
+main .use-case-card, main .secondary-offer, main .proof-metric,
+main .case-card, main .service-card, main .feature-card,
+main .choice-card, main .audience-card, .faq-item, .pricing-card,
+.audit-scope-list li, .custom-scope-note, .nairobi-probe-card {
+  background: transparent !important;
+  border-color: rgba(255,255,255,.08) !important;
+  box-shadow: none !important;
+}
+.section-elevated, .section[style*="background:var(--bg-elevated)"],
+.section[style*="background: var(--bg-elevated)"],
+.hero-highlight, .contact-gradient, .cta-section, .compact-band,
+.homepage-footer, .contact-footer, footer {
+  background: #0A0E17 !important;
+  background-image: none !important;
+}
+.hero-highlight .hero-subtitle, .contact-gradient .section-lead,
+.cta-section .section-lead, .homepage-footer p, .contact-footer p, footer p,
+.homepage-footer a:not(.btn), .contact-footer a:not(.btn), footer a:not(.btn) {
+  color: #A0AEC0 !important;
+}
+input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]),
+select, textarea, .form-input, .contact-form input, .contact-form select,
+.contact-form textarea, .contact-page-form input, .contact-page-form select,
+.contact-page-form textarea {
+  background: #0D131D !important;
+  border: 1px solid rgba(255,255,255,.12) !important;
+  color: #FFFFFF !important;
+  box-shadow: none !important;
+}
+input::placeholder, textarea::placeholder {
+  color: #A0AEC0 !important;
+  opacity: .8;
+}
+input:focus, select:focus, textarea:focus, .form-input:focus {
+  border-color: #38A1E0 !important;
+  outline-color: rgba(56,161,224,.24) !important;
+}
+:where(a,button,input,select,textarea,[tabindex]):focus-visible {
+  outline-color: #38A1E0 !important;
+}
+.site-menu { background: #0A0E17 !important; }
+.site-menu .menu-column > a:hover, .site-menu .menu-group-title:hover {
+  color: #38A1E0 !important;
+}
+.site-menu .menu-toggle, .menu-toggle {
+  border-color: rgba(255,255,255,.12) !important;
+  color: #FFFFFF !important;
+}
+.proof-strip, .footer-follow, .footer-copy, .menu-footer {
+  border-color: rgba(255,255,255,.08) !important;
+}
