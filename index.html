@@ -24,7 +24,7 @@
   <link rel="stylesheet" href="/css/marketing.css?v=6">
   <link rel="stylesheet" href="/css/brand.css?v=6">
   <link rel="stylesheet" href="/css/product-pages.css?v=1">
-  <link rel="stylesheet" href="/css/regional-performance.css?v=2">
+  <link rel="stylesheet" href="/css/regional-performance.css?v=3">
 
   <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
   <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
@@ -93,8 +93,9 @@
 </div>
 
 <main>
-  <section class="section hero-highlight">
-    <div class="container">
+  <section class="section hero-highlight" data-hero-network-section>
+    <canvas class="hero-network-canvas" data-hero-network aria-hidden="true"></canvas>
+    <div class="container hero-network-content">
       <div class="hero-grid">
         <div>
           <div class="label">Infrastructure Performance &amp; Latency Intelligence</div>
@@ -123,7 +124,7 @@
     </div>
   </section>
 
-  <section class="section regional-performance-section" aria-labelledby="regional-performance-title">
+  <section class="section regional-performance-section regional-network-atmosphere" aria-labelledby="regional-performance-title">
     <div class="container">
       <div class="regional-performance-heading">
         <div class="section-heading">
@@ -339,7 +340,8 @@
 
 
 </script>
-<script src="/js/regional-network-illustration.js?v=2" defer></script>
+<script src="/js/regional-network-illustration.js?v=3" defer></script>
+<script src="/js/hero-network-background.js?v=1" defer></script>
 <script src="/js/product-pages.js?v=1"></script>
 </body>
 </html>
