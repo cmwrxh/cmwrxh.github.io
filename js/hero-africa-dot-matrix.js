@@ -48,7 +48,12 @@
   var fadeDurations = new Float32Array(0), holdDurations = new Float32Array(0);
   var dotCount = 0, rafId = 0, running = false, visible = false, pageVisible = !document.hidden;
   var lastFrame = 0, slowFrames = 0, mapLeft = 0, mapTop = 0, mapWidth = 0, mapHeight = 0;
-  var bucketPaths = new Array(CONFIG.buckets);
+  var dotBuckets = new Uint8Array(0);
+  var bucketColors = new Array(CONFIG.buckets);
+  for (var colorBucket = 0; colorBucket < CONFIG.buckets; colorBucket++) {
+    var colorAlpha = ((colorBucket + 0.5) / CONFIG.buckets) * CONFIG.peakAlpha;
+    bucketColors[colorBucket] = 'rgba(' + CONFIG.color + ',' + colorAlpha.toFixed(3) + ')';
+  }
 
   function randomBetween(range) {
     return range.min + Math.random() * (range.max - range.min);
@@ -95,27 +100,21 @@
   function draw(time, animateDots) {
     ctx.fillStyle = '#000000';
     ctx.fillRect(0, 0, width, height);
-    for (var b = 0; b < CONFIG.buckets; b++) bucketPaths[b] = null;
-
     for (var i = 0; i < dotCount; i++) {
       if (animateDots) updateDot(i, time);
       var alpha = Math.min(CONFIG.peakAlpha, Math.max(0, levels[i]) * CONFIG.peakAlpha);
-      var bucket = Math.min(CONFIG.buckets - 1, Math.floor((alpha / CONFIG.peakAlpha) * CONFIG.buckets));
-      if (!bucketPaths[bucket]) bucketPaths[bucket] = [];
-      bucketPaths[bucket].push(i);
+      dotBuckets[i] = Math.min(CONFIG.buckets - 1, Math.floor((alpha / CONFIG.peakAlpha) * CONFIG.buckets));
     }
 
+    // Eight shared paths, one per alpha bucket; no per-frame arrays or per-dot draw calls.
     for (var bucketIndex = 0; bucketIndex < CONFIG.buckets; bucketIndex++) {
-      var indices = bucketPaths[bucketIndex];
-      if (!indices || indices.length === 0) continue;
       ctx.beginPath();
-      for (var j = 0; j < indices.length; j++) {
-        var index = indices[j];
-        ctx.moveTo(xs[index] + CONFIG.radius, ys[index]);
-        ctx.arc(xs[index], ys[index], CONFIG.radius, 0, Math.PI * 2);
+      for (var j = 0; j < dotCount; j++) {
+        if (dotBuckets[j] !== bucketIndex) continue;
+        ctx.moveTo(xs[j] + CONFIG.radius, ys[j]);
+        ctx.arc(xs[j], ys[j], CONFIG.radius, 0, Math.PI * 2);
       }
-      var bucketAlpha = ((bucketIndex + 0.5) / CONFIG.buckets) * CONFIG.peakAlpha;
-      ctx.fillStyle = 'rgba(' + CONFIG.color + ',' + bucketAlpha.toFixed(3) + ')';
+      ctx.fillStyle = bucketColors[bucketIndex];
       ctx.fill();
     }
   }
@@ -150,6 +149,7 @@
     levels = new Float32Array(capacity);
     targets = new Float32Array(capacity);
     startLevels = new Float32Array(capacity);
+    dotBuckets = new Uint8Array(capacity);
     startTimes = new Float32Array(capacity);
     fadeDurations = new Float32Array(capacity);
     holdDurations = new Float32Array(capacity);
