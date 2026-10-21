@@ -1,0 +1,26 @@
+name: Android PWA preflight
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: android-pwa-preflight
+  cancel-in-progress: true
+
+jobs:
+  validate-public-pwa:
+    name: Validate live PWA endpoints
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Validate deployed PWA
+        run: node scripts/check-android-pwa.mjs
