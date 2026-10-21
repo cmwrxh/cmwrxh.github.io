@@ -8,6 +8,8 @@
   const form = document.getElementById('scan-form-v2');
   if (!form) return;
   const input = document.getElementById('scan-url');
+  const requestedUrl = new URLSearchParams(window.location.search).get('url');
+  if (requestedUrl && input) input.value = requestedUrl;
   const button = document.getElementById('scan-run');
   const error = document.getElementById('scan-error');
   const work = document.getElementById('scan-work');
