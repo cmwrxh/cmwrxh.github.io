@@ -61,3 +61,9 @@
   -webkit-mask-image: radial-gradient(ellipse at center, #000 42%, rgba(0,0,0,.82) 68%, transparent 100%);
   mask-image: radial-gradient(ellipse at center, #000 42%, rgba(0,0,0,.82) 68%, transparent 100%);
 }
+
+
+/* Pitch-black canvas standard: preserve the existing dot field and radial fade. */
+.hero-africa-dot-hero { background: #000000 !important; }
+.hero-africa-dot-overlay { background: linear-gradient(180deg, rgba(0,0,0,.08), rgba(0,0,0,.16)) !important; }
+.hero-africa-dot-canvas { background: #000000; }
