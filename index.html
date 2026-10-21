@@ -104,14 +104,51 @@
     <div class="container hero-africa-dot-content">
       <div class="hero-grid hero-action-layout">
         <div class="hero-action-copy">
-          <h1 class="hero-title">See how your website responds from <span class="hero-africa-title-accent city-rotator-slot" aria-label="Nairobi, Lagos, Johannesburg, Cairo, Accra and Casablanca"><span class="city-rotator-word" aria-live="polite">Nairobi</span></span>.</h1>
+          <div class="hero-probe-status" aria-label="Probe coverage status"><span class="hero-probe-status-dot" aria-hidden="true"></span><a href="/methodology">Probe coverage: live results where available</a></div>
+          <h1 class="hero-title">See how your website responds from <span class="hero-africa-title-accent city-rotator-slot" aria-label="Nairobi, Lagos, Johannesburg, Cairo, Accra and Casablanca"><span class="city-rotator-word" aria-live="polite">Nairobi</span></span></h1>
           <p class="hero-subtitle">Compare public website and API response behavior from available African network probes, then use the evidence to decide what to investigate. Results depend on probe availability.</p>
           <form class="hero-scan-form" id="homepage-scan-form" action="/scan" method="get">
             <label class="visually-hidden" for="homepage-scan-url">Website URL to scan</label>
             <input id="homepage-scan-url" name="url" type="text" inputmode="url" autocomplete="url" placeholder="https://yourwebsite.com" required>
             <button class="btn btn-primary" type="submit">Run scan <i data-lucide="arrow-right" aria-hidden="true"></i></button>
           </form>
-                    <div class="hero-support-links"><a class="hero-sample-report-link" href="/sample-report">See sample report</a></div>
+          <section class="developer-preview" aria-labelledby="developer-preview-title">
+            <div class="developer-preview-heading">
+              <div><p class="developer-preview-kicker">Developer preview</p><h2 id="developer-preview-title">Scan from your own tools</h2></div>
+              <span class="developer-preview-note">Example request · endpoint availability not verified</span>
+            </div>
+            <div class="developer-code-window">
+              <div class="developer-code-toolbar">
+                <div class="developer-code-tabs" role="tablist" aria-label="Code language">
+                  <button type="button" class="developer-code-tab is-active" role="tab" aria-selected="true" data-code-tab="curl">cURL</button>
+                  <button type="button" class="developer-code-tab" role="tab" aria-selected="false" data-code-tab="python">Python</button>
+                </div>
+                <button type="button" class="developer-copy-button" data-code-copy>Copy</button>
+                <span class="developer-copy-feedback" aria-live="polite"></span>
+              </div>
+              <pre class="developer-code-block"><code data-code-sample="curl">curl -X POST "https://api.africalatency.dev/v1/scan/public" \\
+  -H "Content-Type: application/json" \\
+  -d '{"target":"https://yourwebsite.com","region":"nairobi"}'</code><code data-code-sample="python" hidden>import requests
+
+response = requests.post(
+    "https://api.africalatency.dev/v1/scan/public",
+    json={"target": "https://yourwebsite.com", "region": "lagos"},
+)
+print(response.json())</code></pre>
+            </div>
+            <p class="developer-preview-footnote">Illustrative request only. Confirm the public API route and response contract before integrating it into production.</p>
+          </section>
+          <section class="telemetry-preview" aria-labelledby="telemetry-preview-title">
+            <div class="telemetry-preview-heading"><p class="developer-preview-kicker">Illustrative data</p><h2 id="telemetry-preview-title">Sample Telemetry Output (Nairobi Probe → Safaricom IXP)</h2></div>
+            <dl class="telemetry-preview-rows">
+              <div><dt>DNS Resolution</dt><dd>14ms</dd></div>
+              <div><dt>TLS Handshake</dt><dd>28ms</dd></div>
+              <div><dt>TTFB (Time to First Byte)</dt><dd>112ms</dd></div>
+              <div><dt>Packet Route Hops</dt><dd>4 hops via KIXP</dd></div>
+            </dl>
+            <p class="developer-preview-footnote">Sample values for interface illustration, not a live probe result.</p>
+          </section>
+          <div class="hero-support-links"><a class="hero-sample-report-link" href="/sample-report">See sample report</a></div>
           <p class="audit-path-note">Free public-endpoint snapshot. For a structured audit, start at KES 3,500.</p>
         </div>
       </div>
@@ -184,7 +221,23 @@
     </div>
   </section>
 
-  <section class="section pricing-band" id="pricing"><div class="container"><div class="section-heading"><div class="label">Our product ladder</div><h2>Start with a snapshot. Build toward continuous visibility.</h2><p class="section-lead">Choose the smallest useful step. Monitoring is planned and currently accepting waitlist interest.</p></div><div class="currency-switch" role="group" aria-label="Display currency"><span>Display:</span><button type="button" data-currency="KES" aria-pressed="true">KES</button><button type="button" data-currency="USD" aria-pressed="false">USD</button></div><div class="product-grid"><article class="product-card"><div class="label">Free entry</div><h3>Free Scan</h3><p class="product-price" data-kes="KES 0" data-usd="$0">KES 0</p><p>A point-in-time view of public HTTP response timing from available probes.</p><a class="btn btn-secondary" href="/scan">Run free scan</a></article><article class="product-card product-card-featured"><div class="label">One-time</div><h3>Africa Latency Audit</h3><p class="product-price" data-kes="KES 3,500 · one-time" data-usd="$27 · one-time">KES 3,500 · one-time</p><p>A structured report with observed timings, interpretation and prioritized next steps.</p><a class="btn btn-primary" href="/audit-checkout">View audit</a></article><article class="product-card"><div class="label">Recurring · waitlist</div><h3>Continuous Monitoring</h3><p class="product-price" data-kes="Pilot pricing to be confirmed" data-usd="Pilot access">Pilot pricing to be confirmed</p><p>Planned recurring visibility and reporting. Scope and delivery are being validated.</p><a class="btn btn-secondary" href="/monitoring">Join waitlist</a></article><article class="product-card"><div class="label">Custom scope</div><h3>Custom Deep Dive</h3><p class="product-price" data-kes="From KES 25,000" data-usd="From $195">From KES 25,000</p><p>Manual scoping for broader endpoint coverage, architecture review or authorized deeper investigation.</p><a class="btn btn-secondary" href="/contact">Discuss scope</a></article></div><p class="pricing-note">USD prices are approximate and billed in KES until Paystack USD payments are confirmed. The automated audit tests public endpoints only. Private databases, internal services and third-party dependencies require separate authorization and scope. Results depend on available probes.</p></div></section>
+
+  <section class="section infrastructure-trust-section" aria-labelledby="infrastructure-trust-title">
+    <div class="container">
+      <div class="section-heading">
+        <div class="label">Engineering &amp; Security Standards</div>
+        <h2 id="infrastructure-trust-title">Built for public endpoint safety &amp; objective measurement.</h2>
+        <p class="section-lead">Clear scope, observable evidence and privacy-aware measurement practices.</p>
+      </div>
+      <div class="infrastructure-trust-grid">
+        <article class="infrastructure-trust-item"><h3>Non-Invasive Probes</h3><p>Standard audits test public HTTP/TLS endpoints only. No private database or VPC access is requested.</p></article>
+        <article class="infrastructure-trust-item"><h3>Observable Evidence</h3><p>Completed measurements are reported separately from unavailable locations, without synthetic assumptions.</p></article>
+        <article class="infrastructure-trust-item"><h3>Privacy Compliant</h3><p>Telemetry scans do not inject tracking payloads into the target website or application.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section pricing-band" id="pricing"><div class="container"><div class="section-heading"><div class="label">Our product ladder</div><h2>Start with a snapshot. Build toward continuous visibility.</h2><p class="section-lead">Choose the smallest useful step. Monitoring is planned and currently accepting waitlist interest.</p></div><div class="currency-switch" role="group" aria-label="Display currency"><span>Display:</span><button type="button" data-currency="KES" aria-pressed="true">KES</button><button type="button" data-currency="USD" aria-pressed="false">USD</button></div><div class="product-grid"><article class="product-card"><h3>Free Scan</h3><p class="product-price" data-kes="KES 0" data-usd="$0">KES 0</p><p>A point-in-time view of public HTTP response timing from available probes.</p><a class="btn btn-secondary" href="/scan">Run free scan</a></article><article class="product-card product-card-featured"><h3>Africa Latency Audit</h3><p class="product-price" data-kes="KES 3,500 · one-time" data-usd="$27 · one-time">KES 3,500 · one-time</p><p>A structured report with observed timings, interpretation and prioritized next steps.</p><a class="btn btn-primary" href="/audit-checkout">View audit</a></article><article class="product-card"><h3>Continuous Monitoring</h3><p class="product-price" data-kes="Pilot pricing to be confirmed" data-usd="Pilot access">Pilot pricing to be confirmed</p><p>Planned recurring visibility and reporting. Scope and delivery are being validated.</p><a class="btn btn-secondary" href="/monitoring">Join waitlist</a></article><article class="product-card"><h3>Custom Deep Dive</h3><p class="product-price" data-kes="From KES 25,000" data-usd="From $195">From KES 25,000</p><p>Manual scoping for broader endpoint coverage, architecture review or authorized deeper investigation.</p><a class="btn btn-secondary" href="/contact">Discuss scope</a></article></div><p class="pricing-note">USD prices are approximate and billed in KES until Paystack USD payments are confirmed. The automated audit tests public endpoints only. Private databases, internal services and third-party dependencies require separate authorization and scope. Results depend on available probes.</p></div></section>
 
 <section class="section section-band-audience" id="who-its-for">
     <div class="container">
@@ -273,7 +326,7 @@
   </div>
 </footer>
 
-<script defer src="/africalatency.js" data-al-key="test-site-001"></script>
+
 <script src="/js/main.js?v=6"></script>
 <script>
   document.querySelectorAll('.faq-question').forEach(function (b) {

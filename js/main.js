@@ -32,6 +32,37 @@ document.addEventListener('DOMContentLoaded', () => {
     stickyScanObserver.observe(document.body, { childList: true, subtree: true });
   }
 
+  // Respect analytics choice and keep consent controls unobtrusive.
+  (function setupCookieConsent() {
+    var consentKey = 'africalatency-analytics-consent';
+    function loadAnalytics() {
+      if (document.querySelector('script[data-al-consent-analytics]')) return;
+      var script = document.createElement('script');
+      script.src = '/africalatency.js';
+      script.defer = true;
+      script.setAttribute('data-al-key', 'test-site-001');
+      script.setAttribute('data-al-consent-analytics', 'true');
+      document.body.appendChild(script);
+    }
+    var existing = null;
+    try { existing = window.localStorage.getItem(consentKey); } catch (_) {}
+    if (existing === 'accepted') { loadAnalytics(); return; }
+    if (existing === 'rejected') return;
+    var banner = document.createElement('aside');
+    banner.className = 'cookie-consent-banner';
+    banner.setAttribute('role', 'region');
+    banner.setAttribute('aria-label', 'Cookie preferences');
+    banner.innerHTML = '<div class="cookie-consent-copy">We use optional analytics to understand site performance. You can accept or reject analytics; essential site functions work either way.</div><div class="cookie-consent-actions"><button type="button" data-consent="accept">Accept analytics</button><button type="button" data-consent="reject">Reject analytics</button></div>';
+    function choose(value) {
+      try { window.localStorage.setItem(consentKey, value); } catch (_) {}
+      if (value === 'accepted') loadAnalytics();
+      banner.remove();
+    }
+    banner.querySelector('[data-consent="accept"]').addEventListener('click', function () { choose('accepted'); });
+    banner.querySelector('[data-consent="reject"]').addEventListener('click', function () { choose('rejected'); });
+    document.body.appendChild(banner);
+  })();
+
   const menuStyle = document.createElement('style');
   menuStyle.textContent = `
     .site-menu { position: fixed !important; inset: 0 !important; z-index: 99999 !important; display: flex !important; opacity: 0 !important; visibility: hidden !important; pointer-events: none !important; background: #0A0E17 !important; transition: opacity .2s ease, visibility .2s ease !important; }
@@ -109,13 +140,7 @@ document.addEventListener('DOMContentLoaded', () => {
   updateNavScrollState();
   window.addEventListener('scroll', updateNavScrollState, { passive: true });
 
-  if (!document.querySelector('script[src="/africalatency.js"]')) {
-    const rum = document.createElement('script');
-    rum.defer = true;
-    rum.src = '/africalatency.js';
-    rum.setAttribute('data-al-key', 'test-site-001');
-    document.head.appendChild(rum);
-  }
+  // Analytics is loaded only by setupCookieConsent() after explicit acceptance.
 
   document.querySelectorAll('.nav-brand').forEach((brand) => {
     brand.classList.add('brand-lockup');
