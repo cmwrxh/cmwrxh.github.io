@@ -1,0 +1,27 @@
+/* Shared public marketing infrastructure strip and header actions. */
+.infra-status-banner{position:relative;z-index:50;display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:29px;padding:5px 16px;background:#05080e;border-bottom:1px solid rgba(100,116,139,.28);color:#94a3b8;font:11px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.01em}
+.infra-status-label{color:#64748b;text-transform:uppercase;letter-spacing:.1em}
+.infra-status-peers{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.infra-status-peer{white-space:nowrap;color:#a8b4c4}
+.infra-status-peer:before{content:"";display:inline-block;width:5px;height:5px;margin:0 6px 1px 0;border-radius:50%;background:#38a1e0;box-shadow:0 0 7px rgba(56,161,224,.45)}
+.infra-header-actions{display:flex;align-items:center;gap:16px;margin-left:12px}
+.infra-header-login{color:#cbd5e1!important;text-decoration:none;font-size:13px;font-weight:600;white-space:nowrap}
+.infra-header-login:hover{color:#fff!important}
+.infra-header-cta{display:inline-flex;align-items:center;justify-content:center;min-height:36px;padding:8px 14px;border:1px solid #2b80c5;border-radius:6px;background:#2b80c5;color:#fff!important;text-decoration:none;font-size:13px;font-weight:700;white-space:nowrap;transition:background .16s ease,border-color .16s ease}
+.infra-header-cta:hover{background:#38a1e0;border-color:#38a1e0;color:#fff!important}
+.nav-actions{display:flex;align-items:center;gap:12px}
+.menu-toggle{display:inline-flex!important;flex-direction:column;align-items:center;justify-content:center;gap:6px;width:32px;height:32px;padding:4px;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important}
+.menu-toggle span{display:block!important;width:24px!important;height:2px!important;min-height:2px;background:#fff!important;border-radius:0!important}
+.menu-toggle span:nth-child(3){display:none!important}
+.pricing-nav-links .infra-header-cta{margin-left:2px}
+@media(max-width:700px){
+ .infra-status-banner{align-items:flex-start;flex-direction:column;gap:4px;padding:6px 14px}
+ .infra-status-label{display:none}
+ .infra-status-peers{gap:10px}
+ .infra-status-peer{font-size:10px}
+ .infra-header-actions{gap:10px;margin-left:0}
+ .infra-header-cta{min-height:32px;padding:7px 10px;font-size:12px}
+ .infra-header-login{font-size:12px}
+ .pricing-nav-links .infra-header-cta{margin:0}
+}
+@media(max-width:390px){.infra-status-peers{gap:8px}.infra-status-peer{font-size:9px}.infra-header-actions{gap:7px}}
