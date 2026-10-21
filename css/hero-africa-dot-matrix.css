@@ -38,3 +38,17 @@
   background-clip: text;
   -webkit-text-fill-color: transparent;
 }
+
+
+/* Exact GTmetrix palette for the animated hero canvas and rotating city word. */
+.hero-africa-dot-hero { background: #0A0E17 !important; }
+.hero-africa-dot-overlay { background: linear-gradient(180deg, rgba(10,14,23,0.08), rgba(10,14,23,0.16)); }
+.hero-africa-dot-hero .hero-title { color: #FFFFFF !important; }
+.hero-africa-dot-hero .hero-africa-title-accent,
+.hero-africa-dot-hero .city-rotator-word {
+  color: #38A1E0 !important;
+  background: none !important;
+  -webkit-background-clip: initial !important;
+  background-clip: initial !important;
+  -webkit-text-fill-color: #38A1E0 !important;
+}
