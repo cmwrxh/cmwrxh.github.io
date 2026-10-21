@@ -1,0 +1,168 @@
+/* Seamless dark design system — additive overrides, preserving existing behavior. */
+:root {
+  --design-canvas: #080c14;
+  --design-surface: rgba(255,255,255,.015);
+  --design-border: rgba(255,255,255,.08);
+  --design-border-hover: rgba(59,130,246,.4);
+  --design-blue: #60a5fa;
+}
+html, body { background-color: var(--design-canvas); }
+body { background-image: none; }
+main > .section,
+main > section.section,
+main > section.pricing-band {
+  background-color: transparent;
+  background-image: none;
+}
+main > .section::before,
+main > .section::after { pointer-events: none; }
+.section-band-stats, .section-band-how, .section-band-audit,
+.section-band-audience, .pricing-band {
+  background: transparent !important;
+}
+.section-heading { position: relative; isolation: isolate; }
+.section-heading::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  width: min(500px, 90vw);
+  height: 180px;
+  left: -70px;
+  top: -55px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(59,130,246,.10) 0%, rgba(0,0,0,0) 70%);
+  filter: blur(45px);
+  pointer-events: none;
+}
+main .label,
+main .section-heading .label,
+main .regional-panel-kicker {
+  color: rgba(96,165,250,.92);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .14em;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+main .section-heading h2,
+main #regional-performance-title,
+main .cta-section h2 {
+  color: #f8fafc;
+  font-weight: 700;
+  letter-spacing: -.035em;
+}
+main .process-card, main .audience-card, main .product-card,
+main .regional-insight-row, main .custom-scope-note,
+main .methodology-summary, main .methodology-tags span,
+main .faq-item, main .card, .sample-card {
+  background: var(--design-surface) !important;
+  border-color: var(--design-border) !important;
+  box-shadow: none !important;
+}
+main .process-card, main .audience-card, main .product-card,
+main .custom-scope-note, main .card, .sample-card {
+  transition: background-color 200ms ease, border-color 200ms ease, transform 200ms ease;
+}
+main .process-card:hover, main .audience-card:hover, main .product-card:hover,
+main .custom-scope-note:hover, main .card:hover, .sample-card:hover {
+  background: rgba(255,255,255,.03) !important;
+  border-color: var(--design-border-hover) !important;
+}
+main .product-card-featured {
+  border-color: rgba(59,130,246,.32) !important;
+  background: rgba(59,130,246,.035) !important;
+}
+main .product-card-featured:hover { background: rgba(59,130,246,.06) !important; }
+main .proof-strip {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 8px 22px;
+  padding: 12px 18px;
+  border: 0 !important;
+  border-radius: 999px;
+  background: rgba(255,255,255,.02) !important;
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+main .proof-strip-item {
+  border: 0 !important;
+  background: transparent !important;
+  padding: 5px 0 !important;
+}
+main .hero-support-links { margin-top: 10px; }
+main .hero-support-links .btn-secondary {
+  display: inline;
+  width: auto;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: #94a3b8;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  box-shadow: none;
+}
+main .hero-support-links .btn-secondary:hover { color: #fff; background: transparent; }
+main .hero-scan-form {
+  border-color: rgba(148,163,184,.28);
+  background: rgba(8,12,20,.86);
+  box-shadow: 0 0 0 1px rgba(255,255,255,.025), 0 12px 38px rgba(0,0,0,.18);
+}
+main .hero-scan-form:focus-within {
+  border-color: rgba(59,130,246,.8);
+  box-shadow: 0 0 0 3px rgba(59,130,246,.14);
+}
+main .process-card h3, main .audience-card h3, main .product-card h3 { color: #f8fafc; }
+main .process-card p, main .audience-card p, main .product-card p { color: #b4c0d4; }
+main .process-card::before, main .audience-card::before { background: transparent !important; }
+main .process-card .step-number, main .step-number, main .audience-card > i {
+  color: #93c5fd;
+  background: rgba(59,130,246,.08);
+  border-color: rgba(148,163,184,.16);
+}
+main .regional-insight-row { border-color: rgba(255,255,255,.08) !important; }
+main .pilot-invitation { border-top-color: rgba(255,255,255,.10); }
+main .methodology-tags span { color: #b7c4d7; border: 1px solid rgba(255,255,255,.06); }
+main .faq-item { border-bottom: 1px solid rgba(255,255,255,.10) !important; }
+main .faq-question { background: transparent !important; }
+main .hero-scan-note, main .audit-path-note { color: #94a3b8; }
+.sample-table, .comparison-table, table {
+  border-collapse: collapse;
+  background: transparent !important;
+}
+.sample-table th, .sample-table td,
+.comparison-table th, .comparison-table td,
+table th, table td {
+  background: transparent !important;
+  border-bottom: 1px solid rgba(255,255,255,.10);
+}
+.sample-table thead th, .comparison-table thead th, table thead th {
+  background: transparent !important;
+  color: #cbd5e1;
+}
+.status-badge, .badge-measured, .measured-example {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid rgba(16,185,129,.20);
+  border-radius: 999px;
+  background: rgba(16,185,129,.10);
+  color: #34d399;
+  padding: 3px 8px;
+  font-size: 11px;
+  line-height: 1.35;
+}
+@media (prefers-reduced-motion: reduce) {
+  main .process-card, main .audience-card, main .product-card,
+  main .custom-scope-note, main .card, .sample-card {
+    transition: none !important;
+  }
+}
+@media (max-width: 640px) {
+  main .proof-strip { border-radius: 16px; gap: 6px 16px; }
+  main .proof-strip-item { flex: 1 1 130px; }
+  .section-heading::before { left: -24px; height: 140px; }
+}
