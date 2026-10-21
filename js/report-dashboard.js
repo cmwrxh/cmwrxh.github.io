@@ -117,7 +117,8 @@ if(detailEl){
  };
  resources.forEach(r=>{const bucket=classify(r),n=Number(r.transferSize);if(Number.isFinite(n)&&n>=0)localTotals[bucket]+=n;});
  const hasAggregate=Boolean(requestAnalysis?.resourceDataAvailable);
- const bucketBytes=(key)=>hasAggregate&&buckets[key]&&finite(buckets[key].transferSizeBytes)?Number(buckets[key].transferSizeBytes):(resources.length?localTotals[key]:null);
+ const completeAggregate=hasAggregate&&(!finite(requestAnalysis?.classifiedResourceCount)||!finite(requestAnalysis?.requestCount)||Number(requestAnalysis.classifiedResourceCount)>=Number(requestAnalysis.requestCount));
+ const bucketBytes=(key)=>completeAggregate&&buckets[key]&&finite(buckets[key].transferSizeBytes)?Number(buckets[key].transferSizeBytes):(resources.length?localTotals[key]:null);
  const pageBytes=finite(full.pageWeightBytes)?Number(full.pageWeightBytes):finite(summary.pageWeightBytes)?Number(summary.pageWeightBytes):finite(requestAnalysis?.pageWeightBytes)?Number(requestAnalysis.pageWeightBytes):null;
  const requestCount=finite(full.requestCount)?Number(full.requestCount):finite(summary.requestCount)?Number(summary.requestCount):finite(requestAnalysis?.requestCount)?Number(requestAnalysis.requestCount):(resources.length?resources.length:null);
  const loadedMs=fm.fullyLoadedTimeMs??m.fullyLoadedTimeMs??requestAnalysis?.fullyLoadedTimeMs;
@@ -133,7 +134,7 @@ if(detailEl){
  ];
  detailEl.innerHTML=labels.map(([label,value,source])=>'<div class="rd-page-detail"><span>'+esc(label)+'</span><strong>'+esc(value)+'</strong><span>'+esc(source)+'</span></div>').join('');
  const note=document.getElementById('rd-page-details-note');
- if(note)note.textContent=hasAggregate?'Breakdown uses aggregate totals from all '+esc(requestAnalysis.requestCount??resources.length)+' returned resource request(s).':'This report does not include resource aggregates; displayed categories use only resource rows available to this report.';
+ if(note)note.textContent=completeAggregate?'Breakdown uses aggregate totals from all '+esc(requestAnalysis.requestCount??resources.length)+' returned resource request(s).':hasAggregate?'Category breakdown is incomplete for this saved report; total size and request count still use the complete Lighthouse totals.':'This report does not include resource aggregates; displayed categories use only resource rows available to this report.';
 }
 
 const timedResources=resources.filter(r=>finite(r.startTime)&&finite(r.endTime)&&Number(r.endTime)>=Number(r.startTime));
