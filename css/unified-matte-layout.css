@@ -551,3 +551,11 @@ main .section-lead, main .section-heading > p, main .hero-subtitle, main .region
 /* Homepage hero now transitions directly to regional performance. */
 .hero-africa-dot-hero { padding-bottom: 5rem !important; }
 .hero-africa-dot-hero + .regional-performance-section { padding-top: 5rem !important; }
+
+
+/* Subtle probe coverage indicator beneath the regional map. */
+.regional-map-panel .regional-probe-status { display:flex; align-items:center; justify-content:center; gap:.5rem; margin:.85rem 0 0; color:#94a3b8; font-size:.75rem; line-height:1.5; letter-spacing:.01em; text-align:center; }
+.regional-probe-status-dot { display:inline-block; flex:0 0 6px; width:6px; height:6px; border-radius:50%; background:#38A1E0; box-shadow:0 0 8px rgba(56,161,224,.22); }
+.regional-probe-status a { color:inherit; text-decoration:none; }
+.regional-probe-status a:hover { color:#cbd5e1; text-decoration:underline; text-underline-offset:3px; }
+@media(max-width:600px){.regional-map-panel .regional-probe-status{font-size:.7rem;gap:.4rem}}
