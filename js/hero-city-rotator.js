@@ -5,7 +5,7 @@
   var target = document.querySelector('[data-city-rotator]');
   if (!target) return;
 
-  var cities = ['Nairobi', 'Lagos', 'Johannesburg', 'Cairo', 'Accra', 'Casablanca', 'Kigali'];
+  var cities = ['Nairobi', 'Lagos', 'Johannesburg', 'Cairo', 'Accra', 'Casablanca'];
   var index = 0;
   var interval = 0;
   var swapTimer = 0;
