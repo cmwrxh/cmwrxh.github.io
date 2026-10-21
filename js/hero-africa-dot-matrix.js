@@ -51,7 +51,7 @@
   var dotBuckets = new Uint8Array(0);
   var bucketColors = new Array(CONFIG.buckets);
   for (var colorBucket = 0; colorBucket < CONFIG.buckets; colorBucket++) {
-    var colorAlpha = ((colorBucket + 0.5) / CONFIG.buckets) * CONFIG.peakAlpha;
+    var colorAlpha = (colorBucket / (CONFIG.buckets - 1)) * CONFIG.peakAlpha;
     bucketColors[colorBucket] = 'rgba(' + CONFIG.color + ',' + colorAlpha.toFixed(3) + ')';
   }
 
@@ -102,7 +102,7 @@
     ctx.fillRect(0, 0, width, height);
     for (var i = 0; i < dotCount; i++) {
       if (animateDots) updateDot(i, time);
-      var alpha = Math.min(CONFIG.peakAlpha, Math.max(0, levels[i]) * CONFIG.peakAlpha);
+      var alpha = Math.min(CONFIG.peakAlpha, Math.max(0, levels[i]));
       dotBuckets[i] = Math.min(CONFIG.buckets - 1, Math.floor((alpha / CONFIG.peakAlpha) * CONFIG.buckets));
     }
 
@@ -166,7 +166,7 @@
         var i = dotCount++;
         xs[i] = x;
         ys[i] = y;
-        var initial = Math.random();
+        var initial = 0.12 + Math.random() * 0.88;
         var target = pickTarget();
         var fade = randomBetween(CONFIG.fadeMs);
         var hold = randomBetween(CONFIG.holdMs);
