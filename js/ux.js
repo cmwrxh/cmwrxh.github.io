@@ -129,7 +129,7 @@
     addStyles();
     installFormValidation();
     watchAuditConfirmation();
-    addMobileCta();
+    // Fixed bottom scan banner intentionally disabled for a clean mobile layout.
     loadTier4();
   }
 
