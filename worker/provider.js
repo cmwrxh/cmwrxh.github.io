@@ -93,7 +93,7 @@ export async function runLighthouse(url, device, runCount = 1) {
       bestPractices: medianScoreFrom(runs, 'scores.bestPractices'),
       seo: medianScoreFrom(runs, 'scores.seo')
     },
-    metrics: Object.fromEntries(['lcpMs','fcpMs','tbtMs','cls','speedIndexMs','ttfbMs'].map(key => [key, medianMetric(key)])),
+    metrics: Object.fromEntries(['lcpMs','fcpMs','tbtMs','cls','speedIndexMs','ttfbMs','fullyLoadedTimeMs'].map(key => [key, medianMetric(key)])),
     runCount: runs.length,
     aggregation: 'median of 3 Lighthouse runs',
     provider: runs.every(r => r.provider === runs[0].provider) ? runs[0].provider : 'mixed providers'
