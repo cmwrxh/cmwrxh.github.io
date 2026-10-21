@@ -1,0 +1,42 @@
+{
+  "packageId": "dev.africalatency.app",
+  "host": "africalatency.dev",
+  "name": "AfricaLatency",
+  "launcherName": "AfricaLatency",
+  "display": "standalone",
+  "orientation": "portrait",
+  "themeColor": "#0E131A",
+  "themeColorDark": "#0E131A",
+  "backgroundColor": "#0E131A",
+  "startUrl": "/",
+  "iconUrl": "https://africalatency.dev/images/web-app-manifest-512x512.png",
+  "maskableIconUrl": "https://africalatency.dev/images/web-app-manifest-512x512.png",
+  "webManifestUrl": "https://africalatency.dev/manifest.json",
+  "appVersionCode": 1,
+  "appVersionName": "1.0.0",
+  "minSdkVersion": 23,
+  "enableNotifications": false,
+  "enableSiteSettingsShortcut": true,
+  "splashScreenFadeOutDuration": 300,
+  "fallbackType": "customtabs",
+  "generatorApp": "bubblewrap-cli",
+  "signingKey": {
+    "path": "./android.keystore",
+    "alias": "africalatency"
+  },
+  "fingerprints": [],
+  "shortcuts": [
+    {
+      "name": "Run a free scan",
+      "shortName": "Free scan",
+      "url": "/scan",
+      "iconUrl": "https://africalatency.dev/images/web-app-manifest-192x192.png"
+    },
+    {
+      "name": "Sign in",
+      "shortName": "Sign in",
+      "url": "/login",
+      "iconUrl": "https://africalatency.dev/images/web-app-manifest-192x192.png"
+    }
+  ]
+}
