@@ -26,6 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
   removeMobileStickyScanBanner();
+  window.addEventListener('resize', removeMobileStickyScanBanner, { passive: true });
   if ('MutationObserver' in window) {
     var stickyScanObserver = new MutationObserver(removeMobileStickyScanBanner);
     stickyScanObserver.observe(document.body, { childList: true, subtree: true });
