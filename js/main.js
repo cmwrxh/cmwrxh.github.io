@@ -152,7 +152,7 @@ document.addEventListener('DOMContentLoaded', () => {
     ['/scan', 'Free Scan'],
     ['/audit-checkout', 'Africa Latency Audit'],
     ['/monitoring', 'Continuous Monitoring'],
-    ['/services', 'Custom Deep Dive / Enterprise'],
+    ['/pricing.html#one-time-services', 'Custom Deep Dive / Enterprise'],
     ['/sitespeed.html', 'Website Speed Check']
   ];
   const resourceLinks = [
@@ -247,7 +247,7 @@ document.addEventListener('DOMContentLoaded', () => {
     footer.innerHTML = `
       <div class="footer-inner tier4-footer-grid">
         <div class="tier4-footer-col footer-intro"><img class="footer-wordmark" src="/images/africalatency-logo-dark.svg" alt="AfricaLatency" width="180" height="28"><h3>Better performance. Better digital experiences.</h3><p>Infrastructure performance and latency intelligence for African networks.</p><p class="footer-copy">© 2026 AfricaLatency</p></div>
-        <div class="tier4-footer-col"><h4>Products</h4><div class="tier4-footer-links"><a href="/scan">Free Scan</a><a href="/audit-checkout">Africa Latency Audit</a><a href="/monitoring">Continuous Monitoring</a><a href="/services">Custom Deep Dive</a></div></div>
+        <div class="tier4-footer-col"><h4>Products</h4><div class="tier4-footer-links"><a href="/scan">Free Scan</a><a href="/audit-checkout">Africa Latency Audit</a><a href="/monitoring">Continuous Monitoring</a><a href="/pricing.html#one-time-services">Custom Deep Dive</a></div></div>
         <div class="tier4-footer-col"><h4>Company</h4><div class="tier4-footer-links"><a href="/about">About</a><a href="/contact">Contact</a><a href="/cases">Case studies</a><a href="/security">Security</a></div></div>
         <div class="tier4-footer-col"><h4>Resources</h4><div class="tier4-footer-links"><a href="/tools">Tools</a><a href="/sample-report">Sample report</a><a href="/compare">Compare</a><a href="/performance-index">Index</a><a href="/methodology">Methodology</a><a href="/docs">Docs</a><a href="/changelog">Changelog</a><a href="/blog">Blog</a></div></div>
         <div class="tier4-footer-col"><h4>Contact &amp; legal</h4><div class="tier4-footer-links"><a href="mailto:support@africalatency.dev">support@africalatency.dev</a><a href="/terms-of-service.html">Terms of Service</a><a href="/privacy-policy.html">Privacy Policy</a><a href="/refund-policy.html">Refund Policy</a></div><p style="margin-top:16px;color:rgba(255,255,255,.72);font-size:.72rem">Africa Latency Ltd<br>1 Parklands Ave, Nairobi 00623, Kenya</p></div>
