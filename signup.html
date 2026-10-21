@@ -24,7 +24,7 @@ const googleIdentityScript=document.createElement('script');
 googleIdentityScript.src='https://accounts.google.com/gsi/client';googleIdentityScript.async=true;googleIdentityScript.defer=true;
 googleIdentityScript.onload=initializeGoogleSignIn;
 googleIdentityScript.onerror=()=>{status.textContent='Google sign-in could not load. Check your connection and try again.';};
-document.head.appendChild(googleIdentityScript);if(error)status.textContent=error.message;});
+document.head.appendChild(googleIdentityScript);
 document.getElementById('signup-form').addEventListener('submit',async e=>{e.preventDefault();if(!e.currentTarget.reportValidity())return;submit.disabled=true;status.textContent='Creating your account…';const email=document.getElementById('signup-email').value.trim();const password=document.getElementById('signup-password').value;const {data,error}=await client.auth.signUp({email,password,options:{emailRedirectTo:location.origin+safeNext}});if(error){status.textContent=error.message;submit.disabled=false;return;}if(data.session){location.href=safeNext;return;}status.textContent='Check your email to confirm your account. After confirmation, return to your report link to unlock it.';submit.disabled=false;});
 })();
 </script></body></html>
