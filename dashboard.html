@@ -969,10 +969,16 @@
 
             userEmail.textContent = session.user.email || '';
             window.africaLatencyTourUserId = session.user.id;
-            const displayName = session.user.user_metadata?.full_name
+            const displayName = String(
+                session.user.user_metadata?.full_name
                 || session.user.user_metadata?.name
                 || session.user.user_metadata?.given_name
-                || (session.user.email ? session.user.email.split('@')[0] : '');
+                || (session.user.email ? session.user.email.split('@')[0] : '')
+                || ''
+            ).trim();
+            const accountDisplayName = displayName || 'Account';
+            document.documentElement.dataset.accountDisplayName = accountDisplayName;
+            window.africaLatencySetAccountName?.(accountDisplayName);
             welcomeHeading.textContent = displayName
                 ? 'Welcome, ' + displayName + '!'
                 : 'Welcome to AfricaLatency!';
