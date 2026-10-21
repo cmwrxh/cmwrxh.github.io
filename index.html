@@ -24,6 +24,7 @@
   <link rel="stylesheet" href="/css/marketing.css?v=6">
   <link rel="stylesheet" href="/css/brand.css?v=6">
   <link rel="stylesheet" href="/css/product-pages.css?v=1">
+  <link rel="stylesheet" href="/css/regional-performance.css?v=1">
 
   <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
   <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
@@ -122,21 +123,66 @@
     </div>
   </section>
 
-  <section class="section">
+  <section class="section regional-performance-section" aria-labelledby="regional-performance-title">
     <div class="container">
-      <div class="section-heading">
-        <div class="label">Why Africa isn't one network</div>
-        <h2>The same service can feel different from one network to another.</h2>
-        <p class="section-lead">Country, ISP, routing, cloud region and edge coverage can all change the path a request takes. We measure what is observable instead of assuming every location behaves the same.</p>
+      <div class="regional-performance-heading">
+        <div class="section-heading">
+          <div class="label">Regional performance view</div>
+          <h2 id="regional-performance-title">One continent. Many paths.</h2>
+          <p class="section-lead">A website can respond differently across African networks. Country, ISP routing, cloud region and edge coverage all shape the route between a customer and your service.</p>
+        </div>
+        <a class="regional-method-link" href="/methodology">How we measure <i data-lucide="arrow-up-right" aria-hidden="true"></i></a>
       </div>
-      <div class="principles-grid">
-        <article class="principle"><i data-lucide="route" aria-hidden="true"></i><h3>Routing varies</h3><p>Traffic may take different paths between ISPs, exchange points and your service.</p></article>
-        <article class="principle"><i data-lucide="cloud" aria-hidden="true"></i><h3>Infrastructure varies</h3><p>Origin region, DNS answers and CDN or edge coverage affect connection and response time.</p></article>
-        <article class="principle"><i data-lucide="activity" aria-hidden="true"></i><h3>Evidence matters</h3><p>Probe availability changes. We report completed measurements separately from locations that returned no result.</p></article>
+      <div class="regional-performance-layout">
+        <figure class="regional-map-panel" data-network-illustration>
+          <img src="/images/Africa%20map%20latency%20image.jfif" alt="Map of Africa at night, illustrating the varied regions and connectivity environments where website performance can differ" width="1200" height="700" loading="lazy" decoding="async">
+          <div class="network-illustration-label">Animated network illustration · not live telemetry</div>
+          <svg class="regional-map-visual" viewBox="0 0 1000 580" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
+            <defs>
+              <linearGradient id="regional-route-gradient" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#A4F0FF"/>
+                <stop offset="1" stop-color="#36B9F0"/>
+              </linearGradient>
+            </defs>
+            <g stroke="url(#regional-route-gradient)">
+              <path class="network-route" d="M430 255 Q520 190 625 180"/>
+              <path class="network-route route-secondary" d="M430 255 Q555 260 650 350"/>
+              <path class="network-route" d="M430 255 Q475 365 570 470"/>
+              <path class="network-route route-secondary" d="M625 180 Q710 250 650 350"/>
+              <path class="network-route" d="M650 350 Q635 430 570 470"/>
+              <path class="network-route route-secondary" d="M430 255 Q360 300 390 325"/>
+              <path class="network-route" d="M390 325 Q490 400 570 470"/>
+            </g>
+            <g>
+              <g transform="translate(430 255)"><circle class="network-node-halo" r="20"/><circle class="network-pulse" r="12"/><circle class="network-node" r="5"/></g>
+              <g transform="translate(625 180)"><circle class="network-node-halo" r="17"/><circle class="network-pulse pulse-delay-1" r="11"/><circle class="network-node" r="4.5"/></g>
+              <g transform="translate(650 350)"><circle class="network-node-halo" r="21"/><circle class="network-pulse pulse-delay-2" r="12"/><circle class="network-node" r="5.5"/></g>
+              <g transform="translate(570 470)"><circle class="network-node-halo" r="18"/><circle class="network-pulse pulse-delay-1" r="11"/><circle class="network-node" r="4.5"/></g>
+              <g transform="translate(390 325)"><circle class="network-node-halo" r="13"/><circle class="network-pulse pulse-delay-2" r="9"/><circle class="network-node" r="4"/></g>
+            </g>
+          </svg>
+          <figcaption><span class="regional-map-dot" aria-hidden="true"></span> Illustrative routes only. Run a free scan for returned measurements.</figcaption>
+        </figure>
+        <div class="regional-insight-panel">
+          <p class="regional-panel-kicker">What changes the experience</p>
+          <article class="regional-insight-row">
+            <span class="regional-insight-icon" aria-hidden="true"><i data-lucide="route"></i></span>
+            <div><h3>Network path</h3><p>Traffic may take different routes between ISPs, exchange points and your service.</p></div>
+          </article>
+          <article class="regional-insight-row">
+            <span class="regional-insight-icon" aria-hidden="true"><i data-lucide="cloud"></i></span>
+            <div><h3>Infrastructure location</h3><p>Origin region, DNS answers and edge coverage can affect connection and response time.</p></div>
+          </article>
+          <article class="regional-insight-row">
+            <span class="regional-insight-icon" aria-hidden="true"><i data-lucide="activity"></i></span>
+            <div><h3>Available evidence</h3><p>We show returned measurements separately from locations where a probe is unavailable.</p></div>
+          </article>
+          <div class="regional-performance-cta">
+            <p>Get a point-in-time view of your public website or API from available probes.</p>
+            <a class="btn btn-primary" href="/scan">Run a free scan <i data-lucide="arrow-right" aria-hidden="true"></i></a>
+          </div>
+        </div>
       </div>
-      <figure class="regional-image">
-        <img src="/images/Africa%20map%20latency%20image.jfif" alt="Africa at night, illustrating the continent's varied regions and connectivity needs" width="1200" height="700" loading="lazy" decoding="async">
-      </figure>
     </div>
   </section>
 
@@ -276,6 +322,7 @@
 
 
 </script>
+<script src="/js/regional-network-illustration.js?v=1" defer></script>
 <script src="/js/product-pages.js?v=1"></script>
 </body>
 </html>
