@@ -107,7 +107,7 @@
         work.setAttribute('aria-busy','false');
         setStage('completed');
         stageCopy.textContent = 'Opening the shareable report…';
-        window.location.href = '/report.html?id=' + encodeURIComponent(reportId || payload.reportId || jobId);
+        window.location.href = '/reports/' + encodeURIComponent(reportId || payload.reportId || jobId);
         return;
       }
       await new Promise(resolve => setTimeout(resolve, 2000));

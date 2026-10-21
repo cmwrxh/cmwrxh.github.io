@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0A0E17">
+<title>Scan Results | AfricaLatency</title>
+<meta name="description" content="Website performance and African network scan results from AfricaLatency.">
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg">
+<link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/brand.css?v=6">
+<link rel="stylesheet" href="/css/report-dashboard.css">
+</head>
+<body class="report-dashboard-body">
+<nav><div class="nav-inner"><a href="/" class="nav-brand brand-lockup" aria-label="AfricaLatency"><img class="brand-wordmark" src="/images/africalatency-logo-light.svg" alt="AfricaLatency" width="180" height="28"></a><ul class="nav-links"><li><a href="/scan">Run a scan</a></li><li><a href="/dashboard">Dashboard</a></li><li><a href="/login">Log in</a></li></ul></div></nav>
+<main class="rd-shell">
+<div id="rd-status" class="rd-status" role="status" aria-live="polite">Loading scan report…</div>
+<div id="rd-app" hidden>
+<header class="rd-header">
+<div><p class="rd-eyebrow">AFRICALATENCY / PERFORMANCE REPORT</p><h1>Latest Performance Report for: <span id="rd-url">—</span></h1><p class="rd-meta" id="rd-meta"></p></div>
+<div class="rd-actions"><a class="rd-button" href="/scan">Re-test page</a><button class="rd-button secondary" id="rd-pdf" type="button">Export PDF</button><button class="rd-button secondary" id="rd-share" type="button">Share link</button><button class="rd-button secondary" id="rd-compare" type="button">Compare previous</button></div>
+</header>
+<div class="rd-parameters"><span><b>Test location</b><em id="rd-location">Not reported</em></span><span><b>Device</b><em id="rd-device">Not reported</em></span><span><b>Connection profile</b><em id="rd-profile">Not reported</em></span><span><b>Browser</b><em id="rd-browser">Not reported</em></span></div>
+<section class="rd-score-grid" id="rd-scores"></section>
+<nav class="rd-tabs" aria-label="Report sections" role="tablist">
+<button role="tab" aria-selected="true" data-tab="summary">Summary</button><button role="tab" aria-selected="false" data-tab="performance">Performance</button><button role="tab" aria-selected="false" data-tab="structure">Structure</button><button role="tab" aria-selected="false" data-tab="waterfall">Waterfall Chart</button><button role="tab" aria-selected="false" data-tab="video">Video</button><button role="tab" aria-selected="false" data-tab="crux">CrUX Field Data</button><button role="tab" aria-selected="false" data-tab="history">History</button><button role="tab" aria-selected="false" data-tab="alerts">Alerts</button>
+</nav>
+<section class="rd-panel" data-panel="summary">
+<div class="rd-section-head"><div><p class="rd-eyebrow">LAB MEASUREMENTS</p><h2>Core Web Vitals</h2></div><p>Controlled Lighthouse results. Lab measurements are not the same as field data from real visitors.</p></div>
+<div id="rd-vitals" class="rd-vitals"></div>
+<div class="rd-two-col"><section><h2>Speed visualization</h2><div id="rd-filmstrip" class="rd-empty">Filmstrip frames were not returned by this scan.</div></section><section><h2>Top issues</h2><div id="rd-issues" class="rd-empty">Prioritized issue details are not available in this report payload.</div></section></div>
+<section class="rd-regional"><p class="rd-eyebrow">AFRICALATENCY REGIONAL INTELLIGENCE</p><h2>African network health</h2><div id="rd-hubs" class="rd-hub-grid"></div><div class="rd-two-col"><div><h3>ISP carrier routing & peering matrix</h3><div class="rd-empty">Carrier-by-carrier comparison requires separate measurements from identified carrier probes. This scan does not include those measurements.</div></div><div><h3>Regional route & submarine cable path</h3><div class="rd-empty">AS-path and traceroute telemetry was not returned by the current scanner.</div></div></div><div class="rd-two-col"><div><h3>Mobile throttling & data-cost emulator</h3><div id="rd-data-cost" class="rd-empty">Data payload is unavailable or no verified country-specific airtime tariff is configured. No cost estimate is shown.</div></div><div><h3>Multi-hub regional health grid</h3><p class="rd-muted">Only returned probe results are shown. Unavailable hubs are never assigned synthetic timings.</p><div id="rd-grid" class="rd-hub-grid"></div></div></div></section>
+</section>
+<section class="rd-panel" data-panel="performance" hidden><div class="rd-section-head"><div><p class="rd-eyebrow">LAB DETAIL</p><h2>Performance metrics</h2></div><p>Values and scores are displayed only when supplied by the completed scan.</p></div><div id="rd-performance"></div></section>
+<section class="rd-panel" data-panel="structure" hidden><h2>Structure audits</h2><p class="rd-muted">Audit findings from the actual Lighthouse run, when present. No audit rules are inferred from the grade.</p><div id="rd-structure"></div></section>
+<section class="rd-panel" data-panel="waterfall" hidden><h2>Request waterfall</h2><p class="rd-muted">The current worker returns resource details, not phase timing offsets. Resource rows are shown without fabricating DNS, TCP, TLS, TTFB, or download spans.</p><div id="rd-waterfall"></div></section>
+<section class="rd-panel" data-panel="video" hidden><h2>Video & filmstrip</h2><div id="rd-video" class="rd-empty">Frame-by-frame playback is unavailable because this scan did not return a video or filmstrip sequence.</div></section>
+<section class="rd-panel" data-panel="crux" hidden><h2>Chrome UX Report (CrUX) field data</h2><div class="rd-empty">CrUX API integration is not connected to this report yet. Lab data above must not be presented as real-user field data.</div></section>
+<section class="rd-panel" data-panel="history" hidden><h2>Scan history</h2><div id="rd-history" class="rd-empty">Sign in to view your saved scan history. Historical trend charts require multiple saved reports.</div></section>
+<section class="rd-panel" data-panel="alerts" hidden><h2>Performance alerts</h2><div class="rd-empty">Email and webhook alert configuration is not connected yet. No alert is active for this report.</div></section>
+<footer class="rd-footer"><span>Point-in-time measurements, not a guarantee of every visitor’s experience.</span><a href="/methodology">Measurement methodology</a></footer>
+</div></main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="/js/report-dashboard.js"></script>
+</body></html>

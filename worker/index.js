@@ -228,6 +228,40 @@ async function executeJob(job) {
   };
   const { error } = await update({ status: 'completed', stage: 'completed', progress: 100, result, completed_at: new Date().toISOString(), error_message: null });
   if (error) throw error;
+  // Materialize the completed worker result for authenticated report history.
+  // The scan_jobs record remains the execution source of truth.
+  const metrics = lighthouseResult.metrics || {};
+  const scanRow = {
+    scan_job_id: job.id,
+    public_id: job.public_id,
+    user_id: job.user_id || null,
+    target_url: job.url,
+    probe_location: process.env.TEST_LOCATION_LABEL || 'Cloud worker; African probes reported separately',
+    device_emulation: job.device === 'desktop' ? 'Desktop Chrome' : 'Mobile Chrome',
+    connection_profile: job.device === 'mobile' ? 'Lighthouse simulated mobile profile' : 'Not reported',
+    ali_grade: summary.grade || '—',
+    performance_score: summary.performance !== null && summary.performance !== undefined && summary.performance !== '' && Number.isFinite(Number(summary.performance)) ? Math.round(Number(summary.performance)) : null,
+    structure_score: summary.structure !== null && summary.structure !== undefined && summary.structure !== '' && Number.isFinite(Number(summary.structure)) ? Math.round(Number(summary.structure)) : null,
+    lcp_ms: metrics.lcpMs !== null && metrics.lcpMs !== undefined && metrics.lcpMs !== '' && Number.isFinite(Number(metrics.lcpMs)) ? Math.round(Number(metrics.lcpMs)) : null,
+    tbt_ms: metrics.tbtMs !== null && metrics.tbtMs !== undefined && metrics.tbtMs !== '' && Number.isFinite(Number(metrics.tbtMs)) ? Math.round(Number(metrics.tbtMs)) : null,
+    cls_score: metrics.cls !== null && metrics.cls !== undefined && metrics.cls !== '' && Number.isFinite(Number(metrics.cls)) ? Number(metrics.cls) : null,
+    fcp_ms: metrics.fcpMs !== null && metrics.fcpMs !== undefined && metrics.fcpMs !== '' && Number.isFinite(Number(metrics.fcpMs)) ? Math.round(Number(metrics.fcpMs)) : null,
+    speed_index_ms: metrics.speedIndexMs !== null && metrics.speedIndexMs !== undefined && metrics.speedIndexMs !== '' && Number.isFinite(Number(metrics.speedIndexMs)) ? Math.round(Number(metrics.speedIndexMs)) : null,
+    ttfb_ms: metrics.ttfbMs !== null && metrics.ttfbMs !== undefined && metrics.ttfbMs !== '' && Number.isFinite(Number(metrics.ttfbMs)) ? Math.round(Number(metrics.ttfbMs)) : null,
+    total_page_bytes: lighthouseResult.pageWeightBytes !== null && lighthouseResult.pageWeightBytes !== undefined && lighthouseResult.pageWeightBytes !== '' && Number.isFinite(Number(lighthouseResult.pageWeightBytes)) ? Math.round(Number(lighthouseResult.pageWeightBytes)) : null,
+    total_requests: lighthouseResult.requestCount !== null && lighthouseResult.requestCount !== undefined && lighthouseResult.requestCount !== '' && Number.isFinite(Number(lighthouseResult.requestCount)) ? Math.round(Number(lighthouseResult.requestCount)) : null,
+    issues_json: lighthouseResult.opportunities || [],
+    structure_audits_json: lighthouseResult.auditList || [],
+    waterfall_json: lighthouseResult.resourceDetails || [],
+    isp_hop_telemetry_json: null,
+    speed_visualization_json: null,
+    summary_json: summary,
+    full_report_json: result.fullReport,
+    africa_latency_json: result.africaLatency,
+    completed_at: new Date().toISOString()
+  };
+  const { error: reportError } = await supabase.from('scans').upsert(scanRow, { onConflict: 'scan_job_id' });
+  if (reportError) console.warn('[scan-worker] report materialization failed:', reportError.message);
 }
 
 async function processQueue() {
@@ -336,6 +370,7 @@ app.get('/internal/jobs/:id', async (req, res) => {
     if (!job.user_id) {
       const { data } = await supabase.from('scan_jobs').update({ user_id: user.id }).eq('id', job.id).is('user_id', null).select('*').maybeSingle();
       if (data) Object.assign(job, data);
+      await supabase.from('scans').update({ user_id: user.id }).eq('scan_job_id', job.id).is('user_id', null);
     }
     unlocked = job.user_id === user.id;
   }
