@@ -1,198 +1,68 @@
-/* AfricaLatency hero: continuous matte network wave grid.
-   Presentation-only animation; the map illustration below the hero remains separate. */
+/* Lightweight animated uniform dot matrix for the homepage hero. */
 (function () {
   'use strict';
-
   var section = document.querySelector('[data-africa-dot-hero]');
   var canvas = section && section.querySelector('[data-africa-dot-canvas]');
   if (!section || !canvas || !canvas.getContext) return;
-
-  var ctx = canvas.getContext('2d', { alpha: true });
+  var ctx = canvas.getContext('2d', { alpha: false });
   if (!ctx) return;
-
-  var CONFIG = {
-    spacingX: 24,
-    spacingY: 21,
-    maxDpr: 1.75,
-    maxDots: 4200,
-    radius: 1.55,
-    frameInterval: 1000 / 60,
-    waveSpeed: 0.00072,
-    waveFrequency: 0.0105,
-    reducedMotion: false
-  };
-
-  var width = 0;
-  var height = 0;
-  var dpr = 1;
-  var cols = 0;
-  var rows = 0;
-  var rafId = 0;
-  var running = false;
-  var visible = false;
-  var pageVisible = !document.hidden;
-  var reducedMotionQuery = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
-  var reducedMotion = !!(reducedMotionQuery && reducedMotionQuery.matches);
-  var lastFrame = 0;
-  var time = 0;
-  var points = [];
-
+  var CONFIG = { spacing: 18, radius: 1.5, minOpacity: 0.1, maxOpacity: 0.5, maxDpr: 2, maxDots: 10000 };
+  var width = 1, height = 1, dpr = 1, points = [], rafId = 0, running = false;
+  var visible = false, pageVisible = !document.hidden, lastTime = 0;
+  var reducedQuery = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
+  var reducedMotion = !!(reducedQuery && reducedQuery.matches);
+  function randomizeTarget(p) {
+    p.from = p.opacity;
+    p.target = CONFIG.minOpacity + Math.random() * (CONFIG.maxOpacity - CONFIG.minOpacity);
+    p.elapsed = 0; p.duration = 900 + Math.random() * 2600;
+  }
   function resize() {
     var rect = section.getBoundingClientRect();
-    width = Math.max(1, window.innerWidth);
-    height = Math.max(1, rect.height);
+    width = Math.max(1, rect.width); height = Math.max(1, rect.height);
     dpr = Math.min(window.devicePixelRatio || 1, CONFIG.maxDpr);
-
-    canvas.width = Math.round(width * dpr);
-    canvas.height = Math.round(height * dpr);
-    canvas.style.width = '100vw';
-    canvas.style.height = '100%';
+    canvas.width = Math.round(width * dpr); canvas.height = Math.round(height * dpr);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-    var spacingX = CONFIG.spacingX;
-    var spacingY = CONFIG.spacingY;
-    cols = Math.ceil(width / spacingX) + 2;
-    rows = Math.ceil(height / spacingY) + 2;
-    while (cols * rows > CONFIG.maxDots) {
-      spacingX += 2;
-      spacingY += 1;
-      cols = Math.ceil(width / spacingX) + 2;
-      rows = Math.ceil(height / spacingY) + 2;
+    var spacing = CONFIG.spacing, cols = Math.ceil(width / spacing) + 1, rows = Math.ceil(height / spacing) + 1;
+    while (cols * rows > CONFIG.maxDots) { spacing += 2; cols = Math.ceil(width / spacing) + 1; rows = Math.ceil(height / spacing) + 1; }
+    var old = points; points = [];
+    for (var y = 0; y < rows; y++) for (var x = 0; x < cols; x++) {
+      var idx = y * cols + x, prior = old[idx];
+      var p = { x: x * spacing, y: y * spacing, opacity: prior ? prior.opacity : CONFIG.minOpacity + Math.random() * (CONFIG.maxOpacity - CONFIG.minOpacity), from: 0, target: 0, elapsed: 0, duration: 1000 + Math.random() * 2500 };
+      randomizeTarget(p); points.push(p);
     }
-
-    points = new Array(cols * rows);
-    for (var row = 0; row < rows; row++) {
-      for (var col = 0; col < cols; col++) {
-        points[row * cols + col] = {
-          x: (col - 1) * spacingX,
-          y: (row - 1) * spacingY,
-          row: row,
-          col: col
-        };
-      }
-    }
-    draw(0);
+    draw();
   }
-
-  function draw(elapsed) {
-    ctx.clearRect(0, 0, width, height);
-
-    var centerY = height * 0.5;
-    var waveHeight = Math.min(38, Math.max(17, height * 0.045));
-    var secondaryHeight = waveHeight * 0.38;
-    var timePhase = elapsed * CONFIG.waveSpeed;
-
+  function draw() {
+    ctx.fillStyle = '#080d1a'; ctx.fillRect(0, 0, width, height);
     for (var i = 0; i < points.length; i++) {
-      var point = points[i];
-      var baseY = point.y;
-      var depth = (baseY - centerY) / Math.max(1, height * 0.5);
-      var perspective = 0.72 + (1 - Math.min(1, Math.abs(depth))) * 0.58;
-      var phase = point.x * CONFIG.waveFrequency + timePhase + point.row * 0.13;
-
-      var waveA = Math.sin(phase) * waveHeight;
-      var waveB = Math.sin(phase * 0.53 - timePhase * 0.72 + point.row * 0.21) * secondaryHeight;
-      var waveC = Math.cos(phase * 0.29 + timePhase * 0.4) * 7;
-      var y = centerY + (baseY - centerY) * perspective + (waveA + waveB + waveC);
-      var x = point.x + Math.sin(phase * 0.19 + point.row * 0.08) * 5;
-
-      var topFade = Math.min(1, Math.max(0, y / Math.max(1, height * 0.22)));
-      var bottomFade = Math.min(1, Math.max(0, (height - y) / Math.max(1, height * 0.22)));
-      var edgeFade = Math.min(topFade, bottomFade);
-      edgeFade = edgeFade * edgeFade * (3 - 2 * edgeFade);
-
-      var waveEnergy = (Math.sin(phase + point.row * 0.07) + 1) * 0.5;
-      var alpha = (0.11 + waveEnergy * 0.38) * edgeFade;
-      if (Math.abs(depth) > 0.92) alpha *= 0.62;
-      if (alpha < 0.025) continue;
-
-      var cyan = (point.row + point.col) % 4 === 0;
-      ctx.beginPath();
-      ctx.arc(x, y, CONFIG.radius * (0.82 + waveEnergy * 0.24), 0, Math.PI * 2);
-      ctx.fillStyle = cyan
-        ? 'rgba(0, 163, 255, ' + alpha.toFixed(3) + ')'
-        : 'rgba(59, 130, 246, ' + alpha.toFixed(3) + ')';
-      ctx.fill();
+      var p = points[i]; ctx.beginPath(); ctx.arc(p.x, p.y, CONFIG.radius, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(59, 130, 246, ' + p.opacity.toFixed(3) + ')'; ctx.fill();
     }
   }
-
   function animate(timestamp) {
     rafId = 0;
     if (!running || reducedMotion || !pageVisible || !visible) return;
-
-    if (lastFrame && timestamp - lastFrame < CONFIG.frameInterval - 1) {
-      rafId = window.requestAnimationFrame(animate);
-      return;
+    var delta = lastTime ? Math.min(50, timestamp - lastTime) : 16; lastTime = timestamp;
+    for (var i = 0; i < points.length; i++) {
+      var p = points[i]; p.elapsed += delta;
+      var t = Math.min(1, p.elapsed / p.duration), eased = t * t * (3 - 2 * t);
+      p.opacity = p.from + (p.target - p.from) * eased;
+      if (t >= 1) randomizeTarget(p);
     }
-    var delta = lastFrame ? Math.min(40, timestamp - lastFrame) : CONFIG.frameInterval;
-    lastFrame = timestamp;
-    time += delta;
-    draw(time);
-    rafId = window.requestAnimationFrame(animate);
+    draw(); rafId = window.requestAnimationFrame(animate);
   }
-
-  function start() {
-    if (running || reducedMotion || !pageVisible || !visible) return;
-    running = true;
-    lastFrame = 0;
-    rafId = window.requestAnimationFrame(animate);
-  }
-
-  function stop() {
-    running = false;
-    if (rafId) window.cancelAnimationFrame(rafId);
-    rafId = 0;
-    lastFrame = 0;
-  }
-
-  function updateMotionPreference() {
-    reducedMotion = !!(reducedMotionQuery && reducedMotionQuery.matches);
-    stop();
-    if (reducedMotion) draw(0);
-    else start();
-  }
-
+  function start() { if (running || reducedMotion || !pageVisible || !visible) return; running = true; lastTime = 0; rafId = window.requestAnimationFrame(animate); }
+  function stop() { running = false; if (rafId) window.cancelAnimationFrame(rafId); rafId = 0; lastTime = 0; }
+  function motionChanged() { reducedMotion = !!(reducedQuery && reducedQuery.matches); stop(); if (reducedMotion) draw(); else start(); }
   resize();
-
-  if ('ResizeObserver' in window) {
-    var resizeObserver = new ResizeObserver(resize);
-    resizeObserver.observe(section);
-  } else {
-    window.addEventListener('resize', resize, { passive: true });
-  }
-
+  if ('ResizeObserver' in window) { var ro = new ResizeObserver(resize); ro.observe(section); }
+  else window.addEventListener('resize', resize, { passive: true });
   if ('IntersectionObserver' in window) {
-    var intersectionObserver = new IntersectionObserver(function (entries) {
-      var entry = entries[entries.length - 1];
-      if (!entry) return;
-      visible = entry.isIntersecting;
-      if (visible) start();
-      else stop();
-    }, { threshold: 0.01 });
-    intersectionObserver.observe(section);
-  } else {
-    function checkVisibility() {
-      var rect = section.getBoundingClientRect();
-      visible = rect.bottom > 0 && rect.top < window.innerHeight;
-      if (visible) start();
-      else stop();
-    }
-    window.addEventListener('scroll', checkVisibility, { passive: true });
-    window.addEventListener('resize', checkVisibility, { passive: true });
-    checkVisibility();
-  }
-
-  document.addEventListener('visibilitychange', function () {
-    pageVisible = !document.hidden;
-    if (pageVisible) start();
-    else stop();
-  });
-
-  if (reducedMotionQuery && reducedMotionQuery.addEventListener) {
-    reducedMotionQuery.addEventListener('change', updateMotionPreference);
-  } else if (reducedMotionQuery && reducedMotionQuery.addListener) {
-    reducedMotionQuery.addListener(updateMotionPreference);
-  }
-
-  if (reducedMotion) draw(0);
-  else start();
+    var io = new IntersectionObserver(function (entries) { visible = !!(entries[entries.length - 1] && entries[entries.length - 1].isIntersecting); if (visible) start(); else stop(); }, { threshold: 0.01 });
+    io.observe(section);
+  } else { visible = true; start(); }
+  document.addEventListener('visibilitychange', function () { pageVisible = !document.hidden; if (pageVisible) start(); else stop(); });
+  if (reducedQuery && reducedQuery.addEventListener) reducedQuery.addEventListener('change', motionChanged);
+  else if (reducedQuery && reducedQuery.addListener) reducedQuery.addListener(motionChanged);
+  if (reducedMotion) draw();
 }());
