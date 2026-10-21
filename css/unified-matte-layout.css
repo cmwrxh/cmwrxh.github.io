@@ -1,0 +1,127 @@
+/* Unified matte document system — shared across marketing, audit, contact and login routes. */
+:root {
+  --bg: #0a0e17 !important;
+  --bg-elevated: #0a0e17;
+  --bg-card: transparent;
+  --border: rgba(148,163,184,.18);
+  --border-strong: rgba(148,163,184,.28);
+  --text-muted: #a3adbd;
+  --text-dim: #7e899b;
+  --al-canvas: #0a0e17;
+  --al-rule: rgba(148,163,184,.18);
+}
+html, body {
+  background: var(--al-canvas) !important;
+  color: #f3f6fb;
+}
+body::before { content: none !important; }
+main, main > section, .section, .compact-section, .hero-section,
+.contact-gradient, .contact-page-hero, .homepage-footer, .contact-footer,
+footer, .footer-inner, .login-page, .login-card {
+  background-color: var(--al-canvas) !important;
+  background-image: none !important;
+  box-shadow: none !important;
+}
+nav {
+  background: rgba(10,14,23,.96) !important;
+  border-bottom: 1px solid var(--al-rule) !important;
+  backdrop-filter: blur(14px);
+}
+.section, .compact-section, .hero-section {
+  padding-top: clamp(3.5rem, 7vw, 6rem);
+  padding-bottom: clamp(3.5rem, 7vw, 6rem);
+}
+main > section + section,
+main > .section + .section,
+main > .compact-section + .compact-section {
+  border-top: 1px solid var(--al-rule);
+}
+/* Flatten card shells while preserving layout and functional controls. */
+.card, .process-card, .process-cards .process-card,
+.tier4-home-proof-card, .product-card, .pricing-card, .price-card,
+.audit-card, .feature-card, .audience-card, .use-case-card,
+.methodology-card, .faq-item, .principle, .about-card,
+.founder-card, .login-card, .report-card, .metric-card,
+.contact-card, .contact-panel, .service-card, .service-item,
+.product-ladder-card, .who-card, .what-we-do-card,
+.value-card, .mission-card, .coverage-card, .step-card {
+  background: transparent !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+}
+.card, .process-cards .process-card, .tier4-home-proof-card,
+.product-card, .pricing-card, .price-card, .audit-card,
+.feature-card, .audience-card, .use-case-card, .methodology-card,
+.faq-item, .principle, .about-card, .founder-card, .report-card,
+.metric-card, .contact-card, .contact-panel, .service-card,
+.service-item, .product-ladder-card, .who-card, .what-we-do-card,
+.value-card, .mission-card, .coverage-card, .step-card {
+  border: 0 !important;
+  border-bottom: 1px solid var(--al-rule) !important;
+  padding: clamp(1.25rem, 2.6vw, 2rem) 0 !important;
+}
+.process-cards, .tier4-home-proof, .product-ladder, .pricing-grid,
+.audience-grid, .who-grid, .what-we-do-grid, .principles-grid,
+.methodology-grid, .faq-grid, .service-grid, .feature-grid {
+  gap: 0 !important;
+}
+.process-cards .process-card + .process-card,
+.tier4-home-proof-card + .tier4-home-proof-card {
+  border-left: 1px solid var(--al-rule) !important;
+  padding-left: clamp(1rem, 2vw, 1.75rem) !important;
+}
+.label, .editorial-number, .step-number, .eyebrow {
+  background: transparent !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]),
+select, textarea, .form-input, .contact-form input, .contact-form select,
+.contact-form textarea {
+  background: rgba(15,23,42,.52) !important;
+  border: 1px solid #293447 !important;
+  border-radius: 4px !important;
+  box-shadow: none !important;
+  color: #f3f6fb !important;
+}
+input:focus, select:focus, textarea:focus, .form-input:focus {
+  border-color: #3b82f6 !important;
+  outline: 2px solid rgba(59,130,246,.14);
+  outline-offset: 1px;
+}
+.login-page { padding-left: 20px; padding-right: 20px; }
+.login-card { width: min(460px, 100%); }
+.contact-image-form { align-items: start; gap: clamp(2rem, 5vw, 4rem); }
+.contact-support-image, .help-contact-image img {
+  border: 0 !important;
+  border-radius: 2px !important;
+  box-shadow: none !important;
+}
+.latency-collage > img { border-radius: 2px !important; border: 0 !important; }
+.latency-collage:after { border-radius: 2px !important; }
+.floating-stat { background: rgba(10,14,23,.82) !important; border-radius: 2px !important; box-shadow: none !important; }
+.homepage-footer, .contact-footer, footer {
+  border-top: 1px solid var(--al-rule) !important;
+  border-radius: 0 !important;
+}
+.homepage-footer .footer-inner, .contact-footer .footer-inner {
+  background: transparent !important;
+}
+@media (min-width: 760px) {
+  .process-cards { grid-template-columns: repeat(4, minmax(0,1fr)); }
+  .process-cards .process-card { padding: 1rem 1.25rem !important; }
+  .process-cards .process-card:first-child { padding-left: 0 !important; }
+  .tier4-home-proof { grid-template-columns: repeat(3, minmax(0,1fr)); }
+}
+@media (max-width: 759px) {
+  .process-cards, .tier4-home-proof, .product-ladder, .pricing-grid,
+  .audience-grid, .who-grid, .what-we-do-grid, .principles-grid,
+  .methodology-grid, .faq-grid, .service-grid, .feature-grid {
+    grid-template-columns: minmax(0,1fr) !important;
+  }
+  .process-cards .process-card + .process-card,
+  .tier4-home-proof-card + .tier4-home-proof-card {
+    border-left: 0 !important;
+    padding-left: 0 !important;
+  }
+}
