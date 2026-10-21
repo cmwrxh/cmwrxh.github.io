@@ -71,7 +71,7 @@ const structureAuditCatalog=[
  {id:'back-forward-cache',title:'Allow back/forward cache restoration',impact:'Low',metrics:[]},
  {id:'redirects',title:'Avoid multiple page redirects',impact:'Low',metrics:['FCP','LCP']},
  {id:'render-blocking-resources',title:'Eliminate render-blocking resources',impact:'Low',metrics:['FCP','LCP']},
- {id:'uses-long-cache-ttl',title:'Avoid enormous network payloads',impact:'Low',metrics:['LCP'],match:['total-byte-weight','network-payloads']},
+ {id:'total-byte-weight',title:'Avoid enormous network payloads',impact:'Low',metrics:['LCP'],match:['network-payloads']},
  {id:'critical-request-chains',title:'Avoid chaining critical requests',impact:'Low',metrics:['FCP','LCP']},
  {id:'non-composited-animations',title:'Avoid non-composited animations',impact:'Low',metrics:['CLS']},
  {id:'unused-css-rules',title:'Reduce unused CSS',impact:'Low',metrics:['FCP','LCP']},
