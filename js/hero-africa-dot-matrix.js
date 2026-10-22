@@ -12,7 +12,7 @@
     adaptiveFrameMs: 21,
     adaptiveAfterFrames: 24,
     adaptiveSpacingIncrease: 2,
-    colors: { dot: '50,146,224', background: '#071321', blue: '50,146,224', cyan: '79,190,245', indigo: '99,152,220', purple: '139,172,226' },
+    colors: { dot: '50,146,224', background: '#EAF5FF', blue: '50,146,224', cyan: '79,190,245', indigo: '99,152,220', purple: '139,172,226' },
     land: { baseAlpha: 0.065, baseRadius: 0.9, alphaBoost: 0.40, radiusBoost: 0.34, brightnessScale: 1, twinkleScale: 1 },
     ocean: { baseAlpha: 0.038, baseRadius: 0.8, alphaBoost: 0.28, brightnessScale: 0.85, twinkleScale: 0.95 },
     sweepSpeed: 1.8,
