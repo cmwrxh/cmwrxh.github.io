@@ -271,3 +271,75 @@ nav .nav-dropdown-menu a { color: #244761 !important; }
   .visibility-feature-card { transition: none !important; }
   .visibility-feature-card:hover { transform: none; }
 }
+
+
+/* Final homepage refinement: actual desktop navigation markup + bright blue-slate surface. */
+@media (min-width: 1025px) {
+  nav.site-header .nav-inner {
+    display: grid !important;
+    grid-template-columns: minmax(180px, 1fr) auto minmax(240px, 1fr) !important;
+    max-width: 1440px;
+    padding-left: clamp(24px, 4vw, 60px) !important;
+    padding-right: clamp(24px, 4vw, 60px) !important;
+  }
+  nav.site-header .nav-links { list-style: none; padding: 0; }
+  nav.site-header .nav-links > li { position: relative; }
+  nav.site-header .nav-links > li > a,
+  nav.site-header .nav-dropdown-trigger {
+    display: inline-flex; align-items: center; gap: 7px; padding: 10px 0;
+    border: 0; background: transparent; color: #173B59 !important;
+    font: 600 .93rem/1.2 "Plus Jakarta Sans", Inter, sans-serif;
+    cursor: pointer; text-decoration: none;
+  }
+  nav.site-header .nav-links > li > a:hover,
+  nav.site-header .nav-dropdown-trigger:hover,
+  nav.site-header .nav-links > li > a:focus-visible,
+  nav.site-header .nav-dropdown-trigger:focus-visible { color: #0879D5 !important; }
+  nav.site-header .nav-dropdown-arrow { font-size: 1.1rem; line-height: 1; }
+  nav.site-header .nav-dropdown-menu {
+    display: none; position: absolute; top: calc(100% + 6px); left: -18px; z-index: 1001;
+    min-width: 210px; padding: 8px; border-radius: 12px; background: #FFFFFF !important;
+    border: 1px solid #D4E7F7 !important; box-shadow: 0 18px 44px rgba(25,78,125,.14) !important;
+  }
+  nav.site-header .nav-dropdown:hover .nav-dropdown-menu,
+  nav.site-header .nav-dropdown:focus-within .nav-dropdown-menu,
+  nav.site-header .nav-dropdown-trigger[aria-expanded="true"] + .nav-dropdown-menu { display: grid; }
+  nav.site-header .nav-dropdown-menu a {
+    display: block; padding: 10px 12px; border-radius: 7px; color: #244761 !important;
+    font-size: .86rem; text-decoration: none;
+  }
+  nav.site-header .nav-dropdown-menu a:hover,
+  nav.site-header .nav-dropdown-menu a:focus-visible { background: #EEF7FF; color: #086AC7 !important; }
+  nav.site-header .nav-actions { gap: 20px !important; }
+  nav.site-header .nav-login { color: #173B59 !important; }
+  nav.site-header .nav-cta {
+    min-height: 44px; padding: 0 17px !important; border-radius: 9px !important;
+    background: #167FE5 !important; border-color: #167FE5 !important; color: #FFFFFF !important;
+    font: 700 .88rem/1 "Plus Jakarta Sans", Inter, sans-serif;
+  }
+}
+@media (max-width: 1024px) {
+  nav.site-header .nav-inner { display: flex !important; }
+  nav.site-header .nav-links { display: none !important; }
+  nav.site-header .nav-actions { display: flex !important; }
+}
+html, body { background-color: #EAF5FF !important; color: #173B59 !important; }
+body {
+  font-family: "Plus Jakarta Sans", Inter, ui-sans-serif, system-ui, sans-serif !important;
+  background-image: radial-gradient(ellipse at 12% 0%, rgba(50,146,224,.22), transparent 42%), radial-gradient(ellipse at 90% 20%, rgba(111,202,255,.24), transparent 40%), linear-gradient(180deg, #F7FBFF 0%, #EAF5FF 52%, #F8FCFF 100%) !important;
+}
+.hero-africa-dot-hero {
+  background: linear-gradient(145deg, #F7FBFF 0%, #E6F4FF 52%, #D7ECFF 100%) !important;
+  color: #173B59 !important;
+}
+.hero-africa-dot-hero .hero-title { color: #143452 !important; }
+.hero-africa-dot-hero .hero-subtitle, .hero-africa-dot-hero .audit-path-note { color: #496780 !important; }
+.hero-africa-dot-hero .hero-africa-title-accent { color: #167FE5 !important; }
+.hero-africa-dot-overlay { background: radial-gradient(ellipse at 60% 0%, rgba(50,146,224,.12), transparent 65%) !important; }
+#al-sitewide-dot-canvas { background: transparent !important; }
+nav.site-header { background: rgba(247,251,255,.92) !important; border-bottom: 0 !important; box-shadow: none !important; }
+nav.site-header .nav-brand .brand-wordmark { filter: brightness(0) saturate(100%) invert(17%) sepia(25%) saturate(1550%) hue-rotate(172deg) brightness(93%) contrast(95%); }
+.visibility-feature-subheading { color: #267CC0 !important; }
+@media (prefers-reduced-motion: reduce) {
+  nav.site-header *, .hero-africa-dot-hero * { scroll-behavior: auto !important; transition-duration: .01ms !important; }
+}
