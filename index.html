@@ -146,6 +146,55 @@ main::after { background-image: none !important; }
   .hero-header-section *,
   .site-header * { transition-duration: .01ms !important; }
 }
+
+/* Dark glassmorphic treatment for lower-page feature cards and conversion banners. */
+main > section:not(.hero-header-section):not(.hero-wave):not(#hero-section),
+main > section:not(.hero-header-section):not(.hero-wave):not(#hero-section) .wp-block-group,
+main > section:not(.hero-header-section):not(.hero-wave):not(#hero-section) .wp-block-columns,
+main > section:not(.hero-header-section):not(.hero-wave):not(#hero-section) .wp-block-column,
+main > section:not(.hero-header-section):not(.hero-wave):not(#hero-section) .features-cards-wrapper {
+  background-color: #0f1114 !important;
+  background-image: none !important;
+}
+
+main > section:not(.hero-header-section):not(.hero-wave):not(#hero-section) .wp-block-group.has-background,
+main > section:not(.hero-header-section):not(.hero-wave):not(#hero-section) .cta-banner-card,
+main > section:not(.hero-header-section):not(.hero-wave):not(#hero-section) .cta-banner-container,
+main > section:not(.hero-header-section):not(.hero-wave):not(#hero-section) [class*="cta"],
+main > section:not(.hero-header-section):not(.hero-wave):not(#hero-section) [class*="banner"],
+main > section:not(.hero-header-section):not(.hero-wave):not(#hero-section) .card-container,
+main > section:not(.hero-header-section):not(.hero-wave):not(#hero-section) .features-cards-wrapper > * {
+  background-color: rgba(255, 255, 255, 0.04) !important;
+  background-image: none !important;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  color: #ffffff;
+}
+
+main > section:not(.hero-header-section):not(.hero-wave):not(#hero-section) .wp-block-group.has-background h1,
+main > section:not(.hero-header-section):not(.hero-wave):not(#hero-section) .wp-block-group.has-background h2,
+main > section:not(.hero-header-section):not(.hero-wave):not(#hero-section) .wp-block-group.has-background h3,
+main > section:not(.hero-header-section):not(.hero-wave):not(#hero-section) .wp-block-group.has-background h4,
+main > section:not(.hero-header-section):not(.hero-wave):not(#hero-section) .cta-banner-card h1,
+main > section:not(.hero-header-section):not(.hero-wave):not(#hero-section) .cta-banner-card h2,
+main > section:not(.hero-header-section):not(.hero-wave):not(#hero-section) .cta-banner-card h3,
+main > section:not(.hero-header-section):not(.hero-wave):not(#hero-section) .cta-banner-container h1,
+main > section:not(.hero-header-section):not(.hero-wave):not(#hero-section) .cta-banner-container h2,
+main > section:not(.hero-header-section):not(.hero-wave):not(#hero-section) .cta-banner-container h3 {
+  color: #ffffff !important;
+}
+
+main > section:not(.hero-header-section):not(.hero-wave):not(#hero-section) .wp-block-group.has-background p,
+main > section:not(.hero-header-section):not(.hero-wave):not(#hero-section) .cta-banner-card p,
+main > section:not(.hero-header-section):not(.hero-wave):not(#hero-section) .cta-banner-container p {
+  color: #94a3b8 !important;
+}
+
+main > section:not(.hero-header-section):not(.hero-wave):not(#hero-section) .wp-block-group.has-background a,
+main > section:not(.hero-header-section):not(.hero-wave):not(#hero-section) .cta-banner-card a,
+main > section:not(.hero-header-section):not(.hero-wave):not(#hero-section) .cta-banner-container a {
+  color: #8ed5ff !important;
+}
 </style>
   <script>
     if ("serviceWorker" in navigator) {
