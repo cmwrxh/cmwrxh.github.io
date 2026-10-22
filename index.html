@@ -25,7 +25,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/marketing.css?v=7">
@@ -55,10 +55,29 @@
 </head>
 <body>
 
-<nav>
+<nav class="site-header" aria-label="Main navigation">
   <div class="nav-inner">
-    <a href="/" class="nav-brand brand-lockup" aria-label="AfricaLatency"><img class="brand-wordmark" src="/images/africalatency-logo-light.svg" alt="AfricaLatency" width="180" height="28"></a>
+    <a href="/" class="nav-brand brand-lockup" aria-label="AfricaLatency home"><img class="brand-wordmark" src="/images/africalatency-logo-light.svg" alt="AfricaLatency" width="180" height="28"></a>
+    <ul class="nav-links">
+      <li><a href="/pricing">Pricing</a></li>
+      <li class="nav-dropdown">
+        <button class="nav-dropdown-trigger" type="button" aria-expanded="false" aria-controls="resources-dropdown">Resources <span class="nav-dropdown-arrow" aria-hidden="true">⌄</span></button>
+        <div class="nav-dropdown-menu" id="resources-dropdown">
+          <a href="/tools#programmatic-scanning">Tools &amp; API docs</a>
+          <a href="/data-centers">Data centers</a>
+          <a href="/kenya">Kenya</a>
+          <a href="/nigeria">Nigeria</a>
+          <a href="/blog">Blog</a>
+          <a href="/cases">Cases</a>
+          <a href="/help-centre">Help centre</a>
+        </div>
+      </li>
+      <li><a href="/about">About</a></li>
+      <li><a href="/contact">Contact</a></li>
+    </ul>
     <div class="nav-actions">
+      <a class="nav-login" href="/login">Login</a>
+      <a class="nav-cta" href="/scan">Run a free scan</a>
       <button id="menu-toggle" class="menu-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="site-menu"><span></span><span></span></button>
     </div>
   </div>
