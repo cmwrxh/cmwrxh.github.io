@@ -74,11 +74,11 @@
   }
   function draw(ms) {
     var t = ms * 0.001;
-    ctx.fillStyle = '#050A12'; ctx.fillRect(0, 0, width, height);
+    ctx.fillStyle = '#EAF5FF'; ctx.fillRect(0, 0, width, height);
     var glow = ctx.createRadialGradient(width * .5, height * .43, 0, width * .5, height * .43, Math.max(width, height) * .78);
-    glow.addColorStop(0, 'rgba(50,146,224,.20)');
-    glow.addColorStop(.52, 'rgba(50,146,224,.085)');
-    glow.addColorStop(1, 'rgba(5,10,18,0)');
+    glow.addColorStop(0, 'rgba(50,146,224,.17)');
+    glow.addColorStop(.52, 'rgba(50,146,224,.10)');
+    glow.addColorStop(1, 'rgba(234,245,255,0)');
     ctx.fillStyle = glow; ctx.fillRect(0, 0, width, height);
     dots.forEach(function (d) {
       /* Edge-to-edge traveling blueprint wave, with brighter crests and restrained ambient dots. */
@@ -99,8 +99,8 @@
     });
     /* Soft vignette retains contrast for text and panels while keeping the wave full-bleed. */
     var vignette = ctx.createRadialGradient(width * .5, height * .45, Math.min(width, height) * .12, width * .5, height * .45, Math.max(width, height) * .76);
-    vignette.addColorStop(0, 'rgba(5,10,18,0)');
-    vignette.addColorStop(1, 'rgba(5,10,18,.58)');
+    vignette.addColorStop(0, 'rgba(234,245,255,0)');
+    vignette.addColorStop(1, 'rgba(234,245,255,.08)');
     ctx.fillStyle = vignette; ctx.fillRect(0, 0, width, height);
   }
   function animate(ms) {
