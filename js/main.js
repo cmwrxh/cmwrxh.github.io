@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (!document.querySelector('link[data-al-sitewide-canvas]')) {
     const canvasStyle = document.createElement('link');
     canvasStyle.rel = 'stylesheet';
-    canvasStyle.href = '/css/sitewide-africa-dot-matrix.css?v=1';
+    canvasStyle.href = '/css/sitewide-africa-dot-matrix.css?v=2';
     canvasStyle.setAttribute('data-al-sitewide-canvas', 'true');
     document.head.appendChild(canvasStyle);
   }
