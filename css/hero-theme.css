@@ -1,0 +1,314 @@
+/* ==========================================================================
+   AFRICALATENCY.DEV - GTmetrix-Inspired Hero & Header Theme
+   Adapted to the existing static HTML homepage. Keep the dot matrix scoped
+   to the hero; preserve the existing scan form, city rotator and mobile drawer.
+   ========================================================================== */
+
+:root {
+  --gt-bg-gradient-top: rgb(15, 17, 20);
+  --gt-bg-gradient-bottom: rgb(15, 45, 66);
+  --gt-accent-cyan: #3292e0;
+  --gt-dot-color: rgba(50, 146, 224, 0.35);
+  --gt-text-primary: #ffffff;
+  --gt-text-muted: #94a3b8;
+}
+
+html,
+body {
+  background-color: #0F1114 !important;
+  color: var(--gt-text-primary);
+}
+
+body {
+  background-image: none !important;
+  font-family: "Plus Jakarta Sans", Inter, -apple-system, BlinkMacSystemFont, sans-serif !important;
+}
+
+/* Header stays dark; the hero gradient and dots are confined to the hero. */
+nav.site-header {
+  background: #0F1114 !important;
+  border-bottom: none !important;
+  box-shadow: none !important;
+}
+
+nav.site-header .nav-inner {
+  border-bottom: none !important;
+}
+
+nav.site-header .nav-brand .brand-wordmark {
+  filter: brightness(0) invert(1) !important;
+}
+
+nav.site-header .nav-links > li > a,
+nav.site-header .nav-dropdown-trigger,
+nav.site-header .nav-login {
+  color: #e2e8f0 !important;
+  transition: color .2s ease;
+}
+
+nav.site-header .nav-links > li > a:hover,
+nav.site-header .nav-dropdown-trigger:hover,
+nav.site-header .nav-login:hover {
+  color: #fff !important;
+}
+
+nav.site-header .nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem !important;
+}
+
+nav.site-header .nav-cta {
+  background: var(--gt-accent-cyan) !important;
+  border-color: var(--gt-accent-cyan) !important;
+  color: #fff !important;
+  border-radius: 6px !important;
+  transition: background-color .2s ease, box-shadow .2s ease;
+}
+
+nav.site-header .nav-cta:hover {
+  background: #2563eb !important;
+  border-color: #2563eb !important;
+  box-shadow: 0 4px 14px rgba(50, 146, 224, .4);
+}
+
+nav.site-header .nav-dropdown-menu {
+  background: #17232D !important;
+  border: 1px solid #2B465B !important;
+}
+
+nav.site-header .nav-dropdown-menu a {
+  color: #E5F3FF !important;
+}
+
+nav.site-header .nav-dropdown-menu a:hover,
+nav.site-header .nav-dropdown-menu a:focus-visible {
+  background: #203A4D !important;
+  color: #78CBFF !important;
+}
+
+/* Full-bleed hero, with the supplied gradient direction and colors. */
+.hero-wave {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 2rem 1.5rem 5rem !important;
+  color: var(--gt-text-primary) !important;
+  background-color: var(--gt-bg-gradient-top) !important;
+  background-image: linear-gradient(
+    180deg,
+    var(--gt-bg-gradient-bottom) 0%,
+    var(--gt-bg-gradient-top) 100%
+  ) !important;
+  font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif !important;
+}
+
+.hero-wave::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: radial-gradient(var(--gt-dot-color) 1.5px, transparent 1.5px);
+  background-size: 20px 20px;
+  background-position: center center;
+  mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, #000 40%, transparent 100%);
+  -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, #000 40%, transparent 100%);
+}
+
+.hero-wave .hero-africa-dot-content,
+.hero-wave .container {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.hero-wave .hero-title,
+.hero-wave h1 {
+  color: var(--gt-text-primary) !important;
+}
+
+.hero-wave .hero-subtitle {
+  color: #D1E5F4 !important;
+}
+
+.hero-wave .audit-path-note {
+  color: var(--gt-text-muted) !important;
+}
+
+.hero-wave .hero-africa-title-accent {
+  color: var(--gt-accent-cyan) !important;
+}
+
+.hero-wave .hero-scan-form {
+  display: flex;
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 4px;
+  gap: 4px;
+  border: 1px solid rgba(255, 255, 255, .2);
+  border-radius: 8px;
+  background: rgba(15, 23, 42, .8);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .3);
+}
+
+.hero-wave .hero-scan-form input {
+  flex: 1;
+  min-width: 0;
+  padding: .8rem 1.2rem;
+  color: #fff !important;
+  background: transparent !important;
+  border: 0 !important;
+  outline: none;
+  font-size: 1rem;
+}
+
+.hero-wave .hero-scan-form input::placeholder {
+  color: #94a3b8;
+}
+
+.hero-wave .hero-scan-form .btn,
+.hero-wave .hero-scan-form button {
+  flex: 0 0 auto;
+  border: 0;
+  border-radius: 6px;
+  background: var(--gt-accent-cyan);
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color .2s ease;
+}
+
+.hero-wave .hero-scan-form .btn:hover,
+.hero-wave .hero-scan-form button:hover {
+  background: #2563eb;
+}
+
+.hero-wave .hero-sample-report-link {
+  color: #A8DDFF !important;
+}
+
+/* The legacy canvas/overlay must not create a second, competing dot pattern. */
+.hero-wave .hero-africa-dot-canvas,
+.hero-wave .hero-africa-dot-overlay {
+  display: none !important;
+}
+
+@media (min-width: 1025px) {
+  nav.site-header .menu-toggle,
+  nav.site-header .hamburger-button {
+    display: none !important;
+    visibility: hidden !important;
+  }
+}
+
+@media (max-width: 1024px) {
+  .hero-wave {
+    padding: 52px 24px 60px !important;
+  }
+
+  nav.site-header .nav-links {
+    display: none !important;
+  }
+
+  /* On mobile, keep only the brand and hamburger in the header.
+     Login and scan CTA remain available inside the existing drawer. */
+  nav.site-header .nav-actions .nav-login,
+  nav.site-header .nav-actions .nav-cta {
+    display: none !important;
+  }
+
+  nav.site-header .menu-toggle {
+    display: inline-flex !important;
+    visibility: visible !important;
+  }
+}
+
+@media (max-width: 560px) {
+  .hero-wave {
+    padding: 40px 18px 48px !important;
+  }
+
+  .hero-wave .hero-scan-form {
+    flex-direction: column;
+  }
+
+  .hero-wave .hero-scan-form input {
+    min-height: 48px;
+  }
+
+  .hero-wave .hero-scan-form .btn,
+  .hero-wave .hero-scan-form button {
+    min-height: 48px;
+    justify-content: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  nav.site-header *,
+  .hero-wave * {
+    transition-duration: .01ms !important;
+  }
+}
+
+
+/* Keep the page canvas dark below the hero; the dot pattern remains hero-only. */
+main > .section:not(.hero-wave),
+main > .regional-performance-section,
+main > .workflow-showcase,
+main > .get-started-banner-section,
+main > .pan-african-intelligence,
+main > .section-band-audit,
+main > .infrastructure-trust-section {
+  background-color: transparent !important;
+  background-image: none !important;
+  color: #E5F1FA !important;
+}
+
+main > .section:not(.hero-wave) h1,
+main > .section:not(.hero-wave) h2,
+main > .section:not(.hero-wave) h3,
+main > .regional-performance-section h2,
+main > .regional-performance-section h3,
+main > .workflow-showcase h2,
+main > .workflow-showcase h3,
+main > .get-started-banner-section h2,
+main > .pan-african-intelligence h2,
+main > .pan-african-intelligence h3,
+main > .section-band-audit h2,
+main > .section-band-audit h3,
+main > .infrastructure-trust-section h2,
+main > .infrastructure-trust-section h3 {
+  color: #F4F8FC !important;
+}
+
+main > .section:not(.hero-wave) p,
+main > .regional-performance-section p,
+main > .workflow-showcase p,
+main > .get-started-banner-section p,
+main > .pan-african-intelligence p,
+main > .section-band-audit p,
+main > .infrastructure-trust-section p {
+  color: #A9BDCD !important;
+}
+
+/* Preserve contrast for deliberately light interactive/report cards. */
+.visibility-feature-card { color: #244761; }
+.visibility-feature-card-title { color: #163A59 !important; }
+.visibility-feature-card-copy { color: #5A748A !important; }
+.visibility-report-panel,
+.get-started-banner,
+.get-started-mini-report,
+.intelligence-card {
+  color: #244761;
+}
