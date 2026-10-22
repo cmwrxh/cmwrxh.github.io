@@ -25,8 +25,25 @@
   font-size: .72rem; line-height: 1.4;
 }
 .regional-network-atmosphere .regional-insight-panel {
-  min-width: 0; padding: 0; display: block; background: transparent; border: 0; border-radius: 0; box-shadow: none;
+  min-width: 0; padding: 0; display: block; background: transparent; border: 0 !important; border-radius: 0; box-shadow: none;
 }
+.regional-network-atmosphere .regional-insight-list {
+  display: grid;
+  grid-template-rows: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  align-items: stretch;
+}
+.regional-network-atmosphere .regional-insight-row {
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  min-width: 0;
+  min-height: 100%;
+  padding: 16px !important;
+  border: 1px solid rgba(255,255,255,.08) !important;
+}
+.regional-network-atmosphere .regional-insight-row > div { width: 100%; }
+.regional-network-atmosphere .regional-insight-row:last-child { border-bottom: 1px solid rgba(255,255,255,.08) !important; }
 .regional-network-atmosphere .regional-panel-kicker {
   margin: 0 0 14px; color: #84cfff; font-size: .76rem; font-weight: 650; letter-spacing: .09em; text-transform: uppercase;
 }

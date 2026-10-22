@@ -198,10 +198,16 @@ nav.site-header .nav-dropdown-menu a:focus-visible {
   color: #A8DDFF !important;
 }
 
-/* The legacy canvas/overlay must not create a second, competing dot pattern. */
-.hero-wave .hero-africa-dot-canvas,
+/* Keep the canvas enabled; only the redundant overlay stays hidden. */
 .hero-wave .hero-africa-dot-overlay {
   display: none !important;
+}
+.hero-wave .hero-africa-dot-canvas {
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 25%, #000 80%) !important;
+  mask-image: linear-gradient(to bottom, transparent 25%, #000 80%) !important;
 }
 
 @media (min-width: 1025px) {
@@ -392,8 +398,8 @@ main > section:not(.hero-wave) {
   z-index: 1;
 }
 .hero-wave .hero-africa-dot-canvas {
-  -webkit-mask-image: linear-gradient(to bottom, transparent 20%, #000 75%) !important;
-  mask-image: linear-gradient(to bottom, transparent 20%, #000 75%) !important;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 25%, #000 80%) !important;
+  mask-image: linear-gradient(to bottom, transparent 25%, #000 80%) !important;
 }
 .hero-wave + section,
 .hero-africa-dot-hero + .regional-performance-section {
