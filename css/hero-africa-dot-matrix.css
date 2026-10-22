@@ -1,4 +1,4 @@
-/* GTmetrix-inspired black hero and static, masked dot canvas. */
+/* Animated GTmetrix-inspired black hero with a transparent, masked dot canvas. */
 .hero-africa-dot-hero,
 .hero-wave {
   position: relative;
@@ -21,8 +21,8 @@
   background: transparent !important;
   opacity: 1;
   filter: none;
-  -webkit-mask-image: linear-gradient(to bottom, transparent 20%, #000 75%);
-  mask-image: linear-gradient(to bottom, transparent 20%, #000 75%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 30%, #000 85%);
+  mask-image: linear-gradient(to bottom, transparent 30%, #000 85%);
 }
 .hero-africa-dot-overlay {
   background: transparent !important;
