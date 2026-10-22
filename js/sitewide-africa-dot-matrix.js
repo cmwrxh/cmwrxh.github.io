@@ -54,7 +54,7 @@
     }
   }
 
-  var ctx = canvas.getContext('2d', { alpha: false });
+  var ctx = canvas.getContext('2d', { alpha: true });
   if (!ctx) return;
   var dots = [], width = 0, height = 0, dpr = 1, raf = 0;
   var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -74,34 +74,38 @@
   }
   function draw(ms) {
     var t = ms * 0.001;
-    ctx.fillStyle = '#EAF5FF'; ctx.fillRect(0, 0, width, height);
-    var glow = ctx.createRadialGradient(width * .5, height * .43, 0, width * .5, height * .43, Math.max(width, height) * .78);
-    glow.addColorStop(0, 'rgba(50,146,224,.17)');
-    glow.addColorStop(.52, 'rgba(50,146,224,.10)');
-    glow.addColorStop(1, 'rgba(234,245,255,0)');
-    ctx.fillStyle = glow; ctx.fillRect(0, 0, width, height);
+    ctx.clearRect(0, 0, width, height);
+    var hero = document.querySelector('[data-africa-dot-hero], .hero-wave, .hero-africa-dot-hero');
+    if (!hero) return;
+    var rect = hero.getBoundingClientRect();
+    var left = Math.max(0, rect.left);
+    var top = Math.max(0, rect.top);
+    var right = Math.min(width, rect.right);
+    var bottom = Math.min(height, rect.bottom);
+    if (right <= left || bottom <= top) return;
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(left, top, right - left, bottom - top);
+    ctx.clip();
     dots.forEach(function (d) {
-      /* Edge-to-edge traveling blueprint wave, with brighter crests and restrained ambient dots. */
       var diagonal = d.x * .012 + d.y * .018;
       var crest = Math.pow(Math.max(0, Math.sin(diagonal - t * 1.15)), 5);
       var ripple = Math.pow(Math.max(0, Math.sin(Math.hypot(d.x - width * .48, d.y - height * .42) * .018 - t * .85)), 8);
       var shimmer = (Math.sin(d.phase + t * .6) + 1) * .5;
-      var alpha = .045 + crest * .26 + ripple * .13 + shimmer * .025;
-      var radius = .75 + crest * .65 + ripple * .3;
+      var alpha = .018 + crest * .09 + ripple * .04 + shimmer * .012;
+      var radius = .65 + crest * .45 + ripple * .2;
       ctx.beginPath();
-      ctx.fillStyle = 'rgba(50,146,224,' + Math.min(.48, alpha) + ')';
+      ctx.fillStyle = 'rgba(142,213,255,' + Math.min(.16, alpha) + ')';
       ctx.arc(d.x, d.y, radius, 0, Math.PI * 2);
       ctx.fill();
       if (crest > .82) {
-        ctx.beginPath(); ctx.fillStyle = 'rgba(50,146,224,' + (crest * .16) + ')';
-        ctx.arc(d.x, d.y, radius * 2.8, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath();
+        ctx.fillStyle = 'rgba(80,170,235,' + (crest * .045) + ')';
+        ctx.arc(d.x, d.y, radius * 2.2, 0, Math.PI * 2);
+        ctx.fill();
       }
     });
-    /* Soft vignette retains contrast for text and panels while keeping the wave full-bleed. */
-    var vignette = ctx.createRadialGradient(width * .5, height * .45, Math.min(width, height) * .12, width * .5, height * .45, Math.max(width, height) * .76);
-    vignette.addColorStop(0, 'rgba(234,245,255,0)');
-    vignette.addColorStop(1, 'rgba(234,245,255,.08)');
-    ctx.fillStyle = vignette; ctx.fillRect(0, 0, width, height);
+    ctx.restore();
   }
   function animate(ms) {
     draw(ms);
