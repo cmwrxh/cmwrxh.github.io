@@ -147,3 +147,18 @@ main, footer, .homepage-footer, .pricing-footer {
   background: linear-gradient(180deg,#12385a,#0a1a2e) !important;
   background-image: linear-gradient(180deg,#12385a,#0a1a2e) !important;
 }
+
+
+/* Keep the homepage Get Started CTA readable above shared color rules. */
+.get-started-banner .get-started-primary,
+.get-started-banner .get-started-primary span,
+.get-started-banner .get-started-primary i,
+.get-started-banner .get-started-primary svg,
+.get-started-banner .get-started-primary svg * {
+  color: #fff !important;
+}
+.get-started-banner .get-started-primary,
+.get-started-banner .get-started-primary:hover {
+  background: #2f93f5 !important;
+  border-color: #2f93f5 !important;
+}
