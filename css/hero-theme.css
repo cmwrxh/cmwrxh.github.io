@@ -260,3 +260,55 @@ nav.site-header .nav-dropdown-menu a:focus-visible {
     transition-duration: .01ms !important;
   }
 }
+
+
+/* Keep the page canvas dark below the hero; the dot pattern remains hero-only. */
+main > .section:not(.hero-wave),
+main > .regional-performance-section,
+main > .workflow-showcase,
+main > .get-started-banner-section,
+main > .pan-african-intelligence,
+main > .section-band-audit,
+main > .infrastructure-trust-section {
+  background-color: transparent !important;
+  background-image: none !important;
+  color: #E5F1FA !important;
+}
+
+main > .section:not(.hero-wave) h1,
+main > .section:not(.hero-wave) h2,
+main > .section:not(.hero-wave) h3,
+main > .regional-performance-section h2,
+main > .regional-performance-section h3,
+main > .workflow-showcase h2,
+main > .workflow-showcase h3,
+main > .get-started-banner-section h2,
+main > .pan-african-intelligence h2,
+main > .pan-african-intelligence h3,
+main > .section-band-audit h2,
+main > .section-band-audit h3,
+main > .infrastructure-trust-section h2,
+main > .infrastructure-trust-section h3 {
+  color: #F4F8FC !important;
+}
+
+main > .section:not(.hero-wave) p,
+main > .regional-performance-section p,
+main > .workflow-showcase p,
+main > .get-started-banner-section p,
+main > .pan-african-intelligence p,
+main > .section-band-audit p,
+main > .infrastructure-trust-section p {
+  color: #A9BDCD !important;
+}
+
+/* Preserve contrast for deliberately light interactive/report cards. */
+.visibility-feature-card { color: #244761; }
+.visibility-feature-card-title { color: #163A59 !important; }
+.visibility-feature-card-copy { color: #5A748A !important; }
+.visibility-report-panel,
+.get-started-banner,
+.get-started-mini-report,
+.intelligence-card {
+  color: #244761;
+}
