@@ -4,7 +4,7 @@
  */
 'use strict';
 
-const CACHE_NAME = 'africalatency-shell-v1';
+const CACHE_NAME = 'africalatency-shell-v2';
 const OFFLINE_URL = '/offline.html';
 const STATIC_EXTENSIONS = /\.(?:css|js|png|jpe?g|svg|webp|ico|woff2?|ttf|otf)$/i;
 
