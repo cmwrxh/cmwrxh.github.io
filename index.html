@@ -25,7 +25,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/marketing.css?v=7">
@@ -46,7 +46,7 @@
   <link rel="stylesheet" href="/css/pan-african-intelligence.css?v=2">
   <link rel="stylesheet" href="/css/workflow-showcase.css?v=2">
   <link rel="stylesheet" href="/css/get-started-banner.css?v=2">
-  <link rel="stylesheet" href="/css/desktop-header-canvas-fix.css?v=2">
+  <link rel="stylesheet" href="/css/desktop-header-canvas-fix.css?v=3">
   <script>
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => navigator.serviceWorker.register("/service-worker.js").catch((error) => console.warn("AfricaLatency offline support unavailable", error)));
@@ -55,10 +55,29 @@
 </head>
 <body>
 
-<nav>
+<nav class="site-header" aria-label="Main navigation">
   <div class="nav-inner">
-    <a href="/" class="nav-brand brand-lockup" aria-label="AfricaLatency"><img class="brand-wordmark" src="/images/africalatency-logo-light.svg" alt="AfricaLatency" width="180" height="28"></a>
+    <a href="/" class="nav-brand brand-lockup" aria-label="AfricaLatency home"><img class="brand-wordmark" src="/images/africalatency-logo-light.svg" alt="AfricaLatency" width="180" height="28"></a>
+    <ul class="nav-links">
+      <li><a href="/pricing">Pricing</a></li>
+      <li class="nav-dropdown">
+        <button class="nav-dropdown-trigger" type="button" aria-expanded="false" aria-controls="resources-dropdown">Resources <span class="nav-dropdown-arrow" aria-hidden="true">⌄</span></button>
+        <div class="nav-dropdown-menu" id="resources-dropdown">
+          <a href="/tools#programmatic-scanning">Tools &amp; API docs</a>
+          <a href="/data-centers">Data centers</a>
+          <a href="/kenya">Kenya</a>
+          <a href="/nigeria">Nigeria</a>
+          <a href="/blog">Blog</a>
+          <a href="/cases">Cases</a>
+          <a href="/help-centre">Help centre</a>
+        </div>
+      </li>
+      <li><a href="/about">About</a></li>
+      <li><a href="/contact">Contact</a></li>
+    </ul>
     <div class="nav-actions">
+      <a class="nav-login" href="/login">Login</a>
+      <a class="nav-cta" href="/scan">Run a free scan</a>
       <button id="menu-toggle" class="menu-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="site-menu"><span></span><span></span></button>
     </div>
   </div>
@@ -303,6 +322,34 @@
     </div>
   </section>
 
+  
+
+<section class="section section-band-audience" id="who-its-for">
+    <div class="container">
+      <div class="section-heading">
+        <div class="label">Who it's for</div>
+        <h2>Built for teams responsible for real user experience.</h2>
+      </div>
+      <div class="audience-grid">
+        <article class="audience-card"><i data-lucide="wallet-cards" aria-hidden="true"></i><h3>Fintech &amp; payments</h3><p>Investigate slow public endpoints around customer journeys without assuming the gateway is the cause.</p></article>
+        <article class="audience-card"><i data-lucide="shopping-cart" aria-hidden="true"></i><h3>E-commerce</h3><p>Compare response behavior for storefronts and APIs serving customers across multiple markets.</p></article>
+        <article class="audience-card"><i data-lucide="server" aria-hidden="true"></i><h3>SaaS &amp; API teams</h3><p>Give engineering teams regional evidence to guide the next investigation.</p></article>
+        <article class="audience-card"><i data-lucide="panels-top-left" aria-hidden="true"></i><h3>Digital agencies</h3><p>Support client conversations with observed measurements and clear limitations.</p></article>
+      </div>
+      <p class="pilot-invitation">Looking for early pilot customers? <a href="/contact">Discuss a pilot</a></p>
+
+      <div class="methodology-summary"><div><div class="label">Methodology</div><h3>Measurements first, conclusions second.</h3><p>We request measurements from available probes, compare only returned results, and distinguish observations from hypotheses. A missing result is not a slow result.</p><a href="/methodology">Read the full methodology →</a></div><div class="methodology-tags"><span>Public endpoints</span><span>Point-in-time results</span><span>Availability disclosed</span></div></div><div class="faq-section">
+        <div class="section-heading"><div class="label">FAQ</div><h2>Common questions.</h2></div>
+        <div class="faq">
+          <div class="faq-item"><button class="faq-question" type="button" aria-expanded="false"><span>Does every scan return results from all 31 countries?</span><span class="plus" aria-hidden="true">+</span></button><div class="faq-answer">No. We request measurements from up to 31 countries. Only locations with available probes return live results, and unavailable locations are excluded from performance comparisons.</div></div>
+          <div class="faq-item"><button class="faq-question" type="button" aria-expanded="false"><span>Does the standard audit inspect my database?</span><span class="plus" aria-hidden="true">+</span></button><div class="faq-answer">No. The standard audit tests public endpoints. Database internals and third-party dependencies require a separately scoped Custom Deep Dive.</div></div>
+          <div class="faq-item"><button class="faq-question" type="button" aria-expanded="false"><span>Can I start without talking to anyone?</span><span class="plus" aria-hidden="true">+</span></button><div class="faq-answer">Yes. Run the free scan or purchase the Africa Latency Audit online. Custom engagements are scoped separately.</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  
   <section class="section get-started-banner-section" aria-labelledby="get-started-banner-title">
     <div class="container">
       <div class="get-started-banner">
@@ -314,7 +361,7 @@
             <a class="get-started-primary" href="/signup">Get Started for FREE <span>No credit card required</span><i data-lucide="arrow-up-right" aria-hidden="true"></i></a>
             <a class="get-started-secondary" href="/pricing">View Plans and Pricing <i data-lucide="arrow-right" aria-hidden="true"></i></a>
           </div>
-          <p class="get-started-banner-note"><i data-lucide="shield-check" aria-hidden="true"></i> Start with a public endpoint scan. Results depend on probe availability.</p>
+          <p class="get-started-banner-note"><i data-lucide="shield-check" aria-hidden="true"></i> Free scans are point-in-time checks. Continuous monitoring and automated alerts are in development; results depend on probe availability.</p>
         </div>
         <div class="get-started-banner-visual" aria-label="Illustrative AfricaLatency regional performance card">
           <div class="get-started-banner-diamond" aria-hidden="true"></div>
@@ -342,40 +389,6 @@
           <div class="get-started-visual-caption"><i data-lucide="info" aria-hidden="true"></i> Illustration only. No live scan data is shown.</div>
         </div>
       </div>
-    </div>
-  </section>
-
-<section class="section section-band-audience" id="who-its-for">
-    <div class="container">
-      <div class="section-heading">
-        <div class="label">Who it's for</div>
-        <h2>Built for teams responsible for real user experience.</h2>
-      </div>
-      <div class="audience-grid">
-        <article class="audience-card"><i data-lucide="wallet-cards" aria-hidden="true"></i><h3>Fintech &amp; payments</h3><p>Investigate slow public endpoints around customer journeys without assuming the gateway is the cause.</p></article>
-        <article class="audience-card"><i data-lucide="shopping-cart" aria-hidden="true"></i><h3>E-commerce</h3><p>Compare response behavior for storefronts and APIs serving customers across multiple markets.</p></article>
-        <article class="audience-card"><i data-lucide="server" aria-hidden="true"></i><h3>SaaS &amp; API teams</h3><p>Give engineering teams regional evidence to guide the next investigation.</p></article>
-        <article class="audience-card"><i data-lucide="panels-top-left" aria-hidden="true"></i><h3>Digital agencies</h3><p>Support client conversations with observed measurements and clear limitations.</p></article>
-      </div>
-      <p class="pilot-invitation">Looking for early pilot customers? <a href="/contact">Discuss a pilot</a></p>
-
-      <div class="methodology-summary"><div><div class="label">Methodology</div><h3>Measurements first, conclusions second.</h3><p>We request measurements from available probes, compare only returned results, and distinguish observations from hypotheses. A missing result is not a slow result.</p><a href="/methodology">Read the full methodology →</a></div><div class="methodology-tags"><span>Public endpoints</span><span>Point-in-time results</span><span>Availability disclosed</span></div></div><div class="faq-section">
-        <div class="section-heading"><div class="label">FAQ</div><h2>Common questions.</h2></div>
-        <div class="faq">
-          <div class="faq-item"><button class="faq-question" type="button" aria-expanded="false"><span>Does every scan return results from all 31 countries?</span><span class="plus" aria-hidden="true">+</span></button><div class="faq-answer">No. We request measurements from up to 31 countries. Only locations with available probes return live results, and unavailable locations are excluded from performance comparisons.</div></div>
-          <div class="faq-item"><button class="faq-question" type="button" aria-expanded="false"><span>Does the standard audit inspect my database?</span><span class="plus" aria-hidden="true">+</span></button><div class="faq-answer">No. The standard audit tests public endpoints. Database internals and third-party dependencies require a separately scoped Custom Deep Dive.</div></div>
-          <div class="faq-item"><button class="faq-question" type="button" aria-expanded="false"><span>Can I start without talking to anyone?</span><span class="plus" aria-hidden="true">+</span></button><div class="faq-answer">Yes. Run the free scan or purchase the Africa Latency Audit online. Custom engagements are scoped separately.</div></div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="section cta-section">
-    <div class="container narrow">
-      <div class="label">Start with evidence</div>
-      <h2>Find out what your users may be experiencing.</h2>
-      <p class="section-lead">Run a free scan first, then decide whether a full audit or custom investigation is right for your team.</p>
-      <div class="btn-group"><a class="btn btn-primary" href="/scan.html">Run free scan <i data-lucide="arrow-right" aria-hidden="true"></i></a><a class="btn btn-secondary" href="/contact">Talk to AfricaLatency</a></div>
     </div>
   </section>
 </main>
@@ -434,7 +447,7 @@
 
 
 <script src="/js/sitewide-africa-dot-matrix.js?v=3" defer data-al-sitewide-canvas></script>
-<script src="/js/main.js?v=8"></script>
+<script src="/js/main.js?v=9"></script>
 <script>
   document.querySelectorAll('.faq-question').forEach(function (b) {
     b.addEventListener('click', function () {

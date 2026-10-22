@@ -1,6 +1,26 @@
 // Shared site interactions
 
 document.addEventListener('DOMContentLoaded', () => {
+  // Keep the desktop Resources dropdown keyboard and pointer accessible.
+  const resourcesToggle = document.querySelector('.nav-dropdown-trigger[aria-controls="resources-dropdown"]');
+  const resourcesMenu = document.getElementById('resources-dropdown');
+  if (resourcesToggle && resourcesMenu) {
+    const closeResources = () => resourcesToggle.setAttribute('aria-expanded', 'false');
+    resourcesToggle.addEventListener('click', (event) => {
+      event.preventDefault();
+      resourcesToggle.setAttribute('aria-expanded', resourcesToggle.getAttribute('aria-expanded') !== 'true' ? 'true' : 'false');
+    });
+    document.addEventListener('click', (event) => {
+      if (!event.target.closest('.nav-dropdown')) closeResources();
+    });
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') {
+        closeResources();
+        resourcesToggle.blur();
+      }
+    });
+    resourcesMenu.querySelectorAll('a').forEach((link) => link.addEventListener('click', closeResources));
+  }
   // Shared site-wide canvas layer. The hero animation remains an additional foreground effect.
   if (!document.querySelector('link[data-al-sitewide-canvas]')) {
     const canvasStyle = document.createElement('link');
