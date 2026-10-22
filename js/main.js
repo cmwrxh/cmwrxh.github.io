@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   if (!document.querySelector('script[data-al-sitewide-canvas]')) {
     const canvasScript = document.createElement('script');
-    canvasScript.src = '/js/sitewide-africa-dot-matrix.js?v=1';
+    canvasScript.src = '/js/sitewide-africa-dot-matrix.js?v=3';
     canvasScript.defer = true;
     canvasScript.setAttribute('data-al-sitewide-canvas', 'true');
     document.body.appendChild(canvasScript);
