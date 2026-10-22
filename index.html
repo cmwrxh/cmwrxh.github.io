@@ -43,7 +43,7 @@
   <link rel="stylesheet" href="/css/unified-matte-layout.css?v=5">
   <link rel="stylesheet" href="/css/marketing-infrastructure-banner.css?v=1">
   <link rel="stylesheet" href="/css/homepage-mobile-cleanup.css?v=1">
-  <link rel="stylesheet" href="/css/pan-african-intelligence.css?v=1">
+  <link rel="stylesheet" href="/css/pan-african-intelligence.css?v=1">\n  <link rel="stylesheet" href="/css/workflow-showcase.css?v=1">
   <script>
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => navigator.serviceWorker.register("/service-worker.js").catch((error) => console.warn("AfricaLatency offline support unavailable", error)));
@@ -212,17 +212,64 @@
     </div>
   </section>
 
-  <section class="section section-band-how">
+  <section class="section workflow-showcase" aria-labelledby="workflow-showcase-title">
     <div class="container">
-      <div class="section-heading">
-        <div class="label">How it works</div>
-        <h2>From a measurement to a practical next step.</h2>
+      <div class="workflow-intro">
+        <div class="label">The AfricaLatency workflow</div>
+        <h2 id="workflow-showcase-title">From regional measurements to clearer decisions.</h2>
+        <p>Explore how teams can measure public endpoint performance, investigate regional differences and turn returned evidence into next steps.</p>
       </div>
-      <div class="process-cards grid">
-        <article class="process-card"><h3>Measure</h3><p>Request live HTTP measurements from available African probes.</p></article>
-        <article class="process-card"><h3>Compare</h3><p>Review returned timings by location and network where evidence is available.</p></article>
-        <article class="process-card"><h3>Diagnose</h3><p>Identify likely areas for investigation and separate observed facts from hypotheses.</p></article>
-        <article class="process-card"><h3>Fix &amp; validate</h3><p>Prioritize changes, then measure again to check whether performance improved.</p></article>
+
+      <div class="workflow-tabs" role="tablist" aria-label="AfricaLatency workflow stages">
+        <button class="workflow-tab is-active" id="workflow-tab-measure" type="button" role="tab" aria-selected="true" aria-controls="workflow-panel" tabindex="0" data-workflow-tab="measure"><span>1.</span> Test &amp; Measure</button>
+        <button class="workflow-tab" id="workflow-tab-monitor" type="button" role="tab" aria-selected="false" aria-controls="workflow-panel" tabindex="-1" data-workflow-tab="monitor"><span>2.</span> Monitor &amp; Alert</button>
+        <button class="workflow-tab" id="workflow-tab-diagnose" type="button" role="tab" aria-selected="false" aria-controls="workflow-panel" tabindex="-1" data-workflow-tab="diagnose"><span>3.</span> Diagnose &amp; Compare</button>
+        <button class="workflow-tab" id="workflow-tab-reports" type="button" role="tab" aria-selected="false" aria-controls="workflow-panel" tabindex="-1" data-workflow-tab="reports"><span>4.</span> Reports &amp; API Integration</button>
+      </div>
+
+      <div class="workflow-panel" id="workflow-panel" role="tabpanel" aria-labelledby="workflow-tab-measure" tabindex="0">
+        <div class="workflow-copy" aria-live="polite">
+          <div class="workflow-eyebrow" data-workflow-eyebrow>01 / MEASURE</div>
+          <h3 data-workflow-heading>Gain complete visibility into your site's real African performance</h3>
+          <p class="workflow-subheading" data-workflow-subheading>Go beyond single global scores. Pinpoint localized latency, IXP bottlenecks, and regional network delays.</p>
+          <ul class="workflow-bullets" data-workflow-bullets>
+            <li><strong>Synthetic &amp; live probe scans:</strong> Review DNS, TCP, TLS, HTTP and TTFB timings where supported and returned by available probes.</li>
+            <li><strong>Regional context:</strong> Compare returned measurements from available locations, including Nairobi, Johannesburg, Lagos and other supported probe locations.</li>
+            <li><strong>Real user monitoring:</strong> The RUM beta can test connection telemetry on your own device; broad audience and ISP-level collection remain under validation.</li>
+            <li><strong>Browser diagnostics:</strong> Request-by-request waterfall and packet-trace views are not part of the current public scan and remain planned work.</li>
+            <li><strong>Alerts:</strong> Continuous monitoring and automated webhook, Slack or email alerts are in development.</li>
+          </ul>
+          <a class="btn btn-primary workflow-cta" href="/scan">Run a free scan <i data-lucide="arrow-right" aria-hidden="true"></i></a>
+        </div>
+
+        <div class="workflow-preview-wrap">
+          <div class="workflow-preview-backdrop" aria-hidden="true"></div>
+          <article class="workflow-report-preview" aria-label="Illustrative AfricaLatency performance report preview">
+            <div class="workflow-report-topline"><span class="workflow-report-brand"><span class="workflow-brand-mark">A</span> AfricaLatency</span><span class="workflow-sample-label">ILLUSTRATIVE PREVIEW</span></div>
+            <div class="workflow-report-title">
+              <div><div class="workflow-report-kicker" data-report-kicker>PERFORMANCE AUDIT PREVIEW</div><h4>Latest Performance Audit for:</h4><p class="workflow-report-url">https://yourwebsite.com</p></div>
+              <span class="workflow-report-icon" aria-hidden="true"><i data-lucide="external-link"></i></span>
+            </div>
+            <div class="workflow-report-meta"><span><i data-lucide="calendar-clock" aria-hidden="true"></i> Scan time: Oct 2026 (example)</span><span><i data-lucide="map-pin" aria-hidden="true"></i> Primary probe: Nairobi (NIXP, illustrative)</span><span><i data-lucide="monitor-smartphone" aria-hidden="true"></i> Agent: Chrome Mobile / Desktop (example)</span></div>
+            <div class="workflow-metric-grid">
+              <div class="workflow-metric-card"><span class="workflow-metric-label">Example grade</span><div class="workflow-grade-row"><span class="workflow-grade">A</span><strong>98%</strong></div><small>Illustrative only</small></div>
+              <div class="workflow-metric-card"><span class="workflow-metric-label">Example TTFB</span><strong class="workflow-metric-main">240<span>ms</span></strong><small>Global average (example)</small><div class="workflow-metric-secondary">Local probe: 42 ms <em>(example)</em></div></div>
+              <div class="workflow-metric-card"><span class="workflow-metric-label">Browser vitals</span><strong class="workflow-vitals-main">LCP 1.2s</strong><small>FID 14ms · CLS 0.01</small><small class="workflow-metric-note">Sample values, not measured results</small></div>
+            </div>
+            <div class="workflow-waterfall-panel">
+              <div class="workflow-waterfall-heading"><div><strong>Regional request timing</strong><span>Illustrative visual · no live data</span></div><span class="workflow-live-indicator"><i></i> PREVIEW</span></div>
+              <div class="workflow-chart-legend"><span><i class="legend-nairobi"></i>Nairobi</span><span><i class="legend-johannesburg"></i>Johannesburg</span><span><i class="legend-lagos"></i>Lagos</span></div>
+              <div class="workflow-waterfall-grid" aria-label="Illustrative request timing bars for three regions">
+                <div class="workflow-waterfall-row"><span>Nairobi</span><div class="workflow-waterfall-track"><i class="workflow-bar bar-nairobi bar-one"></i><i class="workflow-bar bar-nairobi bar-two"></i><i class="workflow-bar bar-nairobi bar-three"></i></div><small>example</small></div>
+                <div class="workflow-waterfall-row"><span>Johannesburg</span><div class="workflow-waterfall-track"><i class="workflow-bar bar-johannesburg bar-one"></i><i class="workflow-bar bar-johannesburg bar-two"></i><i class="workflow-bar bar-johannesburg bar-three"></i></div><small>example</small></div>
+                <div class="workflow-waterfall-row"><span>Lagos</span><div class="workflow-waterfall-track"><i class="workflow-bar bar-lagos bar-one"></i><i class="workflow-bar bar-lagos bar-two"></i><i class="workflow-bar bar-lagos bar-three"></i></div><small>example</small></div>
+              </div>
+              <div class="workflow-time-axis"><span>0 ms</span><span>250 ms</span><span>500 ms</span><span>750 ms</span><span>1,000 ms</span></div>
+            </div>
+            <div class="workflow-report-footnote"><i data-lucide="info" aria-hidden="true"></i> All scores, timings and browser-vitals values above are illustrative placeholders, not an actual scan. Real report fields depend on available probe and browser data.</div>
+          </article>
+          <p class="workflow-preview-caption">Report-style preview · values are examples only</p>
+        </div>
       </div>
     </div>
   </section>
@@ -400,5 +447,5 @@
 <script src="/js/hero-africa-dot-matrix.js?v=4" defer></script>
 <script src="/js/product-pages.js?v=1"></script>
   <script src="/js/marketing-infrastructure-banner.js?v=1" defer></script>
-</body>
+  <script src="/js/workflow-showcase.js?v=1" defer></script>\n</body>
 </html>
