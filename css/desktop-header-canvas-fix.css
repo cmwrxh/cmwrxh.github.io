@@ -343,3 +343,96 @@ nav.site-header .nav-brand .brand-wordmark { filter: brightness(0) saturate(100%
 @media (prefers-reduced-motion: reduce) {
   nav.site-header *, .hero-africa-dot-hero * { scroll-behavior: auto !important; transition-duration: .01ms !important; }
 }
+
+
+/* Master homepage specification: exact dark GTmetrix-inspired hero gradient. */
+.hero-wave {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  box-sizing: border-box;
+  position: relative;
+  overflow: hidden;
+  background-color: rgba(0, 0, 0, 0) !important;
+  background-image: linear-gradient(0deg, rgb(15, 45, 66) 0%, rgb(15, 17, 20) 100%) !important;
+  background-attachment: scroll;
+  background-clip: border-box;
+  background-origin: padding-box;
+  background-position: 0% 0%;
+  background-repeat: repeat;
+  background-size: auto;
+  font-family: var(--wp--preset--font-family--plus-jakarta-sans, "Plus Jakarta Sans"), sans-serif !important;
+  font-weight: 300;
+  letter-spacing: -0.1px;
+  color: rgb(255, 255, 255) !important;
+  padding-top: var(--wp--preset--spacing--60, 63px) !important;
+  padding-bottom: var(--wp--preset--spacing--80, 90px) !important;
+  padding-left: var(--wp--preset--spacing--50, 45px) !important;
+  padding-right: var(--wp--preset--spacing--50, 45px) !important;
+  width: 100%;
+  max-width: var(--wp--style--global--wide-size, 1500px);
+  margin-left: auto;
+  margin-right: auto;
+}
+.hero-wave .hero-africa-dot-content,
+.hero-wave .container {
+  width: 100%;
+  max-width: 1320px;
+  position: relative;
+  z-index: 2;
+}
+.hero-wave .hero-title,
+.hero-wave h1 { color: #FFFFFF !important; }
+.hero-wave .hero-subtitle,
+.hero-wave .audit-path-note { color: #D1E5F4 !important; }
+.hero-wave .hero-africa-title-accent { color: #6CCBFF !important; }
+.hero-wave .hero-scan-form input {
+  color: #173B59;
+  background: #FFFFFF;
+  border-color: rgba(255,255,255,.5);
+}
+.hero-wave .hero-sample-report-link { color: #A8DDFF !important; }
+.hero-wave .hero-africa-dot-overlay {
+  background: radial-gradient(ellipse at 72% 8%, rgba(67,169,232,.16), transparent 58%) !important;
+  pointer-events: none;
+}
+.hero-wave .hero-africa-dot-canvas { opacity: .28; pointer-events: none; }
+
+@media (min-width: 1025px) {
+  nav.site-header { background: #0F1114 !important; border-bottom: 0 !important; box-shadow: none !important; }
+  nav.site-header .nav-brand .brand-wordmark {
+    filter: brightness(0) invert(1) !important;
+  }
+  nav.site-header .nav-links > li > a,
+  nav.site-header .nav-dropdown-trigger,
+  nav.site-header .nav-login { color: #F4F8FC !important; }
+  nav.site-header .nav-links > li > a:hover,
+  nav.site-header .nav-dropdown-trigger:hover,
+  nav.site-header .nav-login:hover { color: #78CBFF !important; }
+  nav.site-header .nav-dropdown-menu { background: #17232D !important; border-color: #2B465B !important; }
+  nav.site-header .nav-dropdown-menu a { color: #E5F3FF !important; }
+  nav.site-header .nav-dropdown-menu a:hover,
+  nav.site-header .nav-dropdown-menu a:focus-visible { background: #203A4D !important; color: #78CBFF !important; }
+  nav.site-header .menu-toggle { display: none !important; visibility: hidden !important; }
+  nav.site-header .nav-inner { border-bottom: 0 !important; }
+}
+@media (max-width: 1024px) {
+  .hero-wave {
+    padding-top: 52px !important;
+    padding-bottom: 60px !important;
+    padding-left: 24px !important;
+    padding-right: 24px !important;
+    max-width: none;
+  }
+  nav.site-header { background: #0F1114 !important; border-bottom: 0 !important; box-shadow: none !important; }
+  nav.site-header .nav-brand .brand-wordmark { filter: brightness(0) invert(1) !important; }
+  nav.site-header .nav-login { color: #FFFFFF !important; }
+}
+@media (max-width: 560px) {
+  .hero-wave {
+    padding-top: 40px !important;
+    padding-bottom: 48px !important;
+    padding-left: 18px !important;
+    padding-right: 18px !important;
+  }
+}
