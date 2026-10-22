@@ -48,6 +48,96 @@
   <link rel="stylesheet" href="/css/get-started-banner.css?v=2">
   <link rel="stylesheet" href="/css/desktop-header-canvas-fix.css?v=4">
   <link rel="stylesheet" href="/css/hero-theme.css?v=2">
+  <style id="africa-latency-theme-override">
+/* Emergency inline theme override: keep this in the root homepage template. */
+  html,
+  body {
+    background: #0f1114 !important;
+    background-image: none !important;
+    color: #e5f1fa;
+  }
+
+  body { min-height: 100%; }
+
+  nav.site-header,
+  header.site-header,
+  .site-header {
+    background: #0f1114 !important;
+    background-image: none !important;
+    border-bottom: 0 !important;
+    box-shadow: none !important;
+  }
+
+  main > .hero-wave,
+  main > .hero-header-section,
+  main > #hero-section {
+    position: relative !important;
+    isolation: isolate;
+    background-color: #0f1114 !important;
+    background-image: linear-gradient(180deg, #0f2d42 0%, #0f1114 100%) !important;
+  }
+
+  main > .hero-wave::before,
+  main > .hero-header-section::before,
+  main > #hero-section::before {
+    content: "" !important;
+    position: absolute !important;
+    inset: 0 !important;
+    pointer-events: none !important;
+    z-index: 0 !important;
+    background-image: radial-gradient(rgba(50, 146, 224, 0.4) 1.5px, transparent 1.5px) !important;
+    background-size: 20px 20px !important;
+    mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, #000 40%, transparent 100%) !important;
+    -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, #000 40%, transparent 100%) !important;
+  }
+
+  main > .hero-wave > *,
+  main > .hero-header-section > *,
+  main > #hero-section > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  main > section:not(.hero-wave):not(.hero-header-section):not(#hero-section),
+  footer.homepage-footer {
+    background-color: #0f1114 !important;
+    background-image: none !important;
+    color: #e5f1fa;
+  }
+
+  main > section:not(.hero-wave):not(.hero-header-section):not(#hero-section) h1,
+  main > section:not(.hero-wave):not(.hero-header-section):not(#hero-section) h2,
+  main > section:not(.hero-wave):not(.hero-header-section):not(#hero-section) h3,
+  main > section:not(.hero-wave):not(.hero-header-section):not(#hero-section) h4,
+  main > section:not(.hero-wave):not(.hero-header-section):not(#hero-section) p,
+  footer.homepage-footer h3,
+  footer.homepage-footer h4,
+  footer.homepage-footer p {
+    color: #e5f1fa;
+  }
+
+  main > section:not(.hero-wave):not(.hero-header-section):not(#hero-section) a,
+  footer.homepage-footer a {
+    color: #8ed5ff;
+  }
+
+  .hero-wave .hero-title,
+  .hero-wave h1 { color: #fff !important; }
+
+  .hero-wave .hero-subtitle { color: #d1e5f4 !important; }
+
+  .hero-wave .audit-path-note { color: #94a3b8 !important; }
+
+  body::before,
+  body::after,
+  main::before,
+  main::after { background-image: none !important; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-wave *,
+    .site-header * { transition-duration: .01ms !important; }
+  }
+  </style>
   <script>
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => navigator.serviceWorker.register("/service-worker.js").catch((error) => console.warn("AfricaLatency offline support unavailable", error)));
