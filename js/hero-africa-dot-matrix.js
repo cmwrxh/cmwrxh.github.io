@@ -164,7 +164,7 @@
       var alpha = dot.baseAlpha + brightness * alphaBoost;
       /* Radial fade keeps the dot field delicate at its outer edges. */
       var radialDistance = Math.sqrt(Math.pow((dot.x - width * 0.5) / Math.max(1, width * 0.5), 2) + Math.pow((dot.y - height * 0.5) / Math.max(1, height * 0.5), 2));
-      var edgeFade = Math.max(0, Math.min(1, (1.18 - radialDistance) / 0.52));
+      var edgeFade = 1; // Full-bleed wave: keep the dot field visible to both viewport edges.
       alpha *= edgeFade;
       var radius = dot.baseRadius + (dot.land ? brightness * CONFIG.land.radiusBoost : 0);
       if (dot.land && brightness > CONFIG.haloThreshold) {
