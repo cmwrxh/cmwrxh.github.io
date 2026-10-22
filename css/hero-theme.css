@@ -206,8 +206,8 @@ nav.site-header .nav-dropdown-menu a:focus-visible {
   display: block !important;
   opacity: 1 !important;
   visibility: visible !important;
-  -webkit-mask-image: linear-gradient(to bottom, transparent 25%, #000 80%) !important;
-  mask-image: linear-gradient(to bottom, transparent 25%, #000 80%) !important;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 30%, #000 85%) !important;
+  mask-image: linear-gradient(to bottom, transparent 30%, #000 85%) !important;
 }
 
 @media (min-width: 1025px) {
@@ -398,8 +398,8 @@ main > section:not(.hero-wave) {
   z-index: 1;
 }
 .hero-wave .hero-africa-dot-canvas {
-  -webkit-mask-image: linear-gradient(to bottom, transparent 25%, #000 80%) !important;
-  mask-image: linear-gradient(to bottom, transparent 25%, #000 80%) !important;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 30%, #000 85%) !important;
+  mask-image: linear-gradient(to bottom, transparent 30%, #000 85%) !important;
 }
 .hero-wave + section,
 .hero-africa-dot-hero + .regional-performance-section {
