@@ -43,7 +43,7 @@
   <link rel="stylesheet" href="/css/unified-matte-layout.css?v=5">
   <link rel="stylesheet" href="/css/marketing-infrastructure-banner.css?v=1">
   <link rel="stylesheet" href="/css/homepage-mobile-cleanup.css?v=1">
-  <link rel="stylesheet" href="/css/pan-african-intelligence.css?v=1">\n  <link rel="stylesheet" href="/css/workflow-showcase.css?v=1">
+  <link rel="stylesheet" href="/css/pan-african-intelligence.css?v=1">\n  <link rel="stylesheet" href="/css/workflow-showcase.css?v=1">\n  <link rel="stylesheet" href="/css/get-started-banner.css?v=1">
   <script>
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => navigator.serviceWorker.register("/service-worker.js").catch((error) => console.warn("AfricaLatency offline support unavailable", error)));
@@ -311,7 +311,47 @@
     </div>
   </section>
 
-  <section class="section pricing-band" id="pricing"><div class="container"><div class="section-heading"><div class="label">Our product ladder</div><h2>Start with a snapshot. Build toward continuous visibility.</h2><p class="section-lead">Choose the smallest useful step. Monitoring is planned and currently accepting waitlist interest.</p></div><div class="currency-switch" role="group" aria-label="Display currency"><span>Display:</span><button type="button" data-currency="KES" aria-pressed="true">KES</button><button type="button" data-currency="USD" aria-pressed="false">USD</button></div><div class="product-grid"><article class="product-card"><h3>Free Scan</h3><p class="product-price" data-kes="KES 0" data-usd="$0">KES 0</p><p>A point-in-time view of public HTTP response timing from available probes.</p><a class="btn btn-secondary" href="/scan">Run free scan</a></article><article class="product-card product-card-featured"><h3>Africa Latency Audit</h3><p class="product-price" data-kes="KES 3,500 · one-time" data-usd="$27 · one-time">KES 3,500 · one-time</p><p>A structured report with observed timings, interpretation and prioritized next steps.</p><a class="btn btn-primary" href="/audit-checkout">View audit</a></article><article class="product-card"><h3>Continuous Monitoring</h3><p class="product-price" data-kes="Pilot pricing to be confirmed" data-usd="Pilot access">Pilot pricing to be confirmed</p><p>Planned recurring visibility and reporting. Scope and delivery are being validated.</p><a class="btn btn-secondary" href="/monitoring">Join waitlist</a></article><article class="product-card"><h3>Custom Deep Dive</h3><p class="product-price" data-kes="From KES 25,000" data-usd="From $195">From KES 25,000</p><p>Manual scoping for broader endpoint coverage, architecture review or authorized deeper investigation.</p><a class="btn btn-secondary" href="/contact">Discuss scope</a></article></div><p class="pricing-note">USD prices are approximate and billed in KES until Paystack USD payments are confirmed. The automated audit tests public endpoints only. Private databases, internal services and third-party dependencies require separate authorization and scope. Results depend on available probes.</p></div></section>
+  <section class="section get-started-banner-section" aria-labelledby="get-started-banner-title">
+    <div class="container">
+      <div class="get-started-banner">
+        <div class="get-started-banner-copy">
+          <div class="get-started-banner-eyebrow"><span aria-hidden="true"></span> Your next performance insight starts here</div>
+          <h2 id="get-started-banner-title">Get Started with AfricaLatency</h2>
+          <p>Test your endpoints across African edge probes, monitor TTFB &amp; uptime, receive instant latency alerts, and optimize local site performance.</p>
+          <div class="get-started-banner-actions">
+            <a class="get-started-primary" href="/signup">Get Started for FREE <span>No credit card required</span><i data-lucide="arrow-up-right" aria-hidden="true"></i></a>
+            <a class="get-started-secondary" href="/pricing">View Plans and Pricing <i data-lucide="arrow-right" aria-hidden="true"></i></a>
+          </div>
+          <p class="get-started-banner-note"><i data-lucide="shield-check" aria-hidden="true"></i> Start with a public endpoint scan. Results depend on probe availability.</p>
+        </div>
+        <div class="get-started-banner-visual" aria-label="Illustrative AfricaLatency regional performance card">
+          <div class="get-started-banner-diamond" aria-hidden="true"></div>
+          <div class="get-started-banner-dots" aria-hidden="true"></div>
+          <div class="get-started-mini-report">
+            <div class="get-started-mini-report-top">
+              <span class="get-started-mini-brand"><span class="get-started-mini-logo">A</span> AfricaLatency</span>
+              <span class="get-started-example-tag">EXAMPLE UI</span>
+            </div>
+            <div class="get-started-url-row">
+              <span class="get-started-url-icon"><i data-lucide="globe-2" aria-hidden="true"></i></span>
+              <div class="get-started-url-copy"><span>Target endpoint</span><strong>https://yourwebsite.com</strong></div>
+            </div>
+            <div class="get-started-node-status"><span class="get-started-status-dot"></span><strong>Node preview: Nairobi</strong><span>Illustrative</span></div>
+            <div class="get-started-latency-title"><span>Regional response phases</span><span>Example timings</span></div>
+            <div class="get-started-latency-bars" aria-label="Illustrative latency timing bars, not live measurements">
+              <div class="get-started-latency-row"><span>DNS lookup</span><div class="get-started-latency-track"><i class="latency-cyan"></i></div><strong>8 ms</strong></div>
+              <div class="get-started-latency-row"><span>TCP connect</span><div class="get-started-latency-track"><i class="latency-green"></i></div><strong>12 ms</strong></div>
+              <div class="get-started-latency-row"><span>TLS setup</span><div class="get-started-latency-track"><i class="latency-yellow"></i></div><strong>19 ms</strong></div>
+              <div class="get-started-latency-row"><span>First byte</span><div class="get-started-latency-track"><i class="latency-blue"></i></div><strong>28 ms</strong></div>
+            </div>
+            <div class="get-started-report-foot"><span><i data-lucide="activity" aria-hidden="true"></i> Regional probe preview</span><span>Sample values only</span></div>
+          </div>
+          <div class="get-started-floating-metric"><span class="get-started-floating-icon">↯</span><span><strong>28 ms TTFB</strong><small>Illustrative example, not live data</small></span></div>
+          <div class="get-started-visual-caption"><i data-lucide="info" aria-hidden="true"></i> Illustration only. No live scan data is shown.</div>
+        </div>
+      </div>
+    </div>
+  </section>
 
 <section class="section section-band-audience" id="who-its-for">
     <div class="container">
