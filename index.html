@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
   <title>AfricaLatency — Infrastructure Performance &amp; Latency Intelligence</title>
   <meta name="description" content="AfricaLatency measures the real-world performance of applications, APIs and infrastructure across African networks.">
-  <meta name="theme-color" content="#EAF5FF">
+  <meta name="theme-color" content="#0F1114">
   <link rel="manifest" href="/manifest.json">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -46,7 +46,7 @@
   <link rel="stylesheet" href="/css/pan-african-intelligence.css?v=2">
   <link rel="stylesheet" href="/css/workflow-showcase.css?v=2">
   <link rel="stylesheet" href="/css/get-started-banner.css?v=2">
-  <link rel="stylesheet" href="/css/desktop-header-canvas-fix.css?v=3">
+  <link rel="stylesheet" href="/css/desktop-header-canvas-fix.css?v=4">
   <script>
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => navigator.serviceWorker.register("/service-worker.js").catch((error) => console.warn("AfricaLatency offline support unavailable", error)));
@@ -125,7 +125,7 @@
 </div>
 
 <main>
-  <section class="section hero-highlight hero-africa-dot-hero" data-africa-dot-hero>
+  <section class="section hero-highlight hero-africa-dot-hero hero-wave" data-africa-dot-hero>
     <canvas class="hero-africa-dot-canvas" data-africa-dot-canvas aria-hidden="true"></canvas>
     <div class="hero-africa-dot-overlay" aria-hidden="true"></div>
     <div class="container hero-africa-dot-content">
@@ -142,64 +142,6 @@
           <div class="hero-support-links"><a class="hero-sample-report-link" href="/sample-report">See sample report</a></div>
           <p class="audit-path-note">Free public-endpoint snapshot. For a structured audit, start at KES 3,500.</p>
         </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="section pan-african-intelligence" aria-labelledby="pan-african-intelligence-title">
-    <div class="container">
-      <div class="intelligence-heading">
-        <div>
-          <div class="label">Deep insights, grounded in local evidence</div>
-          <h2 id="pan-african-intelligence-title">African Network Intelligence to Measure &amp; Optimize Local Latency</h2>
-        </div>
-        <div class="intelligence-heading-copy">
-          <p>Go beyond generic global averages. Analyze public website and API response behavior directly from live probes positioned across major African network exchanges. Results depend on probe availability and the measurements each probe returns.</p>
-          <a class="btn btn-primary" href="/scan">Get Started Free <i data-lucide="arrow-right" aria-hidden="true"></i></a>
-          <p style="margin:10px 0 0;font-size:.82rem;color:#7f91a8">No credit card required for a free scan.</p>
-        </div>
-      </div>
-
-      <div class="intelligence-grid">
-        <article class="intelligence-card">
-          <div class="intelligence-icon" aria-hidden="true"><i data-lucide="gauge"></i></div>
-          <h3>Web Vitals &amp; Regional Metrics</h3>
-          <p>Use regional response measurements to investigate performance issues that can affect customer experience and retention. Core Web Vitals require browser-based field or lab data and are not inferred from HTTP timing alone.</p>
-        </article>
-
-        <article class="intelligence-card">
-          <div class="intelligence-icon" aria-hidden="true"><i data-lucide="server-cog"></i></div>
-          <h3>Advanced Edge Probing</h3>
-          <p>Compare public endpoint behavior across available probe locations. HTTP timing, status, DNS, TLS and network-path details are shown where the selected probe supports and returns them.</p>
-        </article>
-
-        <article class="intelligence-card">
-          <div class="intelligence-icon" aria-hidden="true"><i data-lucide="bell-ring"></i></div>
-          <h3>Automated Uptime &amp; Latency Alerts</h3>
-          <p>Recurring synthetic checks, webhook delivery and instant email alerts are planned for the continuous-monitoring release. Join the waitlist while this capability is being developed.</p>
-          <span class="feature-status">In development</span>
-        </article>
-
-        <article class="intelligence-card">
-          <div class="intelligence-icon" aria-hidden="true"><i data-lucide="chart-no-axes-combined"></i></div>
-          <h3>Detailed Waterfall Breakdown</h3>
-          <p>Request-by-request browser waterfall analysis is not yet available in the current public scan. Today’s reports focus on measurements actually returned by probes, with expanded asset-level diagnostics planned.</p>
-          <span class="feature-status">Coming soon</span>
-        </article>
-
-        <article class="intelligence-card">
-          <div class="intelligence-icon" aria-hidden="true"><i data-lucide="network"></i></div>
-          <h3>Real-World Audience Telemetry</h3>
-          <p>Explore the Real User Monitoring beta to test browser connection telemetry on your own device. Broader audience collection and aggregated ISP-level insights are still being validated.</p>
-          <span class="feature-status">Beta</span>
-        </article>
-
-        <article class="intelligence-card">
-          <div class="intelligence-icon" aria-hidden="true"><i data-lucide="globe"></i></div>
-          <h3>African Testing Network</h3>
-          <p>Request measurements across a network designed for up to 31 African countries. Each scan reports live results only for locations with available probes, so coverage can vary by run.</p>
-          <a class="feature-status" href="/methodology" style="text-decoration:none">Coverage &amp; methodology</a>
-        </article>
       </div>
     </div>
   </section>
@@ -356,7 +298,7 @@
         <div class="get-started-banner-copy">
           <div class="get-started-banner-eyebrow"><span aria-hidden="true"></span> Your next performance insight starts here</div>
           <h2 id="get-started-banner-title">Get Started with AfricaLatency</h2>
-          <p>Test your endpoints across African edge probes, monitor TTFB &amp; uptime, receive instant latency alerts, and optimize local site performance.</p>
+          <p>Test your endpoints across available African edge probes, inspect TTFB and response timings, and identify where local performance needs attention. Continuous monitoring and automated alerts are in development.</p>
           <div class="get-started-banner-actions">
             <a class="get-started-primary" href="/signup">Get Started for FREE <span>No credit card required</span><i data-lucide="arrow-up-right" aria-hidden="true"></i></a>
             <a class="get-started-secondary" href="/pricing">View Plans and Pricing <i data-lucide="arrow-right" aria-hidden="true"></i></a>
