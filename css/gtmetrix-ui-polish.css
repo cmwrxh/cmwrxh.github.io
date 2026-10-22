@@ -1,0 +1,102 @@
+/* Shared GTmetrix-inspired polish: crisp blue accents, consistent page rhythm, no header divider. */
+html, body { background: #050A12 !important; }
+body { isolation: isolate; }
+#al-sitewide-dot-canvas {
+  position: fixed; inset: 0; z-index: -1; width: 100vw; height: 100vh;
+  display: block; pointer-events: none; background: #050A12;
+}
+main, main > section, .section, .hero-section, footer, .homepage-footer,
+.contact-gradient, .contact-page-hero, .login-page, .pricing-main,
+.included-section, .pricing-heading {
+  background-color: transparent !important;
+  background-image: none !important;
+}
+/* Marketing header: logo, Pricing, Resources, About, Contact, Login, CTA. */
+body nav, body .pricing-nav, body header.site-header {
+  border-bottom: 0 !important; box-shadow: none !important;
+}
+body nav::after, body .pricing-nav::after { display: none !important; }
+body nav .nav-inner {
+  width: min(100% - 48px, 1280px) !important; max-width: 1280px !important;
+  min-height: 76px; margin-inline: auto; gap: clamp(16px, 2vw, 30px);
+  border-bottom: 0 !important;
+}
+body nav .nav-brand { flex: 0 0 auto; }
+body nav .nav-links { flex: 1 1 auto; justify-content: flex-start; gap: clamp(14px, 1.8vw, 25px); }
+body nav .nav-actions { flex: 0 0 auto; display: flex; align-items: center; gap: 12px; margin-left: auto; }
+body nav .nav-links > li > a,
+body nav .nav-links .nav-dropdown-trigger { color: #E8F1FF; font-size: .92rem; font-weight: 500; }
+body nav .nav-links > li > a:hover,
+body nav .nav-links .nav-dropdown-trigger:hover { color: #3292E0; }
+body nav .nav-cta, body nav .btn-primary {
+  background: #007BFF !important; border-color: #007BFF !important;
+  color: #fff !important; box-shadow: 0 5px 20px rgba(0,123,255,.2);
+}
+body nav .nav-cta:hover { background: #3292E0 !important; border-color: #3292E0 !important; }
+body nav .menu-toggle, body nav #menu-toggle { display: none !important; }
+body nav .nav-dropdown-menu { background: #0B1422; border-color: rgba(74,161,255,.22); }
+body nav .nav-dropdown-menu::before { background: #0B1422; border-color: rgba(74,161,255,.22); }
+body nav .nav-dropdown-menu a:hover, body nav .nav-dropdown-menu a:focus-visible {
+  background: rgba(0,123,255,.12); color: #fff;
+}
+/* Page width, hierarchy and vertical rhythm. */
+main > .container, main > section > .container, .pricing-main, .page-container,
+.dashboard-container, .reports-container {
+  width: min(100% - 48px, 1280px); max-width: 1280px; margin-inline: auto;
+}
+.hero-africa-dot-hero { min-height: 0; padding-top: clamp(40px, 5vw, 68px) !important; padding-bottom: clamp(42px, 5vw, 68px) !important; }
+.hero-africa-dot-content { padding-top: 0 !important; padding-bottom: 0 !important; }
+.hero-title { margin-top: 0 !important; margin-bottom: 16px !important; }
+.hero-subtitle { margin-top: 0 !important; margin-bottom: 20px !important; }
+.hero-scan-form { margin-top: 0 !important; margin-bottom: 10px !important; }
+.hero-support-links { margin-top: 10px !important; }
+.audit-path-note { margin-top: 10px !important; }
+.section-heading { margin-bottom: 26px; }
+.section { padding-block: clamp(44px, 5.5vw, 76px); }
+.pricing-main { padding-top: clamp(34px, 4vw, 54px); }
+.pricing-heading { margin-bottom: 32px; }
+.pricing-grid { gap: 18px; }
+.plan-card, .regional-insight-panel, .regional-map-panel, .process-card, .audit-scope-list,
+.dashboard-panel, .report-panel {
+  border-color: rgba(93,160,230,.2);
+}
+.plan-card { background: rgba(9,18,31,.82); }
+.btn-primary, .plan-cta-primary { background-color: #007BFF; border-color: #007BFF; }
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+  outline: 2px solid #3292E0; outline-offset: 3px;
+}
+@media (min-width: 901px) {
+  body nav .nav-inner { padding-top: 0; padding-bottom: 0; }
+  body nav .nav-actions { margin-left: auto; }
+  body nav .nav-links { display: flex !important; }
+}
+@media (max-width: 900px) {
+  body nav .nav-inner { width: min(100% - 32px, 1280px) !important; min-height: 68px; }
+  body nav .menu-toggle, body nav #menu-toggle { display: inline-flex !important; }
+  main > .container, main > section > .container, .pricing-main, .page-container,
+  .dashboard-container, .reports-container { width: min(100% - 32px, 1280px); }
+  .hero-africa-dot-hero { padding-block: 38px !important; }
+}
+@media (max-width: 600px) {
+  .hero-africa-dot-hero { padding-block: 30px !important; }
+  .section { padding-block: 38px; }
+}
+
+/* Standalone pricing route shares the same header hierarchy. */
+body .pricing-nav .pricing-nav-inner {
+  width: min(100% - 48px, 1280px); max-width: 1280px; min-height: 76px;
+  margin-inline: auto; display: flex; align-items: center; gap: clamp(16px, 2vw, 30px);
+}
+body .pricing-nav .pricing-nav-links { flex: 1 1 auto; justify-content: flex-start; gap: clamp(14px, 1.8vw, 25px); }
+body .pricing-nav .nav-actions { display: flex; align-items: center; margin-left: auto; }
+body .pricing-nav .nav-cta { display: inline-flex; align-items: center; white-space: nowrap; }
+@media (min-width: 901px) {
+  body .pricing-nav .pricing-nav-links { display: flex; }
+}
+@media (max-width: 900px) {
+  body .pricing-nav .pricing-nav-inner { width: min(100% - 32px, 1280px); flex-wrap: wrap; gap: 8px 14px; padding-block: 12px; }
+  body .pricing-nav .pricing-nav-links { order: 3; flex: 1 0 100%; display: flex; gap: 18px; overflow-x: auto; padding: 8px 0 10px; scrollbar-width: thin; }
+  body .pricing-nav .pricing-nav-links > li { flex: 0 0 auto; }
+  body .pricing-nav .nav-actions { margin-left: auto; }
+  body .pricing-nav .nav-cta { font-size: .82rem; padding: 10px 12px; }
+}
