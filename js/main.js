@@ -175,7 +175,7 @@ document.addEventListener('DOMContentLoaded', () => {
     ['/methodology', 'Methodology'], ['/security', 'Security'], ['/docs', 'Docs'], ['/changelog', 'Changelog'],
     ['/blog', 'Blog'], ['/cases', 'Case Studies'], ['/data-centers.html', 'Data Centers'], ['/kenya.html', 'Kenya'], ['/nigeria.html', 'Nigeria']
   ];
-  const topLinks = [ ['/about', 'About'], ['/contact', 'Contact'], ['/login.html', 'Login'] ];
+  const topLinks = [ ['/about', 'About'], ['/contact', 'Contact'] ];
 
   const nav = document.querySelector('nav');
   if (nav) {
@@ -208,10 +208,27 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     document.addEventListener('click', () => closeDropdowns());
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeDropdowns(); });
+    const navInner = nav.querySelector('.nav-inner');
+    const actions = navInner?.querySelector('.nav-actions');
+    let navLogin = nav.querySelector('.nav-login');
+    if (!navLogin && actions) {
+      navLogin = document.createElement('a');
+      navLogin.className = 'nav-login';
+      navLogin.href = '/login.html';
+      navLogin.textContent = 'Login';
+      navLogin.setAttribute('aria-label', 'Log in to AfricaLatency');
+      actions.appendChild(navLogin);
+    }
     let navCta = nav.querySelector('.nav-cta');
     if (!navCta) {
-      navCta = document.createElement('a'); navCta.className = 'nav-cta btn btn-primary'; navCta.href = '/scan.html'; navCta.textContent = 'Run a free scan';
-      const navInner = nav.querySelector('.nav-inner'); const actions = navInner?.querySelector('.nav-actions'); if (actions) actions.appendChild(navCta);
+      navCta = document.createElement('a');
+      navCta.className = 'nav-cta btn btn-primary';
+      navCta.href = '/scan.html';
+      navCta.textContent = 'Run a free scan';
+      if (actions) actions.appendChild(navCta);
+    }
+    if (actions && navLogin && navCta) {
+      actions.insertBefore(navLogin, navCta);
     }
   }
 
