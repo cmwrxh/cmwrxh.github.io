@@ -81,3 +81,22 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   .hero-africa-dot-hero { padding-block: 30px !important; }
   .section { padding-block: 38px; }
 }
+
+/* Standalone pricing route shares the same header hierarchy. */
+body .pricing-nav .pricing-nav-inner {
+  width: min(100% - 48px, 1280px); max-width: 1280px; min-height: 76px;
+  margin-inline: auto; display: flex; align-items: center; gap: clamp(16px, 2vw, 30px);
+}
+body .pricing-nav .pricing-nav-links { flex: 1 1 auto; justify-content: flex-start; gap: clamp(14px, 1.8vw, 25px); }
+body .pricing-nav .nav-actions { display: flex; align-items: center; margin-left: auto; }
+body .pricing-nav .nav-cta { display: inline-flex; align-items: center; white-space: nowrap; }
+@media (min-width: 901px) {
+  body .pricing-nav .pricing-nav-links { display: flex; }
+}
+@media (max-width: 900px) {
+  body .pricing-nav .pricing-nav-inner { width: min(100% - 32px, 1280px); flex-wrap: wrap; gap: 8px 14px; padding-block: 12px; }
+  body .pricing-nav .pricing-nav-links { order: 3; flex: 1 0 100%; display: flex; gap: 18px; overflow-x: auto; padding: 8px 0 10px; scrollbar-width: thin; }
+  body .pricing-nav .pricing-nav-links > li { flex: 0 0 auto; }
+  body .pricing-nav .nav-actions { margin-left: auto; }
+  body .pricing-nav .nav-cta { font-size: .82rem; padding: 10px 12px; }
+}
