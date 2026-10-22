@@ -1,0 +1,149 @@
+/* Exact GTmetrix-inspired palette for homepage, About and Pricing routes. */
+:root {
+  --bg: #111214;
+  --surface: rgba(255,255,255,.04);
+  --border: rgba(255,255,255,.08);
+  --gt-hero: #050709;
+  --gt-band: linear-gradient(180deg,#12385a,#0a1a2e);
+  --gt-button: #2f93f5;
+}
+html, body, body.pricing-page {
+  background: #111214 !important;
+  background-image: none !important;
+  color: #fff;
+}
+body::before, body::after, html::before {
+  background: transparent !important;
+  background-image: none !important;
+  mix-blend-mode: normal;
+}
+#al-sitewide-dot-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  width: 100vw;
+  height: 100vh;
+  display: block;
+  pointer-events: none;
+  background: transparent !important;
+}
+body > nav, body > header, body > main, body > footer,
+body > .site-menu, body > .homepage-footer, body > .pricing-nav,
+main, footer, .homepage-footer, .pricing-footer {
+  position: relative;
+  z-index: 1;
+}
+.site-header, nav, .pricing-nav {
+  background: #111214 !important;
+  color: #fff;
+}
+.hero-wave, .hero-africa-dot-hero, .hero-section {
+  background: #050709 !important;
+  background-image: none !important;
+  color: #fff;
+}
+.hero-wave .hero-africa-dot-canvas,
+.hero-africa-dot-hero .hero-africa-dot-canvas,
+.hero-wave .hero-africa-dot-overlay,
+.hero-africa-dot-overlay {
+  pointer-events: none;
+}
+.hero-wave .hero-africa-dot-overlay,
+.hero-africa-dot-hero .hero-africa-dot-overlay {
+  background: transparent !important;
+  background-image: none !important;
+}
+.hero-wave .hero-title, .hero-wave h1, .hero-wave h2,
+.hero-wave h3, .hero-wave p, .hero-wave li,
+.hero-africa-dot-hero h1, .hero-africa-dot-hero h2,
+.hero-section h1, .hero-section h2, .hero-section p {
+  color: #fff;
+}
+.hero-highlight, .contact-gradient, .cta-section, .compact-band,
+.get-started-banner, .get-started-banner-section {
+  background: linear-gradient(180deg,#12385a,#0a1a2e) !important;
+  background-image: linear-gradient(180deg,#12385a,#0a1a2e) !important;
+  color: #fff;
+}
+.visibility-feature-card, .visibility-report-panel, .get-started-mini-report,
+.audience-card, .infrastructure-trust-item, .regional-insight-row,
+.custom-scope-note, .methodology-summary, .faq-item, .visibility-report-chart,
+.get-started-url-row, .visibility-report-selected, .plan-card,
+.pricing-card, .feature-card, .service-card, .case-card, .principle,
+.process-card, .report-panel, .regional-insight-panel, .regional-map-panel,
+.editorial-grid > div, .about-signal {
+  background: transparent !important;
+  background-image: none !important;
+  border: 1px solid rgba(255,255,255,.08) !important;
+  color: #fff !important;
+  box-shadow: none;
+}
+.visibility-feature-card *, .visibility-report-panel *,
+.get-started-mini-report *, .plan-card *, .pricing-card *,
+.feature-card *, .service-card *, .case-card *, .principle *,
+.process-card *, .report-panel *, .regional-insight-panel *,
+.regional-map-panel *, .faq-item, .faq-item * {
+  color: #fff;
+}
+.btn, .btn-primary, .btn-secondary, .nav-cta, .get-started-primary,
+.plan-cta, .plan-cta-primary, .hero-scan-form button,
+.nairobi-probe-card button, .pricing-nav .nav-cta {
+  background: #2f93f5 !important;
+  border-color: #2f93f5 !important;
+  color: #fff !important;
+}
+.btn *, .nav-cta *, .get-started-primary *, .plan-cta-primary * {
+  color: #fff !important;
+}
+.btn:hover, .nav-cta:hover, .get-started-primary:hover,
+.plan-cta:hover, .plan-cta-primary:hover, .hero-scan-form button:hover,
+.nairobi-probe-card button:hover {
+  background: #2f93f5 !important;
+  border-color: #2f93f5 !important;
+  color: #fff !important;
+}
+.homepage-footer, footer, .pricing-footer {
+  background: #111214 !important;
+  background-image: none !important;
+  color: #fff !important;
+}
+.homepage-footer *, footer *, .pricing-footer * {
+  color: #fff;
+}
+@media (prefers-reduced-motion: reduce) {
+  #al-sitewide-dot-canvas { display: none; }
+}
+
+/* Hero-specific overrides intentionally supersede global dark-page surfaces. */
+.hero-wave, .hero-africa-dot-hero, .hero-section {
+  background: #000 !important;
+  background-color: #000 !important;
+  background-image: none !important;
+}
+.hero-wave::before, .hero-wave::after,
+.hero-header-section::before, .hero-header-section::after {
+  content: none !important;
+  display: none !important;
+}
+.hero-africa-dot-canvas, #al-sitewide-dot-canvas, .hero-africa-dot-overlay {
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: 0 !important;
+  pointer-events: none !important;
+  background: transparent !important;
+  background-image: none !important;
+  filter: none !important;
+}
+.hero-africa-dot-canvas {
+  -webkit-mask-image: linear-gradient(to bottom, transparent 20%, #000 75%) !important;
+  mask-image: linear-gradient(to bottom, transparent 20%, #000 75%) !important;
+}
+.hero-africa-dot-content, .hero-wave .container {
+  position: relative !important;
+  z-index: 1 !important;
+}
+.hero-africa-dot-hero + .regional-performance-section,
+.hero-wave + section {
+  background: linear-gradient(180deg,#12385a,#0a1a2e) !important;
+  background-image: linear-gradient(180deg,#12385a,#0a1a2e) !important;
+}

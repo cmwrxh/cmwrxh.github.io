@@ -362,3 +362,41 @@ main > section:not(.hero-wave) {
   background-image: none !important;
 }
 
+
+/* Final approved hero spec: solid black, no pseudo-element dot layer or gradient. */
+.hero-wave, .hero-header-section {
+  background: #000 !important;
+  background-color: #000 !important;
+  background-image: none !important;
+}
+.hero-wave::before, .hero-wave::after,
+.hero-header-section::before, .hero-header-section::after {
+  content: none !important;
+  display: none !important;
+  background: transparent !important;
+  background-image: none !important;
+}
+.hero-wave .hero-africa-dot-canvas,
+.hero-wave .hero-africa-dot-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: transparent !important;
+  background-image: none !important;
+  pointer-events: none;
+  filter: none;
+}
+.hero-wave .hero-africa-dot-content,
+.hero-wave .container {
+  position: relative;
+  z-index: 1;
+}
+.hero-wave .hero-africa-dot-canvas {
+  -webkit-mask-image: linear-gradient(to bottom, transparent 20%, #000 75%) !important;
+  mask-image: linear-gradient(to bottom, transparent 20%, #000 75%) !important;
+}
+.hero-wave + section,
+.hero-africa-dot-hero + .regional-performance-section {
+  background: linear-gradient(180deg,#12385a,#0a1a2e) !important;
+  background-image: linear-gradient(180deg,#12385a,#0a1a2e) !important;
+}

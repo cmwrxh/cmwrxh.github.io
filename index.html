@@ -29,7 +29,7 @@
 
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/marketing.css?v=7">
-  <link rel="stylesheet" href="/css/hero-africa-dot-matrix.css?v=6">
+  <link rel="stylesheet" href="/css/hero-africa-dot-matrix.css?v=7">
   <link rel="stylesheet" href="/css/brand.css?v=10">
   <link rel="stylesheet" href="/css/product-pages.css?v=1">
   <link rel="stylesheet" href="/css/regional-performance.css?v=7">
@@ -47,13 +47,13 @@
   <link rel="stylesheet" href="/css/workflow-showcase.css?v=2">
   <link rel="stylesheet" href="/css/get-started-banner.css?v=2">
   <link rel="stylesheet" href="/css/desktop-header-canvas-fix.css?v=7">
-  <link rel="stylesheet" href="/css/hero-theme.css?v=2">
+  <link rel="stylesheet" href="/css/hero-theme.css?v=3">
   <style id="africa-latency-theme-override">
-html, body { background:#0f1114 !important; background-image:none !important; color:#e5f1fa; }
-.site-header, nav.site-header { background:#0f1114 !important; background-image:none !important; border-bottom:1px solid rgba(255,255,255,.08) !important; box-shadow:none !important; }
+html, body { background:#111214 !important; background-image:none !important; color:#fff; }
+.site-header, nav.site-header { background:#111214 !important; background-image:none !important; border-bottom:1px solid rgba(255,255,255,.08) !important; box-shadow:none !important; }
 
 /* Hero */
-.hero-wave { position:relative; isolation:isolate; overflow:hidden; background:linear-gradient(180deg,#0f2d42 0%,#0f1114 100%) !important; }
+.hero-wave { position:relative; isolation:isolate; overflow:hidden; background:#050709 !important; }
 .hero-wave .hero-africa-dot-overlay { background:none !important; }
 .hero-wave .hero-africa-dot-content { position:relative; z-index:2; }
 .hero-wave .hero-title, .hero-wave h1 { color:#fff !important; }
@@ -61,7 +61,7 @@ html, body { background:#0f1114 !important; background-image:none !important; co
 .hero-wave .audit-path-note { color:#94a3b8 !important; }
 
 /* Sections */
-main > section:not(.hero-wave) { background:#0f1114 !important; background-image:none !important; }
+main > section:not(.hero-wave) { background:#111214 !important; background-image:none !important; }
 main > section:not(.hero-wave) :is(h1,h2,h3,h4) { color:#fff; }
 main > section:not(.hero-wave) :is(p,li) { color:#a9b4c7; }
 main > section:not(.hero-wave) .label { color:#8ed5ff; }
@@ -73,7 +73,7 @@ main a:not(.btn):not(.get-started-primary):not(.get-started-secondary):not(.visi
 .methodology-summary, .faq-item, .visibility-report-chart, .get-started-url-row, .visibility-report-selected {
   background:rgba(255,255,255,.04) !important; background-image:none !important;
   border:1px solid rgba(255,255,255,.12) !important; border-radius:14px;
-  box-shadow:none !important; color:#e5f1fa !important;
+  box-shadow:none !important; color:#fff !important;
 }
 .visibility-feature-card.is-active { border-color:#3b9be0 !important; }
 .visibility-feature-card .visibility-feature-card-title { color:#fff !important; }
@@ -83,19 +83,20 @@ main a:not(.btn):not(.get-started-primary):not(.get-started-secondary):not(.visi
 .get-started-mini-report :is(span,strong,em,small) { color:#e5f1fa !important; }
 
 /* Buttons: never blue on blue */
-.get-started-primary { background:#2f8fe0 !important; }
+.get-started-primary { background:#2f93f5 !important; }
 .get-started-primary, .get-started-primary * { color:#fff !important; }
 .get-started-secondary { background:transparent !important; border:1px solid rgba(255,255,255,.28) !important; }
 .get-started-secondary, .get-started-secondary * { color:#fff !important; }
 .visibility-report-cta { background:transparent !important; color:#8ed5ff !important; }
 
 /* Footer */
-.homepage-footer { background:#0f1114 !important; }
+.homepage-footer { background:#111214 !important; }
 .homepage-footer :is(h3,h4) { color:#fff; }
 .homepage-footer :is(p,a) { color:#a9b4c7; }
 
 @media (prefers-reduced-motion: reduce) { .hero-wave *, .site-header * { transition-duration:.01ms !important; } }
 </style>
+  <link rel="stylesheet" href="/css/gtmetrix-color-system.css?v=2">
   <script>
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => navigator.serviceWorker.register("/service-worker.js").catch((error) => console.warn("AfricaLatency offline support unavailable", error)));
@@ -437,7 +438,7 @@ main a:not(.btn):not(.get-started-primary):not(.get-started-secondary):not(.visi
 </footer>
 
 
-<script src="/js/sitewide-africa-dot-matrix.js?v=4" defer data-al-sitewide-canvas></script>
+
 <script src="/js/main.js?v=9"></script>
 <script>
   document.querySelectorAll('.faq-question').forEach(function (b) {
@@ -481,7 +482,7 @@ main a:not(.btn):not(.get-started-primary):not(.get-started-secondary):not(.visi
 </script>
 <script src="/js/africa-dot-matrix-shared.js?v=2" defer></script>
 <script src="/js/regional-network-illustration.js?v=6" defer></script>
-<script src="/js/hero-africa-dot-matrix.js?v=6" defer></script>
+<script src="/js/hero-africa-dot-matrix.js?v=7" defer></script>
 <script src="/js/product-pages.js?v=1"></script>
   <script src="/js/marketing-infrastructure-banner.js?v=1" defer></script>
   <script src="/js/workflow-showcase.js?v=2" defer></script>
