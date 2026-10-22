@@ -49,152 +49,52 @@
   <link rel="stylesheet" href="/css/desktop-header-canvas-fix.css?v=4">
   <link rel="stylesheet" href="/css/hero-theme.css?v=2">
   <style id="africa-latency-theme-override">
-/* Keep the homepage theme override inline so it wins over cached stylesheets. */
-html,
-body {
-  background-color: #0f1114 !important;
-  background-image: none !important;
-  color: #e5f1fa;
+html, body { background:#0f1114 !important; background-image:none !important; color:#e5f1fa; }
+.site-header, nav.site-header { background:#0f1114 !important; background-image:none !important; border-bottom:1px solid rgba(255,255,255,.08) !important; box-shadow:none !important; }
+
+/* Hero */
+.hero-wave { position:relative; isolation:isolate; overflow:hidden; background:linear-gradient(180deg,#0f2d42 0%,#0f1114 100%) !important; }
+.hero-wave .hero-africa-dot-overlay { background:none !important; }
+.hero-wave .hero-africa-dot-content { position:relative; z-index:2; }
+.hero-wave .hero-title, .hero-wave h1 { color:#fff !important; }
+.hero-wave .hero-subtitle { color:#d1e5f4 !important; }
+.hero-wave .audit-path-note { color:#94a3b8 !important; }
+
+/* Sections */
+main > section:not(.hero-wave) { background:#0f1114 !important; background-image:none !important; }
+main > section:not(.hero-wave) :is(h1,h2,h3,h4) { color:#fff; }
+main > section:not(.hero-wave) :is(p,li) { color:#a9b4c7; }
+main > section:not(.hero-wave) .label { color:#8ed5ff; }
+main a:not(.btn):not(.get-started-primary):not(.get-started-secondary):not(.visibility-report-cta) { color:#8ed5ff; }
+
+/* Cards and panels (real class names) */
+.visibility-feature-card, .visibility-report-panel, .get-started-banner, .get-started-mini-report,
+.audience-card, .infrastructure-trust-item, .regional-insight-row, .custom-scope-note,
+.methodology-summary, .faq-item, .visibility-report-chart, .get-started-url-row, .visibility-report-selected {
+  background:rgba(255,255,255,.04) !important; background-image:none !important;
+  border:1px solid rgba(255,255,255,.12) !important; border-radius:14px;
+  box-shadow:none !important; color:#e5f1fa !important;
 }
+.visibility-feature-card.is-active { border-color:#3b9be0 !important; }
+.visibility-feature-card .visibility-feature-card-title { color:#fff !important; }
+.visibility-feature-card .visibility-feature-card-copy { color:#a9b4c7 !important; }
+.visibility-feature-card .visibility-feature-card-link, .visibility-feature-icon { color:#8ed5ff !important; }
+.visibility-report-panel :is(span,strong,em,p,h3),
+.get-started-mini-report :is(span,strong,em,small) { color:#e5f1fa !important; }
 
-body { min-height: 100%; }
+/* Buttons: never blue on blue */
+.get-started-primary { background:#2f8fe0 !important; }
+.get-started-primary, .get-started-primary * { color:#fff !important; }
+.get-started-secondary { background:transparent !important; border:1px solid rgba(255,255,255,.28) !important; }
+.get-started-secondary, .get-started-secondary * { color:#fff !important; }
+.visibility-report-cta { background:transparent !important; color:#8ed5ff !important; }
 
-nav.site-header,
-header.site-header,
-.site-header {
-  background: #0f1114 !important;
-  background-image: none !important;
-  border-bottom: 0 !important;
-  box-shadow: none !important;
-}
+/* Footer */
+.homepage-footer { background:#0f1114 !important; }
+.homepage-footer :is(h3,h4) { color:#fff; }
+.homepage-footer :is(p,a) { color:#a9b4c7; }
 
-/* Lock the dot pattern and gradient to the hero containers only. */
-.hero-header-section,
-.hero-wave {
-  position: relative !important;
-  isolation: isolate;
-  overflow: hidden !important;
-  background-color: #0f1114 !important;
-  background-image: linear-gradient(180deg, #0f2d42 0%, #0f1114 100%) !important;
-}
-
-.hero-header-section::before,
-.hero-wave::before {
-  content: "" !important;
-  position: absolute !important;
-  inset: 0 !important;
-  z-index: 0 !important;
-  pointer-events: none !important;
-  background-image: radial-gradient(rgba(50, 146, 224, 0.4) 1.5px, transparent 1.5px) !important;
-  background-size: 20px 20px !important;
-  mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, #000 40%, transparent 100%) !important;
-  -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, #000 40%, transparent 100%) !important;
-}
-
-/* Keep all hero content above the decorative dot layer. */
-.hero-header-section > *,
-.hero-wave > * {
-  position: relative;
-  z-index: 1;
-}
-
-/* Remove patterns from every non-hero section and keep the page dark. */
-body,
-main,
-section:not(.hero-header-section):not(.hero-wave),
-footer,
-.wp-block-group:not(.hero-wave) {
-  background-image: none !important;
-  background-color: #0f1114 !important;
-}
-
-main > section:not(.hero-wave):not(.hero-header-section):not(#hero-section),
-footer.homepage-footer {
-  color: #e5f1fa;
-}
-
-main > section:not(.hero-wave):not(.hero-header-section):not(#hero-section) h1,
-main > section:not(.hero-wave):not(.hero-header-section):not(#hero-section) h2,
-main > section:not(.hero-wave):not(.hero-header-section):not(#hero-section) h3,
-main > section:not(.hero-wave):not(.hero-header-section):not(#hero-section) h4,
-main > section:not(.hero-wave):not(.hero-header-section):not(#hero-section) p,
-footer.homepage-footer h3,
-footer.homepage-footer h4,
-footer.homepage-footer p {
-  color: #e5f1fa;
-}
-
-main > section:not(.hero-wave):not(.hero-header-section):not(#hero-section) a,
-footer.homepage-footer a {
-  color: #8ed5ff;
-}
-
-.hero-wave .hero-title,
-.hero-wave h1 { color: #fff !important; }
-
-.hero-wave .hero-subtitle { color: #d1e5f4 !important; }
-
-.hero-wave .audit-path-note { color: #94a3b8 !important; }
-
-body::before,
-body::after,
-main::before,
-main::after { background-image: none !important; }
-
-@media (prefers-reduced-motion: reduce) {
-  .hero-wave *,
-  .hero-header-section *,
-  .site-header * { transition-duration: .01ms !important; }
-}
-
-/* Dark glassmorphic treatment for lower-page feature cards and conversion banners. */
-main > section:not(.hero-header-section):not(.hero-wave):not(#hero-section),
-main > section:not(.hero-header-section):not(.hero-wave):not(#hero-section) .wp-block-group,
-main > section:not(.hero-header-section):not(.hero-wave):not(#hero-section) .wp-block-columns,
-main > section:not(.hero-header-section):not(.hero-wave):not(#hero-section) .wp-block-column,
-main > section:not(.hero-header-section):not(.hero-wave):not(#hero-section) .features-cards-wrapper {
-  background-color: #0f1114 !important;
-  background-image: none !important;
-}
-
-main > section:not(.hero-header-section):not(.hero-wave):not(#hero-section) .wp-block-group.has-background,
-main > section:not(.hero-header-section):not(.hero-wave):not(#hero-section) .cta-banner-card,
-main > section:not(.hero-header-section):not(.hero-wave):not(#hero-section) .cta-banner-container,
-main > section:not(.hero-header-section):not(.hero-wave):not(#hero-section) [class*="cta"],
-main > section:not(.hero-header-section):not(.hero-wave):not(#hero-section) [class*="banner"],
-main > section:not(.hero-header-section):not(.hero-wave):not(#hero-section) .card-container,
-main > section:not(.hero-header-section):not(.hero-wave):not(#hero-section) .features-cards-wrapper > * {
-  background-color: rgba(255, 255, 255, 0.04) !important;
-  background-image: none !important;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 12px;
-  color: #ffffff;
-}
-
-main > section:not(.hero-header-section):not(.hero-wave):not(#hero-section) .wp-block-group.has-background h1,
-main > section:not(.hero-header-section):not(.hero-wave):not(#hero-section) .wp-block-group.has-background h2,
-main > section:not(.hero-header-section):not(.hero-wave):not(#hero-section) .wp-block-group.has-background h3,
-main > section:not(.hero-header-section):not(.hero-wave):not(#hero-section) .wp-block-group.has-background h4,
-main > section:not(.hero-header-section):not(.hero-wave):not(#hero-section) .cta-banner-card h1,
-main > section:not(.hero-header-section):not(.hero-wave):not(#hero-section) .cta-banner-card h2,
-main > section:not(.hero-header-section):not(.hero-wave):not(#hero-section) .cta-banner-card h3,
-main > section:not(.hero-header-section):not(.hero-wave):not(#hero-section) .cta-banner-container h1,
-main > section:not(.hero-header-section):not(.hero-wave):not(#hero-section) .cta-banner-container h2,
-main > section:not(.hero-header-section):not(.hero-wave):not(#hero-section) .cta-banner-container h3 {
-  color: #ffffff !important;
-}
-
-main > section:not(.hero-header-section):not(.hero-wave):not(#hero-section) .wp-block-group.has-background p,
-main > section:not(.hero-header-section):not(.hero-wave):not(#hero-section) .cta-banner-card p,
-main > section:not(.hero-header-section):not(.hero-wave):not(#hero-section) .cta-banner-container p {
-  color: #94a3b8 !important;
-}
-
-main > section:not(.hero-header-section):not(.hero-wave):not(#hero-section) .wp-block-group.has-background a,
-main > section:not(.hero-header-section):not(.hero-wave):not(#hero-section) .cta-banner-card a,
-main > section:not(.hero-header-section):not(.hero-wave):not(#hero-section) .cta-banner-container a {
-  color: #8ed5ff !important;
-}
+@media (prefers-reduced-motion: reduce) { .hero-wave *, .site-header * { transition-duration:.01ms !important; } }
 </style>
   <script>
     if ("serviceWorker" in navigator) {
