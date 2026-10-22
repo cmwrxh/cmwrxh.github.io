@@ -12,9 +12,9 @@
     adaptiveFrameMs: 21,
     adaptiveAfterFrames: 24,
     adaptiveSpacingIncrease: 2,
-    colors: { dot: '56,161,224', background: '#000000', blue: '43,128,197', cyan: '56,161,224', indigo: '99,102,241', purple: '139,92,246' },
-    land: { baseAlpha: 0.045, baseRadius: 0.85, alphaBoost: 0.34, radiusBoost: 0.30, brightnessScale: 1, twinkleScale: 1 },
-    ocean: { baseAlpha: 0.025, baseRadius: 0.8, alphaBoost: 0.22, brightnessScale: 0.8, twinkleScale: 0.9 },
+    colors: { dot: '50,146,224', background: '#EAF5FF', blue: '50,146,224', cyan: '79,190,245', indigo: '99,152,220', purple: '139,172,226' },
+    land: { baseAlpha: 0.065, baseRadius: 0.9, alphaBoost: 0.40, radiusBoost: 0.34, brightnessScale: 1, twinkleScale: 1 },
+    ocean: { baseAlpha: 0.038, baseRadius: 0.8, alphaBoost: 0.28, brightnessScale: 0.85, twinkleScale: 0.95 },
     sweepSpeed: 1.8,
     sweepWidth: 0.012,
     sweepXFactor: 0.9,
@@ -164,7 +164,7 @@
       var alpha = dot.baseAlpha + brightness * alphaBoost;
       /* Radial fade keeps the dot field delicate at its outer edges. */
       var radialDistance = Math.sqrt(Math.pow((dot.x - width * 0.5) / Math.max(1, width * 0.5), 2) + Math.pow((dot.y - height * 0.5) / Math.max(1, height * 0.5), 2));
-      var edgeFade = Math.max(0, Math.min(1, (1.18 - radialDistance) / 0.52));
+      var edgeFade = 1; // Full-bleed wave: keep the dot field visible to both viewport edges.
       alpha *= edgeFade;
       var radius = dot.baseRadius + (dot.land ? brightness * CONFIG.land.radiusBoost : 0);
       if (dot.land && brightness > CONFIG.haloThreshold) {
