@@ -122,3 +122,10 @@ body { background-image: radial-gradient(ellipse at 50% 0%, rgba(50,146,224,.12)
   right: 0 !important;
   background: #050A12 !important;
 }
+
+
+/* Remove the hero's radial mask so the animated wave reaches both viewport edges. */
+.hero-africa-dot-canvas {
+  -webkit-mask-image: none !important;
+  mask-image: none !important;
+}
