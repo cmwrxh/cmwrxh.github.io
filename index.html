@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
   <title>AfricaLatency — Infrastructure Performance &amp; Latency Intelligence</title>
   <meta name="description" content="AfricaLatency measures the real-world performance of applications, APIs and infrastructure across African networks.">
-  <meta name="theme-color" content="#000000">
+  <meta name="theme-color" content="#EAF5FF">
   <link rel="manifest" href="/manifest.json">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -43,9 +43,10 @@
   <link rel="stylesheet" href="/css/unified-matte-layout.css?v=5">
   <link rel="stylesheet" href="/css/marketing-infrastructure-banner.css?v=1">
   <link rel="stylesheet" href="/css/homepage-mobile-cleanup.css?v=1">
-  <link rel="stylesheet" href="/css/pan-african-intelligence.css?v=1">
-  <link rel="stylesheet" href="/css/workflow-showcase.css?v=1">\n  <link rel="stylesheet" href="/css/get-started-banner.css?v=1">
-  <link rel="stylesheet" href="/css/desktop-header-canvas-fix.css?v=1">
+  <link rel="stylesheet" href="/css/pan-african-intelligence.css?v=2">
+  <link rel="stylesheet" href="/css/workflow-showcase.css?v=2">
+  <link rel="stylesheet" href="/css/get-started-banner.css?v=2">
+  <link rel="stylesheet" href="/css/desktop-header-canvas-fix.css?v=2">
   <script>
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => navigator.serviceWorker.register("/service-worker.js").catch((error) => console.warn("AfricaLatency offline support unavailable", error)));
@@ -131,7 +132,7 @@
       <div class="intelligence-heading">
         <div>
           <div class="label">Deep insights, grounded in local evidence</div>
-          <h2 id="pan-african-intelligence-title">Pan-African Intelligence to Measure &amp; Optimize Local Latency</h2>
+          <h2 id="pan-african-intelligence-title">African Network Intelligence to Measure &amp; Optimize Local Latency</h2>
         </div>
         <div class="intelligence-heading-copy">
           <p>Go beyond generic global averages. Analyze public website and API response behavior directly from live probes positioned across major African network exchanges. Results depend on probe availability and the measurements each probe returns.</p>
@@ -143,7 +144,7 @@
       <div class="intelligence-grid">
         <article class="intelligence-card">
           <div class="intelligence-icon" aria-hidden="true"><i data-lucide="gauge"></i></div>
-          <h3>Pan-African Web Vitals</h3>
+          <h3>Web Vitals &amp; Regional Metrics</h3>
           <p>Use regional response measurements to investigate performance issues that can affect customer experience and retention. Core Web Vitals require browser-based field or lab data and are not inferred from HTTP timing alone.</p>
         </article>
 
@@ -176,7 +177,7 @@
 
         <article class="intelligence-card">
           <div class="intelligence-icon" aria-hidden="true"><i data-lucide="globe"></i></div>
-          <h3>Pan-African Testing Network</h3>
+          <h3>African Testing Network</h3>
           <p>Request measurements across a network designed for up to 31 African countries. Each scan reports live results only for locations with available probes, so coverage can vary by run.</p>
           <a class="feature-status" href="/methodology" style="text-decoration:none">Coverage &amp; methodology</a>
         </article>
@@ -214,64 +215,53 @@
     </div>
   </section>
 
-  <section class="section workflow-showcase" aria-labelledby="workflow-showcase-title">
+  <section class="section workflow-showcase visibility-feature-section" aria-labelledby="workflow-showcase-title">
     <div class="container">
-      <div class="workflow-intro">
-        <div class="label">The AfricaLatency workflow</div>
-        <h2 id="workflow-showcase-title">From regional measurements to clearer decisions.</h2>
-        <p>Explore how teams can measure public endpoint performance, investigate regional differences and turn returned evidence into next steps.</p>
+      <div class="visibility-feature-intro">
+        <div class="label">Regional performance intelligence</div>
+        <h2 id="workflow-showcase-title">Gain complete visibility into your site’s real performance</h2>
+        <p class="visibility-feature-subheading">Go beyond single global scores. Pinpoint localized latency, IXP bottlenecks, and regional network delays.</p>
       </div>
 
-      <div class="workflow-tabs" role="tablist" aria-label="AfricaLatency workflow stages">
-        <button class="workflow-tab is-active" id="workflow-tab-measure" type="button" role="tab" aria-selected="true" aria-controls="workflow-panel" tabindex="0" data-workflow-tab="measure"><span>1.</span> Test &amp; Measure</button>
-        <button class="workflow-tab" id="workflow-tab-monitor" type="button" role="tab" aria-selected="false" aria-controls="workflow-panel" tabindex="-1" data-workflow-tab="monitor"><span>2.</span> Monitor &amp; Alert</button>
-        <button class="workflow-tab" id="workflow-tab-diagnose" type="button" role="tab" aria-selected="false" aria-controls="workflow-panel" tabindex="-1" data-workflow-tab="diagnose"><span>3.</span> Diagnose &amp; Compare</button>
-        <button class="workflow-tab" id="workflow-tab-reports" type="button" role="tab" aria-selected="false" aria-controls="workflow-panel" tabindex="-1" data-workflow-tab="reports"><span>4.</span> Reports &amp; API Integration</button>
-      </div>
-
-      <div class="workflow-panel" id="workflow-panel" role="tabpanel" aria-labelledby="workflow-tab-measure" tabindex="0">
-        <div class="workflow-copy" aria-live="polite">
-          <div class="workflow-eyebrow" data-workflow-eyebrow>01 / MEASURE</div>
-          <h3 data-workflow-heading>Gain complete visibility into your site's real African performance</h3>
-          <p class="workflow-subheading" data-workflow-subheading>Go beyond single global scores. Pinpoint localized latency, IXP bottlenecks, and regional network delays.</p>
-          <ul class="workflow-bullets" data-workflow-bullets>
-            <li><strong>Synthetic &amp; live probe scans:</strong> Review DNS, TCP, TLS, HTTP and TTFB timings where supported and returned by available probes.</li>
-            <li><strong>Regional context:</strong> Compare returned measurements from available locations, including Nairobi, Johannesburg, Lagos and other supported probe locations.</li>
-            <li><strong>Real user monitoring:</strong> The RUM beta can test connection telemetry on your own device; broad audience and ISP-level collection remain under validation.</li>
-            <li><strong>Browser diagnostics:</strong> Request-by-request waterfall and packet-trace views are not part of the current public scan and remain planned work.</li>
-            <li><strong>Alerts:</strong> Continuous monitoring and automated webhook, Slack or email alerts are in development.</li>
-          </ul>
-          <a class="btn btn-primary workflow-cta" href="/scan">Run a free scan <i data-lucide="arrow-right" aria-hidden="true"></i></a>
+      <div class="visibility-feature-layout">
+        <div class="visibility-feature-grid" role="group" aria-label="Explore performance capabilities">
+          <button class="visibility-feature-card is-active" type="button" data-feature-card data-feature-title="Web Vitals &amp; Regional Metrics" data-feature-status="Available data varies" data-feature-summary="Compare returned DNS, TCP, TLS, HTTP and TTFB measurements by available probe. Core Web Vitals require browser-based data and are never inferred from connection timings alone." aria-pressed="true">
+            <span class="visibility-feature-icon" aria-hidden="true"><i data-lucide="gauge"></i></span><span class="visibility-feature-card-title">Web Vitals &amp; Regional Metrics</span><span class="visibility-feature-card-copy">Understand response timing by location, with clear limits on browser-vitals availability.</span><span class="visibility-feature-card-link">Explore metrics <i data-lucide="arrow-up-right" aria-hidden="true"></i></span>
+          </button>
+          <button class="visibility-feature-card" type="button" data-feature-card data-feature-title="Advanced Edge Probing" data-feature-status="Profile options evolving" data-feature-summary="Run public endpoint checks from available edge probes. Custom connection speeds and user-agent profiles are being developed and are not represented as universally available controls." aria-pressed="false">
+            <span class="visibility-feature-icon" aria-hidden="true"><i data-lucide="sliders-horizontal"></i></span><span class="visibility-feature-card-title">Advanced Edge Probing</span><span class="visibility-feature-card-copy">Investigate endpoint behavior from available probes; custom connection and user-agent profiles are evolving.</span><span class="visibility-feature-card-link">Explore probing <i data-lucide="arrow-up-right" aria-hidden="true"></i></span>
+          </button>
+          <button class="visibility-feature-card" type="button" data-feature-card data-feature-title="Automated Monitoring &amp; Alerts" data-feature-status="In development" data-feature-summary="Continuous synthetic checks and automated email, webhook or chat alerts are in development. They are not represented as active monitoring in the current public scan." aria-pressed="false">
+            <span class="visibility-feature-icon" aria-hidden="true"><i data-lucide="bell-ring"></i></span><span class="visibility-feature-card-title">Automated Monitoring &amp; Alerts</span><span class="visibility-feature-card-copy">Plan for recurring uptime and latency checks, with monitoring and alert delivery in development.</span><span class="visibility-feature-card-link">Monitoring roadmap <i data-lucide="arrow-up-right" aria-hidden="true"></i></span>
+          </button>
+          <button class="visibility-feature-card" type="button" data-feature-card data-feature-title="Detailed Request Waterfalls" data-feature-status="Coming soon" data-feature-summary="Request-by-request browser waterfall analysis is not part of the current public scan. Reports show only the timing and network evidence actually returned." aria-pressed="false">
+            <span class="visibility-feature-icon" aria-hidden="true"><i data-lucide="chart-no-axes-combined"></i></span><span class="visibility-feature-card-title">Detailed Request Waterfalls</span><span class="visibility-feature-card-copy">See the roadmap for browser-level asset timing; this is not part of the current public scan.</span><span class="visibility-feature-card-link">View diagnostics roadmap <i data-lucide="arrow-up-right" aria-hidden="true"></i></span>
+          </button>
+          <button class="visibility-feature-card" type="button" data-feature-card data-feature-title="Real User Audience Telemetry" data-feature-status="Limited beta" data-feature-summary="The RUM beta currently tests connection telemetry on your own device. Broad audience collection and ISP-level aggregation remain under validation." aria-pressed="false">
+            <span class="visibility-feature-icon" aria-hidden="true"><i data-lucide="users-round"></i></span><span class="visibility-feature-card-title">Real User Audience Telemetry</span><span class="visibility-feature-card-copy">Try device-level connection telemetry in beta; broad audience insights remain under validation.</span><span class="visibility-feature-card-link">Explore RUM beta <i data-lucide="arrow-up-right" aria-hidden="true"></i></span>
+          </button>
+          <button class="visibility-feature-card" type="button" data-feature-card data-feature-title="African Testing Network" data-feature-status="Probe-dependent results" data-feature-summary="Request measurements from supported African cities and regional network nodes. Each scan reports live results only for locations whose probes are available and return data." aria-pressed="false">
+            <span class="visibility-feature-icon" aria-hidden="true"><i data-lucide="network"></i></span><span class="visibility-feature-card-title">Testing Network</span><span class="visibility-feature-card-copy">Compare supported African cities and regional nodes, with coverage clearly reported for each run.</span><span class="visibility-feature-card-link">Coverage &amp; methodology <i data-lucide="arrow-up-right" aria-hidden="true"></i></span>
+          </button>
         </div>
 
-        <div class="workflow-preview-wrap">
-          <div class="workflow-preview-backdrop" aria-hidden="true"></div>
-          <article class="workflow-report-preview" aria-label="Illustrative AfricaLatency performance report preview">
-            <div class="workflow-report-topline"><span class="workflow-report-brand"><span class="workflow-brand-mark">A</span> AfricaLatency</span><span class="workflow-sample-label">ILLUSTRATIVE PREVIEW</span></div>
-            <div class="workflow-report-title">
-              <div><div class="workflow-report-kicker" data-report-kicker>PERFORMANCE AUDIT PREVIEW</div><h4>Latest Performance Audit for:</h4><p class="workflow-report-url">https://yourwebsite.com</p></div>
-              <span class="workflow-report-icon" aria-hidden="true"><i data-lucide="external-link"></i></span>
+        <aside class="visibility-report-panel" aria-labelledby="visibility-report-title">
+          <div class="visibility-report-panel-heading"><div><span class="visibility-report-kicker">INTERACTIVE REPORT PREVIEW</span><h3 id="visibility-report-title">See what each capability covers</h3></div><span class="visibility-report-badge">Example UI</span></div>
+          <div class="visibility-report-browser"><span></span><span></span><span></span><strong>yourwebsite.com</strong><i data-lucide="external-link" aria-hidden="true"></i></div>
+          <div class="visibility-report-content">
+            <div class="visibility-report-selected"><span class="visibility-report-selected-icon"><i data-lucide="activity" aria-hidden="true"></i></span><div><span>SELECTED CAPABILITY</span><strong data-feature-preview-title>Web Vitals &amp; Regional Metrics</strong></div></div>
+            <p data-feature-preview-summary>Compare returned DNS, TCP, TLS, HTTP and TTFB measurements by available probe. Core Web Vitals require browser-based data and are never inferred from connection timings alone.</p>
+            <div class="visibility-report-detail-row"><span>Capability status</span><strong data-feature-preview-status>Available data varies</strong></div>
+            <div class="visibility-report-chart" aria-label="Illustrative performance timing chart, not live scan data">
+              <div class="visibility-report-chart-top"><strong>Regional timing profile</strong><span>Illustrative only</span></div>
+              <div class="visibility-report-chart-row"><span>Nairobi</span><i><b style="width:48%"></b></i><em>example</em></div>
+              <div class="visibility-report-chart-row"><span>Lagos</span><i><b style="width:72%"></b></i><em>example</em></div>
+              <div class="visibility-report-chart-row"><span>Johannesburg</span><i><b style="width:59%"></b></i><em>example</em></div>
             </div>
-            <div class="workflow-report-meta"><span><i data-lucide="calendar-clock" aria-hidden="true"></i> Scan time: Oct 2026 (example)</span><span><i data-lucide="map-pin" aria-hidden="true"></i> Primary probe: Nairobi (NIXP, illustrative)</span><span><i data-lucide="monitor-smartphone" aria-hidden="true"></i> Agent: Chrome Mobile / Desktop (example)</span></div>
-            <div class="workflow-metric-grid">
-              <div class="workflow-metric-card"><span class="workflow-metric-label">Example grade</span><div class="workflow-grade-row"><span class="workflow-grade">A</span><strong>98%</strong></div><small>Illustrative only</small></div>
-              <div class="workflow-metric-card"><span class="workflow-metric-label">Example TTFB</span><strong class="workflow-metric-main">240<span>ms</span></strong><small>Global average (example)</small><div class="workflow-metric-secondary">Local probe: 42 ms <em>(example)</em></div></div>
-              <div class="workflow-metric-card"><span class="workflow-metric-label">Browser vitals</span><strong class="workflow-vitals-main">LCP 1.2s</strong><small>FID 14ms · CLS 0.01</small><small class="workflow-metric-note">Sample values, not measured results</small></div>
-            </div>
-            <div class="workflow-waterfall-panel">
-              <div class="workflow-waterfall-heading"><div><strong>Regional request timing</strong><span>Illustrative visual · no live data</span></div><span class="workflow-live-indicator"><i></i> PREVIEW</span></div>
-              <div class="workflow-chart-legend"><span><i class="legend-nairobi"></i>Nairobi</span><span><i class="legend-johannesburg"></i>Johannesburg</span><span><i class="legend-lagos"></i>Lagos</span></div>
-              <div class="workflow-waterfall-grid" aria-label="Illustrative request timing bars for three regions">
-                <div class="workflow-waterfall-row"><span>Nairobi</span><div class="workflow-waterfall-track"><i class="workflow-bar bar-nairobi bar-one"></i><i class="workflow-bar bar-nairobi bar-two"></i><i class="workflow-bar bar-nairobi bar-three"></i></div><small>example</small></div>
-                <div class="workflow-waterfall-row"><span>Johannesburg</span><div class="workflow-waterfall-track"><i class="workflow-bar bar-johannesburg bar-one"></i><i class="workflow-bar bar-johannesburg bar-two"></i><i class="workflow-bar bar-johannesburg bar-three"></i></div><small>example</small></div>
-                <div class="workflow-waterfall-row"><span>Lagos</span><div class="workflow-waterfall-track"><i class="workflow-bar bar-lagos bar-one"></i><i class="workflow-bar bar-lagos bar-two"></i><i class="workflow-bar bar-lagos bar-three"></i></div><small>example</small></div>
-              </div>
-              <div class="workflow-time-axis"><span>0 ms</span><span>250 ms</span><span>500 ms</span><span>750 ms</span><span>1,000 ms</span></div>
-            </div>
-            <div class="workflow-report-footnote"><i data-lucide="info" aria-hidden="true"></i> All scores, timings and browser-vitals values above are illustrative placeholders, not an actual scan. Real report fields depend on available probe and browser data.</div>
-          </article>
-          <p class="workflow-preview-caption">Report-style preview · values are examples only</p>
-        </div>
+            <div class="visibility-report-disclaimer"><i data-lucide="info" aria-hidden="true"></i> Preview only. Bars and labels are illustrative, not measurements. Real results depend on available probes and returned data.</div>
+          </div>
+          <a class="visibility-report-cta" href="/scan">Run a free scan <i data-lucide="arrow-right" aria-hidden="true"></i></a>
+        </aside>
       </div>
     </div>
   </section>
@@ -443,8 +433,8 @@
 </footer>
 
 
-<script src="/js/sitewide-africa-dot-matrix.js?v=2" defer data-al-sitewide-canvas></script>
-<script src="/js/main.js?v=7"></script>
+<script src="/js/sitewide-africa-dot-matrix.js?v=3" defer data-al-sitewide-canvas></script>
+<script src="/js/main.js?v=8"></script>
 <script>
   document.querySelectorAll('.faq-question').forEach(function (b) {
     b.addEventListener('click', function () {
@@ -490,6 +480,6 @@
 <script src="/js/hero-africa-dot-matrix.js?v=5" defer></script>
 <script src="/js/product-pages.js?v=1"></script>
   <script src="/js/marketing-infrastructure-banner.js?v=1" defer></script>
-  <script src="/js/workflow-showcase.js?v=1" defer></script>
+  <script src="/js/workflow-showcase.js?v=2" defer></script>
 </body>
 </html>
