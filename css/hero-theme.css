@@ -312,3 +312,53 @@ main > .infrastructure-trust-section p {
 .intelligence-card {
   color: #244761;
 }
+
+/* Emergency theme hardening: match the approved dark canvas without applying
+   global text overrides that could break scan forms, reports or light cards. */
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #0f1114 !important;
+  background-image: none !important;
+  color: #fff;
+}
+
+nav.site-header,
+header.site-header,
+nav.nav-container,
+.wp-block-navigation {
+  background-color: #0f1114 !important;
+  background-image: none !important;
+  border-bottom: none !important;
+}
+
+/* Keep the exact navy-to-dark gradient and cyan dots inside the hero only. */
+.hero-header-section,
+.hero-wave {
+  position: relative;
+  width: 100%;
+  background-color: #0f1114 !important;
+  background-image: linear-gradient(180deg, #0f2d42 0%, #0f1114 100%) !important;
+}
+
+.hero-header-section::before,
+.hero-wave::before {
+  background-image: radial-gradient(rgba(50, 146, 224, 0.4) 1.5px, transparent 1.5px);
+  background-size: 20px 20px;
+  mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, #000 40%, transparent 100%);
+  -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, #000 40%, transparent 100%);
+}
+
+/* A consistent dark page canvas below the hero; nested report and feature cards
+   retain their own component backgrounds and contrast styles. */
+main > section:not(.hero-wave) {
+  background-color: #0f1114 !important;
+  background-image: none !important;
+}
+
+.homepage-footer {
+  background-color: #0f1114 !important;
+  background-image: none !important;
+}
+
