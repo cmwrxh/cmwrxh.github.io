@@ -109,3 +109,14 @@ The main homepage previously used both **9 African countries** (analysis label/c
 - [x] Added one-time GitHub Actions workflow `.github/workflows/vendor-plus-jakarta-sans.yml` to download the two Latin WOFF2 assets from `@fontsource/plus-jakarta-sans` and commit them to `/fonts`.
 - [ ] Awaiting the font workflow to commit the actual WOFF2 assets.
 - [ ] Awaiting the homepage visual-review workflow and comparison artifact on this head before visual approval.
+
+
+## Round 3 review fixes
+
+- [x] Prefixed redesigned homepage shell classes with `al-` in HTML, CSS, and JavaScript to isolate the new header, hero, feature band, tabs, and footer.
+- [x] Added `css/legacy-home.css` with layered imports for legacy global and restored-section stylesheets; it loads before the unlayered homepage redesign stylesheet.
+- [x] Set the hero to pure black, feature band to the requested three-stop blue gradient, header to `#171619`, transparent header buttons, and content max width to 1280px.
+- [x] Removed duplicate inline and `main.js` analytics consent banner paths. `js/compliance.js` remains the single consent owner using `africalatency_analytics_consent_v1`.
+- [x] Extended font-vendoring workflow to 400, 500, 600 and 700 weights. Only 400 and 700 are preloaded.
+- [x] Extended visual review to save viewport and full-page screenshots at 1280px, 820px and 390px and upload all artifacts.
+- [ ] Inspect the new visual-review artifact and compare restored sections with main at 1280px and 390px before calling visual verification complete.
