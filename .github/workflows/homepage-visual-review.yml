@@ -1,18 +1,6 @@
 name: Homepage visual review
 
 on:
-  push:
-    branches: [feat/africalatency-homepage-dotfield]
-    paths:
-      - 'index.html'
-      - 'css/homepage-reference-redesign.css'
-      - 'css/legacy-home.css'
-      - 'js/compliance.js'
-      - 'js/main.js'
-      - 'js/homepage-reference-redesign.js'
-      - 'docs/visual-review/reference.html'
-      - 'scripts/visual-review.mjs'
-      - '.github/workflows/homepage-visual-review.yml'
   pull_request:
     branches: [main]
     paths:
@@ -25,7 +13,10 @@ on:
       - 'docs/visual-review/reference.html'
       - 'scripts/visual-review.mjs'
       - '.github/workflows/homepage-visual-review.yml'
-  workflow_dispatch:
+
+concurrency:
+  group: homepage-visual-review-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
@@ -46,10 +37,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Install screenshot browser
-        run: |
-          npm install --no-save playwright
-          npx playwright install --with-deps chromium
+      - name: Check visual review script syntax
+        run: node --check scripts/visual-review.mjs
+      - name: Install Playwright
+        run: npm install --no-save playwright
       - name: Start static preview server
         run: |
           python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/homepage-visual-review-server.log 2>&1 &
