@@ -98,3 +98,14 @@ The main homepage previously used both **9 African countries** (analysis label/c
 - Hides a legacy mobile sticky scan banner.
 - Normalizes/replaces footer markup.
 - It does **not** implement auth-aware login/logout state or session-aware header behavior. The redesign keeps the new accessible mobile menu and opt-in analytics consent, and intentionally does not load `main.js` because its header/footer mutations and sitewide dot layer conflict with the new design.
+
+
+## Round 2 review fixes
+
+- [x] Removed the duplicated visible FAQ block. The homepage now has one “Common questions.” heading and three visible FAQ items.
+- [x] The free-scan label is restored to **“9 African countries”**, matching `worker/index.js`. FAQ, FAQPage JSON-LD and Open Graph description now state that the free scan requests measurements from nine African countries and live regional results depend on probe availability. Visible FAQ copy and JSON-LD answers/questions are aligned.
+- [x] Removed broad global stylesheets (`style.css`, `brand.css`, `hero-theme.css`, `gtmetrix-color-system.css`, `desktop-header-canvas-fix.css`) from the homepage. Restored section styles remain for the legacy content; the new homepage stylesheet is loaded last to protect the redesigned header/hero/features/tabs. These legacy section styles still need screenshot verification at all three widths.
+- [x] Added `@font-face` for Plus Jakarta Sans 400 and 700 with `font-display: swap`, plus preload links and system fallbacks.
+- [x] Added one-time GitHub Actions workflow `.github/workflows/vendor-plus-jakarta-sans.yml` to download the two Latin WOFF2 assets from `@fontsource/plus-jakarta-sans` and commit them to `/fonts`.
+- [ ] Awaiting the font workflow to commit the actual WOFF2 assets.
+- [ ] Awaiting the homepage visual-review workflow and comparison artifact on this head before visual approval.
