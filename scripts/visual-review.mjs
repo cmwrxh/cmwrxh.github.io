@@ -17,7 +17,7 @@ try {
   for (const size of sizes) {
     const capture = async (url, filename) => {
       const page = await browser.newPage({ viewport: { width: size.width, height: size.height }, deviceScaleFactor: 1 });
-      await page.addInitScript(() => { if (location.origin === 'http://127.0.0.1:4173') localStorage.setItem('africalatency_analytics_consent_v1', 'rejected'); });
+      await page.addInitScript(() => { if (location.origin === 'http://127.0.0.1:4173') localStorage.setItem('africalatency_analytics_consent_v1', 'rejected'); localStorage.setItem('africalatency-analytics-consent', 'rejected'); });
       await page.goto(url, { waitUntil: 'networkidle', timeout: 45000 });
       await page.evaluate(() => document.fonts ? document.fonts.ready.then(() => true) : true);
       await page.waitForTimeout(350);
