@@ -61,3 +61,30 @@ main.pricing-main .plan-card a.plan-cta:hover,
 main.pricing-main .plan-card a.plan-cta:focus-visible { color: #fff !important; }
 main.pricing-main .plan-card a.plan-cta:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
 @media (max-width: 640px) { main.pricing-main .plan-card a.plan-cta { min-height: 48px; } }
+
+/* Enterprise, FAQ and conversion band follow the pricing page's dark GTmetrix-style system. */
+.plan-card:nth-child(1){--plan-accent:#7b8798}
+.plan-card:nth-child(2){--plan-accent:#4c9fe8}
+.plan-card:nth-child(3){--plan-accent:#8b78ff}
+.plan-card:nth-child(4){--plan-accent:#e2a55b}
+.plan-card{border-top:3px solid var(--plan-accent, var(--pricing-blue))}
+.plan-card h2{color:var(--plan-accent, #f4f7fc)}
+.plan-card-recommended{box-shadow:0 16px 42px rgba(80,116,210,.12)}
+.included-grid li{display:flex;align-items:center;flex-wrap:wrap;gap:5px}
+.included-grid li:before{flex:0 0 auto}
+.pricing-enterprise{display:flex;align-items:center;justify-content:space-between;gap:28px;margin:54px 0 0;padding:30px 32px;border:1px solid rgba(95,145,198,.35);border-radius:16px;background:linear-gradient(115deg,rgba(28,57,84,.72),rgba(17,21,31,.96))}
+.pricing-enterprise h2,.pricing-faq h2,.pricing-cta-band h2{margin:7px 0 10px;color:#f5f7fb;font-size:clamp(1.45rem,2.4vw,2rem);line-height:1.2}
+.pricing-enterprise p,.pricing-faq-heading>p:last-child,.pricing-faq-contact p,.pricing-cta-band p:last-of-type{max-width:650px;color:#b6c1d0;line-height:1.65}
+.pricing-enterprise .plan-cta,.pricing-cta-band .plan-cta{flex:0 0 auto;min-width:155px}
+.pricing-faq{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(250px,.9fr);gap:28px;margin:60px 0 30px;padding:34px;border-radius:18px;background:linear-gradient(130deg,#321c2a 0%,#171b2b 70%,#10141d 100%)}
+.pricing-faq-heading{grid-column:1/-1}
+.pricing-faq-list{display:grid;gap:10px;align-content:start}
+.pricing-faq-list details{padding:16px 18px;border:1px solid rgba(255,255,255,.13);border-radius:10px;background:rgba(8,12,20,.32)}
+.pricing-faq-list summary{color:#f4f7fc;font-weight:650;cursor:pointer;line-height:1.5}
+.pricing-faq-list details p{margin:12px 0 0;color:#c4cedb;line-height:1.65;font-size:.9rem}
+.pricing-faq-contact{align-self:start;padding:22px;border:1px solid rgba(255,255,255,.14);border-radius:12px;background:rgba(5,10,18,.32)}
+.pricing-faq-contact h3{margin:0;color:#fff;font-size:1.2rem}
+.pricing-faq-contact a{display:inline-block;margin-top:8px;color:#8ecaff;font-weight:700;text-decoration:none}
+.pricing-cta-band{display:flex;align-items:center;justify-content:space-between;gap:24px;margin:36px 0 18px;padding:30px 32px;border-radius:16px;background:linear-gradient(110deg,#12395a,#15243c 62%,#291b32)}
+.pricing-cta-band h2{max-width:720px}
+@media(max-width:700px){.pricing-enterprise,.pricing-cta-band{align-items:stretch;flex-direction:column;padding:24px 20px}.pricing-faq{grid-template-columns:minmax(0,1fr);padding:22px 16px;gap:18px}.pricing-faq-heading{grid-column:auto}.pricing-enterprise .plan-cta,.pricing-cta-band .plan-cta{width:100%}}
