@@ -230,3 +230,52 @@ a:focus-visible, button:focus-visible, input:focus-visible, [role="tabpanel"]:fo
 @media (max-width: 420px) {
   .al-header-button { padding: 0 9px; }
 }
+
+
+/* Follow-up: readable body copy and WCAG AA link affordances. Keep display titles tightly tracked. */
+.al-lede,
+.al-form-help,
+.al-section-subtitle,
+.al-feature-card p,
+.al-tab-panel p,
+.visibility-feature-subheading,
+.visibility-feature-card-copy,
+.visibility-report-content p,
+.section-lead,
+.section-heading > p,
+.faq-answer,
+.methodology-summary p,
+.get-started-banner-copy > p,
+.al-site-footer p,
+.al-consent-banner p {
+  letter-spacing: 0;
+  word-spacing: 0.04em;
+}
+.al-form-help { color: #cbd5e1; }
+.al-section-subtitle,
+.al-tab-panel p { color: #d3deea; }
+.visibility-feature-subheading { color: #8fcaff !important; }
+.visibility-feature-card-copy { color: #c8d7e6 !important; }
+.visibility-feature-card-link,
+.al-panel-link { color: #a5d6ff; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+.al-site-footer a:not(.al-brand),
+.al-consent-banner a,
+.faq-answer a,
+.methodology-summary a,
+.visibility-report-content a,
+.custom-scope-note a,
+.pilot-invitation a,
+.get-started-banner a:not(.get-started-primary) {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+.al-site-footer nav a { color: #d0d8e1; }
+.al-copyright { color: #b7c1cc; }
+.al-analysis-options { letter-spacing: 0; word-spacing: 0.04em; }
+.al-analysis-item { justify-content: center; }
+@media (max-width: 760px) {
+  .al-analysis-options { justify-content: center; text-align: center; }
+  .al-analysis-options strong { flex-basis: 100%; text-align: center; }
+  .al-analysis-item { justify-content: center; width: 100%; }
+}
