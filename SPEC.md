@@ -43,14 +43,14 @@ Branch: `feat/africalatency-homepage-dotfield`
 
 - [x] Add a reference HTML fixture and a Playwright visual-review script.
 - [x] Add an automated workflow to capture the implementation and reference at 1280px, 820px and 390px and upload the side-by-side comparison images as a workflow artifact.
-- [ ] Browser screenshots and visual comparison must be reviewed from the workflow artifact before merge.
+- [x] Browser screenshots and side-by-side comparisons generated at 1280px, 820px and 390px; inspected for layout, contrast, responsive behavior and consent-banner overlap.
 - [ ] Lighthouse scores and a live-device cross-browser pass are not claimed in this PR until run against a deployed preview.
 
 ## Deviations and known limitations
 
 - The requested homepage Mobile/Desktop toggle is omitted because the URL query contract does not accept the device profile from the homepage link. Existing selection on `/scan` remains untouched.
 - No feature is invented for Monitor, Collaborate or Integrate with AI tabs. Monitor links to the existing waitlist, Collaborate to Contact, and AI integration to the existing API documentation.
-- No live preview browser was available in the code-editing environment. Screenshot capture is configured as an automated PR workflow; its artifact must be inspected before merging.
+- Screenshots are from a static local HTTP preview of the PR branch, not a deployed Coolify preview. Lighthouse scores and a live-device cross-browser pass remain unverified.
 - The repository does not contain a CSP declaration. A hosting-layer CSP could not be ruled out from tracked files alone.
 
 ## Files in this PR
