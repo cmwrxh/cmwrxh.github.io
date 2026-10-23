@@ -10,7 +10,7 @@
 @media print{nav,footer,.report-actions,.report-cta,.locked-overlay,#full-report-content{display:none!important}.report-v2{max-width:none;padding:0}.locked-content{filter:none;opacity:1}.report-card{break-inside:avoid}.report-table-wrap{overflow:visible}.report-table{min-width:0;font-size:9pt}}\n</style>
 </head>
 <body>
-<nav><div class="nav-inner"><a href="/" class="nav-brand brand-lockup" aria-label="AfricaLatency"><img class="brand-wordmark" src="/images/africalatency-logo-light.svg" alt="AfricaLatency" width="180" height="28"></a><ul class="nav-links"><li><a href="/scan">Run a scan</a></li><li><a href="/how-we-score">How we score</a></li><li><a href="/login">Log in</a></li></ul></div></nav>
+<nav><div class="nav-inner"><a href="/" class="nav-brand brand-lockup" aria-label="AfricaLatency"><img class="brand-wordmark" src="/images/africalatency-logo-light.svg" alt="AfricaLatency" width="180" height="28"></a><div class="nav-actions"><button id="menu-toggle" class="menu-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="site-menu"><span></span><span></span><span></span></button></div></div></nav>
 <main class="report-v2">
 <div id="report-status" class="report-status">Loading report…</div>
 <div id="report-content" hidden>
@@ -89,4 +89,4 @@ document.getElementById('print-report').addEventListener('click',()=>window.prin
 }catch(e){setStatus(e.message||'Unable to load the report.');}
 })();
 </script>
-</body></html>
+<script src="/js/main.js?v=7" defer></script></body></html>
