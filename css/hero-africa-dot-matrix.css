@@ -1,0 +1,51 @@
+/* GTmetrix-inspired black hero and static, masked dot canvas. */
+.hero-africa-dot-hero,
+.hero-wave {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background: #000 !important;
+  background-image: none !important;
+}
+.hero-africa-dot-canvas,
+.hero-africa-dot-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.hero-africa-dot-canvas {
+  display: block;
+  background: transparent !important;
+  opacity: 1;
+  filter: none;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 20%, #000 75%);
+  mask-image: linear-gradient(to bottom, transparent 20%, #000 75%);
+}
+.hero-africa-dot-overlay {
+  background: transparent !important;
+  background-image: none !important;
+}
+.hero-africa-dot-content,
+.hero-wave .container,
+.hero-wave .hero-africa-dot-content {
+  position: relative;
+  z-index: 1;
+}
+.hero-africa-dot-hero .hero-title,
+.hero-wave .hero-title,
+.hero-wave h1 { color: #fff !important; }
+.hero-africa-dot-hero .hero-africa-title-accent,
+.hero-africa-dot-hero .city-rotator-word {
+  background: none !important;
+  -webkit-background-clip: initial !important;
+  background-clip: initial !important;
+}
+/* The hero ends sharply; the next section begins with the specified navy band. */
+.hero-africa-dot-hero + .regional-performance-section,
+.hero-wave + section {
+  background: linear-gradient(180deg,#12385a,#0a1a2e) !important;
+  background-image: linear-gradient(180deg,#12385a,#0a1a2e) !important;
+}
