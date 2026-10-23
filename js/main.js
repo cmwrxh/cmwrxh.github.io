@@ -170,6 +170,7 @@ document.addEventListener('DOMContentLoaded', () => {
   ];
   const topLinks = [ ['/about', 'About'], ['/contact', 'Contact'] ];
 
+  const linkList = (items) => items.map(([href, text]) => `<a href="${href}">${text}</a>`).join('');
   const nav = document.querySelector('nav');
   if (nav) {
     let navLinks = nav.querySelector('.nav-links');
@@ -181,7 +182,6 @@ document.addEventListener('DOMContentLoaded', () => {
         actions.className = 'nav-actions'; navInner.appendChild(actions); navInner.insertBefore(navLinks, actions);
       }
     }
-    const linkList = (items) => items.map(([href, text]) => `<a href="${href}">${text}</a>`).join('');
   const renderDropdown = (label, groups, extraClass) => `<li class="nav-dropdown"><button class="nav-dropdown-trigger" type="button" aria-haspopup="true" aria-expanded="false">${label}</button><div class="nav-dropdown-menu ${extraClass}">${groups.map(([heading, items]) => (heading ? `<span class="nav-dropdown-heading">${heading}</span>` : '') + linkList(items)).join('')}</div></li>`;
     navLinks.innerHTML = [
       `<li><a href="/pricing.html">Pricing</a></li>`,
