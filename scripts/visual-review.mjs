@@ -17,7 +17,7 @@ try {
   for (const size of sizes) {
     const capture = async (url, filename) => {
       const page = await browser.newPage({ viewport: { width: size.width, height: size.height }, deviceScaleFactor: 1 });
-      await page.addInitScript(() => { if (location.origin === 'http://127.0.0.1:4173') localStorage.setItem('africalatency_analytics_consent_v1', 'rejected'); localStorage.setItem('africalatency-analytics-consent', 'rejected'); });
+      await page.addInitScript(() => { if (location.origin === 'http://127.0.0.1:4173') localStorage.setItem('africalatency_analytics_consent_v1', 'rejected'); localStorage.setItem('africalatency-analytics-consent', 'rejected'); localStorage.setItem('africalatency-analytics-consent', 'rejected'); });
       await page.goto(url, { waitUntil: 'networkidle', timeout: 45000 });
       await page.evaluate(() => document.fonts ? document.fonts.ready.then(() => true) : true);
       await page.waitForTimeout(350);
@@ -56,8 +56,8 @@ try {
       const branchPage = await browser.newPage({ viewport: { width: size.width, height: size.height }, deviceScaleFactor: 1 });
       const mainPage = await browser.newPage({ viewport: { width: size.width, height: size.height }, deviceScaleFactor: 1 });
       await Promise.all([
-        branchPage.addInitScript(() => localStorage.setItem('africalatency_analytics_consent_v1', 'rejected')),
-        mainPage.addInitScript(() => localStorage.setItem('africalatency_analytics_consent_v1', 'rejected'))
+        branchPage.addInitScript(() => localStorage.setItem('africalatency_analytics_consent_v1', 'rejected'); localStorage.setItem('africalatency-analytics-consent', 'rejected')),
+        mainPage.addInitScript(() => localStorage.setItem('africalatency_analytics_consent_v1', 'rejected'); localStorage.setItem('africalatency-analytics-consent', 'rejected'))
       ]);
       await Promise.all([
         branchPage.goto(base + '/', { waitUntil: 'networkidle', timeout: 45000 }),
@@ -87,4 +87,5 @@ try {
 } finally {
   await browser.close();
 }
+// Both the legacy and current consent keys are rejected for a clean visual comparison.
 console.log('Captured viewport/full-page screenshots at 1280px, 820px and 390px, plus seven restored-section comparisons against main at 1280px and 390px.');
