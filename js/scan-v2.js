@@ -126,26 +126,58 @@
     }
     throw new Error('This scan is taking longer than expected. You can reopen the report link and check its status.');
   }
-  async function setupTurnstile() {
-    const response = await fetch('/api/scan?config=1');
-    const config = await response.json().catch(() => ({}));
-    if (!config.turnstileSiteKey) return;
+  function turnstileSetupError(message) {
     const host = document.getElementById('scan-turnstile');
     host.hidden = false;
-    if (window.turnstile) return renderTurnstile(config.turnstileSiteKey);
+    host.textContent = message;
+    setError(message);
+  }
+  async function setupTurnstile() {
+    const host = document.getElementById('scan-turnstile');
+    host.hidden = false;
+    host.textContent = 'Loading bot verification…';
+    let config;
+    try {
+      const response = await fetch('/api/scan?config=1', { cache: 'no-store' });
+      if (!response.ok) throw new Error('Configuration request returned HTTP ' + response.status);
+      config = await response.json();
+    } catch (_) {
+      turnstileSetupError('Bot verification could not be loaded. Refresh the page and try again. If this continues, please try again later.');
+      return;
+    }
+    if (!config || !config.turnstileSiteKey) {
+      turnstileSetupError('Bot verification is not configured for this site yet. Anonymous scans are temporarily unavailable.');
+      return;
+    }
+    host.textContent = '';
+    if (window.turnstile) {
+      try { renderTurnstile(config.turnstileSiteKey); }
+      catch (_) { turnstileSetupError('Cloudflare bot verification failed to initialize. Refresh the page and try again.'); }
+      return;
+    }
     const script = document.createElement('script');
     script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
     script.async = true; script.defer = true;
-    script.onload = () => renderTurnstile(config.turnstileSiteKey);
+    script.onload = () => {
+      if (!window.turnstile) {
+        turnstileSetupError('Cloudflare bot verification did not initialize. Check browser content blockers or try another browser.');
+        return;
+      }
+      try { renderTurnstile(config.turnstileSiteKey); }
+      catch (_) { turnstileSetupError('Cloudflare bot verification failed to initialize. Refresh the page and try again.'); }
+    };
+    script.onerror = () => turnstileSetupError('Cloudflare bot verification could not load. Check browser content blockers or try another browser.');
     document.head.append(script);
   }
   function renderTurnstile(siteKey) {
     if (!window.turnstile || turnstileWidget !== null) return;
+    const host = document.getElementById('scan-turnstile');
+    host.textContent = '';
     turnstileWidget = window.turnstile.render('#scan-turnstile', {
       sitekey: siteKey,
-      callback: token => { turnstileToken = token; },
-      'expired-callback': () => { turnstileToken = ''; },
-      'error-callback': () => { turnstileToken = ''; }
+      callback: token => { turnstileToken = token; setError(''); },
+      'expired-callback': () => { turnstileToken = ''; setError('Bot verification expired. Please complete it again.'); },
+      'error-callback': () => { turnstileToken = ''; setError('Cloudflare bot verification encountered an error. Please retry verification.'); }
     });
   }
   document.querySelectorAll('[data-device]').forEach(control => control.addEventListener('click', () => {
