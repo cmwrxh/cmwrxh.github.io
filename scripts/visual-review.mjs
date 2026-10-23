@@ -17,7 +17,7 @@ try {
     const capture = async (url, filename) => {
       const page = await browser.newPage({ viewport: { width: size.width, height: size.height }, deviceScaleFactor: 1 });
       await page.goto(url, { waitUntil: 'networkidle', timeout: 45000 });
-      await page.evaluate(() => document.fonts && document.fonts.ready);
+      await page.evaluate(() => document.fonts ? document.fonts.ready.then(() => true) : true);
       await page.waitForTimeout(350);
       const word = await page.$('[data-rotating-word]');
       if (word) await word.evaluate(el => { el.textContent = 'AI-Built'; el.setAttribute('aria-label', 'AI-Built'); });
