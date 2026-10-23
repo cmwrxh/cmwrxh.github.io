@@ -12,6 +12,8 @@ on:
       - 'js/homepage-reference-redesign.js'
       - 'docs/visual-review/reference.html'
       - 'scripts/visual-review.mjs'
+      - 'scripts/nav-responsive-review.mjs'
+      - '.github/workflows/nav-responsive-review.yml'
       - '.github/workflows/homepage-visual-review.yml'
 
 concurrency:
@@ -62,5 +64,14 @@ jobs:
         with:
           name: homepage-reference-comparisons
           path: artifacts/visual-review/*.png
+          if-no-files-found: error
+          retention-days: 14
+      - name: Run responsive navigation checks and capture 30 screenshots
+        run: node scripts/nav-responsive-review.mjs
+      - name: Upload responsive navigation screenshots
+        uses: actions/upload-artifact@v4
+        with:
+          name: africalatency-responsive-navigation
+          path: artifacts/nav-responsive/*.png
           if-no-files-found: error
           retention-days: 14
