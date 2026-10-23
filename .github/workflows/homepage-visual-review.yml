@@ -1,0 +1,66 @@
+name: Homepage visual review
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'index.html'
+      - 'css/legacy-home.css'
+      - 'css/homepage-reference-redesign.css'
+      - 'js/compliance.js'
+      - 'js/main.js'
+      - 'js/homepage-reference-redesign.js'
+      - 'docs/visual-review/reference.html'
+      - 'scripts/visual-review.mjs'
+      - '.github/workflows/homepage-visual-review.yml'
+
+concurrency:
+  group: homepage-visual-review-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  screenshots:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out branch
+        uses: actions/checkout@v4
+      - name: Check out main for restored-section baseline
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: main-reference
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check visual review script syntax
+        run: node --check scripts/visual-review.mjs
+      - name: Install Playwright
+        run: npm install --no-save playwright
+      - name: Start static preview server
+        run: |
+          python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/homepage-visual-review-server.log 2>&1 &
+          echo $! > /tmp/homepage-visual-review-server.pid
+          python3 -m http.server 4174 --bind 127.0.0.1 --directory main-reference >/tmp/homepage-main-baseline.log 2>&1 &
+          echo $! > /tmp/homepage-main-baseline.pid
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:4173/ >/dev/null && curl --fail --silent http://127.0.0.1:4174/ >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/homepage-visual-review-server.log
+          exit 1
+      - name: Check homepage script syntax
+        run: node --check js/homepage-reference-redesign.js
+      - name: Capture viewport and full-page reference comparisons at desktop, tablet, and mobile widths
+        run: node scripts/visual-review.mjs
+      - name: Upload visual comparisons
+        uses: actions/upload-artifact@v4
+        with:
+          name: homepage-reference-comparisons
+          path: artifacts/visual-review/*.png
+          if-no-files-found: error
+          retention-days: 14

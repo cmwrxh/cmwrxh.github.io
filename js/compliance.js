@@ -83,7 +83,7 @@
     var style = document.createElement('style');
     style.id = 'africalatency-compliance-styles';
     style.textContent = `
-      .al-cookie-banner { position: fixed; left: 20px; right: 20px; bottom: 20px; z-index: 100000; max-width: 760px; margin: 0 auto; padding: 18px 20px; background: var(--bg-card, #111114); color: var(--text, #fff); border: 1px solid var(--border-strong, rgba(255,255,255,.16)); border-radius: 14px; box-shadow: 0 18px 50px rgba(0,0,0,.35); }
+      .al-cookie-banner { position: fixed; left: 20px; right: 20px; bottom: 20px; z-index: 100000; max-width: 760px; margin: 0 auto; padding: 18px 20px; background: #111318; color: var(--text, #fff); border: 1px solid var(--border-strong, rgba(255,255,255,.16)); border-radius: 14px; box-shadow: 0 18px 50px rgba(0,0,0,.35); }
       .al-cookie-banner p { margin: 0 0 12px; color: var(--text-muted, #9aa0ab); font-size: .86rem; line-height: 1.55; }
       .al-cookie-banner a { color: var(--accent, #39ff9a); }
       .al-cookie-actions { display: flex; gap: 10px; flex-wrap: wrap; }

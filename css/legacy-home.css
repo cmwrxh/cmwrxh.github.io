@@ -1,0 +1,17 @@
+/* Important legacy resets must not outrank the namespaced homepage or the restored-section compatibility layer. */
+@layer al-priority, legacy;
+@import url("/css/style.css") layer(legacy);
+@import url("/css/brand.css") layer(legacy);
+@import url("/css/hero-theme.css") layer(legacy);
+@import url("/css/gtmetrix-color-system.css") layer(legacy);
+@import url("/css/desktop-header-canvas-fix.css") layer(legacy);
+@import url("/css/marketing.css") layer(legacy);
+@import url("/css/product-pages.css") layer(legacy);
+@import url("/css/regional-performance.css") layer(legacy);
+@import url("/css/unified-matte-layout.css") layer(legacy);
+@import url("/css/marketing-infrastructure-banner.css") layer(legacy);
+@import url("/css/homepage-mobile-cleanup.css") layer(legacy);
+@import url("/css/pan-african-intelligence.css") layer(legacy);
+@import url("/css/workflow-showcase.css") layer(legacy);
+@import url("/css/get-started-banner.css") layer(legacy);
+

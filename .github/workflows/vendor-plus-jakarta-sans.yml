@@ -1,0 +1,39 @@
+name: Vendor Plus Jakarta Sans fonts
+on:
+  push:
+    branches: [feat/africalatency-homepage-dotfield]
+    paths:
+      - '.github/workflows/vendor-plus-jakarta-sans.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  vendor-fonts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/africalatency-homepage-dotfield
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Download @fontsource package
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/fontsource /tmp/fontpkg fonts
+          cd /tmp/fontsource
+          npm pack @fontsource/plus-jakarta-sans
+          tar -xzf fontsource-plus-jakarta-sans-*.tgz -C /tmp/fontpkg
+          for weight in 400 500 600 700; do
+            cp "/tmp/fontpkg/package/files/plus-jakarta-sans-latin-${weight}-normal.woff2" "$GITHUB_WORKSPACE/fonts/"
+          done
+      - name: Commit the font files
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add fonts/plus-jakarta-sans-latin-{400,500,600,700}-normal.woff2
+          if git diff --cached --quiet; then
+            echo "Font files already current"
+            exit 0
+          fi
+          git commit -m "Vendor Plus Jakarta Sans Latin WOFF2 fonts"
+          git push origin HEAD:feat/africalatency-homepage-dotfield
