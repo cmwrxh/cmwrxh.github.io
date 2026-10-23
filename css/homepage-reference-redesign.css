@@ -205,3 +205,19 @@ a:focus-visible, button:focus-visible, input:focus-visible, [role="tabpanel"]:fo
 .al-features { background: linear-gradient(180deg, #123352 0%, #0e2a3f 52%, #0b1e31 100%) !important; }
 .al-wrap { max-width: 1280px; }
 .al-header-button { background: transparent !important; box-shadow: none !important; }
+
+/* The legacy global styles contain !important declarations. This small early layer
+   neutralizes those only where they collide with the new shell or restored cards. */
+@layer al-priority {
+  .al-header { background: #171619 !important; }
+  .al-hero { background: #000 !important; }
+  .al-features { background: linear-gradient(180deg, #123352 0%, #0e2a3f 52%, #0b1e31 100%) !important; }
+  nav.al-header-actions { background: transparent !important; border: 0 !important; box-shadow: none !important; backdrop-filter: none !important; }
+  .al-header-button { background: transparent !important; color: #e8e8e8 !important; }
+  .legacy-homepage-sections .visibility-feature-card { color: #e5f1fa !important; }
+  .legacy-homepage-sections .visibility-feature-card-title { color: #e5f1fa !important; }
+  .legacy-homepage-sections .visibility-feature-card-copy { color: #a9b4c7 !important; }
+  .legacy-homepage-sections .visibility-feature-card-link { color: #67c8ff !important; }
+  .legacy-homepage-sections .visibility-feature-card .visibility-feature-icon { color: #e5f1fa !important; }
+  .legacy-homepage-sections .visibility-feature-card[aria-pressed="true"] { border-color: #3292e0 !important; }
+}
