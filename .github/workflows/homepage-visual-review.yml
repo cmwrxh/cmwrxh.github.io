@@ -17,7 +17,10 @@ on:
     branches: [main]
     paths:
       - 'index.html'
+      - 'css/legacy-home.css'
       - 'css/homepage-reference-redesign.css'
+      - 'js/compliance.js'
+      - 'js/main.js'
       - 'js/homepage-reference-redesign.js'
       - 'docs/visual-review/reference.html'
       - 'scripts/visual-review.mjs'
