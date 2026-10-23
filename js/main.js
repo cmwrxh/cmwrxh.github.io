@@ -111,6 +111,8 @@ document.addEventListener('DOMContentLoaded', () => {
       .nav-dropdown-menu { position: absolute; top: calc(100% + 12px); left: -14px; display: none; min-width: 205px; padding: 9px; border: 1px solid rgba(255,255,255,.10); border-radius: 12px; background: #111114; box-shadow: 0 18px 45px rgba(0,0,0,.35); }
       .nav-dropdown-menu::before { content: ''; position: absolute; top: -8px; left: 20px; width: 14px; height: 14px; background: #111114; border-left: 1px solid rgba(255,255,255,.10); border-top: 1px solid rgba(255,255,255,.10); transform: rotate(45deg); }
       .nav-dropdown-menu a { position: relative; z-index: 1; display: flex !important; width: 100%; padding: 9px 10px; border-radius: 7px; color: #c8ccd4; text-decoration: none; font-size: .86rem; }
+      .nav-dropdown-heading { display: block; padding: 8px 10px 4px; color: #7f8794; font-size: .68rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+      .nav-dropdown-heading:not(:first-child) { margin-top: 6px; border-top: 1px solid rgba(255,255,255,.08); padding-top: 12px; }
       .nav-dropdown-menu a:hover,
       .nav-dropdown-menu a:focus-visible { background: rgba(255,255,255,.06); color: #fff; outline: none; }
       .nav-links > li > a { color: #fff; font-weight: 500; }
@@ -123,7 +125,7 @@ document.addEventListener('DOMContentLoaded', () => {
       .nav-dropdown.open .nav-dropdown-trigger { color: #fff; }
       .nav-dropdown-menu a.nav-dropdown-highlight { color: #fff; font-weight: 600; }
       .nav-links .nav-dropdown-menu.nav-services { min-width: 225px; }
-      .nav-links .nav-dropdown-menu.nav-resources { min-width: 210px; left: -10px; }
+      .nav-links .nav-dropdown-menu.nav-resources { min-width: 230px; max-height: 70vh; overflow-y: auto; left: -10px; }
       .nav-links .nav-dropdown-menu.nav-resources::before { left: 22px; }
       .nav-cta { display: inline-flex; align-items: center; white-space: nowrap; }
       .nav-actions { margin-left: auto; }
@@ -152,15 +154,17 @@ document.addEventListener('DOMContentLoaded', () => {
     brand.innerHTML = '<img class="brand-wordmark" src="/images/africalatency-logo-light.svg" alt="AfricaLatency" width="180" height="28">';
   });
 
+  // Former Services items now live under Resources -> Tools (single functional menu).
   const serviceLinks = [
     ['/scan', 'Free Scan'],
     ['/audit-checkout', 'Africa Latency Audit'],
     ['/monitoring', 'Continuous Monitoring'],
+    ['/sitespeed.html', 'Website Speed Check'],
     ['/services', 'Custom Deep Dive / Enterprise'],
-    ['/sitespeed.html', 'Website Speed Check']
+    ['/tools', 'Tools & API']
   ];
   const resourceLinks = [
-    ['/tools', 'Tools'], ['/sample-report', 'Sample Report'], ['/compare', 'Compare'], ['/performance-index', 'Africa Internet Performance Index'],
+    ['/sample-report', 'Sample Report'], ['/compare', 'Compare'], ['/performance-index', 'Africa Internet Performance Index'],
     ['/methodology', 'Methodology'], ['/security', 'Security'], ['/docs', 'Docs'], ['/changelog', 'Changelog'],
     ['/blog', 'Blog'], ['/cases', 'Case Studies'], ['/data-centers.html', 'Data Centers'], ['/kenya.html', 'Kenya'], ['/nigeria.html', 'Nigeria']
   ];
@@ -177,10 +181,11 @@ document.addEventListener('DOMContentLoaded', () => {
         actions.className = 'nav-actions'; navInner.appendChild(actions); navInner.insertBefore(navLinks, actions);
       }
     }
-    const renderDropdown = (label, items, extraClass) => `<li class="nav-dropdown"><button class="nav-dropdown-trigger" type="button" aria-haspopup="true" aria-expanded="false">${label}</button><div class="nav-dropdown-menu ${extraClass}">${items.map(([href, text]) => `<a href="${href}">${text}</a>`).join('')}</div></li>`;
+    const linkList = (items) => items.map(([href, text]) => `<a href="${href}">${text}</a>`).join('');
+  const renderDropdown = (label, groups, extraClass) => `<li class="nav-dropdown"><button class="nav-dropdown-trigger" type="button" aria-haspopup="true" aria-expanded="false">${label}</button><div class="nav-dropdown-menu ${extraClass}">${groups.map(([heading, items]) => (heading ? `<span class="nav-dropdown-heading">${heading}</span>` : '') + linkList(items)).join('')}</div></li>`;
     navLinks.innerHTML = [
       `<li><a href="/pricing.html">Pricing</a></li>`,
-      renderDropdown('Resources', resourceLinks, 'nav-resources'),
+      renderDropdown('Resources', [['Tools', serviceLinks], ['Resources', resourceLinks]], 'nav-resources'),
       ...topLinks.map(([href, text]) => `<li><a href="${href}">${text}</a></li>`)
     ].join('');
     const dropdowns = navLinks.querySelectorAll('.nav-dropdown');
@@ -229,7 +234,8 @@ document.addEventListener('DOMContentLoaded', () => {
       <div class="menu-column">
         <div class="menu-group"><a href="/pricing.html" class="menu-group-title">Pricing</a></div>
         <a href="/about" class="menu-item">About</a>
-        <div class="menu-group"><div class="menu-label menu-group-title">Resources</div><div class="menu-subitems"><a href="/tools">Tools</a><a href="/sample-report">Sample report</a><a href="/compare">Compare</a><a href="/performance-index">Performance Index</a><a href="/methodology">Methodology</a><a href="/security">Security</a><a href="/docs">Docs</a><a href="/changelog">Changelog</a><a href="/blog">Blog</a><a href="/cases">Case studies</a></div></div>
+        <div class="menu-group"><div class="menu-label menu-group-title">Tools</div><div class="menu-subitems">${linkList(serviceLinks)}</div></div>
+        <div class="menu-group"><div class="menu-label menu-group-title">Resources</div><div class="menu-subitems">${linkList(resourceLinks.filter(([href]) => !['/data-centers.html','/kenya.html','/nigeria.html'].includes(href)))}</div></div>
         <a href="/contact" class="menu-item">Contact</a>
       </div><div class="legacy-menu-bottom"><div class="menu-label">Follow</div></div>`;
     if (socialIcons) grid.querySelector('.legacy-menu-bottom').appendChild(socialIcons);
@@ -238,9 +244,15 @@ document.addEventListener('DOMContentLoaded', () => {
   if (!document.getElementById('site-menu')) {
     const navLinks = nav?.querySelector('.nav-links');
     if (nav && navLinks) {
-      const toggle = document.createElement('button'); toggle.id = 'menu-toggle'; toggle.className = 'menu-toggle'; toggle.type = 'button';
-      toggle.setAttribute('aria-label', 'Open menu'); toggle.setAttribute('aria-expanded', 'false'); toggle.setAttribute('aria-controls', 'site-menu'); toggle.innerHTML = '<span></span><span></span><span></span>';
-      const actions = nav.querySelector('.nav-actions') || document.createElement('div'); actions.className = 'nav-actions'; actions.appendChild(toggle); nav.querySelector('.nav-inner').appendChild(actions);
+      // Reuse the hamburger already present in the page markup; only create one when the page has none.
+      const existingToggles = Array.from(document.querySelectorAll('button.menu-toggle, #menu-toggle'));
+      existingToggles.slice(1).forEach((extra) => extra.remove());
+      let toggle = existingToggles[0];
+      if (!toggle) {
+        toggle = document.createElement('button'); toggle.id = 'menu-toggle'; toggle.className = 'menu-toggle'; toggle.type = 'button';
+        toggle.setAttribute('aria-label', 'Open menu'); toggle.setAttribute('aria-expanded', 'false'); toggle.setAttribute('aria-controls', 'site-menu'); toggle.innerHTML = '<span></span><span></span><span></span>';
+        const actions = nav.querySelector('.nav-actions') || document.createElement('div'); actions.className = 'nav-actions'; actions.appendChild(toggle); nav.querySelector('.nav-inner').appendChild(actions);
+      }
       const menu = document.createElement('div'); menu.className = 'site-menu legacy-menu'; menu.id = 'site-menu'; menu.setAttribute('aria-hidden', 'true');
       menu.innerHTML = `<div class="site-menu-inner"><div class="menu-head"><img class="menu-wordmark" src="/images/africalatency-logo-dark.svg" alt="AfricaLatency" width="180" height="28"><button id="menu-close" class="menu-close" type="button" aria-label="Close menu">×</button></div><div class="menu-grid legacy-menu-grid"><div class="menu-column legacy-menu-links"></div><div class="legacy-menu-bottom"><div class="menu-label">Follow</div><div class="social-icons"><a href="https://www.linkedin.com/in/charles-mwaura-bb7814140/" target="_blank" rel="noopener" aria-label="LinkedIn"><i data-lucide="linkedin" aria-hidden="true"></i></a><a href="https://github.com/cmwrxh/cmwrxh.github.io" target="_blank" rel="noopener" aria-label="GitHub"><i data-lucide="github" aria-hidden="true"></i></a><a href="mailto:support@africalatency.dev" aria-label="Email"><i data-lucide="mail" aria-hidden="true"></i></a></div></div></div><div class="menu-footer"><a class="btn btn-secondary" href="/login">Log In</a><a class="btn btn-primary" href="/scan">Try for FREE</a></div></div>`;
       const linkContainer = menu.querySelector('.legacy-menu-links');
