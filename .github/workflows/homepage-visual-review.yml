@@ -1,0 +1,51 @@
+name: Homepage visual review
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'index.html'
+      - 'css/homepage-reference-redesign.css'
+      - 'js/homepage-reference-redesign.js'
+      - 'docs/visual-review/reference.html'
+      - 'scripts/visual-review.mjs'
+      - '.github/workflows/homepage-visual-review.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  screenshots:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out branch
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install screenshot browser
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Start static preview server
+        run: |
+          python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/homepage-visual-review-server.log 2>&1 &
+          echo $! > /tmp/homepage-visual-review-server.pid
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:4173/ >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/homepage-visual-review-server.log
+          exit 1
+      - name: Capture reference and homepage at desktop, tablet, and mobile widths
+        run: node scripts/visual-review.mjs
+      - name: Upload visual comparisons
+        uses: actions/upload-artifact@v4
+        with:
+          name: homepage-reference-comparisons
+          path: artifacts/visual-review/*.png
+          if-no-files-found: error
+          retention-days: 14
