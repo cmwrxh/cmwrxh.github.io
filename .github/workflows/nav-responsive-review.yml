@@ -1,0 +1,59 @@
+name: Responsive navigation review
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'pricing.html'
+      - 'scan.html'
+      - 'services.html'
+      - 'tools.html'
+      - 'about.html'
+      - 'docs.html'
+      - 'monitoring.html'
+      - 'methodology.html'
+      - 'sample-report.html'
+      - 'signup.html'
+      - 'index.html'
+      - 'js/main.js'
+      - 'css/pricing.css'
+      - 'css/homepage-reference-redesign.css'
+      - 'scripts/nav-responsive-review.mjs'
+      - '.github/workflows/nav-responsive-review.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  responsive:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install Playwright and Chromium
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Start local static preview
+        run: |
+          python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/nav-preview.log 2>&1 &
+          echo $! > /tmp/nav-preview.pid
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:4173/ >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/nav-preview.log
+          exit 1
+      - name: Run 10-page responsive navigation checks and capture screenshots
+        run: node scripts/nav-responsive-review.mjs
+      - name: Upload responsive screenshots
+        uses: actions/upload-artifact@v4
+        with:
+          name: africalatency-responsive-navigation
+          path: artifacts/nav-responsive/*.png
+          if-no-files-found: error
+          retention-days: 14
