@@ -252,3 +252,6 @@ a:focus-visible, button:focus-visible, input:focus-visible, [role="tabpanel"]:fo
   .al-site-footer .al-wrap,
   .al-site-footer .al-footer-inner { width:calc(100% - 40px); }
 }
+
+.faq-section .faq-answer[hidden] { display:none !important; }
+.faq-section .faq-item.is-open .faq-answer { display:block; }
