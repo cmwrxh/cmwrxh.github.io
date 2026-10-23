@@ -34,6 +34,11 @@ jobs:
     steps:
       - name: Check out branch
         uses: actions/checkout@v4
+      - name: Check out main for restored-section baseline
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: main-reference
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
@@ -46,8 +51,10 @@ jobs:
         run: |
           python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/homepage-visual-review-server.log 2>&1 &
           echo $! > /tmp/homepage-visual-review-server.pid
+          python3 -m http.server 4174 --bind 127.0.0.1 --directory main-reference >/tmp/homepage-main-baseline.log 2>&1 &
+          echo $! > /tmp/homepage-main-baseline.pid
           for attempt in $(seq 1 30); do
-            if curl --fail --silent http://127.0.0.1:4173/ >/dev/null; then exit 0; fi
+            if curl --fail --silent http://127.0.0.1:4173/ >/dev/null && curl --fail --silent http://127.0.0.1:4174/ >/dev/null; then exit 0; fi
             sleep 1
           done
           cat /tmp/homepage-visual-review-server.log
