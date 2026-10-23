@@ -351,5 +351,21 @@
     <script src="/js/workflow-showcase.js?v=2" defer></script>
 <script src="/js/compliance.js?v=1" defer></script>
   <script src="/js/homepage-reference-redesign.js?v=2" defer></script>
+<script>
+  // Accessible homepage FAQ accordion; scoped to lower-page FAQ only.
+  document.querySelectorAll('.faq-section .faq-question').forEach((button) => {
+    const answer = button.parentElement.querySelector('.faq-answer');
+    if (!answer) return;
+    answer.hidden = button.getAttribute('aria-expanded') !== 'true';
+    button.addEventListener('click', () => {
+      const expanded = button.getAttribute('aria-expanded') === 'true';
+      button.setAttribute('aria-expanded', String(!expanded));
+      button.parentElement.classList.toggle('is-open', !expanded);
+      answer.hidden = expanded;
+      const plus = button.querySelector('.plus');
+      if (plus) plus.textContent = expanded ? '+' : '−';
+    });
+  });
+</script>
 </body>
 </html>
