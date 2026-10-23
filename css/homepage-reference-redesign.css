@@ -69,7 +69,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, [role="tabpanel"]:fo
 .analysis-options { min-height: 28px; margin-top: 14px; display: flex; justify-content: center; align-items: center; gap: 24px; font-size: 14.5px; letter-spacing: -.03em; }
 .analysis-options strong { font-weight: 500; }
 .analysis-item { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; color: #f3f3f5; }
-.flag-africa { display: block; width: 28px; height: 22px; border-radius: 2px; }
+.region-globe { display: block; width: 28px; height: 28px; flex: 0 0 28px; }
 
 /* Feature band */
 .features { min-height: 881px; padding: 72px 0 74px; background: radial-gradient(120% 90% at 20% 0%, #16405f 0%, transparent 60%), linear-gradient(180deg, var(--al-feature-top), var(--al-feature-mid) 55%, var(--al-feature-bottom)); }
