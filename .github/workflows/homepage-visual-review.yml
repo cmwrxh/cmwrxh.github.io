@@ -40,6 +40,8 @@ jobs:
           done
           cat /tmp/homepage-visual-review-server.log
           exit 1
+      - name: Check homepage script syntax
+        run: node --check js/homepage-reference-redesign.js
       - name: Capture reference and homepage at desktop, tablet, and mobile widths
         run: node scripts/visual-review.mjs
       - name: Upload visual comparisons
