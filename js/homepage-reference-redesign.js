@@ -71,7 +71,7 @@
       if (running && inView && !reduceMotion) raf = window.requestAnimationFrame(loop);
     }
     if ('IntersectionObserver' in window) {
-      var hero = canvas.closest('.hero') || canvas;
+      var hero = canvas.closest('.al-hero') || canvas;
       observer = new IntersectionObserver(function (entries) {
         inView = !!(entries[0] && entries[0].isIntersecting);
         syncLoop();
@@ -191,7 +191,7 @@
     function activate(tab, focus) {
       tabs.forEach(function (item) {
         var selected = item === tab;
-        item.classList.toggle('is-active', selected);
+        item.classList.toggle('al-is-active', selected);
         item.setAttribute('aria-selected', String(selected));
         item.tabIndex = selected ? 0 : -1;
         var panel = document.getElementById(item.getAttribute('aria-controls'));
@@ -216,7 +216,7 @@
 
   /* Small, self-contained mobile menu; no legacy homepage header scripts are needed. */
   (function initMenu() {
-    var button = document.querySelector('.menu-toggle');
+    var button = document.querySelector('.al-menu-toggle');
     var menu = document.getElementById('mobile-menu');
     if (!button || !menu) return;
     button.addEventListener('click', function () {
