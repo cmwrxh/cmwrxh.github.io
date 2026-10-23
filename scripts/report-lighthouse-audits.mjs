@@ -1,6 +1,6 @@
 import { readFile } from 'node:fs/promises';
 
-for (const file of ['artifacts/lighthouse/mobile.json', 'artifacts/lighthouse/desktop.json']) {
+for (const file of ['artifacts/lighthouse/mobile.report.json', 'artifacts/lighthouse/desktop.report.json']) {
   const report = JSON.parse(await readFile(file, 'utf8'));
   console.log('\n' + file + ' — category scores');
   for (const category of ['performance', 'accessibility', 'best-practices', 'seo']) {
