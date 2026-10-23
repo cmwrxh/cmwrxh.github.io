@@ -361,13 +361,43 @@
       <p class="copyright">© 2026 AfricaLatency · <a href="mailto:support@africalatency.dev">support@africalatency.dev</a></p>
     </div>
   </footer>
-  <script src="/js/main.js?v=9"></script>
     <script src="/js/africa-dot-matrix-shared.js?v=2" defer></script>
     <script src="/js/regional-network-illustration.js?v=6" defer></script>
     <script src="/js/product-pages.js?v=1"></script>
     <script src="/js/marketing-infrastructure-banner.js?v=1" defer></script>
     <script src="/js/workflow-showcase.js?v=2" defer></script>
-    <script src="/js/compliance.js?v=1" defer></script>
+  <script>
+(function () {
+  var key = 'africalatency-analytics-consent';
+  function loadAnalytics() {
+    if (document.querySelector('script[data-al-consent-analytics]')) return;
+    var script = document.createElement('script');
+    script.src = '/africalatency.js';
+    script.defer = true;
+    script.setAttribute('data-al-key', 'test-site-001');
+    script.setAttribute('data-al-consent-analytics', 'true');
+    document.body.appendChild(script);
+  }
+  var choice = null;
+  try { choice = localStorage.getItem(key); } catch (_) {}
+  if (choice === 'accepted') { loadAnalytics(); return; }
+  if (choice === 'rejected') return;
+  var banner = document.createElement('aside');
+  banner.className = 'cookie-consent-banner';
+  banner.setAttribute('role', 'region');
+  banner.setAttribute('aria-label', 'Cookie preferences');
+  banner.innerHTML = '<div class="cookie-consent-copy">We use optional analytics to understand site performance. You can accept or reject analytics; essential site functions work either way.</div><div class="cookie-consent-actions"><button type="button" data-consent="accept">Accept analytics</button><button type="button" data-consent="reject">Reject analytics</button></div>';
+  function choose(value) {
+    try { localStorage.setItem(key, value); } catch (_) {}
+    if (value === 'accepted') loadAnalytics();
+    banner.remove();
+  }
+  banner.querySelector('[data-consent="accept"]').addEventListener('click', function () { choose('accepted'); });
+  banner.querySelector('[data-consent="reject"]').addEventListener('click', function () { choose('rejected'); });
+  document.body.appendChild(banner);
+}());
+</script>
+  <script src="/js/compliance.js?v=1" defer></script>
   <script src="/js/homepage-reference-redesign.js?v=2" defer></script>
 </body>
 </html>
