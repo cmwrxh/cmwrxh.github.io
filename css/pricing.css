@@ -52,3 +52,12 @@
 @media(max-width:1000px){.pricing-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.plan-card:nth-child(2){border-right:1px solid var(--pricing-line)}.plan-card:nth-child(n+3){border-top:1px solid var(--pricing-line)}.included-section{grid-template-columns:1fr;gap:24px}}
 @media(max-width:600px){.pricing-nav-inner{padding:0 18px;min-height:68px}.pricing-nav-links{gap:13px}.pricing-nav-links a{font-size:.78rem}.pricing-nav-links a:nth-child(2),.pricing-nav-links a:nth-child(3){display:none}.pricing-main{padding:48px 16px 38px}.pricing-heading{margin-bottom:32px}.pricing-intro{font-size:.9rem}.billing-control{gap:8px;flex-wrap:wrap}.billing-savings{font-size:.65rem}.pricing-grid{grid-template-columns:minmax(0,1fr)}.plan-card,.plan-card:last-child{padding:25px 20px;border-left:1px solid var(--pricing-line);border-right:1px solid var(--pricing-line);border-top:1px solid var(--pricing-line)}.plan-card:first-child{border-top:0}.plan-card-recommended .plan-card-top{padding-top:24px}.plan-description{min-height:0}.plan-price{margin:21px 0}.price-primary{font-size:1.8rem}.included-section{margin-top:45px}.included-grid{grid-template-columns:1fr}.pricing-footer{gap:14px;padding:20px 18px 28px}.pricing-footer span{width:100%;order:3}}
 @media(prefers-reduced-motion:reduce){.billing-switch-knob,.plan-cta{transition:none}}
+
+
+/* Button labels: brand.css forces blue link colour on non-.btn links inside <main>,
+   which made .plan-cta labels blue on the blue button fill. Higher specificity restores white. */
+main.pricing-main .plan-card a.plan-cta,
+main.pricing-main .plan-card a.plan-cta:hover,
+main.pricing-main .plan-card a.plan-cta:focus-visible { color: #fff !important; }
+main.pricing-main .plan-card a.plan-cta:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+@media (max-width: 640px) { main.pricing-main .plan-card a.plan-cta { min-height: 48px; } }
