@@ -6,6 +6,9 @@ on:
     paths:
       - 'index.html'
       - 'css/homepage-reference-redesign.css'
+      - 'css/legacy-home.css'
+      - 'js/compliance.js'
+      - 'js/main.js'
       - 'js/homepage-reference-redesign.js'
       - 'docs/visual-review/reference.html'
       - 'scripts/visual-review.mjs'
@@ -51,7 +54,7 @@ jobs:
           exit 1
       - name: Check homepage script syntax
         run: node --check js/homepage-reference-redesign.js
-      - name: Capture reference and homepage at desktop, tablet, and mobile widths
+      - name: Capture viewport and full-page reference comparisons at desktop, tablet, and mobile widths
         run: node scripts/visual-review.mjs
       - name: Upload visual comparisons
         uses: actions/upload-artifact@v4
