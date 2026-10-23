@@ -247,7 +247,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, [role="tabpanel"]:fo
 .methodology-summary p,
 .get-started-banner-copy > p,
 .al-site-footer p,
-.al-consent-banner p {
+.al-cookie-banner p {
   letter-spacing: 0;
   word-spacing: 0.04em;
 }
@@ -259,7 +259,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, [role="tabpanel"]:fo
 .visibility-feature-card-link,
 .al-panel-link { color: #a5d6ff; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
 .al-site-footer a:not(.al-brand),
-.al-consent-banner a,
+.al-cookie-banner a,
 .faq-answer a,
 .methodology-summary a,
 .visibility-report-content a,
