@@ -1,490 +1,135 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AfricaLatency | Website Performance Across African Networks</title>
+  <meta name="description" content="Measure website performance and response latency across African networks. Run a free Lighthouse scan and review available regional measurements.">
+  <meta name="theme-color" content="#000000">
+  <link rel="canonical" href="https://africalatency.dev/">
   <link rel="icon" type="image/svg+xml" href="/images/favicon.svg">
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <title>AfricaLatency — Infrastructure Performance &amp; Latency Intelligence</title>
-  <meta name="description" content="AfricaLatency measures the real-world performance of applications, APIs and infrastructure across African networks.">
-  <meta name="theme-color" content="#0F1114">
-  <link rel="manifest" href="/manifest.json">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-title" content="AfricaLatency">
-  <link rel="canonical" href="https://www.africalatency.dev/">
-  <meta property="og:type" content="website">
-  <meta property="og:site_name" content="AfricaLatency">
-  <meta property="og:title" content="AfricaLatency — Infrastructure Performance &amp; Latency Intelligence">
-  <meta property="og:image" content="https://africalatency.dev/images/og-image.svg">
-  <meta property="og:image:width" content="1200">
-  <meta property="og:image:height" content="630">
-  <meta property="og:description" content="We request measurements from up to 31 African countries. Only locations with available probes return live results.">
-  <meta property="og:url" content="https://www.africalatency.dev/">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:image" content="https://africalatency.dev/images/og-image.svg">
-
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
-
-  <link rel="stylesheet" href="/css/style.css">
-  <link rel="stylesheet" href="/css/marketing.css?v=7">
-  <link rel="stylesheet" href="/css/hero-africa-dot-matrix.css?v=8">
-  <link rel="stylesheet" href="/css/brand.css?v=10">
-  <link rel="stylesheet" href="/css/product-pages.css?v=1">
-  <link rel="stylesheet" href="/css/regional-performance.css?v=8">
-
-  <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
-  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
-  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
-<script type="application/ld+json" id="faq-schema">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Does every scan return results from all 31 countries?","acceptedAnswer":{"@type":"Answer","text":"No. Measurements are requested from up to 31 countries. Only locations with available probes return live results."}},{"@type":"Question","name":"Does the automated audit inspect private databases?","acceptedAnswer":{"@type":"Answer","text":"No. The automated audit tests public endpoints only. Private databases and third-party dependencies require a separately scoped engagement."}},{"@type":"Question","name":"Is continuous monitoring available now?","acceptedAnswer":{"@type":"Answer","text":"Continuous Monitoring is in development. Join the waitlist to hear when pilot places are available."}}]}</script>
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"AfricaLatency","url":"https://africalatency.dev/","logo":"https://africalatency.dev/images/africalatency-logo-dark.svg","email":"support@africalatency.dev"}</script>
-  <link rel="stylesheet" href="/css/unified-matte-layout.css?v=5">
-  <link rel="stylesheet" href="/css/marketing-infrastructure-banner.css?v=1">
-  <link rel="stylesheet" href="/css/homepage-mobile-cleanup.css?v=1">
-  <link rel="stylesheet" href="/css/pan-african-intelligence.css?v=2">
-  <link rel="stylesheet" href="/css/workflow-showcase.css?v=2">
-  <link rel="stylesheet" href="/css/get-started-banner.css?v=3">
-  <link rel="stylesheet" href="/css/desktop-header-canvas-fix.css?v=7">
-  <link rel="stylesheet" href="/css/hero-theme.css?v=4">
-  <style id="africa-latency-theme-override">
-html, body { background:#111214 !important; background-image:none !important; color:#fff; }
-.site-header, nav.site-header { background:#111214 !important; background-image:none !important; border-bottom:1px solid rgba(255,255,255,.08) !important; box-shadow:none !important; }
-
-/* Hero */
-.hero-wave { position:relative; isolation:isolate; overflow:hidden; background:#050709 !important; }
-.hero-wave .hero-africa-dot-overlay { background:none !important; }
-.hero-wave .hero-africa-dot-content { position:relative; z-index:2; }
-.hero-wave .hero-title, .hero-wave h1 { color:#fff !important; }
-.hero-wave .hero-subtitle { color:#d1e5f4 !important; }
-.hero-wave .audit-path-note { color:#94a3b8 !important; }
-
-/* Sections */
-main > section:not(.hero-wave) { background:#111214 !important; background-image:none !important; }
-main > section:not(.hero-wave) :is(h1,h2,h3,h4) { color:#fff; }
-main > section:not(.hero-wave) :is(p,li) { color:#a9b4c7; }
-main > section:not(.hero-wave) .label { color:#8ed5ff; }
-main a:not(.btn):not(.get-started-primary):not(.get-started-secondary):not(.visibility-report-cta) { color:#8ed5ff; }
-
-/* Cards and panels (real class names) */
-.visibility-feature-card, .visibility-report-panel, .get-started-banner, .get-started-mini-report,
-.audience-card, .infrastructure-trust-item, .regional-insight-row, .custom-scope-note,
-.methodology-summary, .faq-item, .visibility-report-chart, .get-started-url-row, .visibility-report-selected {
-  background:rgba(255,255,255,.04) !important; background-image:none !important;
-  border:1px solid rgba(255,255,255,.12) !important; border-radius:14px;
-  box-shadow:none !important; color:#fff !important;
-}
-.visibility-feature-card.is-active { border-color:#3b9be0 !important; }
-.visibility-feature-card .visibility-feature-card-title { color:#fff !important; }
-.visibility-feature-card .visibility-feature-card-copy { color:#a9b4c7 !important; }
-.visibility-feature-card .visibility-feature-card-link, .visibility-feature-icon { color:#8ed5ff !important; }
-.visibility-report-panel :is(span,strong,em,p,h3),
-.get-started-mini-report :is(span,strong,em,small) { color:#e5f1fa !important; }
-
-/* Buttons: never blue on blue */
-.get-started-primary { background:#2f93f5 !important; }
-.get-started-primary, .get-started-primary * { color:#fff !important; }
-.get-started-secondary { background:transparent !important; border:1px solid rgba(255,255,255,.28) !important; }
-.get-started-secondary, .get-started-secondary * { color:#fff !important; }
-.visibility-report-cta { background:transparent !important; color:#8ed5ff !important; }
-
-/* Footer */
-.homepage-footer { background:#111214 !important; }
-.homepage-footer :is(h3,h4) { color:#fff; }
-.homepage-footer :is(p,a) { color:#a9b4c7; }
-
-@media (prefers-reduced-motion: reduce) { .hero-wave *, .site-header * { transition-duration:.01ms !important; } }
-</style>
-  <link rel="stylesheet" href="/css/gtmetrix-color-system.css?v=3">
-  <script>
-    if ("serviceWorker" in navigator) {
-      window.addEventListener("load", () => navigator.serviceWorker.register("/service-worker.js").catch((error) => console.warn("AfricaLatency offline support unavailable", error)));
-    }
-  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/homepage-reference-redesign.css?v=1">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"AfricaLatency","url":"https://africalatency.dev/","logo":"https://africalatency.dev/images/africalatency-logo-dark.svg","email":"support@africalatency.dev"}</script>
 </head>
 <body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="brand" href="/" aria-label="AfricaLatency home"><img src="/images/africalatency-logo-light.svg" width="180" height="28" alt="AfricaLatency"></a>
+      <nav class="header-actions" aria-label="Main navigation">
+        <a class="header-button" href="/login">Log In</a>
+        <a class="header-button" href="/scan">Try for FREE</a>
+        <button class="menu-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu"><span></span><span></span></button>
+      </nav>
+    </div>
+    <nav id="mobile-menu" class="mobile-menu" aria-label="Additional navigation" hidden>
+      <a href="/scan">Free Scan</a>
+      <a href="/audit-checkout">Africa Latency Audit</a>
+      <a href="/monitoring">Continuous Monitoring</a>
+      <a href="/tools#programmatic-scanning">Tools &amp; API</a>
+      <a href="/sample-report">Sample Report</a>
+      <a href="/contact">Contact</a>
+    </nav>
+  </header>
 
-<nav class="site-header" aria-label="Main navigation">
-  <div class="nav-inner">
-    <a href="/" class="nav-brand brand-lockup" aria-label="AfricaLatency home"><img class="brand-wordmark" src="/images/africalatency-logo-light.svg" alt="AfricaLatency" width="180" height="28"></a>
-    <ul class="nav-links">
-      <li><a href="/pricing">Pricing</a></li>
-      <li class="nav-dropdown">
-        <button class="nav-dropdown-trigger" type="button" aria-expanded="false" aria-controls="resources-dropdown">Resources <span class="nav-dropdown-arrow" aria-hidden="true">⌄</span></button>
-        <div class="nav-dropdown-menu" id="resources-dropdown">
-          <a href="/tools#programmatic-scanning">Tools &amp; API docs</a>
-          <a href="/data-centers">Data centers</a>
-          <a href="/kenya">Kenya</a>
-          <a href="/nigeria">Nigeria</a>
-          <a href="/blog">Blog</a>
-          <a href="/cases">Cases</a>
-          <a href="/help-centre">Help centre</a>
+  <main id="main">
+    <section class="hero" aria-labelledby="hero-title">
+      <canvas class="dot-field" data-dot-field aria-hidden="true"></canvas>
+      <div class="wrap hero-content">
+        <h1 id="hero-title">Find out why your website is slow<span class="hero-accent">Then fix it</span></h1>
+        <p class="lede">AfricaLatency tests your <span class="rotating-word" data-rotating-word aria-label="AI-Built">AI-Built</span> website and helps you understand performance across African networks.</p>
+        <form class="url-form" data-url-form>
+          <label class="visually-hidden" for="homepage-url">Website or API URL</label>
+          <input id="homepage-url" name="url" type="text" inputmode="url" autocomplete="url" placeholder="Enter URL" required maxlength="2048" aria-describedby="url-help">
+          <button class="test-button" type="submit">Test Now</button>
+        </form>
+        <p id="url-help" class="form-help" data-form-help role="status" aria-live="polite">Enter a public website or API URL to start a free scan.</p>
+        <div class="analysis-options" aria-label="Scan information">
+          <strong>Analysis Options:</strong>
+          <span class="analysis-item"><svg class="flag-africa" viewBox="0 0 28 22" aria-hidden="true"><rect width="28" height="22" rx="2" fill="#176b48"/><path d="M0 7.3h28v7.4H0z" fill="#f8fafc"/><path d="M0 0h28v7.3H0z" fill="#161616"/><path d="M0 14.7h28V22H0z" fill="#d63d45"/></svg>9 African countries</span>
         </div>
-      </li>
-      <li><a href="/about">About</a></li>
-      <li><a href="/contact">Contact</a></li>
-    </ul>
-    <div class="nav-actions">
-      <a class="nav-login" href="/login">Login</a>
-      <a class="nav-cta" href="/scan">Run a free scan</a>
-      <button id="menu-toggle" class="menu-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="site-menu"><span></span><span></span></button>
-    </div>
-  </div>
-</nav>
+      </div>
+    </section>
 
-<div class="site-menu" id="site-menu" aria-hidden="true">
-  <div class="site-menu-inner">
-    <div class="menu-head">
-      <img class="menu-wordmark" src="/images/africalatency-logo-dark.svg" alt="AfricaLatency" width="180" height="28">
-      <button id="menu-close" class="menu-close" type="button" aria-label="Close menu">×</button>
-    </div>
-    <div class="menu-grid">
-      <div class="menu-column">
-        <a href="/pricing.html" class="menu-item">Pricing</a>
-        <a href="/about" class="menu-item">About</a>
-        <div class="menu-group">
-          <div class="menu-label menu-group-title">Resources</div>
-          <div class="menu-subitems">
-            <a href="/tools#programmatic-scanning">Tools &amp; API docs</a>
-            <a href="/data-centers">Data centers</a>
-            <a href="/kenya">Kenya</a>
-            <a href="/nigeria">Nigeria</a>
-            <a href="/blog">Blog</a>
-            <a href="/cases">Cases</a>
-            <a href="/help-centre">Help centre</a>
+    <section class="features" aria-labelledby="features-title">
+      <div class="wrap">
+        <div class="features-intro">
+          <h2 id="features-title">Deep insights to understand and optimize performance</h2>
+          <div class="features-intro-copy">
+            <p class="section-subtitle">Go beyond a single score with Lighthouse measurements, resource analysis and available network observations from African locations.</p>
+            <a class="primary-cta" href="/scan">Get Started for FREE <span>No credit card required</span></a>
           </div>
         </div>
-        <a href="/contact" class="menu-item">Contact</a>
 
-      </div>
-      <div class="legacy-menu-bottom">
-        <div class="menu-label">Follow</div>
-        <div class="social-icons">
-          <a href="https://www.linkedin.com/in/charles-mwaura-bb7814140/" target="_blank" rel="noopener" aria-label="LinkedIn"><i data-lucide="linkedin" aria-hidden="true"></i></a>
-          <a href="https://github.com/cmwrxh/cmwrxh.github.io" target="_blank" rel="noopener" aria-label="GitHub"><i data-lucide="github" aria-hidden="true"></i></a>
-          <a href="mailto:support@africalatency.dev" aria-label="Email"><i data-lucide="mail" aria-hidden="true"></i></a>
+        <div class="feature-grid">
+          <article class="feature-card">
+            <h3><svg class="feature-icon" viewBox="0 0 40 40" aria-hidden="true"><path d="M4 29a16 16 0 0 1 32 0z" fill="#e0569c"/><path d="M12 29a8 8 0 0 1 16 0z" fill="#6c5ce7"/><path d="M20 26l8-10" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/></svg><span>Lighthouse performance metrics</span></h3>
+            <p>Review returned LCP, blocking time and layout stability measurements from a lab test.</p>
+          </article>
+          <article class="feature-card">
+            <h3><svg class="feature-icon" viewBox="0 0 40 40" aria-hidden="true"><rect x="5" y="7" width="22" height="22" rx="4" fill="#7c6cf0"/><circle cx="27" cy="26" r="8" fill="#e0569c"/><path d="M11 13h10M11 18h7" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg><span>Mobile and desktop testing</span></h3>
+            <p>Run controlled Lighthouse scans using the existing mobile or desktop test profile.</p>
+          </article>
+          <article class="feature-card">
+            <h3><svg class="feature-icon" viewBox="0 0 40 40" aria-hidden="true"><path d="M20 5l15 28H5z" fill="#e0569c"/><path d="M20 14l8 15H12z" fill="#6c5ce7"/><path d="M20 19v5" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/></svg><span>Monitoring and alerts</span></h3>
+            <p>Coming soon. Continuous monitoring and automated performance alerts are in development.</p>
+          </article>
+          <article class="feature-card">
+            <h3><svg class="feature-icon" viewBox="0 0 40 40" aria-hidden="true"><rect x="7" y="5" width="9" height="9" rx="1" fill="#3b82f6"/><rect x="19" y="5" width="14" height="9" rx="1" fill="#e0569c"/><rect x="7" y="17" width="18" height="7" rx="1" fill="#e0569c"/><rect x="7" y="27" width="11" height="7" rx="1" fill="#6c5ce7"/><rect x="21" y="27" width="12" height="7" rx="1" fill="#3b82f6"/></svg><span>Request-level resource analysis</span></h3>
+            <p>Inspect returned page resources, transfer sizes and the request timing data available.</p>
+          </article>
+          <article class="feature-card">
+            <h3><svg class="feature-icon" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="12" r="8" fill="#7c6cf0"/><path d="M6 36a14 14 0 0 1 28 0z" fill="#6c5ce7"/><circle cx="30" cy="10" r="5" fill="#e0569c"/></svg><span>Real-user metrics</span></h3>
+            <p>Coming soon on general scan reports. CrUX is not connected; RUM needs separate site setup.</p>
+          </article>
+          <article class="feature-card">
+            <h3><svg class="feature-icon" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="15" fill="#4f8ff0"/><path d="M5 20h30M20 5c7 7 7 23 0 30M20 5c-7 7-7 23 0 30" stroke="#fff" stroke-width="1.6" fill="none"/><path d="M8 11c6 3 18 3 24 0M8 29c6-3 18-3 24 0" stroke="#e0569c" stroke-width="2" fill="none"/></svg><span>African network measurements</span></h3>
+            <p>Compare point-in-time results from available probes across nine requested African countries.</p>
+          </article>
         </div>
       </div>
-    </div>
-    <div class="menu-footer">
-      <a class="btn btn-secondary" href="/login">Log In</a>
-      <a class="btn btn-primary" href="/scan">Try for FREE</a>
-    </div>
-  </div>
-</div>
+    </section>
 
-<main>
-  <section class="section hero-highlight hero-africa-dot-hero hero-wave" data-africa-dot-hero>
-    <canvas class="hero-africa-dot-canvas" data-africa-dot-canvas aria-hidden="true"></canvas>
-    <div class="hero-africa-dot-overlay" aria-hidden="true"></div>
-    <div class="container hero-africa-dot-content">
-      <div class="hero-grid hero-action-layout">
-        <div class="hero-action-copy">
-          
-          <h1 class="hero-title">See how your website responds from <span class="hero-africa-title-accent city-rotator-slot" aria-label="Nairobi, Lagos, Johannesburg, Cairo, Accra and Casablanca"><span class="city-rotator-word" aria-live="polite">Nairobi</span></span></h1>
-          <p class="hero-subtitle">Compare public website and API response behavior from available African network probes, then use the evidence to decide what to investigate. Results depend on probe availability.</p>
-          <form class="hero-scan-form" id="homepage-scan-form" action="/scan" method="get">
-            <label class="visually-hidden" for="homepage-scan-url">Website URL to scan</label>
-            <input id="homepage-scan-url" name="url" type="text" inputmode="url" autocomplete="url" placeholder="https://yourwebsite.com" required>
-            <button class="btn btn-primary" type="submit">Run scan <i data-lucide="arrow-right" aria-hidden="true"></i></button>
-          </form>
-          <div class="hero-support-links"><a class="hero-sample-report-link" href="/sample-report">See sample report</a></div>
-          <p class="audit-path-note">Free public-endpoint snapshot. For a structured audit, start at KES 3,500.</p>
+    <section class="tabs-section" aria-label="AfricaLatency capabilities">
+      <div class="wrap">
+        <div class="tabs" role="tablist" aria-label="Product capabilities">
+          <button class="tab is-active" id="tab-test" type="button" role="tab" aria-selected="true" aria-controls="panel-test" tabindex="0">1. Test</button>
+          <button class="tab" id="tab-monitor" type="button" role="tab" aria-selected="false" aria-controls="panel-monitor" tabindex="-1">2. Monitor</button>
+          <button class="tab" id="tab-collaborate" type="button" role="tab" aria-selected="false" aria-controls="panel-collaborate" tabindex="-1">3. Collaborate</button>
+          <button class="tab" id="tab-ai" type="button" role="tab" aria-selected="false" aria-controls="panel-ai" tabindex="-1">4. Integrate with AI</button>
+        </div>
+        <div class="tab-panel" id="panel-test" role="tabpanel" aria-labelledby="tab-test" tabindex="0">
+          <div><h2>Test a public URL</h2><p>Run a free Lighthouse scan and review the returned performance metrics and available African network observations.</p></div>
+          <a class="panel-link" href="/scan">Run a free scan <span aria-hidden="true">↗</span></a>
+        </div>
+        <div class="tab-panel" id="panel-monitor" role="tabpanel" aria-labelledby="tab-monitor" tabindex="0" hidden>
+          <div><h2>Monitoring is coming soon</h2><p>Scheduled measurements and automated alerts are not generally available yet. Join the waitlist to discuss pilot access.</p></div>
+          <a class="panel-link" href="/monitoring">Join the monitoring waitlist <span aria-hidden="true">↗</span></a>
+        </div>
+        <div class="tab-panel" id="panel-collaborate" role="tabpanel" aria-labelledby="tab-collaborate" tabindex="0" hidden>
+          <div><h2>Collaboration is coming soon</h2><p>Shared workspaces and team collaboration features are not represented as available today. Contact us to discuss your workflow.</p></div>
+          <a class="panel-link" href="/contact">Contact AfricaLatency <span aria-hidden="true">↗</span></a>
+        </div>
+        <div class="tab-panel" id="panel-ai" role="tabpanel" aria-labelledby="tab-ai" tabindex="0" hidden>
+          <div><h2>AI integrations are coming soon</h2><p>Explore the existing programmatic scanning documentation while dedicated AI integrations are being evaluated.</p></div>
+          <a class="panel-link" href="/tools#programmatic-scanning">View tools and API docs <span aria-hidden="true">↗</span></a>
         </div>
       </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-inner">
+      <a class="brand footer-brand" href="/" aria-label="AfricaLatency home"><img src="/images/africalatency-logo-dark.svg" width="180" height="28" alt="AfricaLatency"></a>
+      <p>Infrastructure performance and latency intelligence for African networks.</p>
+      <nav aria-label="Footer navigation"><a href="/scan">Free Scan</a><a href="/audit-checkout">Africa Latency Audit</a><a href="/monitoring">Monitoring</a><a href="/sample-report">Sample report</a><a href="/methodology">Methodology</a><a href="/contact">Contact</a><a href="/privacy-policy">Privacy</a></nav>
+      <p class="copyright">© 2026 AfricaLatency · <a href="mailto:support@africalatency.dev">support@africalatency.dev</a></p>
     </div>
-  </section>
-
-  <section class="section regional-performance-section regional-network-atmosphere" aria-labelledby="regional-performance-title">
-    <div class="container regional-performance-container">
-      <div class="regional-performance-layout">
-        <figure class="regional-map-panel" data-network-illustration>
-          <canvas class="regional-map-canvas" data-africa-dot-map aria-hidden="true"></canvas>
-          <figcaption class="regional-probe-status" aria-label="Probe coverage status"><span class="regional-probe-status-dot" aria-hidden="true"></span><a href="/methodology">Probe coverage: live results where available</a></figcaption>
-        </figure>
-        <div class="regional-insight-panel">
-          <div class="label regional-panel-kicker">Regional performance view</div>
-          <h2 id="regional-performance-title">One continent. Many paths.</h2>
-          <p class="section-lead">A website can respond differently across African networks. Country, ISP routing, cloud region and edge coverage all shape the route between a customer and your service.</p>
-          <div class="regional-performance-cta">
-            <a class="btn btn-primary" href="/scan">Run a free scan <i data-lucide="arrow-right" aria-hidden="true"></i></a>
-          </div>
-          <div class="regional-insight-list">
-            <article class="regional-insight-row">
-              <div><h3>Network path</h3><p>Traffic may take different routes between ISPs, exchange points and your service.</p></div>
-            </article>
-            <article class="regional-insight-row">
-              <div><h3>Infrastructure location</h3><p>Origin region, DNS answers and edge coverage can affect connection and response time.</p></div>
-            </article>
-            <article class="regional-insight-row">
-              <div><h3>Available evidence</h3><p>We show returned measurements separately from locations where a probe is unavailable.</p></div>
-            </article>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="section workflow-showcase visibility-feature-section" aria-labelledby="workflow-showcase-title">
-    <div class="container">
-      <div class="visibility-feature-intro">
-        <div class="label">Regional performance intelligence</div>
-        <h2 id="workflow-showcase-title">Gain complete visibility into your site’s real performance</h2>
-        <p class="visibility-feature-subheading">Go beyond single global scores. Pinpoint localized latency, IXP bottlenecks, and regional network delays.</p>
-      </div>
-
-      <div class="visibility-feature-layout">
-        <div class="visibility-feature-grid" role="group" aria-label="Explore performance capabilities">
-          <button class="visibility-feature-card is-active" type="button" data-feature-card data-feature-title="Web Vitals &amp; Regional Metrics" data-feature-status="Available data varies" data-feature-summary="Compare returned DNS, TCP, TLS, HTTP and TTFB measurements by available probe. Core Web Vitals require browser-based data and are never inferred from connection timings alone." aria-pressed="true">
-            <span class="visibility-feature-icon" aria-hidden="true"><i data-lucide="gauge"></i></span><span class="visibility-feature-card-title">Web Vitals &amp; Regional Metrics</span><span class="visibility-feature-card-copy">Understand response timing by location, with clear limits on browser-vitals availability.</span><span class="visibility-feature-card-link">Explore metrics <i data-lucide="arrow-up-right" aria-hidden="true"></i></span>
-          </button>
-          <button class="visibility-feature-card" type="button" data-feature-card data-feature-title="Advanced Edge Probing" data-feature-status="Profile options evolving" data-feature-summary="Run public endpoint checks from available edge probes. Custom connection speeds and user-agent profiles are being developed and are not represented as universally available controls." aria-pressed="false">
-            <span class="visibility-feature-icon" aria-hidden="true"><i data-lucide="sliders-horizontal"></i></span><span class="visibility-feature-card-title">Advanced Edge Probing</span><span class="visibility-feature-card-copy">Investigate endpoint behavior from available probes; custom connection and user-agent profiles are evolving.</span><span class="visibility-feature-card-link">Explore probing <i data-lucide="arrow-up-right" aria-hidden="true"></i></span>
-          </button>
-          <button class="visibility-feature-card" type="button" data-feature-card data-feature-title="Automated Monitoring &amp; Alerts" data-feature-status="In development" data-feature-summary="Continuous synthetic checks and automated email, webhook or chat alerts are in development. They are not represented as active monitoring in the current public scan." aria-pressed="false">
-            <span class="visibility-feature-icon" aria-hidden="true"><i data-lucide="bell-ring"></i></span><span class="visibility-feature-card-title">Automated Monitoring &amp; Alerts</span><span class="visibility-feature-card-copy">Plan for recurring uptime and latency checks, with monitoring and alert delivery in development.</span><span class="visibility-feature-card-link">Monitoring roadmap <i data-lucide="arrow-up-right" aria-hidden="true"></i></span>
-          </button>
-          <button class="visibility-feature-card" type="button" data-feature-card data-feature-title="Detailed Request Waterfalls" data-feature-status="Coming soon" data-feature-summary="Request-by-request browser waterfall analysis is not part of the current public scan. Reports show only the timing and network evidence actually returned." aria-pressed="false">
-            <span class="visibility-feature-icon" aria-hidden="true"><i data-lucide="chart-no-axes-combined"></i></span><span class="visibility-feature-card-title">Detailed Request Waterfalls</span><span class="visibility-feature-card-copy">See the roadmap for browser-level asset timing; this is not part of the current public scan.</span><span class="visibility-feature-card-link">View diagnostics roadmap <i data-lucide="arrow-up-right" aria-hidden="true"></i></span>
-          </button>
-          <button class="visibility-feature-card" type="button" data-feature-card data-feature-title="Real User Audience Telemetry" data-feature-status="Limited beta" data-feature-summary="The RUM beta currently tests connection telemetry on your own device. Broad audience collection and ISP-level aggregation remain under validation." aria-pressed="false">
-            <span class="visibility-feature-icon" aria-hidden="true"><i data-lucide="users-round"></i></span><span class="visibility-feature-card-title">Real User Audience Telemetry</span><span class="visibility-feature-card-copy">Try device-level connection telemetry in beta; broad audience insights remain under validation.</span><span class="visibility-feature-card-link">Explore RUM beta <i data-lucide="arrow-up-right" aria-hidden="true"></i></span>
-          </button>
-          <button class="visibility-feature-card" type="button" data-feature-card data-feature-title="African Testing Network" data-feature-status="Probe-dependent results" data-feature-summary="Request measurements from supported African cities and regional network nodes. Each scan reports live results only for locations whose probes are available and return data." aria-pressed="false">
-            <span class="visibility-feature-icon" aria-hidden="true"><i data-lucide="network"></i></span><span class="visibility-feature-card-title">Testing Network</span><span class="visibility-feature-card-copy">Compare supported African cities and regional nodes, with coverage clearly reported for each run.</span><span class="visibility-feature-card-link">Coverage &amp; methodology <i data-lucide="arrow-up-right" aria-hidden="true"></i></span>
-          </button>
-        </div>
-
-        <aside class="visibility-report-panel" aria-labelledby="visibility-report-title">
-          <div class="visibility-report-panel-heading"><div><span class="visibility-report-kicker">INTERACTIVE REPORT PREVIEW</span><h3 id="visibility-report-title">See what each capability covers</h3></div><span class="visibility-report-badge">Example UI</span></div>
-          <div class="visibility-report-browser"><span></span><span></span><span></span><strong>yourwebsite.com</strong><i data-lucide="external-link" aria-hidden="true"></i></div>
-          <div class="visibility-report-content">
-            <div class="visibility-report-selected"><span class="visibility-report-selected-icon"><i data-lucide="activity" aria-hidden="true"></i></span><div><span>SELECTED CAPABILITY</span><strong data-feature-preview-title>Web Vitals &amp; Regional Metrics</strong></div></div>
-            <p data-feature-preview-summary>Compare returned DNS, TCP, TLS, HTTP and TTFB measurements by available probe. Core Web Vitals require browser-based data and are never inferred from connection timings alone.</p>
-            <div class="visibility-report-detail-row"><span>Capability status</span><strong data-feature-preview-status>Available data varies</strong></div>
-            <div class="visibility-report-chart" aria-label="Illustrative performance timing chart, not live scan data">
-              <div class="visibility-report-chart-top"><strong>Regional timing profile</strong><span>Illustrative only</span></div>
-              <div class="visibility-report-chart-row"><span>Nairobi</span><i><b style="width:48%"></b></i><em>example</em></div>
-              <div class="visibility-report-chart-row"><span>Lagos</span><i><b style="width:72%"></b></i><em>example</em></div>
-              <div class="visibility-report-chart-row"><span>Johannesburg</span><i><b style="width:59%"></b></i><em>example</em></div>
-            </div>
-            <div class="visibility-report-disclaimer"><i data-lucide="info" aria-hidden="true"></i> Preview only. Bars and labels are illustrative, not measurements. Real results depend on available probes and returned data.</div>
-          </div>
-          <a class="visibility-report-cta" href="/scan">Run a free scan <i data-lucide="arrow-right" aria-hidden="true"></i></a>
-        </aside>
-      </div>
-    </div>
-  </section>
-
-  <section class="section section-band-audit">
-    <div class="container">
-      <div class="section-heading">
-        <div class="label">What the audit covers</div>
-        <h2>A clear public-endpoint performance baseline.</h2>
-        <p class="section-lead">The standard audit tests public websites and API endpoints. It does not claim direct access to your private infrastructure.</p>
-      </div>
-      <div class="audit-scope-layout">
-        <ul class="clean-list audit-scope-list">
-          <li><strong>DNS</strong> — lookup timing and returned resolution evidence</li>
-          <li><strong>Connection and TLS</strong> — connection setup and handshake timing when available</li>
-          <li><strong>HTTP response</strong> — time to first byte, total response timing and status</li>
-          <li><strong>Network path</strong> — route evidence and hop information when returned</li>
-          <li><strong>Location comparison</strong> — compare only locations that returned live measurements</li>
-          <li><strong>Prioritized next steps</strong> — practical recommendations with limitations stated</li>
-        </ul>
-        <aside class="custom-scope-note"><h3>Need deeper diagnosis?</h3><p>Database internals, third-party dependencies and private application layers belong in a separately scoped Custom Deep Dive.</p><a href="/audit-intake">Discuss custom scope <i data-lucide="arrow-up-right" aria-hidden="true"></i></a></aside>
-      </div>
-    </div>
-  </section>
-
-
-  <section class="section infrastructure-trust-section" aria-labelledby="infrastructure-trust-title">
-    <div class="container">
-      <div class="section-heading">
-        <div class="label">Engineering &amp; Security Standards</div>
-        <h2 id="infrastructure-trust-title">Built for public endpoint safety &amp; objective measurement.</h2>
-        <p class="section-lead">Clear scope, observable evidence and privacy-aware measurement practices.</p>
-      </div>
-      <div class="infrastructure-trust-grid">
-        <article class="infrastructure-trust-item"><h3>Non-Invasive Probes</h3><p>Standard audits test public HTTP/TLS endpoints only. No private database or VPC access is requested.</p></article>
-        <article class="infrastructure-trust-item"><h3>Observable Evidence</h3><p>Completed measurements are reported separately from unavailable locations, without synthetic assumptions.</p></article>
-        <article class="infrastructure-trust-item"><h3>Privacy Compliant</h3><p>Telemetry scans do not inject tracking payloads into the target website or application.</p></article>
-      </div>
-    </div>
-  </section>
-
-  
-
-<section class="section section-band-audience" id="who-its-for">
-    <div class="container">
-      <div class="section-heading">
-        <div class="label">Who it's for</div>
-        <h2>Built for teams responsible for real user experience.</h2>
-      </div>
-      <div class="audience-grid">
-        <article class="audience-card"><i data-lucide="wallet-cards" aria-hidden="true"></i><h3>Fintech &amp; payments</h3><p>Investigate slow public endpoints around customer journeys without assuming the gateway is the cause.</p></article>
-        <article class="audience-card"><i data-lucide="shopping-cart" aria-hidden="true"></i><h3>E-commerce</h3><p>Compare response behavior for storefronts and APIs serving customers across multiple markets.</p></article>
-        <article class="audience-card"><i data-lucide="server" aria-hidden="true"></i><h3>SaaS &amp; API teams</h3><p>Give engineering teams regional evidence to guide the next investigation.</p></article>
-        <article class="audience-card"><i data-lucide="panels-top-left" aria-hidden="true"></i><h3>Digital agencies</h3><p>Support client conversations with observed measurements and clear limitations.</p></article>
-      </div>
-      <p class="pilot-invitation">Looking for early pilot customers? <a href="/contact">Discuss a pilot</a></p>
-
-      <div class="methodology-summary"><div><div class="label">Methodology</div><h3>Measurements first, conclusions second.</h3><p>We request measurements from available probes, compare only returned results, and distinguish observations from hypotheses. A missing result is not a slow result.</p><a href="/methodology">Read the full methodology →</a></div><div class="methodology-tags"><span>Public endpoints</span><span>Point-in-time results</span><span>Availability disclosed</span></div></div><div class="faq-section">
-        <div class="section-heading"><div class="label">FAQ</div><h2>Common questions.</h2></div>
-        <div class="faq">
-          <div class="faq-item"><button class="faq-question" type="button" aria-expanded="false"><span>Does every scan return results from all 31 countries?</span><span class="plus" aria-hidden="true">+</span></button><div class="faq-answer">No. We request measurements from up to 31 countries. Only locations with available probes return live results, and unavailable locations are excluded from performance comparisons.</div></div>
-          <div class="faq-item"><button class="faq-question" type="button" aria-expanded="false"><span>Does the standard audit inspect my database?</span><span class="plus" aria-hidden="true">+</span></button><div class="faq-answer">No. The standard audit tests public endpoints. Database internals and third-party dependencies require a separately scoped Custom Deep Dive.</div></div>
-          <div class="faq-item"><button class="faq-question" type="button" aria-expanded="false"><span>Can I start without talking to anyone?</span><span class="plus" aria-hidden="true">+</span></button><div class="faq-answer">Yes. Run the free scan or purchase the Africa Latency Audit online. Custom engagements are scoped separately.</div></div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  
-  <section class="section get-started-banner-section" aria-labelledby="get-started-banner-title">
-    <div class="container">
-      <div class="get-started-banner">
-        <div class="get-started-banner-copy">
-          <div class="get-started-banner-eyebrow"><span aria-hidden="true"></span> Your next performance insight starts here</div>
-          <h2 id="get-started-banner-title">Get Started with AfricaLatency</h2>
-          <p>Test your endpoints across available African edge probes, inspect TTFB and response timings, and identify where local performance needs attention. Continuous monitoring and automated alerts are in development.</p>
-          <div class="get-started-banner-actions">
-            <a class="get-started-primary" href="/signup">Get Started for FREE <span>No credit card required</span><i data-lucide="arrow-up-right" aria-hidden="true"></i></a>
-            <a class="get-started-secondary" href="/pricing">View Plans and Pricing <i data-lucide="arrow-right" aria-hidden="true"></i></a>
-          </div>
-          <p class="get-started-banner-note"><i data-lucide="shield-check" aria-hidden="true"></i> Free scans are point-in-time checks. Continuous monitoring and automated alerts are in development; results depend on probe availability.</p>
-        </div>
-        <div class="get-started-banner-visual" aria-label="Illustrative AfricaLatency regional performance card">
-          <div class="get-started-banner-diamond" aria-hidden="true"></div>
-          <div class="get-started-banner-dots" aria-hidden="true"></div>
-          <div class="get-started-mini-report">
-            <div class="get-started-mini-report-top">
-              <span class="get-started-mini-brand"><span class="get-started-mini-logo">A</span> AfricaLatency</span>
-              <span class="get-started-example-tag">EXAMPLE UI</span>
-            </div>
-            <div class="get-started-url-row">
-              <span class="get-started-url-icon"><i data-lucide="globe-2" aria-hidden="true"></i></span>
-              <div class="get-started-url-copy"><span>Target endpoint</span><strong>https://yourwebsite.com</strong></div>
-            </div>
-            <div class="get-started-node-status"><span class="get-started-status-dot"></span><strong>Node preview: Nairobi</strong><span>Illustrative</span></div>
-            <div class="get-started-latency-title"><span>Regional response phases</span><span>Example timings</span></div>
-            <div class="get-started-latency-bars" aria-label="Illustrative latency timing bars, not live measurements">
-              <div class="get-started-latency-row"><span>DNS lookup</span><div class="get-started-latency-track"><i class="latency-cyan"></i></div><strong>8 ms</strong></div>
-              <div class="get-started-latency-row"><span>TCP connect</span><div class="get-started-latency-track"><i class="latency-green"></i></div><strong>12 ms</strong></div>
-              <div class="get-started-latency-row"><span>TLS setup</span><div class="get-started-latency-track"><i class="latency-yellow"></i></div><strong>19 ms</strong></div>
-              <div class="get-started-latency-row"><span>First byte</span><div class="get-started-latency-track"><i class="latency-blue"></i></div><strong>28 ms</strong></div>
-            </div>
-            <div class="get-started-report-foot"><span><i data-lucide="activity" aria-hidden="true"></i> Regional probe preview</span><span>Sample values only</span></div>
-          </div>
-          <div class="get-started-floating-metric"><span class="get-started-floating-icon">↯</span><span><strong>28 ms TTFB</strong><small>Illustrative example, not live data</small></span></div>
-          <div class="get-started-visual-caption"><i data-lucide="info" aria-hidden="true"></i> Illustration only. No live scan data is shown.</div>
-        </div>
-      </div>
-    </div>
-  </section>
-</main>
-
-<footer class="homepage-footer">
-  <div class="footer-inner tier4-footer-grid">
-    <div class="tier4-footer-col footer-intro">
-      <img class="footer-wordmark" src="/images/africalatency-logo-dark.svg" alt="AfricaLatency" width="180" height="28" loading="lazy">
-      <h3>Better performance. Better digital experiences.</h3>
-      <p>Helping businesses understand, improve, and monitor digital performance across Africa.</p>
-      <p class="footer-address">1 Parklands Ave, Nairobi 00623, Kenya</p>
-      <p class="footer-copy">© 2026 AfricaLatency</p>
-    </div>
-    <div class="tier4-footer-col">
-      <h4>Company</h4>
-      <div class="tier4-footer-links">
-        <a href="/about">About</a>
-        <a href="/contact.html">Contact</a>
-        <a href="/cases">Cases</a>
-      </div>
-    </div>
-    <div class="tier4-footer-col">
-      <h4>Legal</h4>
-      <div class="tier4-footer-links">
-        <a href="/terms-of-service">Terms of Service</a>
-        <a href="/privacy-policy">Privacy Policy</a>
-        <a href="/service-level-agreement">Service Level Agreement</a>
-        <a href="/acceptable-use-policy">Acceptable Use</a>
-        <a href="/refund-policy">Refund Policy</a>
-      </div>
-    </div>
-    <div class="tier4-footer-col">
-      <h4>Resources</h4>
-      <div class="tier4-footer-links">
-        <a href="/audit-checkout">Africa Latency Audit</a>
-        <a href="/scan.html">Free Scan</a>
-        <a href="/sitespeed">Website Speed Check</a>
-        <a href="/methodology">Methodology</a>
-        <a href="/data-centers">Data centers</a>
-        <a href="/kenya">Kenya</a>
-        <a href="/nigeria">Nigeria</a>
-        <a href="/blog">Blog</a>
-        <a href="/help-centre">Help centre</a>
-      </div>
-    </div>
-    <div class="tier4-footer-col">
-      <h4>Connect</h4>
-      <div class="tier4-footer-links">
-        <a href="mailto:support@africalatency.dev">support@africalatency.dev</a>
-        <a href="https://github.com/cmwrxh/cmwrxh.github.io" target="_blank" rel="noopener">GitHub</a>
-      </div>
-      <p class="footer-company">Africa Latency Ltd<br>1 Parklands Ave, Nairobi 00623, Kenya</p>
-    </div>
-  </div>
-</footer>
-
-
-
-<script src="/js/main.js?v=9"></script>
-<script>
-  document.querySelectorAll('.faq-question').forEach(function (b) {
-    b.addEventListener('click', function () {
-      var open = b.parentElement.classList.toggle('open');
-      b.setAttribute('aria-expanded', String(open));
-    });
-  });
-
-
-
-  var cityRotator = document.querySelector('.city-rotator-word');
-  if (cityRotator) {
-    var cities = ['Nairobi', 'Lagos', 'Johannesburg', 'Cairo', 'Accra', 'Casablanca'];
-    var cityIndex = 0;
-    var reduceCityMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (!reduceCityMotion) {
-      window.setInterval(function () {
-        cityIndex = (cityIndex + 1) % cities.length;
-        cityRotator.classList.remove('is-entering');
-        cityRotator.textContent = cities[cityIndex];
-        void cityRotator.offsetWidth;
-        cityRotator.classList.add('is-entering');
-      }, 2800);
-    } else {
-      cityRotator.textContent = cities[0];
-    }
-    cityRotator.classList.add('is-entering');
-  }
-
-  var homepageScanForm = document.getElementById('homepage-scan-form');
-  if (homepageScanForm) homepageScanForm.addEventListener('submit', function (event) {
-    event.preventDefault();
-    var field = document.getElementById('homepage-scan-url');
-    var value = field.value.trim();
-    if (!/^https?:\/\//i.test(value)) value = 'https://' + value;
-    try { var parsed = new URL(value); if (!['http:', 'https:'].includes(parsed.protocol)) throw new Error('invalid'); }
-    catch (_) { field.setCustomValidity('Enter a valid public website URL.'); field.reportValidity(); field.setCustomValidity(''); return; }
-    window.location.href = '/scan?url=' + encodeURIComponent(value);
-  });
-</script>
-<script src="/js/africa-dot-matrix-shared.js?v=2" defer></script>
-<script src="/js/regional-network-illustration.js?v=6" defer></script>
-<script src="/js/hero-africa-dot-matrix.js?v=8" defer></script>
-<script src="/js/product-pages.js?v=1"></script>
-  <script src="/js/marketing-infrastructure-banner.js?v=1" defer></script>
-  <script src="/js/workflow-showcase.js?v=2" defer></script>
+  </footer>
+  <script src="/js/compliance.js?v=1" defer></script>
+  <script src="/js/homepage-reference-redesign.js?v=1" defer></script>
 </body>
 </html>
