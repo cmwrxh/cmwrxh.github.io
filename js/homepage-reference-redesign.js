@@ -129,12 +129,12 @@
       stop();
       if (reduceMotion || document.hidden) return;
       timer = window.setInterval(function () {
-        element.classList.add('is-out');
+        element.classList.add('al-is-out');
         transition = window.setTimeout(function () {
           index = (index + 1) % words.length;
           element.textContent = words[index];
           element.setAttribute('aria-label', words[index]);
-          element.classList.remove('is-out');
+          element.classList.remove('al-is-out');
           transition = 0;
         }, 450);
       }, 2600);
