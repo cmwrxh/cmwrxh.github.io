@@ -119,4 +119,6 @@ The main homepage previously used both **9 African countries** (analysis label/c
 - [x] Removed duplicate inline and `main.js` analytics consent banner paths. `js/compliance.js` remains the single consent owner using `africalatency_analytics_consent_v1`.
 - [x] Extended font-vendoring workflow to 400, 500, 600 and 700 weights. Only 400 and 700 are preloaded.
 - [x] Extended visual review to save viewport and full-page screenshots at 1280px, 820px and 390px and upload all artifacts.
-- [ ] Inspect the new visual-review artifact and compare restored sections with main at 1280px and 390px before calling visual verification complete.
+- [x] Visual review workflow succeeded on run #47 and uploaded full-page/viewport screenshots at 1280px, 820px and 390px plus per-section comparisons for regional performance, workflow showcase, audit baseline, trust, audience, FAQ and get-started banner at 1280px and 390px. Artifact: `homepage-reference-comparisons` (run ID `39933050750`).
+- [x] Screenshot review confirmed the hero is pure black, feature band uses the requested blue gradient, the header action area has no black box, the regional Africa illustration renders, and the workflow showcase cards retain their styling and readable text.
+- [x] Screenshot harness suppresses both the compliance consent key and the legacy hyphenated consent key so consent banners do not contaminate baseline comparisons.
