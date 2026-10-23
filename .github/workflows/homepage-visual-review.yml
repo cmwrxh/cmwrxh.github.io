@@ -12,6 +12,8 @@ on:
       - 'js/homepage-reference-redesign.js'
       - 'docs/visual-review/reference.html'
       - 'scripts/visual-review.mjs'
+      - 'scripts/build-legacy-home-css.mjs'
+      - 'scripts/report-lighthouse-audits.mjs'
       - '.github/workflows/homepage-visual-review.yml'
 
 concurrency:
@@ -37,8 +39,16 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Check visual review script syntax
-        run: node --check scripts/visual-review.mjs
+      - name: Check review and build scripts
+        run: |
+          node --check scripts/visual-review.mjs
+          node --check scripts/build-legacy-home-css.mjs
+          node --check scripts/report-lighthouse-audits.mjs
+      - name: Verify committed legacy CSS bundle is reproducible
+        run: |
+          cp css/legacy-home.css /tmp/legacy-home.css
+          node scripts/build-legacy-home-css.mjs
+          cmp /tmp/legacy-home.css css/legacy-home.css
       - name: Install Playwright
         run: npm install --no-save playwright
       - name: Start static preview server
@@ -57,10 +67,25 @@ jobs:
         run: node --check js/homepage-reference-redesign.js
       - name: Capture viewport and full-page reference comparisons at desktop, tablet, and mobile widths
         run: node scripts/visual-review.mjs
+      - name: Install Lighthouse
+        run: npm install --no-save playwright lighthouse
+      - name: Run Lighthouse on local homepage (mobile and desktop)
+        run: |
+          mkdir -p artifacts/lighthouse
+          npx lighthouse http://127.0.0.1:4173/ --chrome-flags='--headless --no-sandbox' --output=json --output=html --output-path=artifacts/lighthouse/mobile --quiet
+          npx lighthouse http://127.0.0.1:4173/ --preset=desktop --chrome-flags='--headless --no-sandbox' --output=json --output=html --output-path=artifacts/lighthouse/desktop --quiet
+          node scripts/report-lighthouse-audits.mjs
       - name: Upload visual comparisons
         uses: actions/upload-artifact@v4
         with:
           name: homepage-reference-comparisons
           path: artifacts/visual-review/*.png
+          if-no-files-found: error
+          retention-days: 14
+      - name: Upload Lighthouse reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: homepage-lighthouse-mobile-desktop
+          path: artifacts/lighthouse/*
           if-no-files-found: error
           retention-days: 14
