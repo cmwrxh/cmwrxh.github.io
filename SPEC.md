@@ -71,3 +71,30 @@ Branch: `feat/africalatency-homepage-dotfield`
 - `js/hero-africa-dot-matrix.js`
 
 No other application files are intended to change.
+
+
+## Review follow-up fixes
+
+- [x] Restored manifest, mobile-web-app and Apple web-app metadata, canonical URL, Open Graph/Twitter metadata, favicon and Apple touch icon links from `main`.
+- [x] Restored the `/service-worker.js` registration and FAQPage JSON-LD.
+- [x] Restored the original homepage sections below the redesigned hero and tab strip, in original order: regional performance, workflow showcase, paid audit baseline, trust/safety, audience, FAQ, get-started banner.
+- [x] Restored the legacy regional map and feature/showcase assets and their CSS dependencies. The old hero-dot files are restored in the repository but are not loaded by the redesigned homepage.
+- [x] DotField now throttles draws to at most 30 fps and pauses when the hero is outside the IntersectionObserver viewport.
+- [x] Reworded Collaborate tab in customer-facing language.
+- [x] Canonical remains `https://www.africalatency.dev/`: main's CNAME contains `africalatency.dev`, and `vercel.json` does not establish a non-www canonical requirement. CNAME alone does not prove which host is served; the requested main canonical was preserved.
+- [x] Kept analytics opt-in consent behavior without loading legacy `js/main.js` on the redesigned header, because that script rewrites the navigation/footer and injects the old sitewide dot layer.
+- [ ] Self-host Plus Jakarta Sans remains blocked: font binaries could not be retrieved in this execution environment. Google Fonts links were removed, so fallback system fonts apply until valid WOFF2 assets are added. Do not merge until this is completed or explicitly waived.
+- [ ] Screenshot workflow must finish against the updated head before visual review is considered complete.
+
+### Country-count audit and proposed wording
+
+The main homepage previously used both **9 African countries** (analysis label/card copy) and **up to 31 countries** (FAQ and Open Graph description). These describe different historical scopes and are inconsistent. Proposed single wording: **“We request measurements from up to 31 African countries; live results appear only where probes are available.”** Avoid implying that all 31 locations are currently live. This update normalizes the homepage analysis label to that wording; other pages still need a repository-wide audit before a site-wide claim of consistency can be certified.
+
+### `js/main.js` homepage behavior review
+
+- Cookie-consent banner with accept/reject choices; loads `/africalatency.js` only after acceptance.
+- Rebuilds desktop navigation/dropdowns and the mobile full-screen menu.
+- Adds a sitewide Africa dot-matrix canvas, adjusts header scroll styling and brand markup.
+- Hides a legacy mobile sticky scan banner.
+- Normalizes/replaces footer markup.
+- It does **not** implement auth-aware login/logout state or session-aware header behavior. The redesign keeps the new accessible mobile menu and opt-in analytics consent, and intentionally does not load `main.js` because its header/footer mutations and sitewide dot layer conflict with the new design.
