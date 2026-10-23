@@ -15,7 +15,7 @@
     var GAP = 12, R_MIN = 0.8, R_MAX = 1.6;
     var COLOR = [56, 152, 220], HOT = [156, 203, 255];
     var width = 0, height = 0, dpr = 1, cols = 0, rows = 0;
-    var phases, frequencies, highlights, frame = 0, running = !document.hidden;
+    var phases, frequencies, highlights, running = !document.hidden, inView = true, lastDraw = 0;
     var raf = 0, observer = null;
 
     function hash2(x, y) {
@@ -61,9 +61,22 @@
       }
     }
     function loop(now) {
-      if (!running || reduceMotion) return;
-      draw(now);
+      if (!running || !inView || reduceMotion) { raf = 0; return; }
+      if (now - lastDraw >= 1000 / 30) { draw(now); lastDraw = now; }
       raf = window.requestAnimationFrame(loop);
+    }
+    function syncLoop() {
+      if (raf) window.cancelAnimationFrame(raf);
+      raf = 0;
+      if (running && inView && !reduceMotion) raf = window.requestAnimationFrame(loop);
+    }
+    if ('IntersectionObserver' in window) {
+      var hero = canvas.closest('.hero') || canvas;
+      observer = new IntersectionObserver(function (entries) {
+        inView = !!(entries[0] && entries[0].isIntersecting);
+        syncLoop();
+      }, { rootMargin: '80px 0px' });
+      observer.observe(hero);
     }
     function resize() {
       var rect = canvas.getBoundingClientRect();
@@ -88,9 +101,7 @@
     }
     document.addEventListener('visibilitychange', function () {
       running = !document.hidden;
-      if (raf) window.cancelAnimationFrame(raf);
-      raf = 0;
-      if (running && !reduceMotion) raf = window.requestAnimationFrame(loop);
+      syncLoop();
     });
     if ('ResizeObserver' in window) {
       observer = new ResizeObserver(resize);
@@ -99,7 +110,7 @@
       window.addEventListener('resize', resize, { passive: true });
     }
     resize();
-    if (!reduceMotion && running) raf = window.requestAnimationFrame(loop);
+    if (!reduceMotion && running && inView) syncLoop();
   }());
 
   /* Eight confirmed words, reference interval and fade timing. */
