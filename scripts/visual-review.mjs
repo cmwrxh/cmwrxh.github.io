@@ -23,8 +23,12 @@ try {
       const word = await page.$('[data-rotating-word]');
       if (word) await word.evaluate(el => { el.textContent = 'AI-Built'; el.setAttribute('aria-label', 'AI-Built'); });
       const buffer = await page.screenshot({ fullPage: true, animations: 'disabled' });
+      const viewportBuffer = await page.screenshot({ fullPage: false, animations: 'disabled' });
       await page.close();
-      await import('node:fs/promises').then(fs => fs.writeFile(resolve(output, filename), buffer));
+      await import('node:fs/promises').then(fs => Promise.all([
+        fs.writeFile(resolve(output, filename), buffer),
+        fs.writeFile(resolve(output, filename.replace('.png', '-viewport.png')), viewportBuffer)
+      ]));
       return buffer;
     };
     const reference = await capture(base + '/docs/visual-review/reference.html', 'reference-' + size.label + '.png');
@@ -40,4 +44,4 @@ try {
 } finally {
   await browser.close();
 }
-console.log('Captured reference, homepage, and side-by-side comparisons at 1280px, 820px, and 390px.');
+console.log('Captured viewport screenshots, full-page screenshots, and side-by-side comparisons at 1280px, 820px, and 390px.');
