@@ -144,7 +144,7 @@ document.addEventListener('DOMContentLoaded', () => {
   updateNavScrollState();
   window.addEventListener('scroll', updateNavScrollState, { passive: true });
 
-  // Analytics is loaded only by setupCookieConsent() after explicit acceptance.
+  // Analytics consent is handled once by js/compliance.js.
 
   document.querySelectorAll('.nav-brand').forEach((brand) => {
     brand.classList.add('brand-lockup');
