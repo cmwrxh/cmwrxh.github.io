@@ -25,13 +25,13 @@ try {
     for (const width of widths) {
       const page = await browser.newPage({ viewport: { width, height: 900 }, deviceScaleFactor: 1 });
       page.on('pageerror', error => failures.push(`${name} @ ${width}px page error: ${error.message}`));
-      const response = await page.goto(base + route, { waitUntil: 'networkidle', timeout: 30000 }).catch(() => null);
+      const response = await page.goto(base + route, { waitUntil: 'domcontentloaded', timeout: 15000 }).catch(() => null);
       if (!response || response.status() >= 400) {
         failures.push(`${name} @ ${width}px failed to load (${response?.status() ?? 'no response'})`);
         await page.close();
         continue;
       }
-      await page.waitForTimeout(400);
+      await page.waitForTimeout(700);
       const metrics = await page.evaluate(() => {
         const toggles = [...document.querySelectorAll('button.menu-toggle, #menu-toggle')];
         const mobileMenu = document.querySelector('#site-menu, .site-menu, #mobile-menu, .al-mobile-menu');
