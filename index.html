@@ -28,17 +28,8 @@
   <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
   <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
-  <!-- Plus Jakarta Sans self-hosting is pending verified font binaries; see PR checklist. -->
 
-  <link rel="stylesheet" href="/css/marketing.css?v=7">
-  <link rel="stylesheet" href="/css/product-pages.css?v=1">
-  <link rel="stylesheet" href="/css/regional-performance.css?v=8">
-  <link rel="stylesheet" href="/css/unified-matte-layout.css?v=5">
-  <link rel="stylesheet" href="/css/marketing-infrastructure-banner.css?v=1">
-  <link rel="stylesheet" href="/css/homepage-mobile-cleanup.css?v=1">
-  <link rel="stylesheet" href="/css/pan-african-intelligence.css?v=2">
-  <link rel="stylesheet" href="/css/workflow-showcase.css?v=2">
-  <link rel="stylesheet" href="/css/get-started-banner.css?v=3">
+
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"AfricaLatency","url":"https://africalatency.dev/","logo":"https://africalatency.dev/images/africalatency-logo-dark.svg","email":"support@africalatency.dev"}</script>
   <script>
     if ("serviceWorker" in navigator) {
@@ -46,20 +37,19 @@
     }
   </script>
 <script type="application/ld+json" id="faq-schema">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Which countries does the free scan cover?","acceptedAnswer":{"@type":"Answer","text":"The free scan requests measurements from nine African countries. Live regional results depend on probe availability."}},{"@type":"Question","name":"Does the standard audit inspect my database?","acceptedAnswer":{"@type":"Answer","text":"No. The standard audit tests public endpoints. Database internals and third-party dependencies require a separately scoped Custom Deep Dive."}},{"@type":"Question","name":"Can I start without talking to anyone?","acceptedAnswer":{"@type":"Answer","text":"Yes. Run the free scan or purchase the Africa Latency Audit online. Custom engagements are scoped separately."}}]}</script>
-  <link rel="stylesheet" href="/css/homepage-reference-redesign.css?v=4">
 </head>
 <body>
-  <a class="skip-link" href="#main">Skip to content</a>
-  <header class="site-header">
-    <div class="wrap header-inner">
-      <a class="brand" href="/" aria-label="AfricaLatency home"><img src="/images/africalatency-logo-dark.svg" width="180" height="28" alt="AfricaLatency"></a>
-      <nav class="header-actions" aria-label="Main navigation">
-        <a class="header-button" href="/login">Log In</a>
-        <a class="header-button" href="/scan">Try for FREE</a>
-        <button class="menu-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu"><span></span><span></span></button>
+  <a class="al-skip-link" href="#main">Skip to content</a>
+  <header class="al-header">
+    <div class="al-wrap al-header-inner">
+      <a class="al-brand" href="/" aria-label="AfricaLatency home"><img src="/images/africalatency-logo-dark.svg" width="180" height="28" alt="AfricaLatency"></a>
+      <nav class="al-header-actions" aria-label="Main navigation">
+        <a class="al-header-button" href="/login">Log In</a>
+        <a class="al-header-button" href="/scan">Try for FREE</a>
+        <button class="al-menu-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu"><span></span><span></span></button>
       </nav>
     </div>
-    <nav id="mobile-menu" class="mobile-menu" aria-label="Additional navigation" hidden>
+    <nav id="mobile-menu" class="al-mobile-menu" aria-label="Additional navigation" hidden>
       <a href="/scan">Free Scan</a>
       <a href="/audit-checkout">Africa Latency Audit</a>
       <a href="/monitoring">Continuous Monitoring</a>
@@ -70,86 +60,86 @@
   </header>
 
   <main id="main">
-    <section class="hero" aria-labelledby="hero-title">
-      <canvas class="dot-field" data-dot-field aria-hidden="true"></canvas>
-      <div class="wrap hero-content">
-        <h1 id="hero-title">Find out why your website is slow<span class="hero-accent">Then fix it</span></h1>
-        <p class="lede">AfricaLatency tests your <span class="rotating-word" data-rotating-word aria-label="AI-Built">AI-Built</span> website and helps you understand performance across African networks.</p>
-        <form class="url-form" data-url-form>
-          <label class="visually-hidden" for="homepage-url">Website or API URL</label>
+    <section class="al-hero" aria-labelledby="hero-title">
+      <canvas class="al-dot-field" data-dot-field aria-hidden="true"></canvas>
+      <div class="al-wrap al-hero-content">
+        <h1 id="hero-title">Find out why your website is slow<span class="al-hero-accent">Then fix it</span></h1>
+        <p class="al-lede">AfricaLatency tests your <span class="al-rotating-word" data-rotating-word aria-label="AI-Built">AI-Built</span> website and helps you understand performance across African networks.</p>
+        <form class="al-url-form" data-url-form>
+          <label class="al-visually-hidden" for="homepage-url">Website or API URL</label>
           <input id="homepage-url" name="url" type="text" inputmode="url" autocomplete="url" placeholder="Enter URL" required maxlength="2048" aria-describedby="url-help">
-          <button class="test-button" type="submit">Test Now</button>
+          <button class="al-test-button" type="submit">Test Now</button>
         </form>
-        <p id="url-help" class="form-help" data-form-help role="status" aria-live="polite">Enter a public website or API URL to start a free scan.</p>
-        <div class="analysis-options" aria-label="Scan information">
+        <p id="url-help" class="al-form-help" data-form-help role="status" aria-live="polite">Enter a public website or API URL to start a free scan.</p>
+        <div class="al-analysis-options" aria-label="Scan information">
           <strong>Analysis Options:</strong>
-          <span class="analysis-item"><svg class="region-globe" viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="10" fill="none" stroke="#8bc6ff" stroke-width="1.7"/><path d="M4.5 14h19M14 4c3.8 4.1 3.8 15.9 0 20M14 4c-3.8 4.1-3.8 15.9 0 20M6.6 8.5h14.8M6.6 19.5h14.8" fill="none" stroke="#8bc6ff" stroke-width="1.2"/></svg>9 African countries</span>
+          <span class="al-analysis-item"><svg class="al-region-globe" viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="10" fill="none" stroke="#8bc6ff" stroke-width="1.7"/><path d="M4.5 14h19M14 4c3.8 4.1 3.8 15.9 0 20M14 4c-3.8 4.1-3.8 15.9 0 20M6.6 8.5h14.8M6.6 19.5h14.8" fill="none" stroke="#8bc6ff" stroke-width="1.2"/></svg>9 African countries</span>
         </div>
       </div>
     </section>
 
-    <section class="features" aria-labelledby="features-title">
-      <div class="wrap">
-        <div class="features-intro">
+    <section class="al-features" aria-labelledby="features-title">
+      <div class="al-wrap">
+        <div class="al-features-intro">
           <h2 id="features-title">Deep insights to understand and optimize performance</h2>
-          <div class="features-intro-copy">
-            <p class="section-subtitle">Go beyond a single score with Lighthouse measurements, resource analysis and available network observations from African locations.</p>
-            <a class="primary-cta" href="/scan">Get Started for FREE <span>No credit card required</span></a>
+          <div class="al-features-intro-copy">
+            <p class="al-section-subtitle">Go beyond a single score with Lighthouse measurements, resource analysis and available network observations from African locations.</p>
+            <a class="al-primary-cta" href="/scan">Get Started for FREE <span>No credit card required</span></a>
           </div>
         </div>
 
-        <div class="feature-grid">
-          <article class="feature-card">
-            <h3><svg class="feature-icon" viewBox="0 0 40 40" aria-hidden="true"><path d="M4 29a16 16 0 0 1 32 0z" fill="#e0569c"/><path d="M12 29a8 8 0 0 1 16 0z" fill="#6c5ce7"/><path d="M20 26l8-10" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/></svg><span>Lighthouse performance metrics</span></h3>
+        <div class="al-feature-grid">
+          <article class="al-feature-card">
+            <h3><svg class="al-feature-icon" viewBox="0 0 40 40" aria-hidden="true"><path d="M4 29a16 16 0 0 1 32 0z" fill="#e0569c"/><path d="M12 29a8 8 0 0 1 16 0z" fill="#6c5ce7"/><path d="M20 26l8-10" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/></svg><span>Lighthouse performance metrics</span></h3>
             <p>Review returned LCP, blocking time and layout stability measurements from a lab test.</p>
           </article>
-          <article class="feature-card">
-            <h3><svg class="feature-icon" viewBox="0 0 40 40" aria-hidden="true"><rect x="5" y="7" width="22" height="22" rx="4" fill="#7c6cf0"/><circle cx="27" cy="26" r="8" fill="#e0569c"/><path d="M11 13h10M11 18h7" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg><span>Mobile and desktop testing</span></h3>
+          <article class="al-feature-card">
+            <h3><svg class="al-feature-icon" viewBox="0 0 40 40" aria-hidden="true"><rect x="5" y="7" width="22" height="22" rx="4" fill="#7c6cf0"/><circle cx="27" cy="26" r="8" fill="#e0569c"/><path d="M11 13h10M11 18h7" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg><span>Mobile and desktop testing</span></h3>
             <p>Run controlled Lighthouse scans using the existing mobile or desktop test profile.</p>
           </article>
-          <article class="feature-card">
-            <h3><svg class="feature-icon" viewBox="0 0 40 40" aria-hidden="true"><path d="M20 5l15 28H5z" fill="#e0569c"/><path d="M20 14l8 15H12z" fill="#6c5ce7"/><path d="M20 19v5" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/></svg><span>Monitoring and alerts</span></h3>
+          <article class="al-feature-card">
+            <h3><svg class="al-feature-icon" viewBox="0 0 40 40" aria-hidden="true"><path d="M20 5l15 28H5z" fill="#e0569c"/><path d="M20 14l8 15H12z" fill="#6c5ce7"/><path d="M20 19v5" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/></svg><span>Monitoring and alerts</span></h3>
             <p>Coming soon. Continuous monitoring and automated performance alerts are in development.</p>
           </article>
-          <article class="feature-card">
-            <h3><svg class="feature-icon" viewBox="0 0 40 40" aria-hidden="true"><rect x="7" y="5" width="9" height="9" rx="1" fill="#3b82f6"/><rect x="19" y="5" width="14" height="9" rx="1" fill="#e0569c"/><rect x="7" y="17" width="18" height="7" rx="1" fill="#e0569c"/><rect x="7" y="27" width="11" height="7" rx="1" fill="#6c5ce7"/><rect x="21" y="27" width="12" height="7" rx="1" fill="#3b82f6"/></svg><span>Request-level resource analysis</span></h3>
+          <article class="al-feature-card">
+            <h3><svg class="al-feature-icon" viewBox="0 0 40 40" aria-hidden="true"><rect x="7" y="5" width="9" height="9" rx="1" fill="#3b82f6"/><rect x="19" y="5" width="14" height="9" rx="1" fill="#e0569c"/><rect x="7" y="17" width="18" height="7" rx="1" fill="#e0569c"/><rect x="7" y="27" width="11" height="7" rx="1" fill="#6c5ce7"/><rect x="21" y="27" width="12" height="7" rx="1" fill="#3b82f6"/></svg><span>Request-level resource analysis</span></h3>
             <p>Inspect returned page resources, transfer sizes and the request timing data available.</p>
           </article>
-          <article class="feature-card">
-            <h3><svg class="feature-icon" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="12" r="8" fill="#7c6cf0"/><path d="M6 36a14 14 0 0 1 28 0z" fill="#6c5ce7"/><circle cx="30" cy="10" r="5" fill="#e0569c"/></svg><span>Real-user metrics</span></h3>
+          <article class="al-feature-card">
+            <h3><svg class="al-feature-icon" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="12" r="8" fill="#7c6cf0"/><path d="M6 36a14 14 0 0 1 28 0z" fill="#6c5ce7"/><circle cx="30" cy="10" r="5" fill="#e0569c"/></svg><span>Real-user metrics</span></h3>
             <p>Coming soon on general scan reports. CrUX is not connected; RUM needs separate site setup.</p>
           </article>
-          <article class="feature-card">
-            <h3><svg class="feature-icon" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="15" fill="#4f8ff0"/><path d="M5 20h30M20 5c7 7 7 23 0 30M20 5c-7 7-7 23 0 30" stroke="#fff" stroke-width="1.6" fill="none"/><path d="M8 11c6 3 18 3 24 0M8 29c6-3 18-3 24 0" stroke="#e0569c" stroke-width="2" fill="none"/></svg><span>African network measurements</span></h3>
+          <article class="al-feature-card">
+            <h3><svg class="al-feature-icon" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="15" fill="#4f8ff0"/><path d="M5 20h30M20 5c7 7 7 23 0 30M20 5c-7 7-7 23 0 30" stroke="#fff" stroke-width="1.6" fill="none"/><path d="M8 11c6 3 18 3 24 0M8 29c6-3 18-3 24 0" stroke="#e0569c" stroke-width="2" fill="none"/></svg><span>African network measurements</span></h3>
             <p>Compare point-in-time results from available probes across nine requested African countries.</p>
           </article>
         </div>
       </div>
     </section>
 
-    <section class="tabs-section" aria-label="AfricaLatency capabilities">
-      <div class="wrap">
-        <div class="tabs" role="tablist" aria-label="Product capabilities">
-          <button class="tab is-active" id="tab-test" type="button" role="tab" aria-selected="true" aria-controls="panel-test" tabindex="0">1. Test</button>
-          <button class="tab" id="tab-monitor" type="button" role="tab" aria-selected="false" aria-controls="panel-monitor" tabindex="-1">2. Monitor</button>
-          <button class="tab" id="tab-collaborate" type="button" role="tab" aria-selected="false" aria-controls="panel-collaborate" tabindex="-1">3. Collaborate</button>
-          <button class="tab" id="tab-ai" type="button" role="tab" aria-selected="false" aria-controls="panel-ai" tabindex="-1">4. Integrate with AI</button>
+    <section class="al-tabs-section" aria-label="AfricaLatency capabilities">
+      <div class="al-wrap">
+        <div class="al-tabs" role="tablist" aria-label="Product capabilities">
+          <button class="al-tab is-active" id="tab-test" type="button" role="tab" aria-selected="true" aria-controls="panel-test" tabindex="0">1. Test</button>
+          <button class="al-tab" id="tab-monitor" type="button" role="tab" aria-selected="false" aria-controls="panel-monitor" tabindex="-1">2. Monitor</button>
+          <button class="al-tab" id="tab-collaborate" type="button" role="tab" aria-selected="false" aria-controls="panel-collaborate" tabindex="-1">3. Collaborate</button>
+          <button class="al-tab" id="tab-ai" type="button" role="tab" aria-selected="false" aria-controls="panel-ai" tabindex="-1">4. Integrate with AI</button>
         </div>
-        <div class="tab-panel" id="panel-test" role="tabpanel" aria-labelledby="tab-test" tabindex="0">
+        <div class="al-tab-panel" id="panel-test" role="tabpanel" aria-labelledby="tab-test" tabindex="0">
           <div><h2>Test a public URL</h2><p>Run a free Lighthouse scan and review the returned performance metrics and available African network observations.</p></div>
-          <a class="panel-link" href="/scan">Run a free scan <span aria-hidden="true">↗</span></a>
+          <a class="al-panel-link" href="/scan">Run a free scan <span aria-hidden="true">↗</span></a>
         </div>
-        <div class="tab-panel" id="panel-monitor" role="tabpanel" aria-labelledby="tab-monitor" tabindex="0" hidden>
+        <div class="al-tab-panel" id="panel-monitor" role="tabpanel" aria-labelledby="tab-monitor" tabindex="0" hidden>
           <div><h2>Monitoring is coming soon</h2><p>Scheduled measurements and automated alerts are not generally available yet. Join the waitlist to discuss pilot access.</p></div>
-          <a class="panel-link" href="/monitoring">Join the monitoring waitlist <span aria-hidden="true">↗</span></a>
+          <a class="al-panel-link" href="/monitoring">Join the monitoring waitlist <span aria-hidden="true">↗</span></a>
         </div>
-        <div class="tab-panel" id="panel-collaborate" role="tabpanel" aria-labelledby="tab-collaborate" tabindex="0" hidden>
+        <div class="al-tab-panel" id="panel-collaborate" role="tabpanel" aria-labelledby="tab-collaborate" tabindex="0" hidden>
           <div><h2>Collaboration is coming soon</h2><p>Shared workspaces and team collaboration features are Bring your team together around clearer performance findings. Contact us to discuss your workflow.</p></div>
-          <a class="panel-link" href="/contact">Contact AfricaLatency <span aria-hidden="true">↗</span></a>
+          <a class="al-panel-link" href="/contact">Contact AfricaLatency <span aria-hidden="true">↗</span></a>
         </div>
-        <div class="tab-panel" id="panel-ai" role="tabpanel" aria-labelledby="tab-ai" tabindex="0" hidden>
+        <div class="al-tab-panel" id="panel-ai" role="tabpanel" aria-labelledby="tab-ai" tabindex="0" hidden>
           <div><h2>AI integrations are coming soon</h2><p>Explore the existing programmatic scanning documentation while dedicated AI integrations are being evaluated.</p></div>
-          <a class="panel-link" href="/tools#programmatic-scanning">View tools and API docs <span aria-hidden="true">↗</span></a>
+          <a class="al-panel-link" href="/tools#programmatic-scanning">View tools and API docs <span aria-hidden="true">↗</span></a>
         </div>
       </div>
     </section>
@@ -343,12 +333,12 @@
   </div>
   </main>
 
-  <footer class="site-footer">
-    <div class="wrap footer-inner">
-      <a class="brand footer-brand" href="/" aria-label="AfricaLatency home"><img src="/images/africalatency-logo-dark.svg" width="180" height="28" alt="AfricaLatency"></a>
+  <footer class="al-site-footer">
+    <div class="al-wrap al-footer-inner">
+      <a class="al-brand al-footer-brand" href="/" aria-label="AfricaLatency home"><img src="/images/africalatency-logo-dark.svg" width="180" height="28" alt="AfricaLatency"></a>
       <p>Infrastructure performance and latency intelligence for African networks.</p>
       <nav aria-label="Footer navigation"><a href="/scan">Free Scan</a><a href="/audit-checkout">Africa Latency Audit</a><a href="/monitoring">Monitoring</a><a href="/sample-report">Sample report</a><a href="/methodology">Methodology</a><a href="/contact">Contact</a><a href="/privacy-policy">Privacy</a></nav>
-      <p class="copyright">© 2026 AfricaLatency · <a href="mailto:support@africalatency.dev">support@africalatency.dev</a></p>
+      <p class="al-copyright">© 2026 AfricaLatency · <a href="mailto:support@africalatency.dev">support@africalatency.dev</a></p>
     </div>
   </footer>
     <script src="/js/africa-dot-matrix-shared.js?v=2" defer></script>
@@ -356,38 +346,7 @@
     <script src="/js/product-pages.js?v=1"></script>
     <script src="/js/marketing-infrastructure-banner.js?v=1" defer></script>
     <script src="/js/workflow-showcase.js?v=2" defer></script>
-  <script>
-(function () {
-  var key = 'africalatency-analytics-consent';
-  function loadAnalytics() {
-    if (document.querySelector('script[data-al-consent-analytics]')) return;
-    var script = document.createElement('script');
-    script.src = '/africalatency.js';
-    script.defer = true;
-    script.setAttribute('data-al-key', 'test-site-001');
-    script.setAttribute('data-al-consent-analytics', 'true');
-    document.body.appendChild(script);
-  }
-  var choice = null;
-  try { choice = localStorage.getItem(key); } catch (_) {}
-  if (choice === 'accepted') { loadAnalytics(); return; }
-  if (choice === 'rejected') return;
-  var banner = document.createElement('aside');
-  banner.className = 'cookie-consent-banner';
-  banner.setAttribute('role', 'region');
-  banner.setAttribute('aria-label', 'Cookie preferences');
-  banner.innerHTML = '<div class="cookie-consent-copy">We use optional analytics to understand site performance. You can accept or reject analytics; essential site functions work either way.</div><div class="cookie-consent-actions"><button type="button" data-consent="accept">Accept analytics</button><button type="button" data-consent="reject">Reject analytics</button></div>';
-  function choose(value) {
-    try { localStorage.setItem(key, value); } catch (_) {}
-    if (value === 'accepted') loadAnalytics();
-    banner.remove();
-  }
-  banner.querySelector('[data-consent="accept"]').addEventListener('click', function () { choose('accepted'); });
-  banner.querySelector('[data-consent="reject"]').addEventListener('click', function () { choose('rejected'); });
-  document.body.appendChild(banner);
-}());
-</script>
-  <script src="/js/compliance.js?v=1" defer></script>
+<script src="/js/compliance.js?v=1" defer></script>
   <script src="/js/homepage-reference-redesign.js?v=2" defer></script>
 </body>
 </html>
