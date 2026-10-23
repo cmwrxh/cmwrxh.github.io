@@ -1,6 +1,15 @@
 name: Homepage visual review
 
 on:
+  push:
+    branches: [feat/africalatency-homepage-dotfield]
+    paths:
+      - 'index.html'
+      - 'css/homepage-reference-redesign.css'
+      - 'js/homepage-reference-redesign.js'
+      - 'docs/visual-review/reference.html'
+      - 'scripts/visual-review.mjs'
+      - '.github/workflows/homepage-visual-review.yml'
   pull_request:
     branches: [main]
     paths:
