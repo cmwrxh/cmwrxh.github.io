@@ -1,4 +1,5 @@
-/* Homepage legacy sections are intentionally layered below the new reference design. */
+/* Important legacy resets must not outrank the namespaced homepage or the restored-section compatibility layer. */
+@layer al-priority, legacy;
 @import url("/css/style.css") layer(legacy);
 @import url("/css/brand.css") layer(legacy);
 @import url("/css/hero-theme.css") layer(legacy);
