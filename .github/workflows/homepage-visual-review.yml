@@ -43,6 +43,8 @@ jobs:
         run: node --check scripts/visual-review.mjs
       - name: Install Playwright
         run: npm install --no-save playwright
+      - name: Install Chromium for responsive navigation review
+        run: npx playwright install chromium
       - name: Start static preview server
         run: |
           python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/homepage-visual-review-server.log 2>&1 &
