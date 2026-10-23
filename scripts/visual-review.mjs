@@ -6,7 +6,7 @@ const base = process.env.VISUAL_REVIEW_BASE_URL || 'http://127.0.0.1:4173';
 const mainBase = process.env.VISUAL_REVIEW_MAIN_URL || 'http://127.0.0.1:4174';
 const output = resolve('artifacts/visual-review');
 await mkdir(output, { recursive: true });
-const browser = await chromium.launch({ headless: true });
+const browser = await chromium.launch({ headless: true, channel: 'chrome' });
 const sizes = [
   { label: '1280', width: 1280, height: 900 },
   { label: '820', width: 820, height: 1000 },
@@ -17,7 +17,7 @@ try {
   for (const size of sizes) {
     const capture = async (url, filename) => {
       const page = await browser.newPage({ viewport: { width: size.width, height: size.height }, deviceScaleFactor: 1 });
-      await page.addInitScript(() => { if (location.origin === 'http://127.0.0.1:4173') localStorage.setItem('africalatency_analytics_consent_v1', 'rejected'); localStorage.setItem('africalatency-analytics-consent', 'rejected'); localStorage.setItem('africalatency-analytics-consent', 'rejected'); });
+      await page.addInitScript(() => { if (location.origin === 'http://127.0.0.1:4173') { localStorage.setItem('africalatency_analytics_consent_v1', 'rejected'); localStorage.setItem('africalatency-analytics-consent', 'rejected'); } });
       await page.goto(url, { waitUntil: 'networkidle', timeout: 45000 });
       await page.evaluate(() => document.fonts ? document.fonts.ready.then(() => true) : true);
       await page.waitForTimeout(350);
@@ -56,8 +56,8 @@ try {
       const branchPage = await browser.newPage({ viewport: { width: size.width, height: size.height }, deviceScaleFactor: 1 });
       const mainPage = await browser.newPage({ viewport: { width: size.width, height: size.height }, deviceScaleFactor: 1 });
       await Promise.all([
-        branchPage.addInitScript(() => localStorage.setItem('africalatency_analytics_consent_v1', 'rejected'); localStorage.setItem('africalatency-analytics-consent', 'rejected')),
-        mainPage.addInitScript(() => localStorage.setItem('africalatency_analytics_consent_v1', 'rejected'); localStorage.setItem('africalatency-analytics-consent', 'rejected'))
+        branchPage.addInitScript(() => { localStorage.setItem('africalatency_analytics_consent_v1', 'rejected'); localStorage.setItem('africalatency-analytics-consent', 'rejected'); }),
+        mainPage.addInitScript(() => { localStorage.setItem('africalatency_analytics_consent_v1', 'rejected'); localStorage.setItem('africalatency-analytics-consent', 'rejected'); })
       ]);
       await Promise.all([
         branchPage.goto(base + '/', { waitUntil: 'networkidle', timeout: 45000 }),
