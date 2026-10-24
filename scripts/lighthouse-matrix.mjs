@@ -181,9 +181,10 @@ const typographyChecks = states.map(state => ({
   ...state.typography
 }));
 await writeFile(resolve(artifacts, 'lighthouse', 'summary.json'), JSON.stringify({ scores, comparisons }, null, 2) + '\n');
+const typographyFailures = typographyChecks.filter(check => check.version === 'pr' && !check.fontVerified);
 await writeFile(
   resolve(artifacts, 'lighthouse', 'typography-checks.json'),
-  JSON.stringify({ checks: typographyChecks, failures: typographyChecks.filter(check => check.version === 'pr' && !check.fontVerified) }, null, 2) + '\n'
+  JSON.stringify({ checks: typographyChecks, failures: typographyFailures }, null, 2) + '\n'
 );
 await writeFile(
   resolve(artifacts, 'lighthouse', 'run-metadata.json'),
@@ -198,4 +199,9 @@ await writeFile(
     screenshots: states
   }, null, 2) + '\n'
 );
+if (typographyFailures.length) {
+  console.error('Plus Jakarta Sans verification failures:', JSON.stringify(typographyFailures.map(check => ({ page: check.page, viewport: check.viewport, finalUrl: check.finalUrl, bodyFontFamily: check.bodyFontFamily, headingFontFamily: check.headingFontFamily, fontResources: check.fontResources }))));
+} else {
+  console.log('Plus Jakarta Sans verified for every post-migration screenshot check.');
+}
 console.log('Wrote raw Lighthouse JSON/HTML, screenshots, score comparisons, typography verification and metadata.');
