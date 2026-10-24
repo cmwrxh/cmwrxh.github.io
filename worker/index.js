@@ -443,7 +443,7 @@ app.get('/internal/jobs/:id', async (req, res) => {
     unlocked = job.user_id === user.id;
   }
   const screenshotUrl = await signedScreenshot(job).catch(() => null);
-  const payload = publicSummary(job, screenshotUrl, await signedFilmstrip(job.id));
+  const payload = publicSummary(job, screenshotUrl, job.status === 'completed' ? await signedFilmstrip(job.id) : []);
   payload.locked = !unlocked;
   if (unlocked) payload.fullReport = job.result?.fullReport || null;
   if (job.status === 'failed') payload.error = job.error_message || 'Scan failed.';
