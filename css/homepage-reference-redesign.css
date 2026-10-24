@@ -230,26 +230,3 @@ a:focus-visible, button:focus-visible, input:focus-visible, [role="tabpanel"]:fo
 @media (max-width: 420px) {
   .al-header-button { padding: 0 9px; }
 }
-
-/* Lower-page repair pass only. The homepage hero/header rules above are intentionally untouched. */
-.legacy-homepage-sections .clean-list.audit-scope-list li strong,
-.clean-list.audit-scope-list li strong { color:#f1f6fc !important; }
-.faq-section .faq-item.open .faq-answer { max-height: none; }
-.visibility-feature-icon:empty,
-.visibility-feature-icon:not(:has(svg)):not(:has(i)) { display:none !important; }
-.al-site-footer .al-wrap,
-.al-site-footer .al-footer-inner { box-sizing:border-box; width:min(100% - 48px, 1240px); margin-inline:auto; }
-.al-site-footer nav { display:flex !important; flex-wrap:wrap !important; align-items:center; gap:10px 20px !important; background:transparent !important; }
-.al-site-footer nav a { display:inline-flex; width:auto; padding:0; background:transparent !important; }
-.al-site-footer .footer-address,
-.al-site-footer [class*="cookie-settings"] { padding-inline:0; }
-.get-started-floating-metric { z-index:2; }
-@media (max-width:767px) {
-  .get-started-floating-metric { position:static !important; inset:auto !important; transform:none !important; width:max-content; max-width:100%; margin:14px auto 0; }
-  .get-started-banner-visual { overflow:visible; }
-  .al-site-footer .al-wrap,
-  .al-site-footer .al-footer-inner { width:calc(100% - 40px); }
-}
-
-.faq-section .faq-answer[hidden] { display:none !important; }
-.faq-section .faq-item.is-open .faq-answer { display:block; }

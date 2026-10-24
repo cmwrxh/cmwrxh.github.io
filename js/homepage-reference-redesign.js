@@ -240,20 +240,4 @@
       button.setAttribute('aria-label', 'Open menu');
     });
   }());
-  /* Homepage FAQ: the .open class is the single source of truth for answer expansion. */
-  (function initFaq() {
-    var items = Array.prototype.slice.call(document.querySelectorAll('.faq-section .faq-item'));
-    items.forEach(function (item) {
-      var question = item.querySelector('.faq-question');
-      var answer = item.querySelector('.faq-answer');
-      if (!question || !answer) return;
-      question.setAttribute('aria-expanded', item.classList.contains('open') ? 'true' : 'false');
-      question.addEventListener('click', function () {
-        var open = !item.classList.contains('open');
-        item.classList.toggle('open', open);
-        question.setAttribute('aria-expanded', open ? 'true' : 'false');
-      });
-    });
-  }());
-
 }());
