@@ -136,6 +136,13 @@ html body [class*="before-after"] span,
 html body [class*="before-after"] small { font-size: max(12px, 0.8rem) !important; line-height: 1.4 !important; }
 
 
+/* Higher-specificity override for page-specific heading rules. */
+html body main > section h1:not(.guardrail-exempt),
+html body main > section h2:not(.guardrail-exempt),
+html body main > section h3:not(.guardrail-exempt),
+html body main > section h4:not(.guardrail-exempt) { line-height: 1.2 !important; }
+
+
 
 /* ---- css/brand.css ---- */
 .brand-lockup {
@@ -2856,6 +2863,13 @@ nav { background: #000000 !important; }
 #menu-toggle.menu-toggle:hover span, #menu-toggle.menu-toggle:focus-visible span { background: #38A1E0; }
 
 
+/* Keep compact headings inside editorial sections within the defined ratio bands. */
+html body main > section h1:not(.guardrail-exempt),
+html body main > section h2:not(.guardrail-exempt),
+html body main > section h3:not(.guardrail-exempt),
+html body main > section h4:not(.guardrail-exempt) { line-height: 1.2 !important; }
+
+
 
 /* ---- css/marketing-infrastructure-banner.css ---- */
 /* Shared public marketing infrastructure strip and header actions. */
@@ -3314,6 +3328,12 @@ body:not(.dashboard-page) #menu-toggle.menu-toggle span:nth-child(3) { display:n
 
 /* Final heading guardrail: 1.2 is valid for both <=32px and >32px headings. */
 html body h1, html body h2, html body h3, html body h4 { line-height: 1.2 !important; }
+
+
+html body main > section h1:not(.guardrail-exempt),
+html body main > section h2:not(.guardrail-exempt),
+html body main > section h3:not(.guardrail-exempt),
+html body main > section h4:not(.guardrail-exempt) { line-height: 1.2 !important; }
 
 
 }
