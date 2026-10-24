@@ -41,6 +41,7 @@ for (const route of pages) {
         const cookie = document.querySelector('.al-cookie-banner');
         const cookieBounds = cookie ? (()=>{const r=cookie.getBoundingClientRect();return r.left>=-1&&r.right<=window.innerWidth+1&&r.width<=window.innerWidth-22;})() : true;
         const preOverflow = [...document.querySelectorAll('pre')].filter(el=>{const r=el.getBoundingClientRect(),s=getComputedStyle(el);return r.right>window.innerWidth+1 || (el.scrollWidth>el.clientWidth+1 && !['auto','scroll'].includes(s.overflowX));}).map(el=>({text:(el.innerText||'').slice(0,60),right:el.getBoundingClientRect().right,overflowX:getComputedStyle(el).overflowX}));
+        const whiteSurfaces = [...document.querySelectorAll('body *')].filter(el => { const r=el.getBoundingClientRect(), s=getComputedStyle(el); return r.width>200 && r.height>60 && s.display!=='none' && s.visibility!=='hidden' && s.backgroundColor==='rgb(255, 255, 255)' && r.bottom>0 && r.top<window.innerHeight; }).map(el=>({tag:el.tagName.toLowerCase(),id:el.id||'',className:typeof el.className==='string'?el.className:'',width:Math.round(el.getBoundingClientRect().width),height:Math.round(el.getBoundingClientRect().height)}));
         const sampleCards = [...document.querySelectorAll('.sample-card')].map(el=>{const s=getComputedStyle(el);return {background:s.backgroundColor,border:s.borderTopColor,fg:s.color,labels:[...el.querySelectorAll('small,strong,p')].map(n=>getComputedStyle(n).color)};});
         const sampleCardIssues = sampleCards.filter(c=>c.background!=='rgb(17, 19, 24)' || !['rgb(255, 255, 255)','rgb(194, 207, 222)'].includes(c.fg) || c.labels.some(v=>!['rgb(255, 255, 255)','rgb(194, 207, 222)'].includes(v)));
         const dot = document.querySelector('.al-sitewide-dot-canvas');
@@ -51,7 +52,7 @@ for (const route of pages) {
           return r.width>0 && r.height>0 && s.visibility!=='hidden' && s.display!=='none';
         }).map(el => {const s=getComputedStyle(el);let node=el,bg=s.backgroundColor;while((bg==='rgba(0, 0, 0, 0)'||bg==='transparent')&&node.parentElement){node=node.parentElement;bg=getComputedStyle(node).backgroundColor;}if(bg==='rgba(0, 0, 0, 0)'||bg==='transparent')bg=getComputedStyle(document.body).backgroundColor;if(bg==='rgba(0, 0, 0, 0)'||bg==='transparent')bg='#ffffff';return {text:(el.innerText||el.getAttribute('aria-label')||'').trim().slice(0,60),fg:s.color,bg};});
         const links = [...document.querySelectorAll('[data-site-header] a[href], [data-site-footer] a[href]')].map(a=>a.href);
-        return {headers,toggles,horizontal,overflowNodes,cookieBounds,preOverflow,sampleCards,sampleCardIssues,dotCanvasIssues,textCoveredByDot,buttons,links};
+        return {headers,toggles,horizontal,overflowNodes,cookieBounds,preOverflow,sampleCards,sampleCardIssues,whiteSurfaces,dotCanvasIssues,textCoveredByDot,buttons,links};
       }, route === '/');
       const linkResults = await Promise.all([...new Set(metrics.links)].map(url => {
         if (!linkStatusCache.has(url)) {
@@ -72,8 +73,8 @@ for (const route of pages) {
         return linkStatusCache.get(url);
       }));
       const contrastIssues = metrics.buttons.filter(b => {const ratio=contrastRatio(b.fg,b.bg);return ratio!==null&&ratio<4.5;}).map(b=>({...b,ratio:contrastRatio(b.fg,b.bg)}));
-      const row = {page:route,width,status,headerCount:metrics.headers,hamburgerCount:metrics.toggles,horizontalScroll:metrics.horizontal,overflowNodes:metrics.overflowNodes,cookieBounds:metrics.cookieBounds,preOverflow:metrics.preOverflow,sampleCardIssues:metrics.sampleCardIssues,dotCanvasIssues:metrics.dotCanvasIssues,textCoveredByDot:metrics.textCoveredByDot,consoleErrors:errors,environmentWarnings,linkFailures:linkResults.filter(x=>!x.ok),contrastIssues};
-      row.ok = status>=200&&status<400&&row.headerCount===1&&row.hamburgerCount===1&&!row.horizontalScroll&&row.cookieBounds&&!row.preOverflow.length&&!row.sampleCardIssues.length&&!row.dotCanvasIssues.length&&!row.textCoveredByDot&&!errors.length&&!row.linkFailures.length&&!row.contrastIssues.length;
+      const row = {page:route,width,status,headerCount:metrics.headers,hamburgerCount:metrics.toggles,horizontalScroll:metrics.horizontal,overflowNodes:metrics.overflowNodes,cookieBounds:metrics.cookieBounds,preOverflow:metrics.preOverflow,sampleCardIssues:metrics.sampleCardIssues,whiteSurfaceIssues:metrics.whiteSurfaces,dotCanvasIssues:metrics.dotCanvasIssues,textCoveredByDot:metrics.textCoveredByDot,consoleErrors:errors,environmentWarnings,linkFailures:linkResults.filter(x=>!x.ok),contrastIssues};
+      row.ok = status>=200&&status<400&&row.headerCount===1&&row.hamburgerCount===1&&!row.horizontalScroll&&row.cookieBounds&&!row.preOverflow.length&&!row.sampleCardIssues.length&&!(row.whiteSurfaceIssues||[]).length&&!row.dotCanvasIssues.length&&!row.textCoveredByDot&&!errors.length&&!row.linkFailures.length&&!row.contrastIssues.length;
       results.push(row);
       await page.close();
     } catch(e) {
@@ -86,7 +87,7 @@ await browser.close();
 fs.writeFileSync(path.join(outDir,'results.json'),JSON.stringify(results,null,2));
 fs.writeFileSync(path.join(outDir,'links.json'),JSON.stringify([...allLinkResults.values()],null,2));
 fs.writeFileSync(path.join(outDir,'links.md'),['| URL | Status | Result / note |','|---|---:|---|',...[...allLinkResults.values()].map(r=>'| '+r.url+' | '+r.status+' | '+(r.warning|| (r.ok?'OK':'ISSUE'))+' |')].join('\n'));
-const markdown = ['| Page | Width | HTTP | Headers | Hamburgers | Horizontal scroll | Cookie bounds | Pre overflow | Sample cards | Dot canvas issues | Text covered | Console errors | Link failures | Contrast failures | Result |','|---|---:|---:|---:|---:|---|---|---:|---:|---:|---|---:|---:|---:|---|',...results.map(r => '| '+r.page+' | '+r.width+' | '+(r.status??0)+' | '+(r.headerCount??'-')+' | '+(r.hamburgerCount??'-')+' | '+(r.horizontalScroll?'FAIL':'OK')+' | '+(r.cookieBounds===false?'FAIL':'OK')+' | '+(r.preOverflow?.length??'-')+' | '+(r.sampleCardIssues?.length??'-')+' | '+(r.dotCanvasIssues?.length??'-')+' | '+(r.textCoveredByDot?'FAIL':'OK')+' | '+(r.consoleErrors?.length??(r.error?1:0))+' | '+(r.linkFailures?.length??'-')+' | '+(r.contrastIssues?.length??'-')+' | '+(r.ok?'OK':'ISSUE')+' |')];
+const markdown = ['| Page | Width | HTTP | Headers | Hamburgers | Horizontal scroll | Cookie bounds | Pre overflow | Sample cards | White surfaces (>200x60) | Dot canvas issues | Text covered | Console errors | Link failures | Contrast failures | Result |','|---|---:|---:|---:|---:|---|---|---:|---:|---:|---|---:|---:|---:|---|',...results.map(r => '| '+r.page+' | '+r.width+' | '+(r.status??0)+' | '+(r.headerCount??'-')+' | '+(r.hamburgerCount??'-')+' | '+(r.horizontalScroll?'FAIL':'OK')+' | '+(r.cookieBounds===false?'FAIL':'OK')+' | '+(r.preOverflow?.length??'-')+' | '+(r.sampleCardIssues?.length??'-')+' | '+(r.whiteSurfaceIssues?.length??'-')+' | '+(r.dotCanvasIssues?.length??'-')+' | '+(r.textCoveredByDot?'FAIL':'OK')+' | '+(r.consoleErrors?.length??(r.error?1:0))+' | '+(r.linkFailures?.length??'-')+' | '+(r.contrastIssues?.length??'-')+' | '+(r.ok?'OK':'ISSUE')+' |')];
 fs.writeFileSync(path.join(outDir,'results.md'),markdown.join('\n'));
 console.log(markdown.join('\n'));
 const routeResults=[];
