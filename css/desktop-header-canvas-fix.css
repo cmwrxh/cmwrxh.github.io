@@ -287,7 +287,7 @@ nav .nav-dropdown-menu a { color: #e5f1fa; }
   nav.site-header .nav-dropdown-trigger {
     display: inline-flex; align-items: center; gap: 7px; padding: 10px 0;
     border: 0; background: transparent; color: #e5f1fa;
-    font: 600 .93rem/1.2 "Plus Jakarta Sans", Inter, sans-serif;
+    font: 600 .93rem/1.2 "Plus Jakarta Sans", system-ui, sans-serif;
     cursor: pointer; text-decoration: none;
   }
   nav.site-header .nav-links > li > a:hover,
@@ -314,7 +314,7 @@ nav .nav-dropdown-menu a { color: #e5f1fa; }
   nav.site-header .nav-cta {
     min-height: 44px; padding: 0 17px !important; border-radius: 9px !important;
     background: #167FE5 !important; border-color: #167FE5 !important; color: #FFFFFF !important;
-    font: 700 .88rem/1 "Plus Jakarta Sans", Inter, sans-serif;
+    font: 700 .88rem/1 "Plus Jakarta Sans", system-ui, sans-serif;
   }
 }
 @media (max-width: 1024px) {
@@ -325,7 +325,7 @@ nav .nav-dropdown-menu a { color: #e5f1fa; }
 /* Remove the obsolete pale-blue theme that previously covered every route. */
 html, body { background-color: var(--bg, #0f1114); color: var(--text, #e5f1fa); }
 body {
-  font-family: "Plus Jakarta Sans", Inter, ui-sans-serif, system-ui, sans-serif;
+  font-family: "Plus Jakarta Sans", system-ui, ui-sans-serif, system-ui, sans-serif;
   background-image: none;
 }
 .hero-africa-dot-hero { background: #0f1114; color: #e5f1fa; }
