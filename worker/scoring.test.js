@@ -45,3 +45,7 @@ test('summarizeRun exposes aggregates and normalizes Lighthouse network timings'
   assert.equal(result.resourceDetails[0].startTime, 100);
   assert.equal(result.resourceDetails[1].endTime, 1400);
 });
+
+
+test('summarizeRun extracts at most ten screenshot thumbnails from Lighthouse JSON', () => { const data = 'data:image/jpeg;base64,/9j/2Q=='; const items = Array.from({ length: 12 }, (_, i) => ({ timing: i * 250, data })); const result = summarizeRun({ categories: {}, audits: { 'screenshot-thumbnails': { details: { items } } } }); assert.equal(result.filmstripFrames.length, 10); assert.deepEqual(result.filmstripFrames[0], { timingMs: 0, dataUrl: data }); assert.equal(result.filmstripFrames[9].timingMs, 2250); });
+test('summarizeRun returns empty filmstrip without thumbnail audit', () => { assert.deepEqual(summarizeRun({ categories: {}, audits: {} }).filmstripFrames, []); });
