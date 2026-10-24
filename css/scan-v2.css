@@ -22,7 +22,7 @@
 .scan-segments{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin:20px 0 16px}
 .scan-segments span{height:6px;border-radius:20px;background:#e5ebf3;transition:background .2s ease}
 .scan-segments span.is-done,.scan-segments span.is-active{background:#2c67c7}
- .scan-stage{font-size:clamp(1.25rem,3vw,1.75rem);letter-spacing:-.025em;margin:0 0 8px}
+ .scan-stage{font-size:clamp(1.25rem,3vw,1.75rem);line-height:1.2;letter-spacing:-.025em;margin:0 0 8px}
 .scan-stage-copy{margin:0;color:var(--scan-muted);line-height:1.6}
 .scan-preview{position:relative;overflow:hidden;margin-top:22px;border:1px solid var(--scan-border);border-radius:12px;background:#f3f6fa;min-height:170px;aspect-ratio:16/8;display:grid;place-items:center}
 .scan-preview img{width:100%;height:100%;object-fit:cover;object-position:top center;display:block}
