@@ -1,5 +1,5 @@
 :root{color-scheme:dark;--pricing-bg:#0A0E17;--pricing-line:#293241;--pricing-muted:#9AA7BB;--pricing-blue:#2B80C5;--pricing-text:#F4F7FC}
-.pricing-page{margin:0;background:var(--pricing-bg);color:var(--pricing-text);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.pricing-page{margin:0;background:var(--pricing-bg);color:var(--pricing-text);font-family:"Plus Jakarta Sans",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
 .pricing-nav{border-bottom:1px solid var(--pricing-line);background:#0A0E17}
 .pricing-nav-inner{max-width:1240px;min-height:76px;margin:auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between;gap:24px}
 .pricing-nav-links{display:flex;align-items:center;gap:26px;flex-wrap:wrap}
