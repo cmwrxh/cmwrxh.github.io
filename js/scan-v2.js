@@ -48,6 +48,14 @@
     'Lighthouse is a controlled lab test. Real visitors can experience different results.'
   ];
   let tipIndex = 0, tipTimer = null, selectedDevice = 'mobile', turnstileWidget = null, turnstileToken = '';
+  let deviceId = '';
+  try {
+    deviceId = localStorage.getItem('al-guest-device-id') || '';
+    if (!/^[a-zA-Z0-9_-]{24,128}$/.test(deviceId)) {
+      deviceId = crypto.randomUUID().replace(/-/g, '');
+      localStorage.setItem('al-guest-device-id', deviceId);
+    }
+  } catch (_) { deviceId = crypto.randomUUID().replace(/-/g, ''); }
   let supabaseClient = null;
   try {
     if (window.supabase) supabaseClient = window.supabase.createClient(
@@ -175,7 +183,7 @@
     setStage('queued');
     try {
       const token = await getToken();
-      const payload = { url, device: selectedDevice };
+      const payload = { url, device: selectedDevice, deviceId };
       if (!token) {
         if (!turnstileToken) throw new Error('Complete the bot verification before running an anonymous scan.');
         payload.turnstileToken = turnstileToken;
@@ -185,6 +193,23 @@
         body:JSON.stringify(payload)
       });
       const data = await response.json().catch(() => ({}));
+      if (!response.ok && data.code === 'guest_scan_used' && data.reportId) {
+        stopElapsed();
+        work.setAttribute('aria-busy','false');
+        work.style.display = 'none';
+        const gate = document.getElementById('guest-scan-gate');
+        if (gate) {
+          const reportPath = '/reports/' + encodeURIComponent(data.reportId);
+          gate.hidden = false;
+          gate.querySelector('[data-gate-message]').textContent = 'Your free scan is used. Create a free account to keep testing, save this report and compare changes.';
+          gate.querySelector('[data-gate-signup]').href = '/signup?next=' + encodeURIComponent(reportPath);
+          gate.querySelector('[data-gate-login]').href = '/login?next=' + encodeURIComponent(reportPath);
+          gate.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        } else setError(data.error || 'Your free scan is used.');
+        button.disabled = false;
+        button.textContent = 'Run free scan';
+        return;
+      }
       if (!response.ok) throw new Error(data.error || 'Could not start the scan.');
       if (data.cacheHit) stageCopy.textContent = 'A recent scan of this URL and device is available. Reusing that result.';
       setStage('queued', data.queuePosition);
