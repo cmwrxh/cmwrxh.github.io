@@ -16,3 +16,7 @@ body.white-surface-page main .terminal{background:#101828!important;color:#e8edf
 body.white-surface-page main .terminal *{color:#e8edf5!important}
 body.white-surface-page .al-site-header{background:#171619!important;color:#fff!important}
 body.white-surface-page .al-site-footer{background:#111214!important;color:#e8ebf0!important}
+
+/* Keep wide comparison data inside its own scroll container on small screens. */
+body.white-surface-page .table-wrap{max-width:100%;overflow-x:auto;box-sizing:border-box}
+body.white-surface-page .comparison-table{min-width:489px}
