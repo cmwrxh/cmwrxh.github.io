@@ -289,12 +289,26 @@ if (typographyFailures.length) {
   console.log('Plus Jakarta Sans verified for every post-migration screenshot check.');
 }
 if (designFailures.length) {
-  console.error('Typography design guardrail failures:', JSON.stringify(designFailures.map(check => ({
-    page: check.page,
-    viewport: check.viewport,
-    finalUrl: check.finalUrl,
-    designGuardrails: check.designGuardrails
-  }))));
+  console.error('Typography design guardrail failures:');
+  for (const check of designFailures) {
+    const g = check.designGuardrails;
+    const context = `${check.page} @ ${check.viewport}px`;
+    if (!g.contrastPassed) {
+      console.error(`- ${context}: dim text contrast failed (color ${g.dimColor}, page ${g.dimPageContrast}, card ${g.dimCardContrast})`);
+    }
+    if (!g.bodyLineHeightPassed) {
+      console.error(`- ${context}: body line-height ratio ${g.bodyLineHeightRatio}; expected 1.60–1.70`);
+    }
+    for (const item of g.headingLineHeights.filter(item => item.ratio < 1.2 || item.ratio > 1.3)) {
+      console.error(`- ${context}: ${item.tag}${item.className ? `.${item.className.trim().split(/\\s+/).join('.')}` : ''} line-height ${item.lineHeight} / font-size ${item.fontSize} = ${item.ratio}; expected 1.20–1.30`);
+    }
+    for (const item of g.textBelow12) {
+      console.error(`- ${context}: ${item.tag}${item.className ? `.${item.className.trim().split(/\\s+/).join('.')}` : ''} font-size ${item.fontSize}; text="${item.text.replace(/\\s+/g, ' ').slice(0, 70)}"`);
+    }
+    for (const item of g.negativeTracking) {
+      console.error(`- ${context}: ${item.tag}${item.className ? `.${item.className.trim().split(/\\s+/).join('.')}` : ''} letter-spacing ${item.letterSpacing}; text="${item.text.replace(/\\s+/g, ' ').slice(0, 70)}"`);
+    }
+  }
   process.exitCode = 1;
 } else {
   console.log('Typography size, tracking, line-height and contrast guardrails passed for every post-migration screenshot check.');
