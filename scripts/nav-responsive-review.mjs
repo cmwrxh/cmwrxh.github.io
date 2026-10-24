@@ -60,8 +60,28 @@ try {
           if (width < 700 && metrics.toggleCount === 1) {
             await page.locator('button.menu-toggle, #menu-toggle').first().click().catch(() => failures.push(`${name} mobile hamburger was not clickable`));
             await page.waitForTimeout(150);
-            const menuVisible = await page.locator('#site-menu, .site-menu').first().isVisible().catch(() => false);
+            const menuLocator = page.locator('#site-menu, .site-menu').first();
+            const menuVisible = await menuLocator.isVisible().catch(() => false);
             if (metrics.menuCount && !menuVisible) failures.push(`${name} @ ${width}px mobile menu did not become visible after click`);
+            if (menuVisible) {
+              const overlay = await menuLocator.evaluate(el => {
+                const style = getComputedStyle(el);
+                const rect = el.getBoundingClientRect();
+                const grid = el.querySelector('.menu-grid');
+                const gridStyle = grid ? getComputedStyle(grid) : null;
+                return {
+                  position: style.position,
+                  zIndex: Number.parseInt(style.zIndex || '0', 10),
+                  visibility: style.visibility,
+                  pointerEvents: style.pointerEvents,
+                  coversViewport: rect.top <= 1 && rect.left <= 1 && rect.bottom >= innerHeight - 1 && rect.right >= innerWidth - 1,
+                  menuScrollOverflow: gridStyle?.overflowY || '',
+                };
+              });
+              if (overlay.position !== 'fixed' || overlay.zIndex < 1000 || !overlay.coversViewport) failures.push(`${name} @ ${width}px menu overlay position/z-index does not cover the viewport safely: ${JSON.stringify(overlay)}`);
+              if (!['auto', 'scroll'].includes(overlay.menuScrollOverflow)) failures.push(`${name} @ ${width}px mobile menu content is not vertically scrollable: ${overlay.menuScrollOverflow}`);
+              await page.screenshot({ path: path.join(outDir, `after-${name}-${width}-menu-open.png`), fullPage: false });
+            }
             await page.locator('#menu-close').first().click().catch(() => {});
           }
           if (width >= 900) {
@@ -69,8 +89,11 @@ try {
             if (await trigger.count()) {
               await trigger.click().catch(() => failures.push(`${name} desktop dropdown trigger could not be clicked`));
               if (await trigger.getAttribute('aria-expanded').catch(() => null) !== 'true') failures.push(`${name} @ ${width}px dropdown did not set aria-expanded=true`);
-              const toolsGroup = await page.locator('.nav-dropdown-menu').first().innerText().catch(() => '');
+              const dropdown = page.locator('.nav-dropdown-menu').first();
+              const toolsGroup = await dropdown.innerText().catch(() => '');
               if (!/Tools/i.test(toolsGroup)) failures.push(`${name} @ ${width}px Resources dropdown missing Tools group`);
+              const dropdownBox = await dropdown.boundingBox().catch(() => null);
+              if (!dropdownBox || dropdownBox.width < 1 || dropdownBox.height < 1 || dropdownBox.left < -1 || dropdownBox.right > width + 1) failures.push(`${name} @ ${width}px Resources dropdown is clipped or outside the viewport`);
             }
           }
         }
