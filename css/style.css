@@ -46,3 +46,42 @@ main > section .section-lead {
   font-size: 1rem !important;
   line-height: 1.625 !important;
 }
+
+
+/* Dark-surface consistency pass — October 2026 */
+.table-wrap,
+.empty-state,
+.product-card,
+.preview-wireframe,
+.report-preview,
+.founder-copy,
+.methodology-summary,
+.data-article-chart {
+  background: #111318 !important;
+  border-color: #2c2c2e !important;
+  color: #c2cfde !important;
+}
+.table-wrap .data-table thead th,
+.table-wrap .data-table thead td {
+  background: #171619 !important;
+  color: #fff !important;
+  border-color: #2c2c2e !important;
+}
+.table-wrap .data-table tbody th,
+.table-wrap .data-table tbody td {
+  background: #111318 !important;
+  color: #c2cfde !important;
+  border-color: #2c2c2e !important;
+}
+.table-wrap .data-table tbody th,
+.empty-state h2,
+.empty-state h3,
+.product-card h2,
+.product-card h3,
+.methodology-summary h2,
+.methodology-summary h3,
+.data-article-chart figcaption {
+  color: #fff !important;
+}
+/* Hide the old generated footer link until every static page is resynchronized. */
+[data-site-footer] .al-footer-links a[href="/services"] { display: none !important; }
