@@ -1,0 +1,7 @@
+import { createServer } from 'node:http';
+import { readFile } from 'node:fs/promises';
+import { resolve, extname, sep } from 'node:path';
+const root=resolve(process.argv[2]||'.'),port=Number(process.argv[3]||4173);
+const aliases=new Map([['/','index.html'],['/scan','scan.html'],['/pricing','pricing.html'],['/about','about.html'],['/sample-report','sample-report.html'],['/dashboard','dashboard.html'],['/login','login.html'],['/signup','signup.html']]);
+const mime={'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.js':'text/javascript; charset=utf-8','.mjs':'text/javascript; charset=utf-8','.json':'application/json; charset=utf-8','.svg':'image/svg+xml','.png':'image/png','.jpg':'image/jpeg','.jpeg':'image/jpeg','.webp':'image/webp','.ico':'image/x-icon','.woff2':'font/woff2','.xml':'application/xml; charset=utf-8','.webmanifest':'application/manifest+json'};
+createServer(async(req,res)=>{try{const p=decodeURIComponent(new URL(req.url,'http://localhost').pathname),file=resolve(root,aliases.get(p)||p.slice(1)||'index.html');if(file!==root&&!file.startsWith(root+sep)){res.writeHead(403);res.end('Forbidden');return;}const body=await readFile(file);res.writeHead(200,{'content-type':mime[extname(file).toLowerCase()]||'application/octet-stream','cache-control':'no-store'});res.end(body);}catch{res.writeHead(404,{'content-type':'text/plain; charset=utf-8'});res.end('Not found');}}).listen(port,'127.0.0.1',()=>console.log('Static preview serving '+root+' on '+port));

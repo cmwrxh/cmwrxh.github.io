@@ -1,0 +1,119 @@
+name: Legacy CSS regeneration and Lighthouse comparison
+
+on:
+  push:
+    branches:
+      - 'design/typography-**'
+    paths:
+      - 'css/**'
+      - 'scripts/build-legacy-home-css.mjs'
+      - '.github/workflows/regenerate-legacy-css.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'css/**'
+      - 'index.html'
+      - 'scripts/build-legacy-home-css.mjs'
+      - 'scripts/report-lighthouse-audits.mjs'
+      - 'scripts/ci-static-preview.mjs'
+      - 'scripts/lighthouse-matrix.mjs'
+      - '.github/workflows/regenerate-legacy-css.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: legacy-css-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  regenerate:
+    if: github.event_name == 'push' && !startsWith(github.event.head_commit.message, '[bot]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node scripts/build-legacy-home-css.mjs
+      - name: Commit generated bundle when changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add css/legacy-home.css
+          if git diff --cached --quiet; then
+            echo "Generated bundle already matches the committed file."
+          else
+            git commit -m "[bot] regenerate legacy-home.css"
+            git push
+          fi
+
+  reproducibility:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node --check scripts/build-legacy-home-css.mjs
+      - name: Verify committed bundle matches generator output
+        run: |
+          cp css/legacy-home.css /tmp/legacy-home.css
+          node scripts/build-legacy-home-css.mjs
+          cmp /tmp/legacy-home.css css/legacy-home.css
+
+  lighthouse:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Check out main baseline
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: main-reference
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install Playwright and Lighthouse
+        run: |
+          npm install --no-save playwright lighthouse
+          npx playwright install --with-deps chromium
+      - name: Start main and PR static previews on the same runner
+        run: |
+          node scripts/ci-static-preview.mjs main-reference 4174 >/tmp/main-preview.log 2>&1 &
+          echo $! >/tmp/main-preview.pid
+          node scripts/ci-static-preview.mjs . 4173 >/tmp/pr-preview.log 2>&1 &
+          echo $! >/tmp/pr-preview.pid
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:4174/ >/dev/null && curl --fail --silent http://127.0.0.1:4173/ >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/main-preview.log /tmp/pr-preview.log
+          exit 1
+      - name: Run six-page Lighthouse matrix and responsive screenshots
+        env:
+          MAIN_URL: http://127.0.0.1:4174
+          PR_URL: http://127.0.0.1:4173
+        run: node scripts/lighthouse-matrix.mjs
+      - name: Summarize homepage Lighthouse audits
+        run: node scripts/report-lighthouse-audits.mjs
+      - name: Upload raw Lighthouse JSON/HTML, score comparisons and screenshots
+        uses: actions/upload-artifact@v4
+        with:
+          name: typography-lighthouse-main-vs-pr
+          path: |
+            artifacts/lighthouse/**
+            artifacts/screenshots/**
+          if-no-files-found: error
+          retention-days: 14
