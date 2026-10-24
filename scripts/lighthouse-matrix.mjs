@@ -86,6 +86,24 @@ async function inspectTypography(page) {
     const dimColor = resolveCssColor('--text-dim', 'color');
     const pageBackground = resolveCssColor('--bg', 'backgroundColor');
     const rawCardBackground = root.getPropertyValue('--bg-card').trim().toLowerCase();
+    const describeSelector = element => {
+      const parts = [];
+      let current = element;
+      while (current && current !== document.body && parts.length < 6) {
+        let part = current.tagName.toLowerCase();
+        if (current.id) {
+          part += `#${current.id}`;
+        } else if (current.classList && current.classList.length) {
+          part += '.' + [...current.classList].slice(0, 3).join('.');
+        } else if (current.parentElement) {
+          const sameTag = [...current.parentElement.children].filter(sibling => sibling.tagName === current.tagName);
+          if (sameTag.length > 1) part += `:nth-of-type(${sameTag.indexOf(current) + 1})`;
+        }
+        parts.unshift(part);
+        current = current.parentElement;
+      }
+      return parts.join(' > ');
+    };
     const cardSurfaceSelector = '.plan-card, .sample-card, .card, .terminal, .login-card, .faq-item, .about-signal, .trust-card, .visibility-report-chart, .visibility-report-panel, .get-started-url-row, .table-wrapper';
     const cardSurfaces = [...document.querySelectorAll(cardSurfaceSelector)].filter(element => element.getClientRects().length > 0);
     const backgroundColorsFor = element => {
@@ -122,24 +140,6 @@ async function inspectTypography(page) {
         ? getComputedStyle(document.body).backgroundColor
         : null;
     }
-    const describeSelector = element => {
-      const parts = [];
-      let current = element;
-      while (current && current !== document.body && parts.length < 6) {
-        let part = current.tagName.toLowerCase();
-        if (current.id) {
-          part += `#${current.id}`;
-        } else if (current.classList && current.classList.length) {
-          part += '.' + [...current.classList].slice(0, 3).join('.');
-        } else if (current.parentElement) {
-          const sameTag = [...current.parentElement.children].filter(sibling => sibling.tagName === current.tagName);
-          if (sameTag.length > 1) part += `:nth-of-type(${sameTag.indexOf(current) + 1})`;
-        }
-        parts.unshift(part);
-        current = current.parentElement;
-      }
-      return parts.join(' > ');
-    };
     const textLeaves = [...document.querySelectorAll('body *')].filter(element =>
       element.children.length === 0
       && (element.innerText || element.textContent || '').trim()
