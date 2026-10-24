@@ -607,3 +607,7 @@ html body button.al-test-button,html body button.scan-run,html body #al-consent-
 
 /* Size-aware heading line-height guardrail. 1.2 satisfies both defined size bands. */
 h1, h2, h3, h4 { line-height: 1.2 !important; }
+
+
+/* Final size-aware heading override for page-level selectors. */
+html body h1, html body h2, html body h3, html body h4 { line-height: 1.2 !important; }
