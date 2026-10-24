@@ -7,8 +7,13 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
 
 app.set('trust proxy', true); // behind Coolify's Traefik proxy
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// The Paystack webhook verifies an HMAC over the exact raw request bytes, so its
+// handler reads the stream itself. Body parsers must not consume it first.
+const RAW_BODY_PATHS = new Set(['/api/paystack-webhook']);
+const jsonParser = express.json();
+const urlencodedParser = express.urlencoded({ extended: true });
+app.use((req, res, next) => (RAW_BODY_PATHS.has(req.path) ? next() : jsonParser(req, res, next)));
+app.use((req, res, next) => (RAW_BODY_PATHS.has(req.path) ? next() : urlencodedParser(req, res, next)));
 
 // 1. Auto-mount api/*.js as /api/<name> (Vercel-style handlers)
 const apiDir = path.join(__dirname, 'api');
@@ -73,20 +78,4 @@ app.use((req, res, next) => {
   next();
 });
 
-// 3. Customer report route: stable, shareable /reports/<UUID> URL.
-app.get('/reports/:scanId', (req, res, next) => {
-  if (!/^[a-f0-9-]{36}$/i.test(String(req.params.scanId || ''))) {
-    return res.status(404).sendFile(path.join(__dirname, '404.html'));
-  }
-  return res.sendFile(path.join(__dirname, 'reports.html'));
-});
-
-// 3. Static site, with extension fallback (/contact -> contact.html)
-app.use(express.static(__dirname, { extensions: ['html'] }));
-
-// 4. Anything else -> your 404 page
-app.use((req, res) => {
-  res.status(404).sendFile(path.join(__dirname, '404.html'));
-});
-
-app.listen(process.env.PORT || 3000, () => console.log('up'));
+// 3. Customer report route: stable, s
