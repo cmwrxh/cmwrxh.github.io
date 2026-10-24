@@ -130,3 +130,10 @@ html body [class*="tag"],
 html body [class*="disclaimer"],
 html body [class*="before-after"] span,
 html body [class*="before-after"] small { font-size: max(12px, 0.8rem) !important; line-height: 1.4 !important; }
+
+
+/* Higher-specificity override for page-specific heading rules. */
+html body main > section h1:not(.guardrail-exempt),
+html body main > section h2:not(.guardrail-exempt),
+html body main > section h3:not(.guardrail-exempt),
+html body main > section h4:not(.guardrail-exempt) { line-height: 1.2 !important; }
