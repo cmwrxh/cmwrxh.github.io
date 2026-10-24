@@ -207,8 +207,8 @@ async function saveFilmstrip(jobId, frames) {
         (async () => {
           const source = Buffer.from(match[2], 'base64');
           if (!source.length || source.length > 4 * 1024 * 1024) return;
-          const output = await sharp(source, { limitInputPixels: 40000000 }).resize({ width: 400, withoutEnlargement: true }).jpeg({ quality: 65, mozjpeg: true }).toBuffer();
-          if (!output.length || output.length > 25 * 1024) return;
+          const output = await sharp(source, { limitInputPixels: 40000000 }).resize({ width: 900, withoutEnlargement: true }).jpeg({ quality: 78, mozjpeg: true }).toBuffer();
+          if (!output.length || output.length > 80 * 1024) return;
           const timing = Number.isFinite(Number(frame.timingMs)) ? Math.max(0, Math.round(Number(frame.timingMs))) : i;
           const path = jobId + '/filmstrip/' + String(i).padStart(2, '0') + '-' + timing + '.jpg';
           const { error } = await storage.upload(path, output, { contentType: 'image/jpeg', upsert: true });
