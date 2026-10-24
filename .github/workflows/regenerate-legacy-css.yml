@@ -68,6 +68,8 @@ jobs:
           cp css/legacy-home.css /tmp/legacy-home.css
           node scripts/build-legacy-home-css.mjs
           cmp /tmp/legacy-home.css css/legacy-home.css
+      - name: Check Lighthouse matrix script syntax
+        run: node --check scripts/lighthouse-matrix.mjs
 
   lighthouse:
     if: github.event_name == 'pull_request'
