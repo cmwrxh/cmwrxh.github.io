@@ -40,12 +40,10 @@ try {
             if (hero) hero.setAttribute('data-review-hidden-hero', 'true');
             if (hero) hero.style.setProperty('display', 'none', 'important');
           });
-          const faqItems = [...page.locator('.faq-section .faq-item').all()];
           await page.screenshot({ path: path.join(outDir, `${version}-homepage-lower-faq-closed-${width}.png`), fullPage: true });
           const faqCount = await page.locator('.faq-section .faq-item').count();
           if (faqCount >= 2) {
             const firstFaq = page.locator('.faq-section .faq-item').first();
-            const secondFaq = page.locator('.faq-section .faq-item').nth(1);
             const question = firstFaq.locator('.faq-question, button, summary').first();
             await question.click().catch(() => failures.push(`homepage ${version} @ ${width}px FAQ question could not be opened`));
             await page.waitForTimeout(150);
