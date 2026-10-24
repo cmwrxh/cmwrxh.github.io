@@ -1,0 +1,22 @@
+{
+  "lighthouseVersion": "12.8.2",
+  "requestedUrl": "https://example.com/",
+  "finalDisplayedUrl": "https://example.com/",
+  "categories": {},
+  "audits": {
+    "screenshot-thumbnails": {
+      "details": {
+        "items": [
+          {
+            "timing": 0,
+            "data": "data:image/jpeg;base64,/9j/2Q=="
+          },
+          {
+            "timing": 500,
+            "data": "data:image/jpeg;base64,/9j/2Q=="
+          }
+        ]
+      }
+    }
+  }
+}

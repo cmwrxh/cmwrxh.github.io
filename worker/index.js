@@ -1,5 +1,6 @@
 import express from 'express';
 import crypto from 'node:crypto';
+import sharp from 'sharp';
 import { createClient } from '@supabase/supabase-js';
 import { runLighthouse } from './provider.js';
 import { buildRequestAnalysis } from './scoring.js';
@@ -19,6 +20,7 @@ const RETENTION_DAYS = Math.max(1, Math.min(90, Number(process.env.SCAN_ANON_RET
 const IP_HASH_SECRET = process.env.IP_HASH_SECRET;
 const API_KEY_PREFIX = 'al_live_';
 const signedUrlCache = new Map();
+const signedFilmstripCache = new Map();
 let lastAlertAt = 0;
 let busy = false;
 let lastJobAt = Date.now();
@@ -55,7 +57,7 @@ async function userFromRequest(req) {
   const { data, error } = await supabase.auth.getUser(token);
   return error ? null : data?.user || null;
 }
-function publicSummary(job, screenshotUrl = null) {
+function publicSummary(job, screenshotUrl = null, filmstrip = []) {
   const result = job.result || {};
   const savedSummary = result.summary || {};
   const savedFullReport = result.fullReport || {};
@@ -82,6 +84,7 @@ function publicSummary(job, screenshotUrl = null) {
     lighthouseVersion: result.lighthouseVersion || null,
     chromeVersion: result.chromeVersion || null,
     screenshotUrl,
+    filmstrip,
     summary: result.summary ? { ...result.summary, requestAnalysis } : { requestAnalysis },
     africaLatency: result.africaLatency || countries.map(c => ({ country: c.name, countryCode: c.code, status: 'unavailable', rttMs: null })),
     locked: true
@@ -114,8 +117,8 @@ async function reportFor(req, job) {
     }
     unlocked = job.user_id === user.id;
   }
-  const screenshotUrl = await signedScreenshot(job);
-  const response = publicSummary(job, screenshotUrl);
+  const screenshotUrl = await signedScreenshot(job).catch(() => null);
+  const response = publicSummary(job, screenshotUrl, job.status === 'completed' ? await signedFilmstrip(job.id) : []);
   response.locked = !unlocked;
   if (unlocked) response.fullReport = job.result?.fullReport || null;
   return response;
@@ -190,6 +193,58 @@ async function saveScreenshot(jobId, dataUrl) {
   return path;
 }
 
+async function saveFilmstrip(jobId, frames) {
+  if (!Array.isArray(frames) || !frames.length) return;
+  const storage = supabase.storage.from('scan-screenshots');
+  const deadline = Date.now() + 8000;
+  let dropped = 0;
+  for (let i = 0; i < Math.min(frames.length, 10) && Date.now() < deadline; i++) {
+    try {
+      const frame = frames[i];
+      const match = String(frame?.dataUrl || '').match(/^data:image\\/(png|jpeg|webp);base64,([A-Za-z0-9+/=]+)$/);
+      if (!match) { dropped++; continue; }
+      const remainingMs = deadline - Date.now();
+      if (remainingMs <= 0) { dropped += Math.min(frames.length, 10) - i; break; }
+      await Promise.race([
+        (async () => {
+          const source = Buffer.from(match[2], 'base64');
+          if (!source.length || source.length > 4 * 1024 * 1024) { dropped++; return; }
+          let output = await sharp(source, { limitInputPixels: 40000000 }).resize({ width: 900, withoutEnlargement: true }).jpeg({ quality: 78, mozjpeg: true }).toBuffer();
+          if (!output.length || output.length > 80 * 1024) {
+            output = await sharp(source, { limitInputPixels: 40000000 }).resize({ width: 640, withoutEnlargement: true }).jpeg({ quality: 60, mozjpeg: true }).toBuffer();
+          }
+          if (!output.length || output.length > 80 * 1024) { dropped++; return; }
+          const timing = Number.isFinite(Number(frame.timingMs)) ? Math.max(0, Math.round(Number(frame.timingMs))) : i;
+          const path = jobId + '/filmstrip/' + String(i).padStart(2, '0') + '-' + timing + '.jpg';
+          const { error } = await storage.upload(path, output, { contentType: 'image/jpeg', upsert: true });
+          if (error) { dropped++; console.warn('[scan-worker] filmstrip upload failed:', error.message); }
+        })(),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('Filmstrip processing timed out')), remainingMs))
+      ]);
+    } catch (error) {
+      dropped++;
+      console.warn('[scan-worker] filmstrip frame skipped:', String(error?.message || error).slice(0, 160));
+    }
+  }
+  if (dropped) console.warn('[scan-worker] filmstrip frames dropped:', dropped, 'of', Math.min(frames.length, 10));
+}
+async function signedFilmstrip(jobId) {
+  const cached = signedFilmstripCache.get(jobId);
+  if (cached && cached.expiresAt > Date.now()) return cached.frames;
+  try {
+    const { data: files, error } = await supabase.storage.from('scan-screenshots').list(jobId + '/filmstrip', { limit: 10, sortBy: { column: 'name', order: 'asc' } });
+    if (error || !Array.isArray(files)) return [];
+    const output = [];
+    for (const file of files) {
+      const match = file.name.match(/^(\\d{2})-(\\d+)\\.jpg$/); if (!match) continue;
+      const { data, error: signError } = await supabase.storage.from('scan-screenshots').createSignedUrl(jobId + '/filmstrip/' + file.name, 3600);
+      if (!signError && data?.signedUrl) output.push({ timing_ms: Number(match[2]), url: data.signedUrl });
+    }
+    const frames = output.slice(0, 10);
+    signedFilmstripCache.set(jobId, { frames, expiresAt: Date.now() + 50 * 60 * 1000 });
+    return frames;
+  } catch (error) { console.warn('[scan-worker] filmstrip signing failed:', String(error?.message || error).slice(0, 160)); return []; }
+}
 async function executeJob(job) {
   const update = async (fields) => supabase.from('scan_jobs').update({ ...fields, updated_at: new Date().toISOString() }).eq('id', job.id);
   const user = job.user_id ? { id: job.user_id } : null;
@@ -198,7 +253,8 @@ async function executeJob(job) {
   const safeUrl = await validatePublicUrl(job.url);
   await update({ stage: 'lighthouse', progress: 30 });
   const lighthouseResult = await runLighthouse(safeUrl, job.device, runCount);
-  const screenshot = await saveScreenshot(job.id, lighthouseResult.screenshotDataUrl);
+  const screenshot = await saveScreenshot(job.id, lighthouseResult.screenshotDataUrl).catch(() => null);
+  await saveFilmstrip(job.id, lighthouseResult.filmstripFrames).catch(error => console.warn('[scan-worker] filmstrip save failed:', String(error?.message || error).slice(0, 160)));
   const summary = {
     grade: lighthouseResult.grade,
     performance: lighthouseResult.performance,
@@ -386,8 +442,8 @@ app.get('/internal/jobs/:id', async (req, res) => {
     }
     unlocked = job.user_id === user.id;
   }
-  const screenshotUrl = await signedScreenshot(job);
-  const payload = publicSummary(job, screenshotUrl);
+  const screenshotUrl = await signedScreenshot(job).catch(() => null);
+  const payload = publicSummary(job, screenshotUrl, job.status === 'completed' ? await signedFilmstrip(job.id) : []);
   payload.locked = !unlocked;
   if (unlocked) payload.fullReport = job.result?.fullReport || null;
   if (job.status === 'failed') payload.error = job.error_message || 'Scan failed.';
@@ -410,7 +466,10 @@ async function retentionSweep() {
   const cutoff = new Date(Date.now() - RETENTION_DAYS * 86400000).toISOString();
   const { data: expired } = await supabase.from('scan_jobs').select('id,screenshot').is('user_id', null).lt('created_at', cutoff).limit(100);
   for (const job of expired || []) {
-    if (job.screenshot) await supabase.storage.from('scan-screenshots').remove([job.screenshot]).catch(() => {});
+    const storage = supabase.storage.from('scan-screenshots');
+    if (job.screenshot) await storage.remove([job.screenshot]).catch(() => {});
+    const { data: filmstripFiles } = await storage.list(job.id + '/filmstrip', { limit: 100 }).catch(() => ({ data: [] }));
+    if (Array.isArray(filmstripFiles) && filmstripFiles.length) { const paths = filmstripFiles.filter(file => /^\d{2}-\d+\.jpg$/.test(file.name)).map(file => job.id + '/filmstrip/' + file.name); if (paths.length) await storage.remove(paths).catch(() => {}); }
     await supabase.from('scan_jobs').delete().eq('id', job.id).is('user_id', null);
   }
 }
