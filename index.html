@@ -13,7 +13,7 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="AfricaLatency">
-  <link rel="canonical" href="https://www.africalatency.dev/">
+  <link rel="canonical" href="https://africalatency.dev/">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="AfricaLatency">
   <meta property="og:title" content="AfricaLatency — Infrastructure Performance &amp; Latency Intelligence">
@@ -21,7 +21,7 @@
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:description" content="The free scan checks performance from nine African countries. Live regional results depend on probe availability.">
-  <meta property="og:url" content="https://www.africalatency.dev/">
+  <meta property="og:url" content="https://africalatency.dev/">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:image" content="https://africalatency.dev/images/og-image.svg">
   <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
@@ -39,27 +39,35 @@
 <script type="application/ld+json" id="faq-schema">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Which countries does the free scan cover?","acceptedAnswer":{"@type":"Answer","text":"The free scan requests measurements from nine African countries. Live regional results depend on probe availability."}},{"@type":"Question","name":"Does the standard audit inspect my database?","acceptedAnswer":{"@type":"Answer","text":"No. The standard audit tests public endpoints. Database internals and third-party dependencies require a separately scoped Custom Deep Dive."}},{"@type":"Question","name":"Can I start without talking to anyone?","acceptedAnswer":{"@type":"Answer","text":"Yes. Run the free scan or purchase the Africa Latency Audit online. Custom engagements are scoped separately."}}]}</script>
   <link rel="stylesheet" href="/css/legacy-home.css?v=2">
   <link rel="stylesheet" href="/css/homepage-reference-redesign.css?v=6">
+  <link rel="stylesheet" href="/css/site-header.css">
 </head>
-<body>
+<body class="home-page">
   <a class="al-skip-link" href="#main">Skip to content</a>
-  <header class="al-header">
-    <div class="al-wrap al-header-inner">
-      <a class="al-brand" href="/" aria-label="AfricaLatency home"><img src="/images/africalatency-logo-dark.svg" width="180" height="28" alt="AfricaLatency"></a>
-      <nav class="al-header-actions" aria-label="Main navigation">
-        <a class="al-header-button" href="/login">Log In</a>
-        <a class="al-header-button" href="/scan">Try for FREE</a>
-        <button class="al-menu-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu"><span></span><span></span></button>
-      </nav>
-    </div>
-    <nav id="mobile-menu" class="al-mobile-menu" aria-label="Additional navigation" hidden>
-      <a href="/scan">Free Scan</a>
-      <a href="/audit-checkout">Africa Latency Audit</a>
-      <a href="/monitoring">Continuous Monitoring</a>
-      <a href="/tools#programmatic-scanning">Tools &amp; API</a>
-      <a href="/sample-report">Sample Report</a>
-      <a href="/contact">Contact</a>
+  <!-- site-header:start -->
+<header class="al-site-header" data-site-header>
+  <div class="al-header-inner">
+    <a class="al-brand" href="/" aria-label="AfricaLatency home"><img src="/images/africalatency-logo-dark.svg" width="180" height="28" alt="AfricaLatency"></a>
+    <nav class="al-desktop-nav" aria-label="Main navigation">
+      <a href="/pricing">Pricing</a>
+      <div class="al-dropdown"><button type="button" class="al-dropdown-trigger" aria-expanded="false" aria-controls="al-resources-menu">Resources <span aria-hidden="true">⌄</span></button>
+        <div class="al-dropdown-menu" id="al-resources-menu">
+          <a href="/tools">Tools &amp; API docs</a><a href="/docs">Docs</a><a href="/sample-report">Sample report</a><a href="/compare">Compare</a><a href="/performance-index">Performance Index</a><a href="/methodology">Methodology</a><a href="/security">Security</a><a href="/changelog">Changelog</a><a href="/blog">Blog</a><a href="/cases">Case studies</a><a href="/data-centers">Data centers</a><a href="/kenya">Kenya</a>
+        </div>
+      </div>
+      <a href="/about">About</a><a href="/contact">Contact</a>
     </nav>
-  </header>
+    <div class="al-header-actions"><a class="al-login" href="/login">Log In</a><a class="al-try" href="/scan">Try for FREE</a></div>
+    <button class="al-menu-toggle" type="button" aria-label="Open navigation menu" aria-expanded="false" aria-controls="al-mobile-menu"><span></span><span></span><span></span></button>
+  </div>
+  <nav class="al-mobile-menu" id="al-mobile-menu" aria-label="Mobile navigation" hidden>
+    <a href="/pricing">Pricing</a><a href="/about">About</a>
+    <details><summary>Resources</summary><a href="/tools">Tools &amp; API docs</a><a href="/docs">Docs</a><a href="/sample-report">Sample report</a><a href="/compare">Compare</a><a href="/performance-index">Performance Index</a><a href="/methodology">Methodology</a><a href="/security">Security</a><a href="/changelog">Changelog</a><a href="/blog">Blog</a><a href="/cases">Case studies</a><a href="/data-centers">Data centers</a><a href="/kenya">Kenya</a></details>
+    <a href="/contact">Contact</a>
+    <div class="al-social-links"><a href="https://www.linkedin.com/in/charles-mwaura-bb7814140/" rel="noopener noreferrer">LinkedIn</a><a href="https://github.com/cmwrxh/cmwrxh.github.io" rel="noopener noreferrer">GitHub</a><a href="mailto:support@africalatency.dev">Email</a></div>
+    <a class="al-try" href="/scan">Try for FREE</a><a class="al-login" href="/login">Log In</a>
+  </nav>
+</header>
+<!-- site-header:end -->
 
   <main id="main">
     <section class="al-hero" aria-labelledby="hero-title">
@@ -335,14 +343,13 @@
   </div>
   </main>
 
-  <footer class="al-site-footer">
-    <div class="al-wrap al-footer-inner">
-      <a class="al-brand al-footer-brand" href="/" aria-label="AfricaLatency home"><img src="/images/africalatency-logo-dark.svg" width="180" height="28" alt="AfricaLatency"></a>
-      <p>Infrastructure performance and latency intelligence for African networks.</p>
-      <nav aria-label="Footer navigation"><a href="/scan">Free Scan</a><a href="/audit-checkout">Africa Latency Audit</a><a href="/monitoring">Monitoring</a><a href="/sample-report">Sample report</a><a href="/methodology">Methodology</a><a href="/contact">Contact</a><a href="/privacy-policy">Privacy</a></nav>
-      <p class="al-copyright">© 2026 AfricaLatency · <a href="mailto:support@africalatency.dev">support@africalatency.dev</a></p>
-    </div>
-  </footer>
+  <!-- site-footer:start -->
+<footer class="al-site-footer" data-site-footer><div class="al-footer-inner">
+  <div class="al-footer-brand"><a href="/">AfricaLatency</a><p>Infrastructure performance and latency intelligence for African networks.</p></div>
+  <nav class="al-footer-links" aria-label="Footer navigation"><a href="/pricing">Pricing</a><a href="/scan">Free Scan</a><a href="/audit-checkout">Africa Latency Audit</a><a href="/monitoring">Continuous Monitoring</a><a href="/tools">Tools &amp; API docs</a><a href="/docs">Docs</a><a href="/sample-report">Sample report</a><a href="/compare">Compare</a><a href="/performance-index">Performance Index</a><a href="/methodology">Methodology</a><a href="/security">Security</a><a href="/changelog">Changelog</a><a href="/blog">Blog</a><a href="/cases">Case studies</a><a href="/data-centers">Data centers</a><a href="/kenya">Kenya</a><a href="/about">About</a><a href="/contact">Contact</a><a href="/services">Services</a><a href="/terms-of-service">Terms</a><a href="/privacy-policy.html">Privacy</a><a href="/refund-policy">Refund policy</a></nav>
+  <p class="al-footer-legal">© <span data-year>2026</span> AfricaLatency · 1 Parklands Ave · <a href="mailto:support@africalatency.dev">support@africalatency.dev</a></p>
+</div></footer>
+<!-- site-footer:end -->
     <script src="/js/africa-dot-matrix-shared.js?v=2" defer></script>
     <script src="/js/regional-network-illustration.js?v=6" defer></script>
     <script src="/js/product-pages.js?v=1"></script>
@@ -350,5 +357,6 @@
     <script src="/js/workflow-showcase.js?v=2" defer></script>
 <script src="/js/compliance.js?v=1" defer></script>
   <script src="/js/homepage-reference-redesign.js?v=3" defer></script>
+  <script src="/js/site-header.js" defer></script>
 </body>
 </html>
