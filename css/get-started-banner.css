@@ -136,3 +136,9 @@
 
 /* Final heading guardrail: 1.2 is valid for both <=32px and >32px headings. */
 html body h1, html body h2, html body h3, html body h4 { line-height: 1.2 !important; }
+
+
+html body main > section h1:not(.guardrail-exempt),
+html body main > section h2:not(.guardrail-exempt),
+html body main > section h3:not(.guardrail-exempt),
+html body main > section h4:not(.guardrail-exempt) { line-height: 1.2 !important; }
