@@ -1288,8 +1288,8 @@ main, footer, .homepage-footer, .pricing-footer {
 .btn, .btn-primary, .btn-secondary, .nav-cta, .get-started-primary,
 .plan-cta, .plan-cta-primary, .hero-scan-form button,
 .nairobi-probe-card button, .pricing-nav .nav-cta {
-  background: #2f93f5 !important;
-  border-color: #2f93f5 !important;
+  background: #1769c9 !important;
+  border-color: #1769c9 !important;
   color: #fff !important;
 }
 .btn *, .nav-cta *, .get-started-primary *, .plan-cta-primary * {
@@ -1298,8 +1298,8 @@ main, footer, .homepage-footer, .pricing-footer {
 .btn:hover, .nav-cta:hover, .get-started-primary:hover,
 .plan-cta:hover, .plan-cta-primary:hover, .hero-scan-form button:hover,
 .nairobi-probe-card button:hover {
-  background: #2f93f5 !important;
-  border-color: #2f93f5 !important;
+  background: #1769c9 !important;
+  border-color: #1769c9 !important;
   color: #fff !important;
 }
 .homepage-footer, footer, .pricing-footer {
@@ -1359,8 +1359,8 @@ main, footer, .homepage-footer, .pricing-footer {
 }
 .get-started-banner .get-started-primary,
 .get-started-banner .get-started-primary:hover {
-  background: #2f93f5 !important;
-  border-color: #2f93f5 !important;
+  background: #1769c9 !important;
+  border-color: #1769c9 !important;
 }
 
 
@@ -1608,8 +1608,8 @@ nav .nav-dropdown-menu a { color: #e5f1fa; }
 .get-started-banner-copy h2 { color: #fff; }
 .get-started-banner-copy p { color: #a9b4c7; }
 .get-started-banner-eyebrow { color: #1676C3 !important; }
-.get-started-primary { background: #167FE5 !important; color: #fff !important; box-shadow: 0 10px 22px rgba(22,127,229,.2); }
-.get-started-primary:hover { background: #086AC7 !important; }
+.get-started-primary { background: #1769c9 !important; border-color: #1769c9 !important; color: #fff !important; box-shadow: 0 10px 22px rgba(22,127,229,.2); }
+.get-started-primary:hover { background: #135cb0 !important; border-color: #135cb0 !important; }
 .get-started-secondary { background: transparent; border-color: #6BADE0 !important; color: #8ed5ff; }
 .get-started-mini-report { background: rgba(255,255,255,.04); border-color: rgba(255,255,255,.12); box-shadow: 0 24px 52px rgba(24,84,135,.17) !important; }
 .get-started-mini-report-top, .get-started-url-row, .get-started-latency-title { color: #e5f1fa; }
@@ -3245,8 +3245,8 @@ body:not(.dashboard-page) #menu-toggle.menu-toggle span:nth-child(3) { display:n
 .get-started-banner-copy > p:not(.get-started-banner-note) { max-width: 590px; margin: 17px 0 28px; color: #cbd5e1; font-size: clamp(1rem,1.4vw,1.12rem); line-height: 1.75; }
 .get-started-banner-actions { display: flex; align-items: stretch; flex-wrap: wrap; gap: 12px; }
 .get-started-primary, .get-started-secondary { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 54px; border-radius: 9px; font-size: .94rem; font-weight: 750; line-height: 1.35; text-decoration: none; transition: background .2s ease,border-color .2s ease,box-shadow .2s ease,transform .2s ease; }
-.get-started-primary { position: relative; padding: 12px 17px; border: 1px solid #3292e0; color: #fff; background: #3292e0; box-shadow: 0 8px 22px rgba(50,146,224,.2); }
-.get-started-primary:hover { transform: translateY(-1px); border-color: #2563eb; background: #2563eb; box-shadow: 0 12px 26px rgba(50,146,224,.28); }
+.get-started-primary { position: relative; padding: 12px 17px; border: 1px solid #1769c9; color: #fff; background: #1769c9; box-shadow: 0 8px 22px rgba(50,146,224,.2); }
+.get-started-primary:hover { transform: translateY(-1px); border-color: #135cb0; background: #135cb0; box-shadow: 0 12px 26px rgba(50,146,224,.28); }
 .get-started-primary span { color: #fff !important; font-size: .75rem; font-weight: 550; }
 .get-started-primary svg, .get-started-secondary svg { width: 17px; height: 17px; flex: 0 0 17px; }
 .get-started-secondary { padding: 12px 17px; border: 1px solid #475569; color: #f8fafc; background: rgba(15,23,42,.35); }
@@ -3328,8 +3328,8 @@ body:not(.dashboard-page) #menu-toggle.menu-toggle span:nth-child(3) { display:n
 }
 .get-started-banner .get-started-primary,
 .get-started-banner .get-started-primary:hover {
-  background: #2f93f5 !important;
-  border-color: #2f93f5 !important;
+  background: #1769c9 !important;
+  border-color: #1769c9 !important;
 }
 
 
