@@ -76,7 +76,6 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Use a public HTTP or HTTPS URL with no credentials or custom port.' });
   }
   const device = body.device === 'desktop' ? 'desktop' : 'mobile';
-  const userToken = String(req.headers.authorization || '').replace(/^Bearer\s+/i, '').trim();
   const ip = String(req.headers['cf-connecting-ip'] || req.headers['x-forwarded-for'] || req.socket?.remoteAddress || 'unknown').split(',')[0].trim();
   let verified = false;
   if (!userToken) {
@@ -85,7 +84,7 @@ export default async function handler(req, res) {
   }
   const guestNonce = !userToken ? newGuestProofNonce() : null;
   const result = await sendToWorker('/internal/jobs', req, {
-    url: parsed.toString(), device, turnstileVerified: verified,
+    url: parsed.toString(), device, deviceId: body.deviceId, turnstileVerified: verified,
     ...(guestNonce ? { guestProofHash: guestProofHash(guestNonce), firstGuestScan: true } : {})
   });
   if (!userToken && result.status === 202 && result.payload?.guestProofStored === true && result.payload?.reportId) {
