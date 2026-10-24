@@ -108,10 +108,9 @@ fs.writeFileSync(path.join(outDir,'results.json'),JSON.stringify(results,null,2)
 fs.writeFileSync(path.join(outDir,'links.json'),JSON.stringify([...allLinkResults.values()],null,2));
 fs.writeFileSync(path.join(outDir,'links.md'),['| URL | Status | Result / note |','|---|---:|---|',...[...allLinkResults.values()].map(r=>'| '+r.url+' | '+r.status+' | '+(r.warning|| (r.ok?'OK':'ISSUE'))+' |')].join('\n'));
 const markdown = ['| Page | Width | HTTP | Headers | Hamburgers | Horizontal scroll | Cookie bounds | Pre overflow | Sample cards | Dot canvas issues | Text covered | White surface | Large white surfaces | Console errors | Link failures | Contrast targets | Contrast failures | Result |','|---|---:|---:|---:|---|---|---:|---:|---:|---|---:|---|---:|---:|---:|---:|---:|---|',...results.map(r => '| '+r.page+' | '+r.width+' | '+(r.status??0)+' | '+(r.headerCount??'-')+' | '+(r.hamburgerCount??'-')+' | '+(r.horizontalScroll?'FAIL':'OK')+' | '+(r.cookieBounds===false?'FAIL':'OK')+' | '+(r.preOverflow?.length??'-')+' | '+(r.sampleCardIssues?.length??'-')+' | '+(r.dotCanvasIssues?.length??'-')+' | '+(r.textCoveredByDot?'FAIL':'OK')+' | '+(r.whiteSurface?'PASS':'FAIL')+' | '+(r.whiteSurfaces?.length??'-')+' | '+(r.consoleErrors?.length??(r.error?1:0))+' | '+(r.linkFailures?.length??'-')+' | '+(r.contrastTargets??'-')+' | '+(r.contrastIssues?.length??'-')+' | '+(r.ok?'OK':'ISSUE')+' |')];
-|---|---:|---:|---:|---:|---|---|---:|---:|---:|---|---|---:|---:|---:|---:|---|
-console.log(markdown.join('\\n'));
+console.log(markdown.join('\n'));
 const contrastDetails = ['| Page | Width | Visible links/buttons with non-transparent backgrounds | Failures below 4.5:1 | Details |','|---|---:|---:|---:|---|',...results.map(r => '| '+r.page+' | '+r.width+' | '+(r.contrastTargets??'-')+' | '+(r.contrastIssues?.length??'-')+' | '+((r.contrastIssues||[]).map(x=>String(x.ratio)+':1 '+x.tag+'.'+String(x.className||'').trim().replace(/\\s+/g,'.')+' "'+x.text+'"').join('; ')||'None')+' |')];
-fs.writeFileSync(path.join(outDir,'contrast.md'),contrastDetails.join('\\n'));
+fs.writeFileSync(path.join(outDir,'contrast.md'),contrastDetails.join('\n'));
 const contrastRoutes = new Set(['/','/pricing','/why-africa-latency','/locations','/compare','/cases','/about','/tools']);
 const contrastWidths = new Set([1280,720,390]);
 const contrastRows = results.filter(r => contrastRoutes.has(r.page) && contrastWidths.has(r.width));
@@ -120,7 +119,7 @@ const contrastMarkdown = [
   '|---|---:|---:|---:|---|',
   ...contrastRows.map(r => '| '+(r.page)+' | '+r.width+'px | '+(r.contrastTargets??'-')+' | '+(r.contrastIssues?.length??'-')+' | '+(r.contrastIssues?.length===0?'PASS':'FAIL')+' |')
 ];
-fs.writeFileSync(path.join(outDir,'all-buttons-contrast.md'),contrastMarkdown.join('\\n'));
+fs.writeFileSync(path.join(outDir,'all-buttons-contrast.md'),contrastMarkdown.join('\n'));
 console.log('Requested all-buttons contrast matrix:');
 console.log(contrastMarkdown.join('\\n'));
 if (contrastRows.length !== 24 || contrastRows.some(r => !r.contrastIssues || r.contrastIssues.length > 0)) {
