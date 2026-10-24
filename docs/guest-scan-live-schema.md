@@ -77,10 +77,14 @@ RLS enabled; not forced. Policy: authenticated users may SELECT rows where `auth
 - `claim_next_scan_job() RETURNS SETOF scan_jobs`: locks the oldest queued job with `FOR UPDATE SKIP LOCKED`, updates it to processing/fetching/progress 8 and returns it. SECURITY DEFINER; search_path public.
 - `enqueue_scan_job(p_url text, p_device text, p_user_id uuid, p_ip_hash text, p_max_queue integer DEFAULT 12) RETURNS SETOF scan_jobs`: validates device and URL length; advisory-locks the queue; counts queued/processing jobs; raises `SCAN_QUEUE_FULL` when full; inserts and returns a job. SECURITY DEFINER; search_path public.
 
+## Comparison with `supabase/migrations/20261021150417_create_scan_reports.sql`
+
+The live `public.scans` table is documented by this migration. It matches the declared columns and nullability, including `cls_score numeric(6,4)` (confirmed from `information_schema.columns` numeric precision 6 and scale 4), defaults, primary/unique keys, foreign keys, check constraints, and the two secondary indexes. The migration's policy setup corresponds to the live authenticated owner-only SELECT policy; RLS is enabled and not forced. The migration also contains `REVOKE`/`GRANT` statements; those are not reflected in `pg_policies` and were not inspected as part of the approved scope. No difference was observed in the allowed schema metadata for the `scans` table. The migration's `CREATE TABLE IF NOT EXISTS` would not reconcile drift if an existing table differed, but the inspected table definition matches the declared schema.
+
 ## Differences from repository `sql/scan-v2.sql`
 
 1. The repository SQL creates `scan_jobs`, but the live `scan_jobs` already exists. Its live column set, order, types, nullability, defaults, primary/unique keys, three named operational indexes, and device/status/progress/user foreign-key constraints match the declarations in the repository SQL.
-2. The repository SQL does **not** create `public.scans`. Live `scans` exists with 33 columns, a primary key, unique public/job IDs, foreign keys to `scan_jobs` and `auth.users`, three check constraints, and two non-constraint secondary indexes. This is the material schema omission in the repository file.
+2. The repository file `sql/scan-v2.sql` does **not** create `public.scans`; however, the separate migration `supabase/migrations/20261021150417_create_scan_reports.sql` does document it and matches the inspected live schema.
 3. The repository SQL does not declare the live `scans` RLS policy. Live RLS is enabled on both tables; `scans` has the authenticated owner-only SELECT policy. No explicit `scan_jobs` policy was returned.
 4. The repository SQL creates `scan_rate_limits` and its function; the live function has the same effective body/defaults as the repository definition. Its default remains 3/hour, so the application must pass the newly approved explicit caps for the guest IP/device backstops rather than rely on the function default.
 5. The live `claim_next_scan_job` and `enqueue_scan_job` definitions match the repository SQL bodies and defaults as inspected.
