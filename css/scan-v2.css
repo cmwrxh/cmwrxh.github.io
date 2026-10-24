@@ -50,3 +50,6 @@
 @keyframes scan-pulse{50%{opacity:.45;box-shadow:0 0 0 7px #2c67c70b}}
 @media(max-width:640px){.scan-resource-links{gap:10px 16px}.scan-resource-links a{padding:4px 0}}
 @media(prefers-reduced-motion:reduce){.scan-work[aria-busy=true] .scan-stage:before{animation:none}}
+
+
+.scan-stage { line-height: 1.2 !important; }
