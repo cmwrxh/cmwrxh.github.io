@@ -31,7 +31,7 @@ html{scroll-behavior:smooth}body{font-family:"Plus Jakarta Sans",system-ui,sans-
 
 
 /* Phase 2 Item 1: approved design tokens and dark-surface parity. */
-:root{--gt-bg:#121212;--gt-surface:#202125;--gt-line:rgba(255,255,255,.08);--gt-blue:#2a94fa;--gt-blue-hover:#3da0ff;--al-plan-lite:#646464;--al-plan-lite-name:#a6a6a6;--al-plan-core:#5cb9b1;--al-plan-core-name:#7fd0c9;--al-plan-advanced:#67a7d5;--al-plan-advanced-name:#72a4c9;--al-plan-expert:#a17ed2;--al-plan-expert-name:#b79be0}
+:root{--gt-bg:#121212;--gt-surface:#202125;--gt-line:rgba(255,255,255,.08);--gt-blue:#1769c9;--gt-blue-hover:#135cb0;--al-plan-lite:#646464;--al-plan-lite-name:#a6a6a6;--al-plan-core:#5cb9b1;--al-plan-core-name:#7fd0c9;--al-plan-advanced:#67a7d5;--al-plan-advanced-name:#72a4c9;--al-plan-expert:#a17ed2;--al-plan-expert-name:#b79be0}
 html,body{background:#121212!important}body{color:#ececec}
 .al-primary-cta,.al-panel-link,.visibility-report-cta,.get-started-primary,.al-site-header .al-try,.pricing-page .plan-cta,.pricing-page .btn-primary{background:#1769c9!important;border-color:#1769c9!important;color:#fff!important}
 .al-primary-cta *,.al-panel-link *,.visibility-report-cta *,.get-started-primary *{color:#fff!important}
@@ -44,7 +44,7 @@ html,body{background:#121212!important}body{color:#ececec}
 .pricing-comparison tbody tr:nth-child(even) th,.pricing-comparison tbody tr:nth-child(even) td{background:#1a1b1e!important}
 .pricing-comparison tbody th,.pricing-comparison tbody td{border-color:rgba(255,255,255,.08)!important;color:#ececec!important}
 .pricing-comparison thead .plan-free>span{color:var(--al-plan-lite-name)!important}.pricing-comparison thead .plan-developer>span{color:var(--al-plan-core-name)!important}.pricing-comparison thead .plan-business>span{color:var(--al-plan-advanced-name)!important}.pricing-comparison thead .plan-enterprise>span{color:var(--al-plan-expert-name)!important}
-.pricing-comparison .plan-select{background:var(--plan-color,#2a94fa)!important;color:#fff!important;border:1px solid var(--plan-color,#2a94fa)!important}
+.pricing-comparison .plan-select{background:var(--plan-color,#1769c9)!important;color:#fff!important;border:1px solid var(--plan-color,#2a94fa)!important}
 .coming-soon{display:inline-block;margin-inline-start:.35em;padding:.18em .45em;border-radius:3px;background:#202328;color:#ececec;border:1px solid #454a53;font-size:11px;font-weight:700;white-space:nowrap}
 .al-audit-offer a{background:#dc59a5!important;color:#fff!important;border-color:#dc59a5!important}
 .regional-performance-section.regional-network-atmosphere{background:#121212!important;background-image:none!important;padding-block:64px!important;min-height:0!important}
