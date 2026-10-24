@@ -162,7 +162,7 @@ input:focus, select:focus, textarea:focus, .form-input:focus {
   --border: rgba(255,255,255,.08) !important;
   --border-strong: rgba(255,255,255,.12) !important;
   --text: #FFFFFF !important;
-  --text-muted: #A0AEC0 !important;
+  --text-muted: #808792 !important;
   --text-dim: #808792 !important;
   --accent: #38A1E0 !important;
   --blue: #38A1E0 !important;
@@ -192,7 +192,7 @@ select, textarea, .form-input, .contact-form input, .contact-form select,
   --border: rgba(255,255,255,0.08) !important;
   --border-strong: rgba(255,255,255,0.12) !important;
   --text: #FFFFFF !important;
-  --text-muted: #A0AEC0 !important;
+  --text-muted: #808792 !important;
   --text-dim: #808792 !important;
   --accent: #38A1E0 !important;
   --blue: #38A1E0 !important;
@@ -243,7 +243,7 @@ input:focus, select:focus, textarea:focus, .form-input:focus {
   --border: rgba(255,255,255,0.08) !important;
   --border-strong: rgba(255,255,255,0.12) !important;
   --text: #FFFFFF !important;
-  --text-muted: #A0AEC0 !important;
+  --text-muted: #808792 !important;
   --text-dim: #808792 !important;
   --accent: #38A1E0 !important;
   --blue: #38A1E0 !important;
