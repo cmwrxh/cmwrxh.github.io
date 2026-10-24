@@ -274,17 +274,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function normalizeFooter() {
     const footer = document.querySelector('footer');
-    if (!footer || footer.dataset.unifiedFooter) return;
+    if (!footer || footer.dataset.unifiedFooter || footer.dataset.siteFooter) return;
     footer.dataset.unifiedFooter = 'true';
-    footer.classList.add('homepage-footer');
+    footer.dataset.siteFooter = 'true';
+    footer.className = 'al-site-footer';
+    if (!document.querySelector('link[href="/css/site-header.css"]')) {
+      const stylesheet = document.createElement('link');
+      stylesheet.rel = 'stylesheet';
+      stylesheet.href = '/css/site-header.css';
+      document.head.appendChild(stylesheet);
+    }
     footer.innerHTML = `
-      <div class="footer-inner tier4-footer-grid">
-        <div class="tier4-footer-col footer-intro"><img class="footer-wordmark" src="/images/africalatency-logo-dark.svg" alt="AfricaLatency" width="180" height="28"><h3>Better performance. Better digital experiences.</h3><p>Infrastructure performance and latency intelligence for African networks.</p><p class="footer-copy">© 2026 AfricaLatency</p></div>
-        <div class="tier4-footer-col"><h4>Products</h4><div class="tier4-footer-links"><a href="/scan">Free Scan</a><a href="/audit-checkout">Africa Latency Audit</a><a href="/monitoring">Continuous Monitoring</a><a href="/services">Custom Deep Dive</a></div></div>
-        <div class="tier4-footer-col"><h4>Company</h4><div class="tier4-footer-links"><a href="/about">About</a><a href="/contact">Contact</a><a href="/cases">Case studies</a><a href="/security">Security</a></div></div>
-        <div class="tier4-footer-col"><h4>Resources</h4><div class="tier4-footer-links"><a href="/tools">Tools</a><a href="/sample-report">Sample report</a><a href="/compare">Compare</a><a href="/performance-index">Index</a><a href="/methodology">Methodology</a><a href="/docs">Docs</a><a href="/changelog">Changelog</a><a href="/blog">Blog</a></div></div>
-        <div class="tier4-footer-col"><h4>Contact &amp; legal</h4><div class="tier4-footer-links"><a href="mailto:support@africalatency.dev">support@africalatency.dev</a><a href="/terms-of-service.html">Terms of Service</a><a href="/privacy-policy.html">Privacy Policy</a><a href="/refund-policy.html">Refund Policy</a></div><p style="margin-top:16px;color:rgba(255,255,255,.72);font-size:.72rem">Africa Latency Ltd<br>1 Parklands Ave, Nairobi 00623, Kenya</p></div>
+      <div class="al-footer-inner">
+        <div class="al-footer-brand"><a href="/" aria-label="AfricaLatency home">AfricaLatency</a><p>Infrastructure performance and latency intelligence for teams serving African networks.</p><a class="al-footer-contact" href="mailto:support@africalatency.dev">support@africalatency.dev</a></div>
+        <nav class="al-footer-links" aria-label="Product"><strong>Product</strong><a href="/scan">Free Scan</a><a href="/pricing">Pricing</a><a href="/audit-checkout">Africa Latency Audit</a><a href="/monitoring">Continuous Monitoring</a><a href="/tools">Tools &amp; API docs</a></nav>
+        <nav class="al-footer-links" aria-label="Explore"><strong>Explore</strong><a href="/locations">Locations</a><a href="/why-africa-latency">Why AfricaLatency</a><a href="/compare">Compare tools</a><a href="/performance-index">Performance Index</a><a href="/cases">Case studies</a><a href="/sample-report">Sample report</a></nav>
+        <nav class="al-footer-links" aria-label="Resources"><strong>Resources</strong><a href="/docs">Docs</a><a href="/methodology">Methodology</a><a href="/security">Security</a><a href="/changelog">Changelog</a><a href="/blog">Blog</a><a href="/about">About</a><a href="/contact">Contact</a></nav>
+        <div class="al-footer-bottom"><span>© <span data-year>2026</span> AfricaLatency · 1 Parklands Ave</span><nav aria-label="Legal"><a href="/terms-of-service">Terms</a><a href="/privacy-policy.html">Privacy</a><a href="/refund-policy">Refund policy</a></nav></div>
       </div>`;
+    footer.querySelectorAll('[data-year]').forEach((node) => { node.textContent = String(new Date().getFullYear()); });
   }
 
   normalizeFooter();
