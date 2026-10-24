@@ -94,7 +94,7 @@ jobs:
       - name: Verify no Google Fonts references in PR base (#127)
         run: |
           cd base-reference
-          if git grep -nE 'fonts\\.googleapis\\.com|fonts\\.gstatic\\.com' -- '*.html' '*.css' '*.js'; then
+          if git grep -nE 'fonts\.googleapis\.com|fonts\.gstatic\.com' -- '*.html' '*.css' '*.js'; then
             echo "FAIL: remote Google Fonts references remain in the PR base."
             exit 1
           else
