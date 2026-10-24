@@ -11,6 +11,7 @@ on:
       - 'docs.html'
       - 'monitoring.html'
       - 'js/main.js'
+      - 'js/homepage-reference-redesign.js'
       - 'css/pricing.css'
       - 'css/homepage-reference-redesign.css'
       - 'scripts/nav-responsive-review.mjs'
