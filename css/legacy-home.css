@@ -753,6 +753,10 @@ h1, h2, h3, h4 { line-height: 1.2 !important; }
 html body h1, html body h2, html body h3, html body h4 { line-height: 1.2 !important; }
 
 
+/* Keep the contrast token consistent across responsive theme overrides. */
+:root { --text-dim: #808792 !important; }
+
+
 
 /* ---- css/hero-theme.css ---- */
 /* ==========================================================================
@@ -2445,7 +2449,7 @@ input:focus, select:focus, textarea:focus, .form-input:focus {
   --border: rgba(255,255,255,.08) !important;
   --border-strong: rgba(255,255,255,.12) !important;
   --text: #FFFFFF !important;
-  --text-muted: #A0AEC0 !important;
+  --text-muted: #808792 !important;
   --text-dim: #808792 !important;
   --accent: #38A1E0 !important;
   --blue: #38A1E0 !important;
@@ -2475,7 +2479,7 @@ select, textarea, .form-input, .contact-form input, .contact-form select,
   --border: rgba(255,255,255,0.08) !important;
   --border-strong: rgba(255,255,255,0.12) !important;
   --text: #FFFFFF !important;
-  --text-muted: #A0AEC0 !important;
+  --text-muted: #808792 !important;
   --text-dim: #808792 !important;
   --accent: #38A1E0 !important;
   --blue: #38A1E0 !important;
@@ -2526,7 +2530,7 @@ input:focus, select:focus, textarea:focus, .form-input:focus {
   --border: rgba(255,255,255,0.08) !important;
   --border-strong: rgba(255,255,255,0.12) !important;
   --text: #FFFFFF !important;
-  --text-muted: #A0AEC0 !important;
+  --text-muted: #808792 !important;
   --text-dim: #808792 !important;
   --accent: #38A1E0 !important;
   --blue: #38A1E0 !important;
