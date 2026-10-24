@@ -19,7 +19,16 @@ const header = fs.readFileSync(path.join(root, 'templates/site-header.html'), 'u
 const footer = fs.readFileSync(path.join(root, 'templates/site-footer.html'), 'utf8').trim();
 const headerBlock = `<!-- site-header:start -->\n${header}\n<!-- site-header:end -->`;
 const footerBlock = `<!-- site-footer:start -->\n${footer}\n<!-- site-footer:end -->`;
-const files = fs.readdirSync(root).filter((name) => name.endsWith('.html') && fs.statSync(path.join(root, name)).isFile());
+const shellPages = [
+  'index.html','pricing.html','scan.html','tools.html','services.html','sample-report.html',
+  'about.html','contact.html','compare.html','methodology.html','docs.html','blog.html','cases.html',
+  'login.html','signup.html','404.html','thank-you.html','changelog.html','how-we-score.html',
+  'security.html','work.html','kenya.html','nigeria.html','data-centers.html','sitespeed-checkout.html',
+  'refund-policy.html','privacy-policy.html','help-centre.html','monitoring.html','audit-checkout.html',
+  'terms-of-service.html','acceptable-use-policy.html','service-level-agreement.html',
+  'audit-intake.html','audit-report.html','labs.html'
+];
+const files = shellPages.filter((name) => fs.existsSync(path.join(root, name)) && fs.statSync(path.join(root, name)).isFile());
 const errors = [];
 let changed = 0;
 
