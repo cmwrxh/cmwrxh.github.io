@@ -142,3 +142,11 @@ html body main > section h1:not(.guardrail-exempt),
 html body main > section h2:not(.guardrail-exempt),
 html body main > section h3:not(.guardrail-exempt),
 html body main > section h4:not(.guardrail-exempt) { line-height: 1.2 !important; }
+
+
+/* Last remaining compact report labels flagged by the rendered-page audit. */
+.get-started-report-foot > span,
+.get-started-floating-metric > span:nth-of-type(2) > strong {
+  font-size: max(12px, 0.8rem) !important;
+}
+html body #regional-performance-title { line-height: 1.2 !important; }
