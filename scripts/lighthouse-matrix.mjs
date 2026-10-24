@@ -83,24 +83,42 @@ async function inspectTypography(page) {
     if (!cardBackground || /rgba?\\(\\s*0\\s*,\\s*0\\s*,\\s*0\\s*,\\s*0\\s*\\)/i.test(cardBackground)) {
       cardBackground = getComputedStyle(document.body).backgroundColor;
     }
+    const describeSelector = element => {
+      const parts = [];
+      let current = element;
+      while (current && current !== document.body && parts.length < 6) {
+        let part = current.tagName.toLowerCase();
+        if (current.id) {
+          part += `#${current.id}`;
+        } else if (current.classList && current.classList.length) {
+          part += '.' + [...current.classList].slice(0, 3).join('.');
+        } else if (current.parentElement) {
+          const sameTag = [...current.parentElement.children].filter(sibling => sibling.tagName === current.tagName);
+          if (sameTag.length > 1) part += `:nth-of-type(${sameTag.indexOf(current) + 1})`;
+        }
+        parts.unshift(part);
+        current = current.parentElement;
+      }
+      return parts.join(' > ');
+    };
     const textLeaves = [...document.querySelectorAll('body *')].filter(element =>
       element.children.length === 0
       && (element.innerText || element.textContent || '').trim()
       && element.getClientRects().length > 0
     );
     const textBelow12 = textLeaves.filter(element => parseFloat(getComputedStyle(element).fontSize) < 12)
-      .map(element => ({ tag: element.tagName.toLowerCase(), className: String(element.className || '').slice(0, 120), text: (element.innerText || element.textContent || '').trim().slice(0, 100), fontSize: getComputedStyle(element).fontSize }));
+      .map(element => ({ selector: describeSelector(element), tag: element.tagName.toLowerCase(), className: String(element.className || '').slice(0, 120), text: (element.innerText || element.textContent || '').trim().slice(0, 100), fontSize: getComputedStyle(element).fontSize }));
     const negativeTracking = textLeaves.filter(element => {
       const style = getComputedStyle(element);
       const size = parseFloat(style.fontSize);
       return (element.tagName.toLowerCase() === 'p' || size < 24)
         && parseFloat(style.letterSpacing) < 0;
-    }).map(element => ({ tag: element.tagName.toLowerCase(), className: String(element.className || '').slice(0, 80), text: (element.innerText || element.textContent || '').trim().slice(0, 80), fontSize: getComputedStyle(element).fontSize, letterSpacing: getComputedStyle(element).letterSpacing })).slice(0, 20);
+    }).map(element => ({ selector: describeSelector(element), tag: element.tagName.toLowerCase(), className: String(element.className || '').slice(0, 120), text: (element.innerText || element.textContent || '').trim().slice(0, 100), fontSize: getComputedStyle(element).fontSize, letterSpacing: getComputedStyle(element).letterSpacing })).slice(0, 20);
     const bodyStyle = getComputedStyle(document.body);
     const bodyLineHeightRatio = Number((parseFloat(bodyStyle.lineHeight) / parseFloat(bodyStyle.fontSize)).toFixed(2));
     const headingLineHeights = [...document.querySelectorAll('h1, h2, h3, h4')].map(element => {
       const style = getComputedStyle(element);
-      return { tag: element.tagName.toLowerCase(), className: String(element.className || '').slice(0, 120), ratio: Number((parseFloat(style.lineHeight) / parseFloat(style.fontSize)).toFixed(2)), fontSize: style.fontSize, lineHeight: style.lineHeight };
+      return { selector: describeSelector(element), tag: element.tagName.toLowerCase(), className: String(element.className || '').slice(0, 120), ratio: Number((parseFloat(style.lineHeight) / parseFloat(style.fontSize)).toFixed(2)), fontSize: style.fontSize, lineHeight: style.lineHeight };
     });
     const dimPageContrast = contrast(dimColor, pageBackground);
     const dimCardContrast = contrast(dimColor, cardBackground);
@@ -300,13 +318,13 @@ if (designFailures.length) {
       console.error(`- ${context}: body line-height ratio ${g.bodyLineHeightRatio}; expected 1.60–1.70`);
     }
     for (const item of g.headingLineHeights.filter(item => item.ratio < 1.2 || item.ratio > 1.3)) {
-      console.error(`- ${context}: ${item.tag}${item.className ? `.${item.className.trim().split(/\\s+/).join('.')}` : ''} line-height ${item.lineHeight} / font-size ${item.fontSize} = ${item.ratio}; expected 1.20–1.30`);
+      console.error(`- ${context}: ${item.selector} line-height ${item.lineHeight} / font-size ${item.fontSize} = ${item.ratio}; expected 1.20–1.30`);
     }
     for (const item of g.textBelow12) {
-      console.error(`- ${context}: ${item.tag}${item.className ? `.${item.className.trim().split(/\\s+/).join('.')}` : ''} font-size ${item.fontSize}; text="${item.text.replace(/\\s+/g, ' ').slice(0, 70)}"`);
+      console.error(`- ${context}: ${item.selector} font-size ${item.fontSize}; text="${item.text.replace(/\\s+/g, ' ').slice(0, 70)}"`);
     }
     for (const item of g.negativeTracking) {
-      console.error(`- ${context}: ${item.tag}${item.className ? `.${item.className.trim().split(/\\s+/).join('.')}` : ''} letter-spacing ${item.letterSpacing}; text="${item.text.replace(/\\s+/g, ' ').slice(0, 70)}"`);
+      console.error(`- ${context}: ${item.selector} letter-spacing ${item.letterSpacing}; text="${item.text.replace(/\\s+/g, ' ').slice(0, 70)}"`);
     }
   }
   process.exitCode = 1;
