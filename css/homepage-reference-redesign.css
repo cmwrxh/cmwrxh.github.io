@@ -10,7 +10,7 @@
   --al-feature-top: #123352;
   --al-feature-mid: #0e2a3f;
   --al-feature-bottom: #0b1e31;
-  --al-blue-cta: #2993fb;
+  --al-blue-cta: #1769c9;
   --al-blue-test: #3a98da;
   --al-blue-dot: #3898dc;
   --al-blue-logo: #4a90d6;
@@ -254,7 +254,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, [role="tabpanel"]:fo
 .al-primary-cta > span { font-size: max(12px, 0.8rem) !important; }
 
 /* Item 1 repairs: accessible CTAs, stable mobile type, and feature-card contrast. */
-.al-test-button,.al-primary-cta,.al-feature-grid .al-primary-cta{background:#075985!important;color:#fff!important}
+.al-test-button,.al-primary-cta,.al-feature-grid .al-primary-cta{background:#1769c9!important;color:#fff!important}
 .al-primary-cta{gap:12px;flex-wrap:wrap}
 .al-primary-cta>span{color:#fff!important}
 .al-feature-card h3,.al-feature-card h3 span{color:#fff!important}
@@ -272,7 +272,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, [role="tabpanel"]:fo
 .al-primary-cta,
 .visibility-report-cta,
 .get-started-primary {
-  background: #2a94fa !important;
+  background: #1769c9 !important;
   color: #fff !important;
 }
 .al-primary-cta *,
@@ -289,3 +289,8 @@ a:focus-visible, button:focus-visible, input:focus-visible, [role="tabpanel"]:fo
 }
 .regional-performance-layout { grid-template-columns: minmax(0, 1fr) !important; }
 .regional-performance-layout .regional-insight-panel { min-width: 0; }
+
+/* WCAG AA primary CTA hover state. */
+.al-primary-cta:hover,
+.visibility-report-cta:hover,
+.get-started-primary:hover { background: #135cb0 !important; filter: none !important; }
