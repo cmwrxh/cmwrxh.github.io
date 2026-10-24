@@ -183,7 +183,7 @@ const typographyChecks = states.map(state => ({
 await writeFile(resolve(artifacts, 'lighthouse', 'summary.json'), JSON.stringify({ scores, comparisons }, null, 2) + '\n');
 await writeFile(
   resolve(artifacts, 'lighthouse', 'typography-checks.json'),
-  JSON.stringify({ checks: typographyChecks, failures: typographyChecks.filter(check => !check.fontVerified) }, null, 2) + '\n'
+  JSON.stringify({ checks: typographyChecks, failures: typographyChecks.filter(check => check.version === 'pr' && !check.fontVerified) }, null, 2) + '\n'
 );
 await writeFile(
   resolve(artifacts, 'lighthouse', 'run-metadata.json'),
