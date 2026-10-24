@@ -112,6 +112,22 @@ const markdown = ['| Page | Width | HTTP | Headers | Hamburgers | Horizontal scr
 console.log(markdown.join('\\n'));
 const contrastDetails = ['| Page | Width | Visible links/buttons with non-transparent backgrounds | Failures below 4.5:1 | Details |','|---|---:|---:|---:|---|',...results.map(r => '| '+r.page+' | '+r.width+' | '+(r.contrastTargets??'-')+' | '+(r.contrastIssues?.length??'-')+' | '+((r.contrastIssues||[]).map(x=>String(x.ratio)+':1 '+x.tag+'.'+String(x.className||'').trim().replace(/\\s+/g,'.')+' "'+x.text+'"').join('; ')||'None')+' |')];
 fs.writeFileSync(path.join(outDir,'contrast.md'),contrastDetails.join('\\n'));
+const contrastRoutes = new Set(['/','/pricing','/why-africa-latency','/locations','/compare','/cases','/about','/tools']);
+const contrastWidths = new Set([1280,720,390]);
+const contrastRows = results.filter(r => contrastRoutes.has(r.page) && contrastWidths.has(r.width));
+const contrastMarkdown = [
+  '| Route | Viewport | Visible buttons/links checked | Failures below 4.5:1 | Result |',
+  '|---|---:|---:|---:|---|',
+  ...contrastRows.map(r => '| '+(r.page==='home'?'/':r.page==='why-africa-latency'?'/why-africa-latency':r.page==='locations'?'/locations':r.page==='compare'?'/compare':r.page==='cases'?'/cases':r.page==='about'?'/about':r.page==='tools'?'/tools':'/'+r.page)+' | '+r.width+'px | '+(r.contrastTargets??'-')+' | '+(r.contrastIssues?.length??'-')+' | '+(r.contrastIssues?.length===0?'PASS':'FAIL')+' |')
+];
+fs.writeFileSync(path.join(outDir,'all-buttons-contrast.md'),contrastMarkdown.join('\\n'));
+console.log('Requested all-buttons contrast matrix:');
+console.log(contrastMarkdown.join('\\n'));
+if (contrastRows.length !== 24 || contrastRows.some(r => !r.contrastIssues || r.contrastIssues.length > 0)) {
+  console.error('All-buttons contrast check failed or did not cover all 24 requested route/viewport combinations.');
+  process.exitCode = 1;
+}
+
 console.log('Contrast matrix written to artifacts/site-shell/contrast.md');
 const routeResults=[];
 for(const route of routeChecks){try{const response=await fetch(base+route,{redirect:'manual'});routeResults.push({route,status:response.status,location:response.headers.get('location'),ok:response.status>=200&&response.status<400});}catch(e){routeResults.push({route,status:0,error:e.message,ok:false});}}
