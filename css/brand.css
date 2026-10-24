@@ -611,3 +611,7 @@ h1, h2, h3, h4 { line-height: 1.2 !important; }
 
 /* Final size-aware heading override for page-level selectors. */
 html body h1, html body h2, html body h3, html body h4 { line-height: 1.2 !important; }
+
+
+/* Keep the contrast token consistent across responsive theme overrides. */
+:root { --text-dim: #808792 !important; }
