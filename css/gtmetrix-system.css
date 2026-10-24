@@ -63,3 +63,20 @@ html,body{background:#121212!important}body{color:#ececec}
 .table-wrap .data-table tbody th,.empty-state h2,.empty-state h3,.product-card h2,.product-card h3,.methodology-summary h2,.methodology-summary h3,.data-article-chart figcaption{color:#fff!important}
 @media(max-width:720px){.al-site-footer .al-footer-inner{grid-template-columns:1fr 1fr!important;width:calc(100% - 40px)!important}.al-site-footer .al-footer-brand{grid-column:1/-1}.al-site-footer .al-footer-bottom{flex-direction:column!important}}
 @media(max-width:520px){.al-site-footer .al-footer-inner{grid-template-columns:1fr!important}.al-site-footer .al-footer-brand{grid-column:auto}.al-site-footer .al-footer-bottom{align-items:flex-start!important}}
+
+
+/* Contrast and responsive fixes from measured review at 1280px, 720px and 390px. */
+.al-primary-cta,.al-panel-link,.visibility-report-cta,.get-started-primary,.al-site-header .al-try,.al-site-header .al-mobile-cta,.pricing-page .plan-cta,.pricing-page .btn-primary,.pricing-comparison .plan-select{background:#2a94fa;border-color:#2a94fa;color:#fff}
+.al-primary-cta:hover,.al-panel-link:hover,.visibility-report-cta:hover,.get-started-primary:hover,.al-site-header .al-try:hover,.al-site-header .al-mobile-cta:hover{background:#3da0ff;color:#fff}
+.al-primary-cta,.al-panel-link,.visibility-report-cta,.get-started-primary,.al-site-header .al-try,.al-site-header .al-mobile-cta,.pricing-page .plan-cta,.pricing-page .btn-primary,.pricing-comparison .plan-select{-webkit-text-fill-color:#fff}
+.al-site-footer .al-footer-links,.al-site-footer .al-footer-brand,.al-site-footer .al-footer-bottom,.al-site-footer .al-footer-bottom nav[aria-label="Legal"]{background:transparent;box-shadow:none;border-radius:0}
+.al-site-footer .al-footer-links,.al-site-footer .al-footer-brand{background-color:transparent}
+.al-site-footer .al-footer-links a,.al-site-footer .al-footer-bottom a{background:transparent;box-shadow:none}
+.visibility-feature-card h2,.visibility-feature-card h3,.visibility-feature-card h4,.visibility-feature-title,.al-feature-card h2,.al-feature-card h3,.al-feature-card h4,.feature-card h2,.feature-card h3,.feature-card h4,.capability-card h2,.capability-card h3,.capability-card h4{color:#fff}
+.pricing-comparison-section,.pricing-comparison-scroll{width:100%;max-width:100%;min-width:0}
+.pricing-comparison-scroll{overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior-inline:contain}
+.pricing-comparison{min-width:720px;width:100%}
+.table-wrap{width:100%;max-width:100%;min-width:0;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior-inline:contain}
+.table-wrap .data-table{min-width:700px;width:100%}
+body{overflow-wrap:anywhere}
+@media(max-width:520px){.al-site-footer .al-footer-links,.al-site-footer .al-footer-brand,.al-site-footer .al-footer-bottom,.al-site-footer .al-footer-bottom nav[aria-label="Legal"]{background:transparent!important;box-shadow:none!important}.pricing-comparison-section,.pricing-comparison-scroll,.table-wrap{max-width:100vw}.pricing-comparison{min-width:720px}.table-wrap .data-table{min-width:700px}}
