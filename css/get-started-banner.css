@@ -132,3 +132,7 @@
 .workflow-preview-caption {
   font-size: max(12px, 0.8rem) !important;
 }
+
+
+/* Final heading guardrail: 1.2 is valid for both <=32px and >32px headings. */
+html body h1, html body h2, html body h3, html body h4 { line-height: 1.2 !important; }
