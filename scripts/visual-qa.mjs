@@ -41,6 +41,8 @@ for (const route of pages) {
         return {headers,toggles,horizontal,buttons,links};
       });
       const links = [...new Set(metrics.links)].map(async url => {
+        if (url.startsWith('mailto:')) return {url,status:'mailto',ok:/^mailto:[^\s@]+@[^\s@]+\.[^\s@]+$/i.test(url)};
+        if (!url.startsWith('http://') && !url.startsWith('https://')) return {url,status:'invalid-scheme',ok:false};
         try { const res = await page.request.get(url, { timeout: 15000, maxRedirects: 5 }); return {url,status:res.status(),ok:res.status()>=200&&res.status()<400}; }
         catch(e) { return {url,status:0,ok:false,error:e.message}; }
       });
