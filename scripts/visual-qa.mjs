@@ -55,8 +55,8 @@ for (const route of pages) {
       const linkResults = await Promise.all([...new Set(metrics.links)].map(url => {
         if (!linkStatusCache.has(url)) {
           linkStatusCache.set(url, (async () => {
-            if (url.startsWith('mailto:')) return {url,status:'mailto',ok:/^mailto:[^\s@]+@[^\s@]+\.[^\s@]+$/i.test(url)};
-            if (!url.startsWith('http://') && !url.startsWith('https://')) return {url,status:'invalid-scheme',ok:false};
+            if (url.startsWith('mailto:')) { const result={url,status:'mailto',ok:/^mailto:[^\s@]+@[^\s@]+\.[^\s@]+$/i.test(url)};allLinkResults.set(url,result);return result; }
+            if (!url.startsWith('http://') && !url.startsWith('https://')) { const result={url,status:'invalid-scheme',ok:false};allLinkResults.set(url,result);return result; }
             let checkUrl=url;
             try { const parsed=new URL(url); if (['africalatency.dev','www.africalatency.dev'].includes(parsed.hostname)) checkUrl=base+parsed.pathname+parsed.search; } catch {}
             try {
@@ -84,6 +84,7 @@ for (const route of pages) {
 await browser.close();
 fs.writeFileSync(path.join(outDir,'results.json'),JSON.stringify(results,null,2));
 fs.writeFileSync(path.join(outDir,'links.json'),JSON.stringify([...allLinkResults.values()],null,2));
+fs.writeFileSync(path.join(outDir,'links.md'),['| URL | Status | Result / note |','|---|---:|---|',...[...allLinkResults.values()].map(r=>'| '+r.url+' | '+r.status+' | '+(r.warning|| (r.ok?'OK':'ISSUE'))+' |')].join('\n'));
 const markdown = ['| Page | Width | HTTP | Headers | Hamburgers | Horizontal scroll | Cookie bounds | Pre overflow | Sample cards | Dot canvas issues | Text covered | Console errors | Link failures | Contrast failures | Result |','|---|---:|---:|---:|---:|---|---|---:|---:|---:|---|---:|---:|---:|---|',...results.map(r => '| '+r.page+' | '+r.width+' | '+(r.status??0)+' | '+(r.headerCount??'-')+' | '+(r.hamburgerCount??'-')+' | '+(r.horizontalScroll?'FAIL':'OK')+' | '+(r.cookieBounds===false?'FAIL':'OK')+' | '+(r.preOverflow?.length??'-')+' | '+(r.sampleCardIssues?.length??'-')+' | '+(r.dotCanvasIssues?.length??'-')+' | '+(r.textCoveredByDot?'FAIL':'OK')+' | '+(r.consoleErrors?.length??(r.error?1:0))+' | '+(r.linkFailures?.length??'-')+' | '+(r.contrastIssues?.length??'-')+' | '+(r.ok?'OK':'ISSUE')+' |')];
 fs.writeFileSync(path.join(outDir,'results.md'),markdown.join('\n'));
 console.log(markdown.join('\n'));
