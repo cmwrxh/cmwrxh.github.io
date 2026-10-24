@@ -33,7 +33,7 @@ for (const route of pages) {
         const dir=path.join(outDir, route === '/' ? 'home' : route.slice(1)); fs.mkdirSync(dir,{recursive:true});
         await page.screenshot({path:path.join(dir,`${width}.png`),fullPage:true});
       });
-      const metrics = await page.evaluate((isHome, routePath) => {
+      const metrics = await page.evaluate(({isHome, routePath}) => {
         const headers = document.querySelectorAll('[data-site-header], header.al-site-header').length;
         const bodyBg = getComputedStyle(document.body).backgroundColor;
         const effectiveBg = bodyBg === 'rgba(0, 0, 0, 0)' ? '#ffffff' : bodyBg;
@@ -56,7 +56,7 @@ for (const route of pages) {
         }).map(el => {const s=getComputedStyle(el);let node=el,bg=s.backgroundColor;while((bg==='rgba(0, 0, 0, 0)'||bg==='transparent')&&node.parentElement){node=node.parentElement;bg=getComputedStyle(node).backgroundColor;}if(bg==='rgba(0, 0, 0, 0)'||bg==='transparent')bg=getComputedStyle(document.body).backgroundColor;if(bg==='rgba(0, 0, 0, 0)'||bg==='transparent')bg='#ffffff';return {text:(el.innerText||el.getAttribute('aria-label')||'').trim().slice(0,60),fg:s.color,bg};});
         const links = [...document.querySelectorAll('[data-site-header] a[href], [data-site-footer] a[href]')].map(a=>a.href);
         return {headers,toggles,horizontal,overflowNodes,cookieBounds,preOverflow,sampleCards,sampleCardIssues,dotCanvasIssues,textCoveredByDot,buttons,links,whiteSurface};
-      }, route === '/', route);
+      }, { isHome: route === '/', routePath: route });
       const linkResults = await Promise.all([...new Set(metrics.links)].map(url => {
         if (!linkStatusCache.has(url)) {
           linkStatusCache.set(url, (async () => {
