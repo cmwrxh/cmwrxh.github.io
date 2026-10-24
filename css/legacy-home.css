@@ -126,6 +126,10 @@ html body main .about-hero h2:not(.guardrail-exempt) {
   line-height: 1.25 !important;
 }
 html body main .scan-stage:not(.guardrail-exempt) {
+
+html body main h2:not(.guardrail-exempt):not(.guardrail-exempt) {
+  line-height: 1.25 !important;
+}
   line-height: 1.3 !important;
 }
 
