@@ -5,3 +5,15 @@
 .developer-code-window{min-width:0;max-width:100%;overflow:hidden;box-sizing:border-box}
 .developer-code-block{display:block;max-width:100%;min-width:0;box-sizing:border-box;overflow-x:auto;white-space:pre}
 .developer-code-block code{white-space:pre}
+
+/* The canvas is viewport-fixed; use the layout viewport width to avoid 100vw scrollbar overflow. */
+#al-sitewide-dot-canvas{z-index:-1!important;pointer-events:none!important;width:auto!important;max-width:100%!important;opacity:.35!important}
+body.home-page #al-sitewide-dot-canvas{opacity:1!important}
+/* Enforce accessible contrast for primary and secondary action controls. */
+html body main a.plan-cta-primary,html body main a.plan-cta-primary:visited,
+html body main a.plan-cta:not(.plan-cta-outline),html body main a.plan-cta:not(.plan-cta-outline):visited,
+html body a.btn-primary,html body button.btn-primary,html body .btn.btn-primary,
+html body a.btn-secondary,html body button.btn-secondary,html body .btn.btn-secondary,
+html body button.al-test-button,html body #al-consent-accept,html body #al-consent-reject{
+  background-color:#075985!important;border-color:#075985!important;color:#fff!important
+}
