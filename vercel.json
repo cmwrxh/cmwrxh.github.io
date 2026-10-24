@@ -149,6 +149,16 @@
       "source": "/pricing.html",
       "destination": "/pricing",
       "permanent": true
+    },
+    {
+      "source": "/data-centers.html",
+      "destination": "/data-centers",
+      "permanent": true
+    },
+    {
+      "source": "/kenya.html",
+      "destination": "/kenya",
+      "permanent": true
     }
   ],
   "rewrites": [
@@ -267,6 +277,14 @@
     {
       "source": "/pricing",
       "destination": "/pricing.html"
+    },
+    {
+      "source": "/data-centers",
+      "destination": "/data-centers.html"
+    },
+    {
+      "source": "/kenya",
+      "destination": "/kenya.html"
     }
   ]
 }

@@ -5,6 +5,7 @@ import path from 'node:path';
 const base = process.env.SITE_BASE_URL || 'http://127.0.0.1:4173';
 const pages = ['/', '/pricing', '/scan', '/tools', '/services', '/sample-report', '/about', '/contact', '/compare', '/methodology', '/docs', '/blog', '/cases', '/login', '/signup'];
 const widths = [1280, 820, 390];
+const routeChecks = ['/performance-index','/data-centers','/data-centers.html','/kenya','/kenya.html'];
 const results = [];
 const browser = await chromium.launch({ headless: true });
 const outDir = 'artifacts/site-shell';
@@ -33,12 +34,17 @@ for (const route of pages) {
         const headers = document.querySelectorAll('[data-site-header], header.al-site-header').length;
         const toggles = document.querySelectorAll('.al-menu-toggle').length;
         const horizontal = document.documentElement.scrollWidth > window.innerWidth + 1;
+        const cookie = document.querySelector('.al-cookie-banner');
+        const cookieBounds = cookie ? (()=>{const r=cookie.getBoundingClientRect();return r.left>=-1&&r.right<=window.innerWidth+1&&r.width<=window.innerWidth-22;})() : true;
+        const preOverflow = [...document.querySelectorAll('pre')].filter(el=>{const r=el.getBoundingClientRect(),s=getComputedStyle(el);return r.right>window.innerWidth+1 || (el.scrollWidth>el.clientWidth+1 && !['auto','scroll'].includes(s.overflowX));}).map(el=>({text:(el.innerText||'').slice(0,60),right:el.getBoundingClientRect().right,overflowX:getComputedStyle(el).overflowX}));
+        const sampleCards = [...document.querySelectorAll('.sample-card')].map(el=>{const s=getComputedStyle(el);return {background:s.backgroundColor,border:s.borderTopColor,fg:s.color,labels:[...el.querySelectorAll('small,strong,p')].map(n=>getComputedStyle(n).color)};});
+        const sampleCardIssues = sampleCards.filter(c=>c.background!=='rgb(17, 19, 24)' || !['rgb(255, 255, 255)','rgb(194, 207, 222)'].includes(c.fg) || c.labels.some(v=>!['rgb(255, 255, 255)','rgb(194, 207, 222)'].includes(v)));
         const buttons = [...document.querySelectorAll('button,a.al-try,a.al-login,.btn,.btn-primary,.plan-cta')].filter(el => {
           const r=el.getBoundingClientRect(), s=getComputedStyle(el);
           return r.width>0 && r.height>0 && s.visibility!=='hidden' && s.display!=='none';
         }).map(el => {const s=getComputedStyle(el);let node=el,bg=s.backgroundColor;while((bg==='rgba(0, 0, 0, 0)'||bg==='transparent')&&node.parentElement){node=node.parentElement;bg=getComputedStyle(node).backgroundColor;}if(bg==='rgba(0, 0, 0, 0)'||bg==='transparent')bg=getComputedStyle(document.body).backgroundColor;if(bg==='rgba(0, 0, 0, 0)'||bg==='transparent')bg='#ffffff';return {text:(el.innerText||el.getAttribute('aria-label')||'').trim().slice(0,60),fg:s.color,bg};});
         const links = [...document.querySelectorAll('[data-site-header] a[href], [data-site-footer] a[href]')].map(a=>a.href);
-        return {headers,toggles,horizontal,buttons,links};
+        return {headers,toggles,horizontal,cookieBounds,preOverflow,sampleCards,sampleCardIssues,buttons,links};
       });
       const links = [...new Set(metrics.links)].map(async url => {
         if (url.startsWith('mailto:')) return {url,status:'mailto',ok:/^mailto:[^\s@]+@[^\s@]+\.[^\s@]+$/i.test(url)};
@@ -48,8 +54,8 @@ for (const route of pages) {
       });
       const linkResults = await Promise.all(links);
       const contrastIssues = metrics.buttons.filter(b => {const ratio=contrastRatio(b.fg,b.bg);return ratio!==null&&ratio<4.5;}).map(b=>({...b,ratio:contrastRatio(b.fg,b.bg)}));
-      const row = {page:route,width,status,headerCount:metrics.headers,hamburgerCount:metrics.toggles,horizontalScroll:metrics.horizontal,consoleErrors:errors,linkFailures:linkResults.filter(x=>!x.ok),contrastIssues};
-      row.ok = status>=200&&status<400&&row.headerCount===1&&row.hamburgerCount===1&&!row.horizontalScroll&&!errors.length&&!row.linkFailures.length&&!row.contrastIssues.length;
+      const row = {page:route,width,status,headerCount:metrics.headers,hamburgerCount:metrics.toggles,horizontalScroll:metrics.horizontal,cookieBounds:metrics.cookieBounds,preOverflow:metrics.preOverflow,sampleCardIssues:metrics.sampleCardIssues,consoleErrors:errors,linkFailures:linkResults.filter(x=>!x.ok),contrastIssues};
+      row.ok = status>=200&&status<400&&row.headerCount===1&&row.hamburgerCount===1&&!row.horizontalScroll&&row.cookieBounds&&!row.preOverflow.length&&!row.sampleCardIssues.length&&!errors.length&&!row.linkFailures.length&&!row.contrastIssues.length;
       results.push(row);
       await page.close();
     } catch(e) {
@@ -60,7 +66,12 @@ for (const route of pages) {
 }
 await browser.close();
 fs.writeFileSync(path.join(outDir,'results.json'),JSON.stringify(results,null,2));
-const markdown = ['| Page | Width | HTTP | Headers | Hamburgers | Horizontal scroll | Console errors | Link failures | Contrast failures | Result |','|---|---:|---:|---:|---:|---|---:|---:|---:|---|',...results.map(r=>`| ${r.page} | ${r.width} | ${r.status??0} | ${r.headerCount??'-'} | ${r.hamburgerCount??'-'} | ${r.horizontalScroll?'FAIL':'OK'} | ${r.consoleErrors?.length??(r.error?1:0)} | ${r.linkFailures?.length??'-'} | ${r.contrastIssues?.length??'-'} | ${r.ok?'OK':'ISSUE'} |`)];
+const markdown = ['| Page | Width | HTTP | Headers | Hamburgers | Horizontal scroll | Cookie bounds | Pre overflow | Sample cards | Console errors | Link failures | Contrast failures | Result |','|---|---:|---:|---:|---|---|---|---:|---:|---:|---:|---:|---|',...results.map(r => '| '+r.page+' | '+r.width+' | '+(r.status??0)+' | '+(r.headerCount??'-')+' | '+(r.hamburgerCount??'-')+' | '+(r.horizontalScroll?'FAIL':'OK')+' | '+(r.cookieBounds===false?'FAIL':'OK')+' | '+(r.preOverflow?.length??'-')+' | '+(r.sampleCardIssues?.length??'-')+' | '+(r.consoleErrors?.length??(r.error?1:0))+' | '+(r.linkFailures?.length??'-')+' | '+(r.contrastIssues?.length??'-')+' | '+(r.ok?'OK':'ISSUE')+' |')];
 fs.writeFileSync(path.join(outDir,'results.md'),markdown.join('\n'));
 console.log(markdown.join('\n'));
-if(results.some(r=>!r.ok)) process.exit(1);
+const routeResults=[];
+for(const route of routeChecks){try{const response=await fetch(base+route,{redirect:'manual'});routeResults.push({route,status:response.status,location:response.headers.get('location'),ok:response.status>=200&&response.status<400});}catch(e){routeResults.push({route,status:0,error:e.message,ok:false});}}
+fs.writeFileSync(path.join(outDir,'routes.json'),JSON.stringify(routeResults,null,2));
+fs.writeFileSync(path.join(outDir,'routes.md'),['| Route | HTTP | Redirect | Result |','|---|---:|---|---|',...routeResults.map(r=>`| ${r.route} | ${r.status} | ${r.location||'—'} | ${r.ok?'OK':'ISSUE'} |`)].join('\n'));
+console.log('Route checks:',JSON.stringify(routeResults));
+if(results.some(r=>!r.ok)||routeResults.some(r=>!r.ok)) process.exit(1);

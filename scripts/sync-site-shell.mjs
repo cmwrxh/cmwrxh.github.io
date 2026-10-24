@@ -11,14 +11,18 @@ import { fileURLToPath } from 'node:url';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const write = process.argv.includes('--write');
 const check = process.argv.includes('--check');
+const forceAppHost = process.argv.includes('--app-host');
 if (!write && !check) {
-  console.error('Usage: node scripts/sync-site-shell.mjs --write|--check');
+  console.error('Usage: node scripts/sync-site-shell.mjs --write|--check [--app-host]');
   process.exit(2);
 }
 const header = fs.readFileSync(path.join(root, 'templates/site-header.html'), 'utf8').trim();
 const footer = fs.readFileSync(path.join(root, 'templates/site-footer.html'), 'utf8').trim();
-const headerBlock = `<!-- site-header:start -->\n${header}\n<!-- site-header:end -->`;
-const footerBlock = `<!-- site-footer:start -->\n${footer}\n<!-- site-footer:end -->`;
+const appHostPages = new Set(['scan.html','login.html','signup.html','dashboard.html','reports.html','report.html','account.html','app.html']);
+function renderShell(template, marker, appHost) {
+  const content = appHost ? template.replace(/(\b(?:href|src)=["'])\/(?!\/)([^"']*)/g, '$1https://africalatency.dev/$2') : template;
+  return '<!-- site-' + marker + ':start -->\n' + content.trim() + '\n<!-- site-' + marker + ':end -->';
+}
 const shellPages = [
   'index.html','pricing.html','scan.html','tools.html','services.html','sample-report.html',
   'about.html','contact.html','compare.html','methodology.html','docs.html','blog.html','cases.html',
@@ -34,6 +38,9 @@ let changed = 0;
 
 function replaceOrInsertShell(html, name) {
   let out = html;
+  const appHost = forceAppHost || appHostPages.has(name);
+  const headerBlock = renderShell(header, 'header', appHost);
+  const footerBlock = renderShell(footer, 'footer', appHost);
   const replaceMarked = (source, start, end, replacement) => {
     const a = source.indexOf(start), b = source.indexOf(end);
     if (a !== -1 && b !== -1 && b > a) return source.slice(0, a) + replacement + source.slice(b + end.length);
