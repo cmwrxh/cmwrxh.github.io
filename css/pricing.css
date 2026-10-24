@@ -96,3 +96,12 @@ main.pricing-main .plan-card a.plan-cta:focus-visible { outline: 2px solid #fff;
 /* Phase 2 Item 1: preserve plan fills while meeting 4.5:1 normal-text contrast. */
 .pricing-comparison .plan-select:not([style*="#646464"]) { color: #0b1116 !important; }
 .pricing-comparison .plan-select[style*="#646464"] { color: #fff !important; }
+
+
+/* Phase 2 Item 1: keep plan fills; use dark labels on paid plans and white on Free. */
+html body .pricing-comparison a.plan-select:not([style*="#646464"]) {
+  color: #0b1116 !important;
+}
+html body .pricing-comparison a.plan-select[style*="#646464"] {
+  color: #fff !important;
+}
