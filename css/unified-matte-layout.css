@@ -574,3 +574,7 @@ html body main > section h1:not(.guardrail-exempt),
 html body main > section h2:not(.guardrail-exempt),
 html body main > section h3:not(.guardrail-exempt),
 html body main > section h4:not(.guardrail-exempt) { line-height: 1.2 !important; }
+
+
+/* The regional title has an ID-specific legacy rule; retain the same 1.2 ratio. */
+html body #regional-performance-title { line-height: 1.2 !important; }
