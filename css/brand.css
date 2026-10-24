@@ -603,3 +603,7 @@ html body a.btn-secondary,html body button.btn-secondary,html body .btn.btn-seco
 html body button.al-test-button,html body button.scan-run,html body #al-consent-accept,html body #al-consent-reject{
   background-color:#075985!important;border-color:#075985!important;color:#fff!important
 }
+
+
+/* Size-aware heading line-height guardrail. 1.2 satisfies both defined size bands. */
+h1, h2, h3, h4 { line-height: 1.2 !important; }
