@@ -91,6 +91,20 @@ jobs:
         run: |
           npm install --no-save playwright lighthouse
           npx playwright install --with-deps chromium
+      - name: Verify no Google Fonts references in PR base (#127)
+        run: |
+          cd base-reference
+          if git grep -nE 'fonts\\.googleapis\\.com|fonts\\.gstatic\\.com' -- '*.html' '*.css' '*.js'; then
+            echo "FAIL: remote Google Fonts references remain in the PR base."
+            exit 1
+          else
+            result=$?
+            if [ "$result" -eq 1 ]; then
+              echo "PASS: zero references to fonts.googleapis.com or fonts.gstatic.com in .html, .css and .js files on the PR base (#127)."
+            else
+              exit "$result"
+            fi
+          fi
       - name: Start PR base and PR static previews on the same runner
         run: |
           node scripts/ci-static-preview.mjs base-reference 4174 >/tmp/base-preview.log 2>&1 &
