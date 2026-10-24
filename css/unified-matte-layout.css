@@ -567,3 +567,10 @@ nav { background: #000000 !important; }
 #menu-toggle.menu-toggle::after { content: none !important; display: none !important; }
 #menu-toggle.menu-toggle span { display: block; width: 24px; height: 2px; border-radius: 0; background: #FFFFFF; }
 #menu-toggle.menu-toggle:hover span, #menu-toggle.menu-toggle:focus-visible span { background: #38A1E0; }
+
+
+/* Keep compact headings inside editorial sections within the defined ratio bands. */
+html body main > section h1:not(.guardrail-exempt),
+html body main > section h2:not(.guardrail-exempt),
+html body main > section h3:not(.guardrail-exempt),
+html body main > section h4:not(.guardrail-exempt) { line-height: 1.2 !important; }
