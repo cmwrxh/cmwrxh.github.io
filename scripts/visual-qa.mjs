@@ -38,7 +38,7 @@ for (const route of pages) {
           const r=el.getBoundingClientRect(), s=getComputedStyle(el);
           if(r.width<200||r.height<60||s.display==='none'||s.visibility==='hidden'||Number(s.opacity)===0) return false;
           const bg=s.backgroundColor.match(/[\d.]+/g);
-          return bg && bg.length>=3 && bg.slice(0,3).map(Number).every(v=>v>=245) && s.backgroundImage==='none';
+          return bg && bg.length>=3 && bg.slice(0,3).map(Number).every(v=>v>=245) && (bg.length<4 || Number(bg[3])>=0.8) && s.backgroundImage==='none';
         }).map(el=>({tag:el.tagName.toLowerCase(),className:typeof el.className==='string'?el.className:'',width:Math.round(el.getBoundingClientRect().width),height:Math.round(el.getBoundingClientRect().height)}));
         const headers = document.querySelectorAll('[data-site-header], header.al-site-header').length;
         const bodyBg = getComputedStyle(document.body).backgroundColor;
