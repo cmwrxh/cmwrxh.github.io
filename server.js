@@ -7,8 +7,13 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
 
 app.set('trust proxy', true); // behind Coolify's Traefik proxy
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// The Paystack webhook verifies an HMAC over the exact raw request bytes, so its
+// handler reads the stream itself. Body parsers must not consume it first.
+const RAW_BODY_PATHS = new Set(['/api/paystack-webhook']);
+const jsonParser = express.json();
+const urlencodedParser = express.urlencoded({ extended: true });
+app.use((req, res, next) => (RAW_BODY_PATHS.has(req.path) ? next() : jsonParser(req, res, next)));
+app.use((req, res, next) => (RAW_BODY_PATHS.has(req.path) ? next() : urlencodedParser(req, res, next)));
 
 // 1. Auto-mount api/*.js as /api/<name> (Vercel-style handlers)
 const apiDir = path.join(__dirname, 'api');

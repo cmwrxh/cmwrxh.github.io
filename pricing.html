@@ -18,18 +18,13 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/brand.css?v=10">
-  <link rel="stylesheet" href="/css/pricing.css?v=1">
+  <link rel="stylesheet" href="/css/pricing.css?v=2">
   <link rel="stylesheet" href="/css/sitewide-africa-dot-matrix.css?v=3">
   <link rel="stylesheet" href="/css/marketing-infrastructure-banner.css?v=1">
   <link rel="stylesheet" href="/css/gtmetrix-color-system.css?v=2">
 </head>
 <body class="pricing-page">
-  <nav class="pricing-nav" aria-label="Main navigation">
-    <div class="pricing-nav-inner">
-      <a href="/" class="nav-brand brand-lockup" aria-label="AfricaLatency home"><img class="brand-wordmark" src="/images/africalatency-logo-light.svg" alt="AfricaLatency" width="180" height="28"></a>
-      <ul class="nav-links pricing-nav-links" aria-label="Main navigation"><li><a href="/pricing.html" aria-current="page">Pricing</a></li><li class="nav-dropdown"><button class="nav-dropdown-trigger" type="button" aria-haspopup="true" aria-expanded="false">Resources</button><div class="nav-dropdown-menu nav-resources"><a href="/tools">Tools &amp; API docs</a><a href="/sample-report">Sample report</a><a href="/methodology">Methodology</a><a href="/docs">Docs</a><a href="/blog">Blog</a><a href="/cases">Case studies</a><a href="/data-centers.html">Data centers</a><a href="/kenya.html">Kenya</a><a href="/nigeria.html">Nigeria</a></div></li><li><a href="/about">About</a></li><li><a href="/contact">Contact</a></li><li><a href="/login">Login</a></li></ul><div class="nav-actions"><a class="nav-cta btn btn-primary" href="/scan">Run a free scan</a></div>
-    </div>
-  </nav>
+  <nav><div class="nav-inner"><a href="/" class="nav-brand brand-lockup" aria-label="AfricaLatency"><img class="brand-wordmark" src="/images/africalatency-logo-light.svg" alt="AfricaLatency" width="180" height="28"></a><div class="nav-actions"><button id="menu-toggle" class="menu-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="site-menu"><span></span><span></span><span></span></button></div></div></nav>
   <main class="pricing-main">
     <header class="pricing-heading">
       <p class="pricing-eyebrow">Pricing</p>
@@ -83,6 +78,20 @@
       <div class="included-heading"><p class="pricing-eyebrow">Standard across every tier</p><h2 id="included-title">Included in all plans</h2></div>
       <ul class="included-grid"><li>Higher Queue Priority</li><li>Full Telemetry PDF Export</li><li>Non-Invasive Public Probes</li><li>Historical Latency Graphs</li><li>Email &amp; Webhook Alerts</li></ul>
     </section>
+    <section class="pricing-enterprise" aria-labelledby="enterprise-title">
+      <div><p class="pricing-eyebrow">Need more control?</p><h2 id="enterprise-title">Enterprise performance intelligence</h2><p>For organisations that need tailored coverage, integration support, or a custom measurement programme.</p></div>
+      <a class="plan-cta plan-cta-primary" href="/contact?subject=Enterprise%20pricing">Talk to our team</a>
+    </section>
+    <section class="pricing-faq" aria-labelledby="pricing-faq-title">
+      <div class="pricing-faq-heading"><p class="pricing-eyebrow">Frequently asked questions</p><h2 id="pricing-faq-title">Questions before you start?</h2><p>Choose a starting point and expand as your measurement needs grow.</p></div>
+      <div class="pricing-faq-list">
+        <details><summary>Can I start without paying?</summary><p>Yes. The Free plan is listed at KES 0 and is intended for point-in-time public endpoint testing.</p></details>
+        <details><summary>What does AfricaLatency measure?</summary><p>It separates browser-based performance measurements from live network measurements, and reports regional results only where probe results are available.</p></details>
+        <details><summary>Are subscription plans and limits fully active?</summary><p>Plan features and limits are shown for comparison. Subscription checkout, plan enforcement and trial provisioning must be connected before these offers are treated as active paid subscriptions.</p></details>
+      </div>
+      <aside class="pricing-faq-contact"><h3>Still have questions?</h3><p>Tell us about your stack and the regions you need to understand.</p><a href="/contact">Contact AfricaLatency →</a></aside>
+    </section>
+    <section class="pricing-cta-band" aria-labelledby="pricing-cta-title"><div><p class="pricing-eyebrow">Start with a clear baseline</p><h2 id="pricing-cta-title">See how your service performs across African networks.</h2><p>Run a free scan before deciding what to monitor next.</p></div><a class="plan-cta plan-cta-primary" href="/scan">Run a free scan</a></section>
     <p class="pricing-footnote">Plan features and limits are shown for comparison. Subscription checkout, plan enforcement and trial provisioning must be connected before these offers are treated as active paid subscriptions.</p>
   </main>
   <footer class="pricing-footer"><a href="/">AfricaLatency</a><span>Infrastructure performance &amp; latency intelligence</span><a href="/terms-of-service">Terms</a><a href="/privacy-policy.html">Privacy</a></footer>
@@ -123,5 +132,5 @@
   </script>
   
   <script src="/js/marketing-infrastructure-banner.js?v=1" defer></script>
-</body>
+<script src="/js/main.js?v=7" defer></script></body>
 </html>
