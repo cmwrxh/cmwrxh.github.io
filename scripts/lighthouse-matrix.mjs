@@ -113,7 +113,7 @@ async function inspectTypography(page) {
       .filter(item => item.ratios.length === 0)
       .map(item => item.selector);
     const measuredCardRatios = cardBackgroundMeasurements.flatMap(item => item.ratios);
-    const cardBackground = cardSurfaces.length
+    let cardBackground = cardSurfaces.length
       ? getComputedStyle(cardSurfaces[0]).backgroundColor
       : resolveCssColor('--bg-card', 'backgroundColor');
     if (!cardBackground || cardBackground === 'rgba(0, 0, 0, 0)') {
