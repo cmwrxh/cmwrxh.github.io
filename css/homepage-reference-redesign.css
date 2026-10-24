@@ -252,3 +252,17 @@ a:focus-visible, button:focus-visible, input:focus-visible, [role="tabpanel"]:fo
 
 /* Keep the CTA reassurance readable at narrow viewport sizes. */
 .al-primary-cta > span { font-size: max(12px, 0.8rem) !important; }
+
+/* Item 1 repairs: accessible CTAs, stable mobile type, and feature-card contrast. */
+.al-test-button,.al-primary-cta,.al-feature-grid .al-primary-cta{background:#075985!important;color:#fff!important}
+.al-primary-cta{gap:12px;flex-wrap:wrap}
+.al-primary-cta>span{color:#fff!important}
+.al-feature-card h3,.al-feature-card h3 span{color:#fff!important}
+.visibility-feature-card,.visibility-feature-card-title{color:#f1f5f9!important}
+.visibility-feature-card-copy{color:#cbd5e1!important}
+.visibility-feature-icon{color:#e2e8f0!important;display:inline-flex!important;align-items:center;justify-content:center}
+.visibility-feature-icon svg,.visibility-feature-icon i{width:24px;height:24px;color:currentColor;stroke:currentColor}
+.al-tab-panel p{line-height:1.65}
+.al-hero h1{text-wrap:balance}
+.al-feature-card h3{line-height:1.3}
+@media(max-width:760px){.al-hero h1{line-height:1.2;margin-bottom:8px}.al-features-intro{gap:18px}.al-primary-cta{align-items:center}}
