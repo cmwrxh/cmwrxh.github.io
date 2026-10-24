@@ -112,6 +112,7 @@ jobs:
       - name: Summarize homepage Lighthouse audits
         run: node scripts/report-lighthouse-audits.mjs
       - name: Upload raw Lighthouse JSON/HTML, score comparisons and screenshots
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: typography-lighthouse-base-vs-pr
