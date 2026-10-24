@@ -248,3 +248,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, [role="tabpanel"]:fo
   letter-spacing: 0;
   word-spacing: 0.04em;
 }
+
+
+/* Keep the CTA reassurance readable at narrow viewport sizes. */
+.al-primary-cta > span { font-size: max(12px, 0.8rem) !important; }
