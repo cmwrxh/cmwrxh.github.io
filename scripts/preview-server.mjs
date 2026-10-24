@@ -1,0 +1,8 @@
+import http from 'node:http';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
+const routes={'/':'index.html','/pricing':'pricing.html','/scan':'scan.html','/tools':'tools.html','/services':'services.html','/sample-report':'sample-report.html','/about':'about.html','/contact':'contact.html','/compare':'compare.html','/methodology':'methodology.html','/docs':'docs.html','/blog':'blog.html','/cases':'cases.html','/case-studies':'cases.html','/login':'login.html','/signup':'signup.html','/performance-index':'internet-performance-index.html','/monitoring':'monitoring.html','/security':'security.html','/changelog':'changelog.html'};
+const mime={'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.js':'text/javascript; charset=utf-8','.svg':'image/svg+xml','.png':'image/png','.jpg':'image/jpeg','.webp':'image/webp','.json':'application/json','.xml':'application/xml','.woff2':'font/woff2'};
+http.createServer((req,res)=>{let pathname=decodeURIComponent(new URL(req.url,'http://localhost').pathname);let target=routes[pathname]||pathname.replace(/^\//,'');if(!path.extname(target)&&fs.existsSync(path.join(root,target+'.html')))target+='.html';const file=path.resolve(root,target);if(!file.startsWith(root+path.sep)&&file!==path.join(root,'index.html')){res.writeHead(403);res.end('Forbidden');return;}if(!fs.existsSync(file)||!fs.statSync(file).isFile()){res.writeHead(404);res.end('Not found');return;}res.writeHead(200,{'Content-Type':mime[path.extname(file)]||'application/octet-stream'});fs.createReadStream(file).pipe(res);}).listen(4173,'127.0.0.1',()=>console.log('QA preview on http://127.0.0.1:4173'));
