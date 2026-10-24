@@ -12,8 +12,6 @@ on:
       - 'js/homepage-reference-redesign.js'
       - 'docs/visual-review/reference.html'
       - 'scripts/visual-review.mjs'
-      - 'scripts/nav-responsive-review.mjs'
-      - '.github/workflows/nav-responsive-review.yml'
       - '.github/workflows/homepage-visual-review.yml'
 
 concurrency:
@@ -43,8 +41,6 @@ jobs:
         run: node --check scripts/visual-review.mjs
       - name: Install Playwright
         run: npm install --no-save playwright
-      - name: Install Chromium for responsive navigation review
-        run: npx playwright install chromium
       - name: Start static preview server
         run: |
           python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/homepage-visual-review-server.log 2>&1 &
@@ -66,14 +62,5 @@ jobs:
         with:
           name: homepage-reference-comparisons
           path: artifacts/visual-review/*.png
-          if-no-files-found: error
-          retention-days: 14
-      - name: Run responsive navigation checks and capture 30 screenshots
-        run: node scripts/nav-responsive-review.mjs
-      - name: Upload responsive navigation screenshots
-        uses: actions/upload-artifact@v4
-        with:
-          name: africalatency-responsive-navigation
-          path: artifacts/nav-responsive/*.png
           if-no-files-found: error
           retention-days: 14
