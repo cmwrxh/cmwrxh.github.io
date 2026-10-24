@@ -442,6 +442,11 @@ async function retentionSweep() {
   if (!supabase) return;
   const rateCutoff = new Date(Date.now() - 2 * 86400000).toISOString();
   await supabase.from('scan_rate_limits').delete().lt('window_started_at', rateCutoff);
+  // Proof and job-level IP hashes are cleared no later than 30 days after creation.
+  const hashCutoff = new Date(Date.now() - 30 * 86400000).toISOString();
+  await supabase.from('scan_jobs').update({ ip_hash: null }).lt('created_at', hashCutoff).not('ip_hash', 'is', null);
+  await supabase.from('scan_jobs').update({ guest_proof_hash: null, guest_proof_expires_at: null })
+    .lt('guest_proof_expires_at', new Date().toISOString()).not('guest_proof_hash', 'is', null);
   const cutoff = new Date(Date.now() - RETENTION_DAYS * 86400000).toISOString();
   const { data: expired } = await supabase.from('scan_jobs').select('id,screenshot').is('user_id', null).lt('created_at', cutoff).limit(100);
   for (const job of expired || []) {
