@@ -201,14 +201,21 @@ async function saveFilmstrip(jobId, frames) {
       const frame = frames[i];
       const match = String(frame?.dataUrl || '').match(/^data:image\/(png|jpeg|webp);base64,([A-Za-z0-9+/=]+)$/);
       if (!match) continue;
-      const source = Buffer.from(match[2], 'base64');
-      if (!source.length || source.length > 4 * 1024 * 1024) continue;
-      const output = await sharp(source, { limitInputPixels: 40000000 }).resize({ width: 400, withoutEnlargement: true }).jpeg({ quality: 65, mozjpeg: true }).toBuffer();
-      if (!output.length || output.length > 25 * 1024) continue;
-      const timing = Number.isFinite(Number(frame.timingMs)) ? Math.max(0, Math.round(Number(frame.timingMs))) : i;
-      const path = jobId + '/filmstrip/' + String(i).padStart(2, '0') + '-' + timing + '.jpg';
-      const { error } = await storage.upload(path, output, { contentType: 'image/jpeg', upsert: true });
-      if (error) console.warn('[scan-worker] filmstrip upload failed:', error.message);
+      const remainingMs = deadline - Date.now();
+      if (remainingMs <= 0) break;
+      await Promise.race([
+        (async () => {
+          const source = Buffer.from(match[2], 'base64');
+          if (!source.length || source.length > 4 * 1024 * 1024) return;
+          const output = await sharp(source, { limitInputPixels: 40000000 }).resize({ width: 400, withoutEnlargement: true }).jpeg({ quality: 65, mozjpeg: true }).toBuffer();
+          if (!output.length || output.length > 25 * 1024) return;
+          const timing = Number.isFinite(Number(frame.timingMs)) ? Math.max(0, Math.round(Number(frame.timingMs))) : i;
+          const path = jobId + '/filmstrip/' + String(i).padStart(2, '0') + '-' + timing + '.jpg';
+          const { error } = await storage.upload(path, output, { contentType: 'image/jpeg', upsert: true });
+          if (error) console.warn('[scan-worker] filmstrip upload failed:', error.message);
+        })(),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('Filmstrip processing timed out')), remainingMs))
+      ]);
     } catch (error) { console.warn('[scan-worker] filmstrip frame skipped:', String(error?.message || error).slice(0, 160)); }
   }
 }
