@@ -764,6 +764,10 @@ html body h1, html body h2, html body h3, html body h4 { line-height: 1.2 !impor
 :root { --text-dim: #808792 !important; }
 
 
+/* Principle index numbers are visible labels, not decorative microcopy. */
+.principle > span { font-size: max(12px, 0.8rem) !important; }
+
+
 
 /* ---- css/hero-theme.css ---- */
 /* ==========================================================================
@@ -2870,6 +2874,10 @@ html body main > section h3:not(.guardrail-exempt),
 html body main > section h4:not(.guardrail-exempt) { line-height: 1.2 !important; }
 
 
+/* The regional title has an ID-specific legacy rule; retain the same 1.2 ratio. */
+html body #regional-performance-title { line-height: 1.2 !important; }
+
+
 
 /* ---- css/marketing-infrastructure-banner.css ---- */
 /* Shared public marketing infrastructure strip and header actions. */
@@ -3334,6 +3342,14 @@ html body main > section h1:not(.guardrail-exempt),
 html body main > section h2:not(.guardrail-exempt),
 html body main > section h3:not(.guardrail-exempt),
 html body main > section h4:not(.guardrail-exempt) { line-height: 1.2 !important; }
+
+
+/* Last remaining compact report labels flagged by the rendered-page audit. */
+.get-started-report-foot > span,
+.get-started-floating-metric > span:nth-of-type(2) > strong {
+  font-size: max(12px, 0.8rem) !important;
+}
+html body #regional-performance-title { line-height: 1.2 !important; }
 
 
 }
