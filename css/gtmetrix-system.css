@@ -20,3 +20,6 @@ html{scroll-behavior:smooth}body{font-family:"Plus Jakarta Sans",system-ui,sans-
 .gt-section-band .gt-btn,.gt-cta .gt-btn,.pricing-page .pricing-cta-band .btn-primary{background:#fff!important;border-color:#fff!important;color:#102033!important}
 .al-feature-icon:empty,i[data-lucide]:empty{display:none!important}
 @media(max-width:520px){.feature-row,.workflow-row,.visibility-feature-row,.al-feature-row{display:flex!important;flex-direction:column!important}.feature-row img,.workflow-row img,.visibility-feature-row img,.al-feature-row img,.feature-row .feature-image,.workflow-row .feature-image,.visibility-feature-row .feature-image,.al-feature-row .feature-image{order:-1!important;width:100%;max-width:100%;height:auto;object-fit:contain}.visibility-feature-layout{grid-template-columns:1fr!important}}
+
+@media(max-width:520px){.visibility-feature-layout{display:flex!important;flex-direction:column!important}.visibility-report-panel{order:-1!important;width:100%;max-width:100%}.get-started-banner{display:flex!important;flex-direction:column!important}.get-started-banner-visual{order:-1!important;width:100%;max-width:100%}}
+.get-started-banner .get-started-primary{background:#fff!important;border-color:#fff!important;color:#102033!important}
