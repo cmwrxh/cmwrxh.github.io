@@ -44,6 +44,13 @@
     <div id="scan-turnstile" class="scan-turnstile" hidden></div>
     <p id="scan-note" class="scan-note">Only scan public websites you have permission to test. Mobile is the default and uses Lighthouse's simulated mobile throttling.</p>
     <div id="scan-error" class="scan-error" role="alert"></div>
+    <section id="guest-scan-gate" class="scan-gate" hidden aria-live="polite" style="margin-top:16px;padding:20px;border:1px solid #cbd5e1;border-radius:12px;background:#fff;color:#0f172a">
+      <p data-gate-message>Your free scan is used. Create a free account to keep testing, save this report and compare changes.</p>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:14px">
+        <a data-gate-signup class="scan-run" href="/signup">Create a free account</a>
+        <a data-gate-login class="scan-run" href="/login" style="background:#fff;color:#0f172a;border:1px solid #94a3b8">Log in</a>
+      </div>
+    </section>
   </form>
   <section id="scan-work" class="scan-work" aria-live="polite">
     <div class="scan-progress-head"><h2>Your scan is in progress</h2><div class="scan-progress-meta"><span id="scan-queue-count" class="scan-progress-count"></span><span id="scan-elapsed" class="scan-progress-count">Typical duration: 1–3 minutes</span></div></div>

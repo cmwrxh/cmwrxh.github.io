@@ -157,7 +157,8 @@
   const params = new URLSearchParams(window.location.search);
   const requestedNext = params.get('next') || '/dashboard';
   // Authentication should always land in the dashboard, never send users back to the public homepage.
-  const safeNext = ['/dashboard', '/dashboard.html'].includes(requestedNext) ? requestedNext : '/dashboard';
+  const safeNext = ['/dashboard', '/dashboard.html'].includes(requestedNext) ||
+    /^\/reports\/[a-f0-9-]{36}$/i.test(requestedNext) ? requestedNext : '/dashboard';
   document.getElementById('signup-link').href = '/signup?next=' + encodeURIComponent(safeNext);
   const status = document.getElementById('login-status');
   const submit = document.getElementById('login-submit');
