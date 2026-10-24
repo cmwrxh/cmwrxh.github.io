@@ -23,6 +23,7 @@ function renderShell(template, marker, appHost) {
   const content = appHost ? template.replace(/(\b(?:href|src)=["'])\/(?!\/)([^"']*)/g, '$1https://africalatency.dev/$2') : template;
   return '<!-- site-' + marker + ':start -->\n' + content.trim() + '\n<!-- site-' + marker + ':end -->';
 }
+// index.html is intentionally excluded: the homepage header is frozen; sync must not overwrite it.
 const shellPages = [
   'pricing.html','scan.html','tools.html','services.html','sample-report.html',
   'about.html','contact.html','compare.html','methodology.html','docs.html','blog.html','cases.html',
