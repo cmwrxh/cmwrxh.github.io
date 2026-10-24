@@ -40,7 +40,33 @@ try {
             if (hero) hero.setAttribute('data-review-hidden-hero', 'true');
             if (hero) hero.style.setProperty('display', 'none', 'important');
           });
-          await page.screenshot({ path: path.join(outDir, `${version}-homepage-lower-${width}.png`), fullPage: true });
+          const faqItems = [...page.locator('.faq-section .faq-item').all()];
+          await page.screenshot({ path: path.join(outDir, `${version}-homepage-lower-faq-closed-${width}.png`), fullPage: true });
+          const faqCount = await page.locator('.faq-section .faq-item').count();
+          if (faqCount >= 2) {
+            const firstFaq = page.locator('.faq-section .faq-item').first();
+            const secondFaq = page.locator('.faq-section .faq-item').nth(1);
+            const question = firstFaq.locator('.faq-question, button, summary').first();
+            await question.click().catch(() => failures.push(`homepage ${version} @ ${width}px FAQ question could not be opened`));
+            await page.waitForTimeout(150);
+            const faqState = await page.evaluate(() => {
+              const items = [...document.querySelectorAll('.faq-section .faq-item')];
+              const first = items[0], second = items[1];
+              const answer = first?.querySelector('.faq-answer');
+              return {
+                firstOpen: first?.classList.contains('open') || false,
+                secondOpen: second?.classList.contains('open') || false,
+                answerComplete: !!answer && answer.scrollHeight <= answer.clientHeight + 2,
+                answerText: answer?.innerText || ''
+              };
+            });
+            if (version === 'after' && !faqState.firstOpen) failures.push(`homepage @ ${width}px opened FAQ did not receive .open class`);
+            if (version === 'after' && faqState.secondOpen) failures.push(`homepage @ ${width}px a closed FAQ item became open too`);
+            if (version === 'after' && !faqState.answerComplete) failures.push(`homepage @ ${width}px open FAQ answer is clipped`);
+            await page.screenshot({ path: path.join(outDir, `${version}-homepage-lower-faq-open-${width}.png`), fullPage: true });
+          } else {
+            failures.push(`homepage @ ${width}px expected at least two FAQ items for closed/open-state testing`);
+          }
           await page.evaluate(() => {
             const hero = document.querySelector('[data-review-hidden-hero="true"]');
             if (hero) { hero.style.removeProperty('display'); hero.removeAttribute('data-review-hidden-hero'); }
