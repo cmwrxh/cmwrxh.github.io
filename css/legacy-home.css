@@ -133,6 +133,11 @@ html body main h2:not(.guardrail-exempt):not(.guardrail-exempt) {
   line-height: 1.3 !important;
 }
 
+/* The About compact section uses a more specific page selector; normalize it explicitly. */
+html body main > section.section.compact-section > div.container.narrow.center > h2 {
+  line-height: 1.25 !important;
+}
+
 
 
 /* ---- css/brand.css ---- */
