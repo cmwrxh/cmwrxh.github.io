@@ -79,8 +79,14 @@ async function inspectTypography(page) {
     };
     const dimColor = resolveCssColor('--text-dim', 'color');
     const pageBackground = resolveCssColor('--bg', 'backgroundColor');
+    const rawCardBackground = root.getPropertyValue('--bg-card').trim().toLowerCase();
     let cardBackground = resolveCssColor('--bg-card', 'backgroundColor');
-    if (!cardBackground || cardBackground === 'rgba(0, 0, 0, 0)') cardBackground = null;
+    if (!cardBackground || cardBackground === 'rgba(0, 0, 0, 0)') {
+      // Transparent card tokens inherit the real page surface; unresolved non-transparent tokens fail closed.
+      cardBackground = rawCardBackground === 'transparent'
+        ? getComputedStyle(document.body).backgroundColor
+        : null;
+    }
     const describeSelector = element => {
       const parts = [];
       let current = element;
