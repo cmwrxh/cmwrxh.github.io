@@ -85,9 +85,10 @@ try {
         await branchPage.locator('main > .al-features').evaluate(el => Math.ceil(el.getBoundingClientRect().bottom + window.scrollY)),
         await mainPage.locator('main > .al-features').evaluate(el => Math.ceil(el.getBoundingClientRect().bottom + window.scrollY))
       );
+      await Promise.all([mainPage.setViewportSize({ width: size.width, height: topHeight }), branchPage.setViewportSize({ width: size.width, height: topHeight })]);
       const [mainTop, branchTop] = await Promise.all([
-        mainPage.screenshot({ clip: { x: 0, y: 0, width: size.width, height: topHeight }, animations: 'disabled' }),
-        branchPage.screenshot({ clip: { x: 0, y: 0, width: size.width, height: topHeight }, animations: 'disabled' })
+        mainPage.screenshot({ animations: 'disabled' }),
+        branchPage.screenshot({ animations: 'disabled' })
       ]);
       const [mainFooter, branchFooter] = await Promise.all([
         mainPage.locator('.al-site-footer').screenshot({ animations: 'disabled' }),
