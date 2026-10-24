@@ -93,7 +93,7 @@ try {
               const toolsGroup = await dropdown.innerText().catch(() => '');
               if (!/Tools/i.test(toolsGroup)) failures.push(`${name} @ ${width}px Resources dropdown missing Tools group`);
               const dropdownBox = await dropdown.boundingBox().catch(() => null);
-              if (!dropdownBox || dropdownBox.width < 1 || dropdownBox.height < 1 || dropdownBox.left < -1 || dropdownBox.right > width + 1) failures.push(`${name} @ ${width}px Resources dropdown is clipped or outside the viewport`);
+              if (!dropdownBox || dropdownBox.width < 1 || dropdownBox.height < 1 || dropdownBox.x < -1 || dropdownBox.x + dropdownBox.width > width + 1) failures.push(`${name} @ ${width}px Resources dropdown is clipped or outside the viewport`);
             }
           }
         }
