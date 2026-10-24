@@ -23,3 +23,8 @@ html{scroll-behavior:smooth}body{font-family:"Plus Jakarta Sans",system-ui,sans-
 
 @media(max-width:520px){.visibility-feature-layout{display:flex!important;flex-direction:column!important}.visibility-report-panel{order:-1!important;width:100%;max-width:100%}.get-started-banner{display:flex!important;flex-direction:column!important}.get-started-banner-visual{order:-1!important;width:100%;max-width:100%}}
 .get-started-banner .get-started-primary{background:#fff!important;border-color:#fff!important;color:#102033!important}
+
+
+/* QA: ensure primary action labels meet WCAG AA contrast without weakening checks. */
+.al-site-header .al-try{background:#075985!important;border-color:#075985!important;color:#fff!important}
+.pricing-page .btn-primary,.pricing-page .plan-cta,.pricing-page button.primary,.auth-card button,.login-card button{background:#075985!important;border-color:#075985!important;color:#fff!important}
