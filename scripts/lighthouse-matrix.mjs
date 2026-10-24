@@ -53,7 +53,7 @@ async function inspectTypography(page) {
         const raw = hex[1].length === 3 ? [...hex[1]].map(ch => ch + ch).join('') : hex[1];
         return [0, 2, 4].map(index => parseInt(raw.slice(index, index + 2), 16));
       }
-      const rgb = text.match(/^rgba?\\(\\s*(\\d+)\\s*,\\s*(\\d+)\\s*,\\s*(\\d+)/i);
+      const rgb = text.match(/^rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/i);
       return rgb ? [Number(rgb[1]), Number(rgb[2]), Number(rgb[3])] : null;
     };
     const luminance = rgb => {
@@ -246,9 +246,19 @@ const typographyChecks = states.map(state => ({
 }));
 await writeFile(resolve(artifacts, 'lighthouse', 'summary.json'), JSON.stringify({ scores, comparisons }, null, 2) + '\n');
 const typographyFailures = typographyChecks.filter(check => check.version === 'pr' && !check.fontVerified);
+const designFailures = typographyChecks.filter(check => {
+  if (check.version !== 'pr') return false;
+  const guardrails = check.designGuardrails;
+  return !guardrails
+    || !guardrails.contrastPassed
+    || !guardrails.bodyLineHeightPassed
+    || !guardrails.headingLineHeightsPassed
+    || !guardrails.textSizePassed
+    || !guardrails.trackingPassed;
+});
 await writeFile(
   resolve(artifacts, 'lighthouse', 'typography-checks.json'),
-  JSON.stringify({ checks: typographyChecks, failures: typographyFailures }, null, 2) + '\n'
+  JSON.stringify({ checks: typographyChecks, failures: typographyFailures, designFailures }, null, 2) + '\n'
 );
 await writeFile(
   resolve(artifacts, 'lighthouse', 'run-metadata.json'),
@@ -267,5 +277,16 @@ if (typographyFailures.length) {
   console.error('Plus Jakarta Sans verification failures:', JSON.stringify(typographyFailures.map(check => ({ page: check.page, viewport: check.viewport, finalUrl: check.finalUrl, bodyFontFamily: check.bodyFontFamily, headingFontFamily: check.headingFontFamily, fontResources: check.fontResources }))));
 } else {
   console.log('Plus Jakarta Sans verified for every post-migration screenshot check.');
+}
+if (designFailures.length) {
+  console.error('Typography design guardrail failures:', JSON.stringify(designFailures.map(check => ({
+    page: check.page,
+    viewport: check.viewport,
+    finalUrl: check.finalUrl,
+    designGuardrails: check.designGuardrails
+  }))));
+  process.exitCode = 1;
+} else {
+  console.log('Typography size, tracking, line-height and contrast guardrails passed for every post-migration screenshot check.');
 }
 console.log('Wrote raw Lighthouse JSON/HTML, screenshots, score comparisons, typography verification and metadata.');
