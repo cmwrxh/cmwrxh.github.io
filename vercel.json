@@ -6,6 +6,16 @@
   },
   "redirects": [
     {
+      "source": "/why-africa-latency",
+      "destination": "/why-africa-latency.html",
+      "permanent": false
+    },
+    {
+      "source": "/locations",
+      "destination": "/locations.html",
+      "permanent": false
+    },
+    {
       "source": "/about.html",
       "destination": "/about",
       "permanent": true

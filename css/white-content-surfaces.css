@@ -1,0 +1,28 @@
+/* Explicit light content surfaces for Compare and Cases; shared shell stays dark. */
+body.white-surface-page{background:#f7f9fc!important;color:#17212f!important}
+body.white-surface-page main{background:#f7f9fc!important;color:#17212f!important}
+body.white-surface-page main .hero-section,body.white-surface-page main .section:not(.cta-section){background:#f7f9fc!important;background-image:none!important;color:#17212f!important}
+body.white-surface-page main h1,body.white-surface-page main h2,body.white-surface-page main h3,body.white-surface-page main h4,body.white-surface-page main .page-title{color:#101828!important}
+body.white-surface-page main p,body.white-surface-page main li,body.white-surface-page main th,body.white-surface-page main td,body.white-surface-page main .section-lead,body.white-surface-page main .hero-subtitle{color:#475467!important}
+body.white-surface-page main .card,body.white-surface-page main .product-card,body.white-surface-page main .comparison-card,body.white-surface-page main .principle,body.white-surface-page main .case-card{background:#fff!important;background-image:none!important;color:#17212f!important;border:1px solid #dbe3ed!important;box-shadow:0 12px 30px rgba(16,24,40,.05)!important}
+body.white-surface-page main table{background:#fff!important;color:#17212f!important;border-collapse:collapse}
+body.white-surface-page main th{background:#eef3f8!important;color:#344054!important}
+body.white-surface-page main td,body.white-surface-page main th{border-color:#dbe3ed!important}
+body.white-surface-page main .cta-section{background:#eaf3fc!important;background-image:none!important}
+body.white-surface-page main .btn-primary{background:#2f93f5!important;border-color:#2f93f5!important;color:#fff!important}
+body.white-surface-page main .btn-secondary{background:#fff!important;border-color:#cbd5e1!important;color:#17212f!important}
+body.white-surface-page main a:not(.btn){color:#1769aa!important}
+body.white-surface-page main .terminal{background:#101828!important;color:#e8edf5!important;border-color:#344054!important}
+body.white-surface-page main .terminal *{color:#e8edf5!important}
+body.white-surface-page .al-site-header{background:#171619!important;color:#fff!important}
+body.white-surface-page .al-site-footer{background:#111214!important;color:#e8ebf0!important}
+
+/* Keep wide comparison data inside its own scroll container on small screens. */
+body.white-surface-page .table-wrap{max-width:100%;overflow-x:auto;box-sizing:border-box}
+body.white-surface-page .comparison-table{min-width:489px}
+
+/* Keep primary action text at WCAG AA contrast on light-surface pages. */
+body.white-surface-page main .btn-primary{background:#075985!important;border-color:#075985!important;color:#fff!important}
+
+/* Preserve AA contrast on the Cases page's primary actions. */
+body.white-surface-page main .btn-primary{background:#075985!important;border-color:#075985!important;color:#fff!important}

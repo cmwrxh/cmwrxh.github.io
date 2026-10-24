@@ -80,6 +80,34 @@ try {
         await pair.screenshot({ path: resolve(output, 'main-vs-branch-' + name + '-' + size.label + '.png'), fullPage: true, animations: 'disabled' });
         await pair.close();
       }
+      await Promise.all([branchPage.evaluate(() => window.scrollTo(0, 0)), mainPage.evaluate(() => window.scrollTo(0, 0))]);
+      const topHeight = Math.max(
+        await branchPage.locator('main > .al-features').evaluate(el => Math.ceil(el.getBoundingClientRect().bottom + window.scrollY)),
+        await mainPage.locator('main > .al-features').evaluate(el => Math.ceil(el.getBoundingClientRect().bottom + window.scrollY))
+      );
+      await Promise.all([mainPage.setViewportSize({ width: size.width, height: topHeight }), branchPage.setViewportSize({ width: size.width, height: topHeight })]);
+      const [mainTop, branchTop] = await Promise.all([
+        mainPage.screenshot({ animations: 'disabled' }),
+        branchPage.screenshot({ animations: 'disabled' })
+      ]);
+      const [mainFooter, branchFooter] = await Promise.all([
+        mainPage.locator('.al-site-footer').screenshot({ animations: 'disabled' }),
+        branchPage.locator('.al-site-footer').screenshot({ animations: 'disabled' })
+      ]);
+      await import('node:fs/promises').then(fs => Promise.all([
+        fs.writeFile(resolve(output, 'main-home-top-' + size.label + '.png'), mainTop),
+        fs.writeFile(resolve(output, 'branch-home-top-' + size.label + '.png'), branchTop),
+        fs.writeFile(resolve(output, 'main-footer-' + size.label + '.png'), mainFooter),
+        fs.writeFile(resolve(output, 'branch-footer-' + size.label + '.png'), branchFooter)
+      ]));
+      const savePair = async (name, leftLabel, leftImage, rightLabel, rightImage) => {
+        const pair = await browser.newPage({ viewport: { width: size.width * 2, height: size.height }, deviceScaleFactor: 1 });
+        await pair.setContent(`<!doctype html><html><head><style>*{box-sizing:border-box}html,body{margin:0;background:#161619;color:#fff;font:14px system-ui}.pair{display:grid;grid-template-columns:${size.width}px ${size.width}px;align-items:start;gap:0}.label{padding:8px 10px;background:#222;font-weight:600}img{display:block;width:${size.width}px;height:auto}</style></head><body><div class="pair"><div><div class="label">${leftLabel} · ${size.width}px</div><img src="data:image/png;base64,${leftImage.toString('base64')}"></div><div><div class="label">${rightLabel} · ${size.width}px</div><img src="data:image/png;base64,${rightImage.toString('base64')}"></div></div></body></html>`);
+        await pair.screenshot({ path: resolve(output, name + '-' + size.label + '.png'), fullPage: true, animations: 'disabled' });
+        await pair.close();
+      };
+      await savePair('main-vs-branch-home-top', 'MAIN · Header, hero + first section', mainTop, 'PR · Header, hero + first section', branchTop);
+      await savePair('main-vs-branch-footer', 'MAIN · Footer', mainFooter, 'PR · Footer', branchFooter);
       await branchPage.close();
       await mainPage.close();
     }

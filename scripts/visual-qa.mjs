@@ -3,8 +3,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const base = process.env.SITE_BASE_URL || 'http://127.0.0.1:4173';
-const pages = ['/', '/pricing', '/scan', '/tools', '/services', '/sample-report', '/about', '/contact', '/compare', '/methodology', '/docs', '/blog', '/cases', '/login', '/signup'];
-const widths = [1280, 820, 390];
+const pages = ['/', '/pricing', '/scan', '/tools', '/services', '/sample-report', '/about', '/contact', '/compare', '/methodology', '/docs', '/blog', '/cases', '/login', '/signup', '/locations', '/why-africa-latency'];
+const widths = [1280, 820, 720, 390];
 const routeChecks = ['/performance-index','/data-centers','/data-centers.html','/kenya','/kenya.html'];
 const results = [];
 const linkStatusCache = new Map();
@@ -33,9 +33,13 @@ for (const route of pages) {
         const dir=path.join(outDir, route === '/' ? 'home' : route.slice(1)); fs.mkdirSync(dir,{recursive:true});
         await page.screenshot({path:path.join(dir,`${width}.png`),fullPage:true});
       });
-      const metrics = await page.evaluate((isHome) => {
+      const metrics = await page.evaluate(({isHome, routePath}) => {
         const headers = document.querySelectorAll('[data-site-header], header.al-site-header').length;
-        const toggles = document.querySelectorAll('.al-menu-toggle').length;
+        const bodyBg = getComputedStyle(document.body).backgroundColor;
+        const effectiveBg = bodyBg === 'rgba(0, 0, 0, 0)' ? '#ffffff' : bodyBg;
+        const bgChannels = effectiveBg.match(/[\d.]+/g);
+        const whiteSurface = !['/compare','/cases'].includes(routePath) || Boolean(bgChannels && bgChannels.slice(0,3).map(Number).every(v => v >= 200));
+        const toggles = document.querySelectorAll('.al-menu-toggle,.al-mobile-toggle').length;
         const horizontal = document.documentElement.scrollWidth > window.innerWidth + 1;
         const overflowNodes = horizontal ? [...document.querySelectorAll('body *')].map(el=>{const r=el.getBoundingClientRect(),s=getComputedStyle(el);return {tag:el.tagName.toLowerCase(),id:el.id||'',className:typeof el.className==='string'?el.className:'',left:Math.round(r.left),right:Math.round(r.right),width:Math.round(r.width),position:s.position,overflowX:s.overflowX};}).filter(x=>x.right>window.innerWidth+1||x.left< -1).filter(x=>x.tag!=='script'&&x.tag!=='style').sort((a,b)=>b.right-a.right).slice(0,12):[];
         const cookie = document.querySelector('.al-cookie-banner');
@@ -51,8 +55,8 @@ for (const route of pages) {
           return r.width>0 && r.height>0 && s.visibility!=='hidden' && s.display!=='none';
         }).map(el => {const s=getComputedStyle(el);let node=el,bg=s.backgroundColor;while((bg==='rgba(0, 0, 0, 0)'||bg==='transparent')&&node.parentElement){node=node.parentElement;bg=getComputedStyle(node).backgroundColor;}if(bg==='rgba(0, 0, 0, 0)'||bg==='transparent')bg=getComputedStyle(document.body).backgroundColor;if(bg==='rgba(0, 0, 0, 0)'||bg==='transparent')bg='#ffffff';return {text:(el.innerText||el.getAttribute('aria-label')||'').trim().slice(0,60),fg:s.color,bg};});
         const links = [...document.querySelectorAll('[data-site-header] a[href], [data-site-footer] a[href]')].map(a=>a.href);
-        return {headers,toggles,horizontal,overflowNodes,cookieBounds,preOverflow,sampleCards,sampleCardIssues,dotCanvasIssues,textCoveredByDot,buttons,links};
-      }, route === '/');
+        return {headers,toggles,horizontal,overflowNodes,cookieBounds,preOverflow,sampleCards,sampleCardIssues,dotCanvasIssues,textCoveredByDot,buttons,links,whiteSurface};
+      }, { isHome: route === '/', routePath: route });
       const linkResults = await Promise.all([...new Set(metrics.links)].map(url => {
         if (!linkStatusCache.has(url)) {
           linkStatusCache.set(url, (async () => {
@@ -72,8 +76,8 @@ for (const route of pages) {
         return linkStatusCache.get(url);
       }));
       const contrastIssues = metrics.buttons.filter(b => {const ratio=contrastRatio(b.fg,b.bg);return ratio!==null&&ratio<4.5;}).map(b=>({...b,ratio:contrastRatio(b.fg,b.bg)}));
-      const row = {page:route,width,status,headerCount:metrics.headers,hamburgerCount:metrics.toggles,horizontalScroll:metrics.horizontal,overflowNodes:metrics.overflowNodes,cookieBounds:metrics.cookieBounds,preOverflow:metrics.preOverflow,sampleCardIssues:metrics.sampleCardIssues,dotCanvasIssues:metrics.dotCanvasIssues,textCoveredByDot:metrics.textCoveredByDot,consoleErrors:errors,environmentWarnings,linkFailures:linkResults.filter(x=>!x.ok),contrastIssues};
-      row.ok = status>=200&&status<400&&row.headerCount===1&&row.hamburgerCount===1&&!row.horizontalScroll&&row.cookieBounds&&!row.preOverflow.length&&!row.sampleCardIssues.length&&!row.dotCanvasIssues.length&&!row.textCoveredByDot&&!errors.length&&!row.linkFailures.length&&!row.contrastIssues.length;
+      const row = {page:route,width,status,headerCount:metrics.headers,hamburgerCount:metrics.toggles,horizontalScroll:metrics.horizontal,overflowNodes:metrics.overflowNodes,cookieBounds:metrics.cookieBounds,preOverflow:metrics.preOverflow,sampleCardIssues:metrics.sampleCardIssues,dotCanvasIssues:metrics.dotCanvasIssues,textCoveredByDot:metrics.textCoveredByDot,whiteSurface:metrics.whiteSurface,consoleErrors:errors,environmentWarnings,linkFailures:linkResults.filter(x=>!x.ok),contrastIssues};
+      row.ok = status>=200&&status<400&&row.headerCount===1&&row.hamburgerCount===1&&!row.horizontalScroll&&row.cookieBounds&&!row.preOverflow.length&&!row.sampleCardIssues.length&&!row.dotCanvasIssues.length&&!row.textCoveredByDot&&row.whiteSurface&&!errors.length&&!row.linkFailures.length&&!row.contrastIssues.length;
       results.push(row);
       await page.close();
     } catch(e) {
@@ -86,7 +90,7 @@ await browser.close();
 fs.writeFileSync(path.join(outDir,'results.json'),JSON.stringify(results,null,2));
 fs.writeFileSync(path.join(outDir,'links.json'),JSON.stringify([...allLinkResults.values()],null,2));
 fs.writeFileSync(path.join(outDir,'links.md'),['| URL | Status | Result / note |','|---|---:|---|',...[...allLinkResults.values()].map(r=>'| '+r.url+' | '+r.status+' | '+(r.warning|| (r.ok?'OK':'ISSUE'))+' |')].join('\n'));
-const markdown = ['| Page | Width | HTTP | Headers | Hamburgers | Horizontal scroll | Cookie bounds | Pre overflow | Sample cards | Dot canvas issues | Text covered | Console errors | Link failures | Contrast failures | Result |','|---|---:|---:|---:|---:|---|---|---:|---:|---:|---|---:|---:|---:|---|',...results.map(r => '| '+r.page+' | '+r.width+' | '+(r.status??0)+' | '+(r.headerCount??'-')+' | '+(r.hamburgerCount??'-')+' | '+(r.horizontalScroll?'FAIL':'OK')+' | '+(r.cookieBounds===false?'FAIL':'OK')+' | '+(r.preOverflow?.length??'-')+' | '+(r.sampleCardIssues?.length??'-')+' | '+(r.dotCanvasIssues?.length??'-')+' | '+(r.textCoveredByDot?'FAIL':'OK')+' | '+(r.consoleErrors?.length??(r.error?1:0))+' | '+(r.linkFailures?.length??'-')+' | '+(r.contrastIssues?.length??'-')+' | '+(r.ok?'OK':'ISSUE')+' |')];
+const markdown = ['| Page | Width | HTTP | Headers | Hamburgers | Horizontal scroll | Cookie bounds | Pre overflow | Sample cards | Dot canvas issues | Text covered | White surface | Console errors | Link failures | Contrast failures | Result |','|---|---:|---:|---:|---:|---|---|---:|---:|---:|---|---|---:|---:|---:|---|',...results.map(r => '| '+r.page+' | '+r.width+' | '+(r.status??0)+' | '+(r.headerCount??'-')+' | '+(r.hamburgerCount??'-')+' | '+(r.horizontalScroll?'FAIL':'OK')+' | '+(r.cookieBounds===false?'FAIL':'OK')+' | '+(r.preOverflow?.length??'-')+' | '+(r.sampleCardIssues?.length??'-')+' | '+(r.dotCanvasIssues?.length??'-')+' | '+(r.textCoveredByDot?'FAIL':'OK')+' | '+(r.whiteSurface?'PASS':'FAIL')+' | '+(r.consoleErrors?.length??(r.error?1:0))+' | '+(r.linkFailures?.length??'-')+' | '+(r.contrastIssues?.length??'-')+' | '+(r.ok?'OK':'ISSUE')+' |')];
 fs.writeFileSync(path.join(outDir,'results.md'),markdown.join('\n'));
 console.log(markdown.join('\n'));
 const routeResults=[];
