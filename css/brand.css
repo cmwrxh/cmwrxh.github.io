@@ -615,3 +615,7 @@ html body h1, html body h2, html body h3, html body h4 { line-height: 1.2 !impor
 
 /* Keep the contrast token consistent across responsive theme overrides. */
 :root { --text-dim: #808792 !important; }
+
+
+/* Principle index numbers are visible labels, not decorative microcopy. */
+.principle > span { font-size: max(12px, 0.8rem) !important; }
