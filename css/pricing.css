@@ -88,3 +88,7 @@ main.pricing-main .plan-card a.plan-cta:focus-visible { outline: 2px solid #fff;
 .pricing-cta-band{display:flex;align-items:center;justify-content:space-between;gap:24px;margin:36px 0 18px;padding:30px 32px;border-radius:16px;background:linear-gradient(110deg,#12395a,#15243c 62%,#291b32)}
 .pricing-cta-band h2{max-width:720px}
 @media(max-width:700px){.pricing-enterprise,.pricing-cta-band{align-items:stretch;flex-direction:column;padding:24px 20px}.pricing-faq{grid-template-columns:minmax(0,1fr);padding:22px 16px;gap:18px}.pricing-faq-heading{grid-column:auto}.pricing-enterprise .plan-cta,.pricing-cta-band .plan-cta{width:100%}}
+
+
+/* Pricing metadata stays readable on desktop and mobile. */
+.billing-savings, .feature-heading { font-size: max(12px, 0.8rem) !important; }
