@@ -23,3 +23,6 @@ body.white-surface-page .comparison-table{min-width:489px}
 
 /* Keep primary action text at WCAG AA contrast on light-surface pages. */
 body.white-surface-page main .btn-primary{background:#075985!important;border-color:#075985!important;color:#fff!important}
+
+/* Preserve AA contrast on the Cases page's primary actions. */
+body.white-surface-page main .btn-primary{background:#075985!important;border-color:#075985!important;color:#fff!important}
