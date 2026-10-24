@@ -45,7 +45,7 @@ html,body{background:#121212!important}body{color:#ececec}
 .pricing-comparison tbody th,.pricing-comparison tbody td{border-color:rgba(255,255,255,.08)!important;color:#ececec!important}
 .pricing-comparison thead .plan-free>span{color:var(--al-plan-lite-name)!important}.pricing-comparison thead .plan-developer>span{color:var(--al-plan-core-name)!important}.pricing-comparison thead .plan-business>span{color:var(--al-plan-advanced-name)!important}.pricing-comparison thead .plan-enterprise>span{color:var(--al-plan-expert-name)!important}
 .pricing-comparison .plan-select{background:var(--plan-color,#1769c9)!important;color:#fff!important;border:1px solid var(--plan-color,#2a94fa)!important}
-.coming-soon{display:inline-block;margin-inline-start:.35em;padding:.18em .45em;border-radius:3px;background:#202328;color:#ececec;border:1px solid #454a53;font-size:11px;font-weight:700;white-space:nowrap}
+.coming-soon{display:inline-block;margin-inline-start:.35em;padding:.18em .45em;border-radius:3px;background:#202328;color:#ececec;border:1px solid #454a53;font-size:12px;font-weight:700;white-space:nowrap}
 .al-audit-offer a{background:#dc59a5!important;color:#fff!important;border-color:#dc59a5!important}
 .regional-performance-section.regional-network-atmosphere{background:#121212!important;background-image:none!important;padding-block:64px!important;min-height:0!important}
 .regional-performance-section .container,.regional-performance-section .regional-performance-container{background:transparent!important;min-height:0!important}
