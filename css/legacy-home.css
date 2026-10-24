@@ -784,6 +784,34 @@ html body h1, html body h2, html body h3, html body h4 { line-height: 1.2 !impor
 .principle > span { font-size: max(12px, 0.8rem) !important; }
 
 
+/* Phase 2 Item 1: primary actions meet WCAG AA contrast on dark surfaces. */
+html body .btn-primary,
+html body button.btn-primary,
+html body a.btn-primary,
+html body .btn.btn-primary,
+html body .al-primary-cta,
+html body .get-started-primary,
+html body .al-mobile-cta,
+html body .al-login,
+html body .visibility-report-cta {
+  background-color: #1769c9 !important;
+  border-color: #1769c9 !important;
+  color: #fff !important;
+}
+html body .btn-primary:hover,
+html body button.btn-primary:hover,
+html body a.btn-primary:hover,
+html body .btn.btn-primary:hover,
+html body .al-primary-cta:hover,
+html body .get-started-primary:hover,
+html body .al-mobile-cta:hover,
+html body .al-login:hover,
+html body .visibility-report-cta:hover {
+  background-color: #135cb0 !important;
+  border-color: #135cb0 !important;
+}
+
+
 
 /* ---- css/hero-theme.css ---- */
 /* ==========================================================================
@@ -1288,8 +1316,8 @@ main, footer, .homepage-footer, .pricing-footer {
 .btn, .btn-primary, .btn-secondary, .nav-cta, .get-started-primary,
 .plan-cta, .plan-cta-primary, .hero-scan-form button,
 .nairobi-probe-card button, .pricing-nav .nav-cta {
-  background: #1769c9 !important;
-  border-color: #1769c9 !important;
+  background: #2f93f5 !important;
+  border-color: #2f93f5 !important;
   color: #fff !important;
 }
 .btn *, .nav-cta *, .get-started-primary *, .plan-cta-primary * {
@@ -1298,8 +1326,8 @@ main, footer, .homepage-footer, .pricing-footer {
 .btn:hover, .nav-cta:hover, .get-started-primary:hover,
 .plan-cta:hover, .plan-cta-primary:hover, .hero-scan-form button:hover,
 .nairobi-probe-card button:hover {
-  background: #1769c9 !important;
-  border-color: #1769c9 !important;
+  background: #2f93f5 !important;
+  border-color: #2f93f5 !important;
   color: #fff !important;
 }
 .homepage-footer, footer, .pricing-footer {
@@ -1359,8 +1387,8 @@ main, footer, .homepage-footer, .pricing-footer {
 }
 .get-started-banner .get-started-primary,
 .get-started-banner .get-started-primary:hover {
-  background: #1769c9 !important;
-  border-color: #1769c9 !important;
+  background: #2f93f5 !important;
+  border-color: #2f93f5 !important;
 }
 
 
@@ -1608,8 +1636,8 @@ nav .nav-dropdown-menu a { color: #e5f1fa; }
 .get-started-banner-copy h2 { color: #fff; }
 .get-started-banner-copy p { color: #a9b4c7; }
 .get-started-banner-eyebrow { color: #1676C3 !important; }
-.get-started-primary { background: #1769c9 !important; border-color: #1769c9 !important; color: #fff !important; box-shadow: 0 10px 22px rgba(22,127,229,.2); }
-.get-started-primary:hover { background: #135cb0 !important; border-color: #135cb0 !important; }
+.get-started-primary { background: #167FE5 !important; color: #fff !important; box-shadow: 0 10px 22px rgba(22,127,229,.2); }
+.get-started-primary:hover { background: #086AC7 !important; }
 .get-started-secondary { background: transparent; border-color: #6BADE0 !important; color: #8ed5ff; }
 .get-started-mini-report { background: rgba(255,255,255,.04); border-color: rgba(255,255,255,.12); box-shadow: 0 24px 52px rgba(24,84,135,.17) !important; }
 .get-started-mini-report-top, .get-started-url-row, .get-started-latency-title { color: #e5f1fa; }
