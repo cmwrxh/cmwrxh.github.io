@@ -37,7 +37,7 @@ const errors = [];
 let changed = 0;
 
 function normalizeLegacyFooter(html) {
-  return html.replace(/<!-- site-footer:start -->[\\s\\S]*?<!-- site-footer:end -->/g, (block) => block.replace('<a href="/services">Services</a>', ''));
+  return html.replace(/<!-- site-footer:start -->[\s\S]*?<!-- site-footer:end -->/g, (block) => block.replace('<a href="/services">Services</a>', ''));
 }
 
 function replaceOrInsertShell(html, name) {
