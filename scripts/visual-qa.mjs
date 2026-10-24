@@ -37,6 +37,7 @@ for (const route of pages) {
         const headers = document.querySelectorAll('[data-site-header], header.al-site-header').length;
         const toggles = document.querySelectorAll('.al-menu-toggle').length;
         const horizontal = document.documentElement.scrollWidth > window.innerWidth + 1;
+        const overflowNodes = horizontal ? [...document.querySelectorAll('body *')].map(el=>{const r=el.getBoundingClientRect(),s=getComputedStyle(el);return {tag:el.tagName.toLowerCase(),id:el.id||'',className:typeof el.className==='string'?el.className:'',left:Math.round(r.left),right:Math.round(r.right),width:Math.round(r.width),position:s.position,overflowX:s.overflowX};}).filter(x=>x.right>window.innerWidth+1||x.left< -1).filter(x=>x.tag!=='script'&&x.tag!=='style').sort((a,b)=>b.right-a.right).slice(0,12):[];
         const cookie = document.querySelector('.al-cookie-banner');
         const cookieBounds = cookie ? (()=>{const r=cookie.getBoundingClientRect();return r.left>=-1&&r.right<=window.innerWidth+1&&r.width<=window.innerWidth-22;})() : true;
         const preOverflow = [...document.querySelectorAll('pre')].filter(el=>{const r=el.getBoundingClientRect(),s=getComputedStyle(el);return r.right>window.innerWidth+1 || (el.scrollWidth>el.clientWidth+1 && !['auto','scroll'].includes(s.overflowX));}).map(el=>({text:(el.innerText||'').slice(0,60),right:el.getBoundingClientRect().right,overflowX:getComputedStyle(el).overflowX}));
@@ -50,7 +51,7 @@ for (const route of pages) {
           return r.width>0 && r.height>0 && s.visibility!=='hidden' && s.display!=='none';
         }).map(el => {const s=getComputedStyle(el);let node=el,bg=s.backgroundColor;while((bg==='rgba(0, 0, 0, 0)'||bg==='transparent')&&node.parentElement){node=node.parentElement;bg=getComputedStyle(node).backgroundColor;}if(bg==='rgba(0, 0, 0, 0)'||bg==='transparent')bg=getComputedStyle(document.body).backgroundColor;if(bg==='rgba(0, 0, 0, 0)'||bg==='transparent')bg='#ffffff';return {text:(el.innerText||el.getAttribute('aria-label')||'').trim().slice(0,60),fg:s.color,bg};});
         const links = [...document.querySelectorAll('[data-site-header] a[href], [data-site-footer] a[href]')].map(a=>a.href);
-        return {headers,toggles,horizontal,cookieBounds,preOverflow,sampleCards,sampleCardIssues,dotCanvasIssues,textCoveredByDot,buttons,links};
+        return {headers,toggles,horizontal,overflowNodes,cookieBounds,preOverflow,sampleCards,sampleCardIssues,dotCanvasIssues,textCoveredByDot,buttons,links};
       }, route === '/');
       const linkResults = await Promise.all([...new Set(metrics.links)].map(url => {
         if (!linkStatusCache.has(url)) {
@@ -71,7 +72,7 @@ for (const route of pages) {
         return linkStatusCache.get(url);
       }));
       const contrastIssues = metrics.buttons.filter(b => {const ratio=contrastRatio(b.fg,b.bg);return ratio!==null&&ratio<4.5;}).map(b=>({...b,ratio:contrastRatio(b.fg,b.bg)}));
-      const row = {page:route,width,status,headerCount:metrics.headers,hamburgerCount:metrics.toggles,horizontalScroll:metrics.horizontal,cookieBounds:metrics.cookieBounds,preOverflow:metrics.preOverflow,sampleCardIssues:metrics.sampleCardIssues,dotCanvasIssues:metrics.dotCanvasIssues,textCoveredByDot:metrics.textCoveredByDot,consoleErrors:errors,environmentWarnings,linkFailures:linkResults.filter(x=>!x.ok),contrastIssues};
+      const row = {page:route,width,status,headerCount:metrics.headers,hamburgerCount:metrics.toggles,horizontalScroll:metrics.horizontal,overflowNodes:metrics.overflowNodes,cookieBounds:metrics.cookieBounds,preOverflow:metrics.preOverflow,sampleCardIssues:metrics.sampleCardIssues,dotCanvasIssues:metrics.dotCanvasIssues,textCoveredByDot:metrics.textCoveredByDot,consoleErrors:errors,environmentWarnings,linkFailures:linkResults.filter(x=>!x.ok),contrastIssues};
       row.ok = status>=200&&status<400&&row.headerCount===1&&row.hamburgerCount===1&&!row.horizontalScroll&&row.cookieBounds&&!row.preOverflow.length&&!row.sampleCardIssues.length&&!row.dotCanvasIssues.length&&!row.textCoveredByDot&&!errors.length&&!row.linkFailures.length&&!row.contrastIssues.length;
       results.push(row);
       await page.close();

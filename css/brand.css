@@ -597,6 +597,6 @@ html body main a.plan-cta-primary,html body main a.plan-cta-primary:visited,
 html body main a.plan-cta:not(.plan-cta-outline),html body main a.plan-cta:not(.plan-cta-outline):visited,
 html body a.btn-primary,html body button.btn-primary,html body .btn.btn-primary,
 html body a.btn-secondary,html body button.btn-secondary,html body .btn.btn-secondary,
-html body button.al-test-button,html body #al-consent-accept,html body #al-consent-reject{
+html body button.al-test-button,html body button.scan-run,html body #al-consent-accept,html body #al-consent-reject{
   background-color:#075985!important;border-color:#075985!important;color:#fff!important
 }
