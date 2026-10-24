@@ -36,7 +36,7 @@ for (const route of pages) {
         const buttons = [...document.querySelectorAll('button,a.al-try,a.al-login,.btn,.btn-primary,.plan-cta')].filter(el => {
           const r=el.getBoundingClientRect(), s=getComputedStyle(el);
           return r.width>0 && r.height>0 && s.visibility!=='hidden' && s.display!=='none';
-        }).map(el => {const s=getComputedStyle(el);return {text:(el.innerText||el.getAttribute('aria-label')||'').trim().slice(0,60),fg:s.color,bg:s.backgroundColor};});
+        }).map(el => {const s=getComputedStyle(el);let node=el,bg=s.backgroundColor;while((bg==='rgba(0, 0, 0, 0)'||bg==='transparent')&&node.parentElement){node=node.parentElement;bg=getComputedStyle(node).backgroundColor;}if(bg==='rgba(0, 0, 0, 0)'||bg==='transparent')bg=getComputedStyle(document.body).backgroundColor;if(bg==='rgba(0, 0, 0, 0)'||bg==='transparent')bg='#ffffff';return {text:(el.innerText||el.getAttribute('aria-label')||'').trim().slice(0,60),fg:s.color,bg};});
         const links = [...document.querySelectorAll('[data-site-header] a[href], [data-site-footer] a[href]')].map(a=>a.href);
         return {headers,toggles,horizontal,buttons,links};
       });
