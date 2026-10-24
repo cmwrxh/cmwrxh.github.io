@@ -20,6 +20,7 @@ const RETENTION_DAYS = Math.max(1, Math.min(90, Number(process.env.SCAN_ANON_RET
 const IP_HASH_SECRET = process.env.IP_HASH_SECRET;
 const API_KEY_PREFIX = 'al_live_';
 const signedUrlCache = new Map();
+const signedFilmstripCache = new Map();
 let lastAlertAt = 0;
 let busy = false;
 let lastJobAt = Date.now();
@@ -117,7 +118,7 @@ async function reportFor(req, job) {
     unlocked = job.user_id === user.id;
   }
   const screenshotUrl = await signedScreenshot(job).catch(() => null);
-  const response = publicSummary(job, screenshotUrl, await signedFilmstrip(job.id));
+  const response = publicSummary(job, screenshotUrl, job.status === 'completed' ? await signedFilmstrip(job.id) : []);
   response.locked = !unlocked;
   if (unlocked) response.fullReport = job.result?.fullReport || null;
   return response;
@@ -196,40 +197,52 @@ async function saveFilmstrip(jobId, frames) {
   if (!Array.isArray(frames) || !frames.length) return;
   const storage = supabase.storage.from('scan-screenshots');
   const deadline = Date.now() + 8000;
+  let dropped = 0;
   for (let i = 0; i < Math.min(frames.length, 10) && Date.now() < deadline; i++) {
     try {
       const frame = frames[i];
-      const match = String(frame?.dataUrl || '').match(/^data:image\/(png|jpeg|webp);base64,([A-Za-z0-9+/=]+)$/);
-      if (!match) continue;
+      const match = String(frame?.dataUrl || '').match(/^data:image\\/(png|jpeg|webp);base64,([A-Za-z0-9+/=]+)$/);
+      if (!match) { dropped++; continue; }
       const remainingMs = deadline - Date.now();
-      if (remainingMs <= 0) break;
+      if (remainingMs <= 0) { dropped += Math.min(frames.length, 10) - i; break; }
       await Promise.race([
         (async () => {
           const source = Buffer.from(match[2], 'base64');
-          if (!source.length || source.length > 4 * 1024 * 1024) return;
-          const output = await sharp(source, { limitInputPixels: 40000000 }).resize({ width: 900, withoutEnlargement: true }).jpeg({ quality: 78, mozjpeg: true }).toBuffer();
-          if (!output.length || output.length > 80 * 1024) return;
+          if (!source.length || source.length > 4 * 1024 * 1024) { dropped++; return; }
+          let output = await sharp(source, { limitInputPixels: 40000000 }).resize({ width: 900, withoutEnlargement: true }).jpeg({ quality: 78, mozjpeg: true }).toBuffer();
+          if (!output.length || output.length > 80 * 1024) {
+            output = await sharp(source, { limitInputPixels: 40000000 }).resize({ width: 640, withoutEnlargement: true }).jpeg({ quality: 60, mozjpeg: true }).toBuffer();
+          }
+          if (!output.length || output.length > 80 * 1024) { dropped++; return; }
           const timing = Number.isFinite(Number(frame.timingMs)) ? Math.max(0, Math.round(Number(frame.timingMs))) : i;
           const path = jobId + '/filmstrip/' + String(i).padStart(2, '0') + '-' + timing + '.jpg';
           const { error } = await storage.upload(path, output, { contentType: 'image/jpeg', upsert: true });
-          if (error) console.warn('[scan-worker] filmstrip upload failed:', error.message);
+          if (error) { dropped++; console.warn('[scan-worker] filmstrip upload failed:', error.message); }
         })(),
         new Promise((_, reject) => setTimeout(() => reject(new Error('Filmstrip processing timed out')), remainingMs))
       ]);
-    } catch (error) { console.warn('[scan-worker] filmstrip frame skipped:', String(error?.message || error).slice(0, 160)); }
+    } catch (error) {
+      dropped++;
+      console.warn('[scan-worker] filmstrip frame skipped:', String(error?.message || error).slice(0, 160));
+    }
   }
+  if (dropped) console.warn('[scan-worker] filmstrip frames dropped:', dropped, 'of', Math.min(frames.length, 10));
 }
 async function signedFilmstrip(jobId) {
+  const cached = signedFilmstripCache.get(jobId);
+  if (cached && cached.expiresAt > Date.now()) return cached.frames;
   try {
     const { data: files, error } = await supabase.storage.from('scan-screenshots').list(jobId + '/filmstrip', { limit: 10, sortBy: { column: 'name', order: 'asc' } });
     if (error || !Array.isArray(files)) return [];
     const output = [];
     for (const file of files) {
-      const match = file.name.match(/^(\d{2})-(\d+)\.jpg$/); if (!match) continue;
+      const match = file.name.match(/^(\\d{2})-(\\d+)\\.jpg$/); if (!match) continue;
       const { data, error: signError } = await supabase.storage.from('scan-screenshots').createSignedUrl(jobId + '/filmstrip/' + file.name, 3600);
       if (!signError && data?.signedUrl) output.push({ timing_ms: Number(match[2]), url: data.signedUrl });
     }
-    return output.slice(0, 10);
+    const frames = output.slice(0, 10);
+    signedFilmstripCache.set(jobId, { frames, expiresAt: Date.now() + 50 * 60 * 1000 });
+    return frames;
   } catch (error) { console.warn('[scan-worker] filmstrip signing failed:', String(error?.message || error).slice(0, 160)); return []; }
 }
 async function executeJob(job) {
