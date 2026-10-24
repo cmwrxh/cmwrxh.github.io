@@ -6,7 +6,7 @@
   --border: rgba(148,163,184,.18);
   --border-strong: rgba(148,163,184,.28);
   --text-muted: #a3adbd;
-  --text-dim: #7e899b;
+  --text-dim: #808792;
   --al-canvas: #0a0e17;
   --al-rule: rgba(148,163,184,.18);
 }
@@ -163,13 +163,13 @@ input:focus, select:focus, textarea:focus, .form-input:focus {
   --border-strong: rgba(255,255,255,.12) !important;
   --text: #FFFFFF !important;
   --text-muted: #A0AEC0 !important;
-  --text-dim: #A0AEC0 !important;
+  --text-dim: #808792 !important;
   --accent: #38A1E0 !important;
   --blue: #38A1E0 !important;
   --al-canvas: #0A0E17 !important;
   --al-rule: rgba(255,255,255,.08) !important;
 }
-html, body { background: #0A0E17 !important; color: #A0AEC0 !important; }
+html, body { background: #0A0E17 !important; color: #808792 !important; }
 h1, h2, h3, h4, .page-title, .hero-title { color: #FFFFFF !important; }
 input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]),
 select, textarea, .form-input, .contact-form input, .contact-form select,
