@@ -78,4 +78,20 @@ app.use((req, res, next) => {
   next();
 });
 
-// 3. Customer report route: stable, s
+// 3. Customer report route: stable, shareable /reports/<UUID> URL.
+app.get('/reports/:scanId', (req, res, next) => {
+  if (!/^[a-f0-9-]{36}$/i.test(String(req.params.scanId || ''))) {
+    return res.status(404).sendFile(path.join(__dirname, '404.html'));
+  }
+  return res.sendFile(path.join(__dirname, 'reports.html'));
+});
+
+// 3. Static site, with extension fallback (/contact -> contact.html)
+app.use(express.static(__dirname, { extensions: ['html'] }));
+
+// 4. Anything else -> your 404 page
+app.use((req, res) => {
+  res.status(404).sendFile(path.join(__dirname, '404.html'));
+});
+
+app.listen(process.env.PORT || 3000, () => console.log('up'));
