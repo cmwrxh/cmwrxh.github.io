@@ -80,9 +80,7 @@ async function inspectTypography(page) {
     const dimColor = resolveCssColor('--text-dim', 'color');
     const pageBackground = resolveCssColor('--bg', 'backgroundColor');
     let cardBackground = resolveCssColor('--bg-card', 'backgroundColor');
-    if (!cardBackground || /rgba?\\(\\s*0\\s*,\\s*0\\s*,\\s*0\\s*,\\s*0\\s*\\)/i.test(cardBackground)) {
-      cardBackground = getComputedStyle(document.body).backgroundColor;
-    }
+    if (!cardBackground || cardBackground === 'rgba(0, 0, 0, 0)') cardBackground = null;
     const describeSelector = element => {
       const parts = [];
       let current = element;
