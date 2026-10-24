@@ -54,6 +54,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
   const body = req.body || {};
+  const userToken = String(req.headers.authorization || '').replace(/^Bearer\\s+/i, '').trim();
   const guestProof = readGuestProof(req);
   if (!userToken && guestProof) {
     return res.status(429).json({
