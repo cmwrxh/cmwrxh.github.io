@@ -49,18 +49,18 @@
 .get-started-url-icon { display: grid; width: 32px; height: 32px; flex: 0 0 32px; place-items: center; border-radius: 8px; color: #67e8f9; background: rgba(34,211,238,.09); }
 .get-started-url-icon svg { width: 17px; height: 17px; }
 .get-started-url-copy { display: flex; min-width: 0; flex-direction: column; gap: 3px; }
-.get-started-url-copy span { color: #94a3b8; font-size: .63rem; }
+.get-started-url-copy span { color: #94a3b8; font-size: max(12px, .8rem); }
 .get-started-url-copy strong { overflow: hidden; color: #dbeafe; font-size: .81rem; text-overflow: ellipsis; white-space: nowrap; }
-.get-started-node-status { display: flex; align-items: center; gap: 7px; padding: 0 1px 15px; color: #a7f3d0; font-size: .69rem; }
+.get-started-node-status { display: flex; align-items: center; gap: 7px; padding: 0 1px 15px; color: #a7f3d0; font-size: max(12px, .8rem); }
 .get-started-status-dot { width: 7px; height: 7px; flex: 0 0 7px; border-radius: 50%; background: #4ade80; box-shadow: 0 0 10px rgba(74,222,128,.6); }
 .get-started-node-status strong { font-weight: 700; }
 .get-started-node-status > span:last-child { margin-left: auto; color: #8da2bc; font-size: .61rem; }
-.get-started-latency-title { display: flex; justify-content: space-between; gap: 8px; padding-bottom: 8px; border-bottom: 1px solid rgba(100,116,139,.2); color: #dbeafe; font-size: .68rem; font-weight: 750; }
-.get-started-latency-title span:last-child { color: #8296af; font-size: .6rem; font-weight: 500; }
+.get-started-latency-title { display: flex; justify-content: space-between; gap: 8px; padding-bottom: 8px; border-bottom: 1px solid rgba(100,116,139,.2); color: #dbeafe; font-size: max(12px, .8rem); font-weight: 750; }
+.get-started-latency-title span:last-child { color: #8296af; font-size: max(12px, .8rem); font-weight: 500; }
 .get-started-latency-bars { display: grid; gap: 13px; padding: 15px 0 12px; }
 .get-started-latency-row { display: grid; grid-template-columns: 86px minmax(0,1fr) 42px; align-items: center; gap: 9px; }
-.get-started-latency-row > span { color: #9eafc5; font-size: .66rem; }
-.get-started-latency-row > strong { color: #dce8f7; font-size: .66rem; text-align: right; font-variant-numeric: tabular-nums; }
+.get-started-latency-row > span { color: #9eafc5; font-size: max(12px, .8rem); }
+.get-started-latency-row > strong { color: #dce8f7; font-size: max(12px, .8rem); text-align: right; font-variant-numeric: tabular-nums; }
 .get-started-latency-track { height: 8px; overflow: hidden; border-radius: 99px; background: rgba(8,15,27,.85); box-shadow: inset 0 1px 2px rgba(0,0,0,.4); }
 .get-started-latency-track i { display: block; height: 100%; border-radius: 99px; box-shadow: 0 0 12px currentColor; }
 .latency-cyan { width: 26%; color: #22d3ee; background: linear-gradient(90deg,#0891b2,#67e8f9); }
@@ -114,4 +114,21 @@
 .get-started-banner .get-started-primary:hover {
   background: #2f93f5 !important;
   border-color: #2f93f5 !important;
+}
+
+
+/* Minimum readable size for all homepage timing and disclosure labels. */
+.get-started-url-copy span,
+.get-started-node-status span,
+.get-started-latency-title span,
+.get-started-latency-row > span,
+.get-started-latency-row > strong,
+.get-started-banner-note,
+.get-started-visual-caption,
+.workflow-metric-card > small,
+.workflow-metric-main span,
+.workflow-metric-secondary,
+.workflow-report-footnote,
+.workflow-preview-caption {
+  font-size: max(12px, 0.8rem) !important;
 }
