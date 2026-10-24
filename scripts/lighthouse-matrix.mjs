@@ -69,17 +69,27 @@ async function inspectTypography(page) {
       const b = luminance(parseColor(background));
       return a === null || b === null ? null : Number(((Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05)).toFixed(2));
     };
-    const dimColor = root.getPropertyValue('--text-dim').trim();
-    const pageBackground = root.getPropertyValue('--bg').trim();
-    const cardBackground = root.getPropertyValue('--bg-card').trim();
+    const resolveCssColor = (property, kind) => {
+      const probe = document.createElement('span');
+      probe.style[kind] = `var(${property})`;
+      document.body.append(probe);
+      const resolved = getComputedStyle(probe)[kind];
+      probe.remove();
+      return resolved;
+    };
+    const dimColor = resolveCssColor('--text-dim', 'color');
+    const pageBackground = resolveCssColor('--bg', 'backgroundColor');
+    let cardBackground = resolveCssColor('--bg-card', 'backgroundColor');
+    if (!cardBackground || /rgba?\\(\\s*0\\s*,\\s*0\\s*,\\s*0\\s*,\\s*0\\s*\\)/i.test(cardBackground)) {
+      cardBackground = getComputedStyle(document.body).backgroundColor;
+    }
     const textLeaves = [...document.querySelectorAll('body *')].filter(element =>
       element.children.length === 0
       && (element.innerText || element.textContent || '').trim()
       && element.getClientRects().length > 0
     );
     const textBelow12 = textLeaves.filter(element => parseFloat(getComputedStyle(element).fontSize) < 12)
-      .map(element => ({ tag: element.tagName.toLowerCase(), className: String(element.className || '').slice(0, 80), text: (element.innerText || element.textContent || '').trim().slice(0, 80), fontSize: getComputedStyle(element).fontSize }))
-      .slice(0, 20);
+      .map(element => ({ tag: element.tagName.toLowerCase(), className: String(element.className || '').slice(0, 120), text: (element.innerText || element.textContent || '').trim().slice(0, 100), fontSize: getComputedStyle(element).fontSize }));
     const negativeTracking = textLeaves.filter(element => {
       const style = getComputedStyle(element);
       const size = parseFloat(style.fontSize);
@@ -90,7 +100,7 @@ async function inspectTypography(page) {
     const bodyLineHeightRatio = Number((parseFloat(bodyStyle.lineHeight) / parseFloat(bodyStyle.fontSize)).toFixed(2));
     const headingLineHeights = [...document.querySelectorAll('h1, h2, h3, h4')].map(element => {
       const style = getComputedStyle(element);
-      return { tag: element.tagName.toLowerCase(), ratio: Number((parseFloat(style.lineHeight) / parseFloat(style.fontSize)).toFixed(2)), fontSize: style.fontSize };
+      return { tag: element.tagName.toLowerCase(), className: String(element.className || '').slice(0, 120), ratio: Number((parseFloat(style.lineHeight) / parseFloat(style.fontSize)).toFixed(2)), fontSize: style.fontSize, lineHeight: style.lineHeight };
     });
     const dimPageContrast = contrast(dimColor, pageBackground);
     const dimCardContrast = contrast(dimColor, cardBackground);
