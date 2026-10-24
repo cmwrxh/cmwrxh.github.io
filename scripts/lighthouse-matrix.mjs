@@ -46,15 +46,20 @@ async function inspectTypography(page) {
       && fontResources.length > 0;
 
     const root = getComputedStyle(document.documentElement);
-    const parseColor = value => {
+    const parseColor = (value, underlay = null) => {
       const text = String(value || '').trim();
       const hex = text.match(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i);
       if (hex) {
         const raw = hex[1].length === 3 ? [...hex[1]].map(ch => ch + ch).join('') : hex[1];
         return [0, 2, 4].map(index => parseInt(raw.slice(index, index + 2), 16));
       }
-      const rgb = text.match(/^rgba?\(\s*(\d+(?:\.\d+)?)\s*(?:,|\s)\s*(\d+(?:\.\d+)?)\s*(?:,|\s)\s*(\d+(?:\.\d+)?)/i);
-      return rgb ? [Number(rgb[1]), Number(rgb[2]), Number(rgb[3])] : null;
+      const rgb = text.match(/^rgba?\(\s*(\d+(?:\.\d+)?)\s*(?:,|\s)\s*(\d+(?:\.\d+)?)\s*(?:,|\s)\s*(\d+(?:\.\d+)?)(?:\s*[,/]\s*(\d*\.?\d+))?\s*\)$/i);
+      if (!rgb) return null;
+      const channels = [Number(rgb[1]), Number(rgb[2]), Number(rgb[3])];
+      const alpha = rgb[4] === undefined ? 1 : Number(rgb[4]);
+      return alpha < 1 && underlay
+        ? channels.map((channel, index) => channel * alpha + underlay[index] * (1 - alpha))
+        : channels;
     };
     const luminance = rgb => {
       if (!rgb) return null;
@@ -65,8 +70,9 @@ async function inspectTypography(page) {
       return 0.2126 * channels[0] + 0.7152 * channels[1] + 0.0722 * channels[2];
     };
     const contrast = (foreground, background) => {
-      const a = luminance(parseColor(foreground));
-      const b = luminance(parseColor(background));
+      const base = parseColor(resolveCssColor('--bg', 'backgroundColor')) || [10, 10, 13];
+      const a = luminance(parseColor(foreground, base));
+      const b = luminance(parseColor(background, base));
       return a === null || b === null ? null : Number(((Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05)).toFixed(2));
     };
     const resolveCssColor = (property, kind) => {
@@ -80,10 +86,35 @@ async function inspectTypography(page) {
     const dimColor = resolveCssColor('--text-dim', 'color');
     const pageBackground = resolveCssColor('--bg', 'backgroundColor');
     const rawCardBackground = root.getPropertyValue('--bg-card').trim().toLowerCase();
-    const cardSurface = document.querySelector('.plan-card, .sample-card, .card, .terminal, .login-card, .faq-item, .visibility-report-chart, .visibility-report-panel, .get-started-url-row, .table-wrapper');
-    const renderedCardBackground = cardSurface ? getComputedStyle(cardSurface).backgroundColor : '';
-    let cardBackground = renderedCardBackground && renderedCardBackground !== 'rgba(0, 0, 0, 0)'
-      ? renderedCardBackground
+    const cardSurfaceSelector = '.plan-card, .sample-card, .card, .terminal, .login-card, .faq-item, .about-signal, .trust-card, .visibility-report-chart, .visibility-report-panel, .get-started-url-row, .table-wrapper';
+    const cardSurfaces = [...document.querySelectorAll(cardSurfaceSelector)].filter(element => element.getClientRects().length > 0);
+    const backgroundColorsFor = element => {
+      const style = getComputedStyle(element);
+      const base = parseColor(resolveCssColor('--bg', 'backgroundColor')) || [10, 10, 13];
+      const colors = [];
+      if (style.backgroundImage && style.backgroundImage !== 'none') {
+        const stops = [...style.backgroundImage.matchAll(/rgba?\([^)]+\)|#[0-9a-f]{3,8}/gi)].map(match => match[0]);
+        for (const stop of stops) {
+          const color = parseColor(stop, base);
+          if (color) colors.push({ color: stop, rgb: color });
+        }
+      }
+      const background = parseColor(style.backgroundColor, base);
+      if (background) colors.push({ color: style.backgroundColor, rgb: background });
+      return colors;
+    };
+    const cardBackgroundMeasurements = cardSurfaces.map(element => ({
+      selector: describeSelector(element),
+      backgroundColor: getComputedStyle(element).backgroundColor,
+      backgroundImage: getComputedStyle(element).backgroundImage,
+      ratios: backgroundColorsFor(element).map(item => contrast(dimColor, item.color)).filter(value => value !== null)
+    }));
+    const unmeasurableCardBackgrounds = cardBackgroundMeasurements
+      .filter(item => item.ratios.length === 0)
+      .map(item => item.selector);
+    const measuredCardRatios = cardBackgroundMeasurements.flatMap(item => item.ratios);
+    const cardBackground = cardSurfaces.length
+      ? getComputedStyle(cardSurfaces[0]).backgroundColor
       : resolveCssColor('--bg-card', 'backgroundColor');
     if (!cardBackground || cardBackground === 'rgba(0, 0, 0, 0)') {
       // Transparent card tokens inherit the real page surface; unresolved non-transparent tokens fail closed.
@@ -129,12 +160,16 @@ async function inspectTypography(page) {
       return { selector: describeSelector(element), tag: element.tagName.toLowerCase(), className: String(element.className || '').slice(0, 120), ratio: Number((parseFloat(style.lineHeight) / parseFloat(style.fontSize)).toFixed(2)), fontSize: style.fontSize, lineHeight: style.lineHeight };
     });
     const dimPageContrast = contrast(dimColor, pageBackground);
-    const dimCardContrast = contrast(dimColor, cardBackground);
+    const dimCardContrast = measuredCardRatios.length
+      ? Math.min(...measuredCardRatios)
+      : contrast(dimColor, cardBackground);
     const designGuardrails = {
       dimColor,
       dimPageContrast,
       dimCardContrast,
-      contrastPassed: dimPageContrast !== null && dimCardContrast !== null && dimPageContrast >= 4.5 && dimCardContrast >= 4.5,
+      contrastPassed: dimPageContrast !== null && dimCardContrast !== null && dimPageContrast >= 4.5 && dimCardContrast >= 4.5 && unmeasurableCardBackgrounds.length === 0,
+      cardBackgroundMeasurements,
+      unmeasurableCardBackgrounds,
       bodyLineHeightRatio,
       bodyLineHeightPassed: bodyLineHeightRatio >= 1.6 && bodyLineHeightRatio <= 1.7,
       headingLineHeights,
@@ -323,7 +358,7 @@ if (designFailures.length) {
     const g = check.designGuardrails;
     const context = `${check.page} @ ${check.viewport}px`;
     if (!g.contrastPassed) {
-      console.error(`- ${context}: dim text contrast failed (color ${g.dimColor}, page ${g.dimPageContrast}, card ${g.dimCardContrast})`);
+      console.error(`- ${context}: dim text contrast failed (color ${g.dimColor}, page ${g.dimPageContrast}, minimum measured card ${g.dimCardContrast}); unmeasurable card elements: ${g.unmeasurableCardBackgrounds.join(', ') || 'none'}`);
     }
     if (!g.bodyLineHeightPassed) {
       console.error(`- ${context}: body line-height ratio ${g.bodyLineHeightRatio}; expected 1.60–1.70`);
