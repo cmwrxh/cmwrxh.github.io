@@ -234,9 +234,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, [role="tabpanel"]:fo
 /* Lower-page repair pass only. The homepage hero/header rules above are intentionally untouched. */
 .legacy-homepage-sections .clean-list.audit-scope-list li strong,
 .clean-list.audit-scope-list li strong { color:#f1f6fc !important; }
-.faq-section .faq-answer { max-height:none !important; height:auto !important; overflow:visible !important; }
-.faq-section .faq-item[aria-expanded="true"] .faq-answer,
-.faq-section .faq-item.is-open .faq-answer { max-height:none !important; }
+.faq-section .faq-item.open .faq-answer { max-height: none; }
 .visibility-feature-icon:empty,
 .visibility-feature-icon:not(:has(svg)):not(:has(i)) { display:none !important; }
 .al-site-footer .al-wrap,
