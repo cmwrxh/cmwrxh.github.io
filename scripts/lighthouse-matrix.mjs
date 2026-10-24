@@ -53,7 +53,7 @@ async function inspectTypography(page) {
         const raw = hex[1].length === 3 ? [...hex[1]].map(ch => ch + ch).join('') : hex[1];
         return [0, 2, 4].map(index => parseInt(raw.slice(index, index + 2), 16));
       }
-      const rgb = text.match(/^rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/i);
+      const rgb = text.match(/^rgba?\(\s*(\d+(?:\.\d+)?)\s*(?:,|\s)\s*(\d+(?:\.\d+)?)\s*(?:,|\s)\s*(\d+(?:\.\d+)?)/i);
       return rgb ? [Number(rgb[1]), Number(rgb[2]), Number(rgb[3])] : null;
     };
     const luminance = rgb => {
@@ -80,7 +80,11 @@ async function inspectTypography(page) {
     const dimColor = resolveCssColor('--text-dim', 'color');
     const pageBackground = resolveCssColor('--bg', 'backgroundColor');
     const rawCardBackground = root.getPropertyValue('--bg-card').trim().toLowerCase();
-    let cardBackground = resolveCssColor('--bg-card', 'backgroundColor');
+    const cardSurface = document.querySelector('.plan-card, .sample-card, .card, .terminal, .login-card, .faq-item, .visibility-report-chart, .visibility-report-panel, .get-started-url-row, .table-wrapper');
+    const renderedCardBackground = cardSurface ? getComputedStyle(cardSurface).backgroundColor : '';
+    let cardBackground = renderedCardBackground && renderedCardBackground !== 'rgba(0, 0, 0, 0)'
+      ? renderedCardBackground
+      : resolveCssColor('--bg-card', 'backgroundColor');
     if (!cardBackground || cardBackground === 'rgba(0, 0, 0, 0)') {
       // Transparent card tokens inherit the real page surface; unresolved non-transparent tokens fail closed.
       cardBackground = rawCardBackground === 'transparent'
@@ -134,7 +138,10 @@ async function inspectTypography(page) {
       bodyLineHeightRatio,
       bodyLineHeightPassed: bodyLineHeightRatio >= 1.6 && bodyLineHeightRatio <= 1.7,
       headingLineHeights,
-      headingLineHeightsPassed: headingLineHeights.length > 0 && headingLineHeights.every(item => item.ratio >= 1.2 && item.ratio <= 1.3),
+      headingLineHeightsPassed: headingLineHeights.length > 0 && headingLineHeights.every(item => {
+        const size = parseFloat(item.fontSize);
+        return size > 32 ? item.ratio >= 1.1 && item.ratio <= 1.2 : item.ratio >= 1.2 && item.ratio <= 1.3;
+      }),
       textBelow12,
       negativeTracking,
       textSizePassed: textBelow12.length === 0,
@@ -321,8 +328,13 @@ if (designFailures.length) {
     if (!g.bodyLineHeightPassed) {
       console.error(`- ${context}: body line-height ratio ${g.bodyLineHeightRatio}; expected 1.60–1.70`);
     }
-    for (const item of g.headingLineHeights.filter(item => item.ratio < 1.2 || item.ratio > 1.3)) {
-      console.error(`- ${context}: ${item.selector} line-height ${item.lineHeight} / font-size ${item.fontSize} = ${item.ratio}; expected 1.20–1.30`);
+    for (const item of g.headingLineHeights.filter(item => {
+      const size = parseFloat(item.fontSize);
+      return size > 32 ? item.ratio < 1.1 || item.ratio > 1.2 : item.ratio < 1.2 || item.ratio > 1.3;
+    })) {
+      const size = parseFloat(item.fontSize);
+      const expected = size > 32 ? '1.10–1.20 for headings above 32px' : '1.20–1.30 for headings at or below 32px';
+      console.error(`- ${context}: ${item.selector} line-height ${item.lineHeight} / font-size ${item.fontSize} = ${item.ratio}; expected ${expected}`);
     }
     for (const item of g.textBelow12) {
       console.error(`- ${context}: ${item.selector} font-size ${item.fontSize}; text="${item.text.replace(/\\s+/g, ' ').slice(0, 70)}"`);
