@@ -619,3 +619,31 @@ html body h1, html body h2, html body h3, html body h4 { line-height: 1.2 !impor
 
 /* Principle index numbers are visible labels, not decorative microcopy. */
 .principle > span { font-size: max(12px, 0.8rem) !important; }
+
+
+/* Phase 2 Item 1: primary actions meet WCAG AA contrast on dark surfaces. */
+html body .btn-primary,
+html body button.btn-primary,
+html body a.btn-primary,
+html body .btn.btn-primary,
+html body .al-primary-cta,
+html body .get-started-primary,
+html body .al-mobile-cta,
+html body .al-login,
+html body .visibility-report-cta {
+  background-color: #1769c9 !important;
+  border-color: #1769c9 !important;
+  color: #fff !important;
+}
+html body .btn-primary:hover,
+html body button.btn-primary:hover,
+html body a.btn-primary:hover,
+html body .btn.btn-primary:hover,
+html body .al-primary-cta:hover,
+html body .get-started-primary:hover,
+html body .al-mobile-cta:hover,
+html body .al-login:hover,
+html body .visibility-report-cta:hover {
+  background-color: #135cb0 !important;
+  border-color: #135cb0 !important;
+}
