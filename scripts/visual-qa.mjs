@@ -37,14 +37,14 @@ for (const route of pages) {
         const whiteSurfaces = [...document.querySelectorAll('body *')].filter(el => {
           const r=el.getBoundingClientRect(), s=getComputedStyle(el);
           if(r.width<200||r.height<60||s.display==='none'||s.visibility==='hidden'||Number(s.opacity)===0) return false;
-          const bg=s.backgroundColor.match(/[\\d.]+/g);
+          const bg=s.backgroundColor.match(/[\d.]+/g);
           return bg && bg.length>=3 && bg.slice(0,3).map(Number).every(v=>v>=245) && s.backgroundImage==='none';
         }).map(el=>({tag:el.tagName.toLowerCase(),className:typeof el.className==='string'?el.className:'',width:Math.round(el.getBoundingClientRect().width),height:Math.round(el.getBoundingClientRect().height)}));
         const headers = document.querySelectorAll('[data-site-header], header.al-site-header').length;
         const bodyBg = getComputedStyle(document.body).backgroundColor;
         const effectiveBg = bodyBg === 'rgba(0, 0, 0, 0)' ? '#ffffff' : bodyBg;
         const bgChannels = effectiveBg.match(/[\d.]+/g);
-        const whiteSurface = !['/compare','/cases'].includes(routePath) || Boolean(bgChannels && bgChannels.slice(0,3).map(Number).every(v => v >= 200));
+        const whiteSurface = !['/compare','/cases'].includes(routePath) || !Boolean(bgChannels && bgChannels.slice(0,3).map(Number).every(v => v >= 200));
         const toggles = document.querySelectorAll('.al-menu-toggle,.al-mobile-toggle').length;
         const horizontal = document.documentElement.scrollWidth > window.innerWidth + 1;
         const overflowNodes = horizontal ? [...document.querySelectorAll('body *')].map(el=>{const r=el.getBoundingClientRect(),s=getComputedStyle(el);return {tag:el.tagName.toLowerCase(),id:el.id||'',className:typeof el.className==='string'?el.className:'',left:Math.round(r.left),right:Math.round(r.right),width:Math.round(r.width),position:s.position,overflowX:s.overflowX};}).filter(x=>x.right>window.innerWidth+1||x.left< -1).filter(x=>x.tag!=='script'&&x.tag!=='style').sort((a,b)=>b.right-a.right).slice(0,12):[];
@@ -61,7 +61,7 @@ for (const route of pages) {
           return r.width>0 && r.height>0 && s.visibility!=='hidden' && s.display!=='none';
         }).map(el => {
           const s=getComputedStyle(el), own=s.backgroundColor;
-          const rgba=(value)=>{const v=value.match(/[\\d.]+/g);return v&&v.length>=3?{r:Number(v[0]),g:Number(v[1]),b:Number(v[2]),a:v.length>3?Number(v[3]):1}:null;};
+          const rgba=(value)=>{const v=value.match(/[\d.]+/g);return v&&v.length>=3?{r:Number(v[0]),g:Number(v[1]),b:Number(v[2]),a:v.length>3?Number(v[3]):1}:null;};
           const blend=(front,back)=>{const a=front.a+(back.a||1)*(1-front.a);return {r:Math.round((front.r*front.a+back.r*(back.a||1)*(1-front.a))/a),g:Math.round((front.g*front.a+back.g*(back.a||1)*(1-front.a))/a),b:Math.round((front.b*front.a+back.b*(back.a||1)*(1-front.a))/a),a};};
           const ownRgb=rgba(own);
           if(!ownRgb || ownRgb.a===0) return null;
@@ -94,7 +94,7 @@ for (const route of pages) {
       }));
       const contrastIssues = metrics.buttons.filter(b => {const ratio=contrastRatio(b.fg,b.bg);return ratio!==null&&ratio<4.5;}).map(b=>({...b,ratio:Number(contrastRatio(b.fg,b.bg).toFixed(2))}));
       const row = {page:route,width,status,headerCount:metrics.headers,hamburgerCount:metrics.toggles,horizontalScroll:metrics.horizontal,overflowNodes:metrics.overflowNodes,cookieBounds:metrics.cookieBounds,preOverflow:metrics.preOverflow,sampleCardIssues:metrics.sampleCardIssues,dotCanvasIssues:metrics.dotCanvasIssues,textCoveredByDot:metrics.textCoveredByDot,whiteSurface:metrics.whiteSurface,whiteSurfaces:metrics.whiteSurfaces,consoleErrors:errors,environmentWarnings,linkFailures:linkResults.filter(x=>!x.ok),contrastTargets:metrics.buttons.length,contrastIssues};
-      row.ok = status>=200&&status<400&&row.headerCount===1&&row.hamburgerCount===1&&!row.horizontalScroll&&row.cookieBounds&&!row.preOverflow.length&&!row.sampleCardIssues.length&&!row.dotCanvasIssues.length&&!row.textCoveredByDot&&row.whiteSurface&&!row.whiteSurfaces.length&&!errors.length&&!row.linkFailures.length&&!row.contrastIssues.length;
+      row.ok = status>=200&&status<400&&row.headerCount===1&&row.hamburgerCount===1&&!row.horizontalScroll&&row.cookieBounds&&!row.preOverflow.length&&!row.sampleCardIssues.length&&!row.dotCanvasIssues.length&&!row.textCoveredByDot&&row.whiteSurface&&!row.whiteSurfaces.length&&!errors.length&&!row.linkFailures.length&&row.contrastTargets>0&&!row.contrastIssues.length;
       results.push(row);
       await page.close();
     } catch(e) {
