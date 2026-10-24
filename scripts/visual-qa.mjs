@@ -118,7 +118,7 @@ const contrastRows = results.filter(r => contrastRoutes.has(r.page) && contrastW
 const contrastMarkdown = [
   '| Route | Viewport | Visible buttons/links checked | Failures below 4.5:1 | Result |',
   '|---|---:|---:|---:|---|',
-  ...contrastRows.map(r => '| '+(r.page==='home'?'/':r.page==='why-africa-latency'?'/why-africa-latency':r.page==='locations'?'/locations':r.page==='compare'?'/compare':r.page==='cases'?'/cases':r.page==='about'?'/about':r.page==='tools'?'/tools':'/'+r.page)+' | '+r.width+'px | '+(r.contrastTargets??'-')+' | '+(r.contrastIssues?.length??'-')+' | '+(r.contrastIssues?.length===0?'PASS':'FAIL')+' |')
+  ...contrastRows.map(r => '| '+(r.page)+' | '+r.width+'px | '+(r.contrastTargets??'-')+' | '+(r.contrastIssues?.length??'-')+' | '+(r.contrastIssues?.length===0?'PASS':'FAIL')+' |')
 ];
 fs.writeFileSync(path.join(outDir,'all-buttons-contrast.md'),contrastMarkdown.join('\\n'));
 console.log('Requested all-buttons contrast matrix:');
