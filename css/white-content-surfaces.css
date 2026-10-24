@@ -20,3 +20,6 @@ body.white-surface-page .al-site-footer{background:#111214!important;color:#e8eb
 /* Keep wide comparison data inside its own scroll container on small screens. */
 body.white-surface-page .table-wrap{max-width:100%;overflow-x:auto;box-sizing:border-box}
 body.white-surface-page .comparison-table{min-width:489px}
+
+/* Keep primary action text at WCAG AA contrast on light-surface pages. */
+body.white-surface-page main .btn-primary{background:#075985!important;border-color:#075985!important;color:#fff!important}
