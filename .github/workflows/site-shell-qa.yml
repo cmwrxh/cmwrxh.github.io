@@ -28,6 +28,8 @@ jobs:
         run: node scripts/visual-qa.mjs
       - name: Run Lighthouse desktop audits
         run: |
+          export CHROME_PATH="$(find "$HOME/.cache/ms-playwright" -type f -path '*/chrome-linux64/chrome' -print -quit)"
+          test -n "$CHROME_PATH"
           mkdir -p artifacts/site-shell/lighthouse
           for pair in "home|/" "pricing|/pricing" "locations|/locations" "why-africa-latency|/why-africa-latency"; do
             name="${pair%%|*}"
