@@ -25,7 +25,7 @@
 .telemetry-payload-section { margin:0 0 1.5rem; padding:1.25rem; border:1px solid #263548; border-radius:8px; background:#0A0E17; color:#A0AEC0; }
 .telemetry-payload-section h2 { color:#fff; margin:.4rem 0 .7rem; font-size:1.4rem; }
 .telemetry-payload-section p { color:#A0AEC0; line-height:1.65; }
-.telemetry-payload-toolbar { display:flex; justify-content:space-between; gap:1rem; padding:.65rem .8rem; background:#111c2b; color:#94a3b8; font: .72rem/1.4 ui-monospace,SFMono-Regular,Menlo,monospace; border:1px solid #263548; border-bottom:0; }
-.telemetry-payload { overflow:auto; margin:0; padding:1rem; border:1px solid #263548; background:#080C17; color:#8ecdf5; font: .8rem/1.7 ui-monospace,SFMono-Regular,Menlo,monospace; white-space:pre; }
+.telemetry-payload-toolbar { display:flex; justify-content:space-between; gap:1rem; padding:.65rem .8rem; background:#111c2b; color:#94a3b8; font: max(12px, .8rem)/1.4 ui-monospace,SFMono-Regular,Menlo,monospace; border:1px solid #263548; border-bottom:0; }
+ .telemetry-payload { overflow:auto; margin:0; padding:1rem; border:1px solid #263548; background:#080C17; color:#8ecdf5; font: .8rem/1.7 ui-monospace,SFMono-Regular,Menlo,monospace; white-space:pre; }
 .telemetry-payload-section .sample-footnote { color:#94a3b8; }
 @media(max-width:600px){.developer-preview-heading{display:block}.developer-preview-note{display:block;margin-top:.35rem;text-align:left}.developer-code-toolbar{gap:.35rem;padding:.4rem}.developer-code-tab,.developer-copy-button{padding:.4rem}.developer-code-block{padding:.75rem;font-size:.7rem}.telemetry-payload-section{padding:.85rem}.telemetry-payload{font-size:.72rem;padding:.75rem}.telemetry-payload-toolbar{font-size:.65rem}}
