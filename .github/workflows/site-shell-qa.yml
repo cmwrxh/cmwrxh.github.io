@@ -1,0 +1,36 @@
+name: Site shell and responsive QA
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [fix/sitewide-header-and-pages]
+permissions:
+  contents: read
+jobs:
+  shell-and-visual-qa:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Verify static shell is synchronized
+        run: node scripts/sync-site-shell.mjs --check
+      - name: Install browser QA dependencies
+        run: npm install --no-save playwright http-server
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Start local marketing site
+        run: |
+          npx http-server . -p 4173 -c-1 > /tmp/site.log 2>&1 &
+          for i in $(seq 1 30); do curl -fsS http://127.0.0.1:4173/ >/dev/null && break; sleep 1; done
+      - name: Capture screenshots and assert responsive quality
+        run: node scripts/visual-qa.mjs
+      - name: Upload screenshots and QA table
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: africalatency-site-shell-qa
+          path: artifacts/site-shell/
+          if-no-files-found: warn
+          retention-days: 14
