@@ -1,3 +1,6 @@
+import crypto from 'node:crypto';
+import { readGuestProof, issueGuestProof, guestProofHash, newGuestProofNonce } from '../lib/guest-scan-proof.js';
+
 const INTERNAL_TOKEN = process.env.SCAN_INTERNAL_TOKEN;
 
 function workerUrl() {
@@ -52,6 +55,18 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
   const body = req.body || {};
+  const userToken = String(req.headers.authorization || '').replace(/^Bearer\\s+/i, '').trim();
+  const guestProof = readGuestProof(req);
+  if (!userToken && guestProof) {
+    return res.status(429).json({
+      code: 'guest_scan_used',
+      error: 'Your free scan is used. Create a free account to keep testing, save this report and compare changes.',
+      reportId: guestProof.reportId
+    });
+  }
+  if (!userToken && !process.env.GUEST_SCAN_COOKIE_SECRET) {
+    return res.status(503).json({ error: 'Guest scan proof is not configured yet. Please sign in to continue.' });
+  }
   const url = normalizedInput(body.url);
   if (!url || url.length > 2048) return res.status(400).json({ error: 'Enter a valid public website URL.' });
   let parsed;
@@ -70,6 +85,21 @@ export default async function handler(req, res) {
     verified = await turnstileOk(body.turnstileToken, ip);
     if (!verified) return res.status(403).json({ error: process.env.TURNSTILE_SITE_KEY ? 'Please complete the bot verification and try again.' : 'Anonymous scanning is not configured yet. Please sign in or try again later.' });
   }
-  const result = await sendToWorker('/internal/jobs', req, { url: parsed.toString(), device, turnstileVerified: verified });
+  const guestNonce = !userToken ? newGuestProofNonce() : null;
+  const result = await sendToWorker('/internal/jobs', req, {
+    url: parsed.toString(), device, turnstileVerified: verified,
+    ...(guestNonce ? { guestProofHash: guestProofHash(guestNonce), firstGuestScan: true } : {})
+  });
+  if (!userToken && result.status === 202 && result.payload?.guestProofStored === true && result.payload?.reportId) {
+    try {
+      const proof = issueGuestProof(result.payload.reportId, guestNonce);
+      res.setHeader('Set-Cookie', proof.setCookie);
+    } catch {
+      return res.status(503).json({ error: 'Guest scan proof could not be issued. Please sign in and try again.' });
+    }
+  }
+  if (result.payload && Object.prototype.hasOwnProperty.call(result.payload, 'guestProofStored')) {
+    delete result.payload.guestProofStored;
+  }
   return res.status(result.status).json(result.payload);
 }
