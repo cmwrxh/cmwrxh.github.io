@@ -64,3 +64,7 @@ body:not(.home-page) .al-mobile-menu.is-open:not([hidden]){display:flex!importan
 @media(max-width:960px){.al-footer-inner{grid-template-columns:repeat(2,minmax(0,1fr));gap:30px}}
 @media(max-width:720px){.al-footer-inner{grid-template-columns:1fr 1fr;gap:28px 20px}.al-footer-brand{grid-column:1/-1}.al-footer-bottom{flex-direction:column}}
 @media(max-width:520px){.al-footer-inner{grid-template-columns:1fr}.al-footer-brand{grid-column:auto}.al-footer-bottom nav{gap:12px}}
+/* Consistent, high-contrast navigation calls to action. */
+.al-site-header .al-try,.al-site-header a.al-try,.al-site-header .al-mobile-menu .al-try{background:#075985!important;color:#fff!important;border:1px solid #075985!important}
+.al-site-header .al-login{color:#fff!important}
+.al-site-header .al-try:focus-visible,.al-site-header .al-login:focus-visible{outline:3px solid #93c5fd;outline-offset:3px}

@@ -119,3 +119,9 @@
   .report-row-action { display: flex; justify-content: flex-start; }
   .report-search { width: 100%; }
 }
+
+/* Item 1: report toolbar contrast and safe URL wrapping. */
+.rd-button{background:#075985!important;color:#fff!important;border-color:#075985!important}
+.rd-button.secondary{background:#eaf2ff!important;color:#12356f!important;border-color:#b8c9df!important}
+.rd-button:focus-visible{outline:3px solid #075985;outline-offset:3px}
+#rd-url{overflow-wrap:anywhere;word-break:normal}

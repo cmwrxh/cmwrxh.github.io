@@ -29,7 +29,7 @@
     '/login.html': ['Log In | AfricaLatency', 'Log in to your AfricaLatency account to access performance data, reports, scans, and available infrastructure intelligence for your monitored services.'],
     '/methodology.html': ['Methodology | How AfricaLatency Measures Performance', 'See how AfricaLatency measures latency and digital performance across African locations, networks, routing paths, infrastructure, applications, and dependencies.'],
     '/nigeria.html': ['Nigeria Digital Performance | AfricaLatency', 'Understand website, API, network, and infrastructure performance for users and services operating across Nigeria.'],
-    '/privacy-policy.html': ['Privacy Policy | AfricaLatency', 'Read the AfricaLatency Privacy Policy covering data collection, diagnostic data, analytics, cookies, third-party services, user rights, retention, and privacy.'],
+    '/privacy-policy': ['Privacy Policy | AfricaLatency', 'Read the AfricaLatency Privacy Policy covering data collection, diagnostic data, analytics, cookies, third-party services, user rights, retention, and privacy.'],
     '/refund-policy.html': ['Refund Policy | AfricaLatency', 'Read the AfricaLatency Refund Policy covering eligibility, service fees, cancellations, refunds, and how to contact support about a billing issue or request.'],
     '/scan.html': ['Free Latency Scan | AfricaLatency', 'Run a free AfricaLatency scan to measure website or API response performance and see how your service performs from key African locations and networks.'],
     '/service-level-agreement.html': ['Service Level Agreement | AfricaLatency', 'Review the AfricaLatency Service Level Agreement covering service availability, support commitments, measurement scope, exclusions, and service remedies.'],
@@ -184,7 +184,7 @@
     banner.setAttribute('role', 'dialog');
     banner.setAttribute('aria-label', 'Analytics consent');
     banner.innerHTML = `
-      <p>We use privacy-friendly analytics to understand how visitors use AfricaLatency.dev. Analytics is optional and will only load after you choose <strong>Accept analytics</strong>. Read our <a href="/privacy-policy.html">Privacy Policy</a>.</p>
+      <p>We use privacy-friendly analytics to understand how visitors use AfricaLatency.dev. Analytics is optional and will only load after you choose <strong>Accept analytics</strong>. Read our <a href="/privacy-policy">Privacy Policy</a>.</p>
       <div class="al-cookie-actions">
         <button type="button" class="btn btn-primary" id="al-consent-accept">Accept analytics</button>
         <button type="button" class="btn btn-secondary" id="al-consent-reject">Reject analytics</button>
@@ -205,9 +205,9 @@
   function addFooterCompliance() {
     document.querySelectorAll('footer').forEach(function (footer) {
       var links = footer.querySelector('.footer-links');
-      if (links && !links.querySelector('a[href="/privacy-policy.html"]')) {
+      if (links && !links.querySelector('a[href="/privacy-policy"]')) {
         var privacy = document.createElement('a');
-        privacy.href = '/privacy-policy.html';
+        privacy.href = '/privacy-policy';
         privacy.textContent = 'Privacy Policy';
         links.appendChild(privacy);
       }

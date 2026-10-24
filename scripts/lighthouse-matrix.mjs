@@ -255,6 +255,28 @@ try {
     }
   }
 
+  // Extra Item 1 review captures requested by the owner. These are screenshot-only and
+  // do not change the existing six-page Lighthouse score matrix.
+  for (const [version, base] of Object.entries(roots)) {
+    for (const route of [
+      { name: 'tools', path: '/tools.html' },
+      { name: 'report', path: '/report.html' }
+    ]) {
+      const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+      try {
+        await page.goto(base + route.path, { waitUntil: 'domcontentloaded', timeout: 45000 });
+        await page.evaluate(async () => { await Promise.race([document.fonts.ready, new Promise(resolve => setTimeout(resolve, 5000))]); });
+        await page.screenshot({
+          path: resolve(artifacts, 'screenshots', `${version}-${route.name}-390.png`),
+          fullPage: true,
+          animations: 'disabled'
+        });
+      } finally {
+        await page.close();
+      }
+    }
+  }
+
   // The normal /dashboard route above remains a logged-out test. This extra capture
   // disables JavaScript only to inspect dashboard.html's own typography before its auth redirect.
   for (const viewport of viewports) {
