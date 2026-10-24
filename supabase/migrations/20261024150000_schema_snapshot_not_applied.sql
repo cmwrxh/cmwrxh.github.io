@@ -8,12 +8,9 @@
 begin;
 
 -- Enum dependency observed on calculator_leads.status.
-DO $$ BEGIN
-  CREATE TYPE public.lead_status_enum AS ENUM ('new');
-EXCEPTION WHEN duplicate_object THEN NULL;
-END $$;
--- NOTE: The live enum's complete label set was not exported in this snapshot.
--- This declaration is only a safe placeholder and must be reconciled before use.
+-- The complete live labels for public.lead_status_enum were not exported.
+-- This snapshot intentionally does not create or alter that type; it must
+-- already exist with the live label set before this file could be replayed.
 
 CREATE TABLE IF NOT EXISTS public.website_speed_checks (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
