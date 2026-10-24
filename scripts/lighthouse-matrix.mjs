@@ -57,7 +57,7 @@ try {
         let finalUrl = requestedUrl;
         try {
           await page.goto(requestedUrl, { waitUntil: 'domcontentloaded', timeout: 45000 });
-          await page.evaluate(async () => { await document.fonts.ready; });
+          await page.evaluate(async () => { await Promise.race([document.fonts.ready, new Promise(resolve => setTimeout(resolve, 5000))]); });
           await page.waitForTimeout(150);
           finalUrl = page.url();
           const typography = await inspectTypography(page);
@@ -124,7 +124,7 @@ try {
     let finalUrl = roots.pr + '/dashboard.html';
     try {
       await page.goto(finalUrl, { waitUntil: 'domcontentloaded', timeout: 45000 });
-      await page.evaluate(async () => { await document.fonts.ready; });
+      await page.evaluate(async () => { await Promise.race([document.fonts.ready, new Promise(resolve => setTimeout(resolve, 5000))]); });
       const typography = await inspectTypography(page);
       await page.screenshot({
         path: resolve(artifacts, 'screenshots', `pr-dashboard-document-font-check-${viewport.width}.png`),
