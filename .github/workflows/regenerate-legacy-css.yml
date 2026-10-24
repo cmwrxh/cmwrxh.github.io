@@ -9,10 +9,10 @@ on:
       - 'scripts/build-legacy-home-css.mjs'
       - '.github/workflows/regenerate-legacy-css.yml'
   pull_request:
-    branches: [main]
+    branches: [main, 'design/typography-**']
     paths:
       - 'css/**'
-      - 'index.html'
+      - '**.html'
       - 'scripts/build-legacy-home-css.mjs'
       - 'scripts/report-lighthouse-audits.mjs'
       - 'scripts/ci-static-preview.mjs'
@@ -68,6 +68,8 @@ jobs:
           cp css/legacy-home.css /tmp/legacy-home.css
           node scripts/build-legacy-home-css.mjs
           cmp /tmp/legacy-home.css css/legacy-home.css
+      - name: Check Lighthouse matrix script syntax
+        run: node --check scripts/lighthouse-matrix.mjs
 
   lighthouse:
     if: github.event_name == 'pull_request'
@@ -77,11 +79,11 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.head.sha }}
-      - name: Check out main baseline
+      - name: Check out PR base baseline
         uses: actions/checkout@v4
         with:
-          ref: main
-          path: main-reference
+          ref: ${{ github.event.pull_request.base.sha }}
+          path: base-reference
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -89,22 +91,22 @@ jobs:
         run: |
           npm install --no-save playwright lighthouse
           npx playwright install --with-deps chromium
-      - name: Start main and PR static previews on the same runner
+      - name: Start PR base and PR static previews on the same runner
         run: |
-          node scripts/ci-static-preview.mjs main-reference 4174 >/tmp/main-preview.log 2>&1 &
-          echo $! >/tmp/main-preview.pid
+          node scripts/ci-static-preview.mjs base-reference 4174 >/tmp/base-preview.log 2>&1 &
+          echo $! >/tmp/base-preview.pid
           node scripts/ci-static-preview.mjs . 4173 >/tmp/pr-preview.log 2>&1 &
           echo $! >/tmp/pr-preview.pid
           for attempt in $(seq 1 30); do
             if curl --fail --silent http://127.0.0.1:4174/ >/dev/null && curl --fail --silent http://127.0.0.1:4173/ >/dev/null; then exit 0; fi
             sleep 1
           done
-          cat /tmp/main-preview.log /tmp/pr-preview.log
+          cat /tmp/base-preview.log /tmp/pr-preview.log
           exit 1
       - name: Run six-page Lighthouse matrix and responsive screenshots
         # Keep default Lighthouse categories so the copied reporter does not display unmeasured categories as zero.
         env:
-          MAIN_URL: http://127.0.0.1:4174
+          BASE_URL: http://127.0.0.1:4174
           PR_URL: http://127.0.0.1:4173
         run: node scripts/lighthouse-matrix.mjs
       - name: Summarize homepage Lighthouse audits
@@ -112,7 +114,7 @@ jobs:
       - name: Upload raw Lighthouse JSON/HTML, score comparisons and screenshots
         uses: actions/upload-artifact@v4
         with:
-          name: typography-lighthouse-main-vs-pr
+          name: typography-lighthouse-base-vs-pr
           path: |
             artifacts/lighthouse/**
             artifacts/screenshots/**

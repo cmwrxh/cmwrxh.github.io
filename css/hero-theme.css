@@ -21,7 +21,7 @@ body {
 
 body {
   background-image: none !important;
-  font-family: "Plus Jakarta Sans", Inter, -apple-system, BlinkMacSystemFont, sans-serif !important;
+  font-family: "Plus Jakarta Sans", system-ui, -apple-system, BlinkMacSystemFont, sans-serif !important;
 }
 
 /* Header stays dark; the hero gradient and dots are confined to the hero. */
