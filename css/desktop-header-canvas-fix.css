@@ -433,3 +433,14 @@ nav.site-header .nav-brand .brand-wordmark { filter: brightness(0) invert(1); }
     padding-right: 18px !important;
   }
 }
+
+
+/* Readable labels in the illustrative homepage report. */
+.visibility-report-selected > div > span,
+.visibility-report-chart-top > span,
+.visibility-report-chart-row > span,
+.visibility-report-chart-row > em,
+.visibility-report-kicker,
+.visibility-report-badge {
+  font-size: max(12px, 0.8rem) !important;
+}

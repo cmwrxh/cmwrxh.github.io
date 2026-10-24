@@ -95,7 +95,7 @@ body { font-size: 16px; line-height: 1.7; }
 .terminal-header,
 .editorial-number,
 .signal-top,
-.signal-status { font-size: 0.72rem; line-height: 1.4; }
+.signal-status { font-size: max(12px, 0.8rem); line-height: 1.4; }
 
 @media (min-width: 901px) {
   .hero-title { font-size: clamp(3rem, 4.2vw, 4.6rem) !important; line-height: 1.02 !important; max-width: 12ch; }
@@ -110,6 +110,9 @@ body { font-size: 16px; line-height: 1.7; }
   .section-lead,
   .hero-subtitle { font-size: 1rem; line-height: 1.68; }
 }
+
+/* Typography guardrails: the shared 1.2 heading leading satisfies both size bands. */
+h1, h2, h3, h4 { line-height: 1.2 !important; }
 
 /* Tier 4 color discipline: green is a deliberate brand/performance signal,
    while generic UI chrome stays neutral. */
@@ -326,7 +329,7 @@ main .card .card{background:transparent!important;border:0!important;border-radi
   --border-strong: rgba(255,255,255,.12);
   --text: #FFFFFF;
   --text-muted: #A0AEC0;
-  --text-dim: #A0AEC0;
+  --text-dim: #808792;
   --accent: #38A1E0;
   --blue: #38A1E0;
   --accent-soft: rgba(56,161,224,.10);
@@ -600,3 +603,19 @@ html body a.btn-secondary,html body button.btn-secondary,html body .btn.btn-seco
 html body button.al-test-button,html body button.scan-run,html body #al-consent-accept,html body #al-consent-reject{
   background-color:#075985!important;border-color:#075985!important;color:#fff!important
 }
+
+
+/* Size-aware heading line-height guardrail. 1.2 satisfies both defined size bands. */
+h1, h2, h3, h4 { line-height: 1.2 !important; }
+
+
+/* Final size-aware heading override for page-level selectors. */
+html body h1, html body h2, html body h3, html body h4 { line-height: 1.2 !important; }
+
+
+/* Keep the contrast token consistent across responsive theme overrides. */
+:root { --text-dim: #808792 !important; }
+
+
+/* Principle index numbers are visible labels, not decorative microcopy. */
+.principle > span { font-size: max(12px, 0.8rem) !important; }

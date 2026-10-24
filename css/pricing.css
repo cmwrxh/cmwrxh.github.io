@@ -18,7 +18,7 @@
 .billing-switch-knob{display:block;width:18px;height:18px;border-radius:50%;background:#EAF3FC;transition:transform .18s ease}
 .billing-switch[aria-checked=true]{background:var(--pricing-blue);border-color:var(--pricing-blue)}
 .billing-switch[aria-checked=true] .billing-switch-knob{transform:translateX(20px)}
-.billing-savings{padding:5px 9px;border:1px solid rgba(43,128,197,.4);border-radius:3px;background:rgba(43,128,197,.12);color:#8DC9F5;font-size:.7rem;font-weight:700;white-space:nowrap}
+.billing-savings{padding:5px 9px;border:1px solid rgba(43,128,197,.4);border-radius:3px;background:rgba(43,128,197,.12);color:#8DC9F5;font-size:max(12px, .8rem);font-weight:700;white-space:nowrap}
 .billing-note{margin:14px 0 0;color:#8592A6;font-size:.8rem}
 .pricing-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid var(--pricing-line);border-bottom:1px solid var(--pricing-line)}
 .plan-card{position:relative;display:flex;flex-direction:column;min-width:0;padding:29px 23px 27px;border-left:1px solid var(--pricing-line)}
@@ -37,7 +37,7 @@
 .plan-cta-outline:hover{background:#151E2C;border-color:#718198}
 .plan-cta-primary{border-color:var(--pricing-blue);background:var(--pricing-blue);color:#fff}
 .plan-cta-primary:hover{background:#2472B2;border-color:#2472B2}
-.feature-heading{margin:28px 0 12px;color:#B5C1D2;font-size:.73rem;font-weight:600}
+.feature-heading{margin:28px 0 12px;color:#B5C1D2;font-size:max(12px, .8rem);font-weight:600}
 .plan-features{display:grid;gap:0;margin:0;padding:0;list-style:none}
 .plan-features li{position:relative;padding:11px 0 11px 19px;border-top:1px solid rgba(41,50,65,.75);color:#D0D8E4;font-size:.78rem;line-height:1.5}
 .plan-features li:before{content:"✓";position:absolute;left:0;top:11px;color:#69B8EE;font-size:.78rem}
@@ -88,3 +88,7 @@ main.pricing-main .plan-card a.plan-cta:focus-visible { outline: 2px solid #fff;
 .pricing-cta-band{display:flex;align-items:center;justify-content:space-between;gap:24px;margin:36px 0 18px;padding:30px 32px;border-radius:16px;background:linear-gradient(110deg,#12395a,#15243c 62%,#291b32)}
 .pricing-cta-band h2{max-width:720px}
 @media(max-width:700px){.pricing-enterprise,.pricing-cta-band{align-items:stretch;flex-direction:column;padding:24px 20px}.pricing-faq{grid-template-columns:minmax(0,1fr);padding:22px 16px;gap:18px}.pricing-faq-heading{grid-column:auto}.pricing-enterprise .plan-cta,.pricing-cta-band .plan-cta{width:100%}}
+
+
+/* Pricing metadata stays readable on desktop and mobile. */
+.billing-savings, .feature-heading { font-size: max(12px, 0.8rem) !important; }

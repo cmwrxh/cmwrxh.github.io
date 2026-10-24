@@ -6,7 +6,7 @@
   --border: rgba(148,163,184,.18);
   --border-strong: rgba(148,163,184,.28);
   --text-muted: #a3adbd;
-  --text-dim: #7e899b;
+  --text-dim: #808792;
   --al-canvas: #0a0e17;
   --al-rule: rgba(148,163,184,.18);
 }
@@ -162,14 +162,14 @@ input:focus, select:focus, textarea:focus, .form-input:focus {
   --border: rgba(255,255,255,.08) !important;
   --border-strong: rgba(255,255,255,.12) !important;
   --text: #FFFFFF !important;
-  --text-muted: #A0AEC0 !important;
-  --text-dim: #A0AEC0 !important;
+  --text-muted: #808792 !important;
+  --text-dim: #808792 !important;
   --accent: #38A1E0 !important;
   --blue: #38A1E0 !important;
   --al-canvas: #0A0E17 !important;
   --al-rule: rgba(255,255,255,.08) !important;
 }
-html, body { background: #0A0E17 !important; color: #A0AEC0 !important; }
+html, body { background: #0A0E17 !important; color: #808792 !important; }
 h1, h2, h3, h4, .page-title, .hero-title { color: #FFFFFF !important; }
 input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]),
 select, textarea, .form-input, .contact-form input, .contact-form select,
@@ -192,14 +192,14 @@ select, textarea, .form-input, .contact-form input, .contact-form select,
   --border: rgba(255,255,255,0.08) !important;
   --border-strong: rgba(255,255,255,0.12) !important;
   --text: #FFFFFF !important;
-  --text-muted: #A0AEC0 !important;
-  --text-dim: #A0AEC0 !important;
+  --text-muted: #808792 !important;
+  --text-dim: #808792 !important;
   --accent: #38A1E0 !important;
   --blue: #38A1E0 !important;
   --al-canvas: #0A0E17 !important;
   --al-rule: rgba(255,255,255,0.08) !important;
 }
-html, body { background: #0A0E17 !important; color: #A0AEC0 !important; }
+html, body { background: #0A0E17 !important; color: #808792 !important; }
 h1, h2, h3, h4, .page-title, .hero-title { color: #FFFFFF !important; }
 .city-rotator-word, .hero-africa-title-accent, .hero-title .city-rotator-slot {
   color: #38A1E0 !important;
@@ -243,8 +243,8 @@ input:focus, select:focus, textarea:focus, .form-input:focus {
   --border: rgba(255,255,255,0.08) !important;
   --border-strong: rgba(255,255,255,0.12) !important;
   --text: #FFFFFF !important;
-  --text-muted: #A0AEC0 !important;
-  --text-dim: #A0AEC0 !important;
+  --text-muted: #808792 !important;
+  --text-dim: #808792 !important;
   --accent: #38A1E0 !important;
   --blue: #38A1E0 !important;
   --al-canvas: #0A0E17 !important;
@@ -260,7 +260,7 @@ html, body, main, main > section, .section, .compact-section, .hero-section,
 }
 h1, h2, h3, h4, .page-title, .hero-title { color: #FFFFFF !important; }
 main p, main li, main .section-lead, main .hero-subtitle, main .faq-answer,
-.homepage-footer p, footer p { color: #A0AEC0 !important; }
+.homepage-footer p, footer p { color: #808792 !important; }
 
 /* Single inline city word with stable mobile width and GTmetrix-blue underline. */
 .city-rotator-slot, .hero-africa-title-accent.city-rotator-slot {
@@ -424,7 +424,7 @@ main > section > .container > h2 {
 main > section .section-lead,
 .regional-insight-panel > p {
   max-width: 42rem;
-  color: #A0AEC0 !important;
+  color: #808792 !important;
   font-size: 1rem !important;
   line-height: 1.625 !important;
 }
@@ -449,7 +449,7 @@ main > section .section-lead,
   border-radius: 0 !important;
   background: transparent !important;
   box-shadow: none !important;
-  color: #A0AEC0 !important;
+  color: #808792 !important;
   font-size: 1rem;
   text-decoration: underline;
   text-underline-offset: 3px;
@@ -481,7 +481,7 @@ main h2, main .section-heading h2, main .regional-insight-panel > h2, main .cta-
  margin-bottom: 1rem !important; color: #FFFFFF !important; font-size: clamp(1.875rem, 3.2vw, 2.25rem) !important; font-weight: 700 !important; letter-spacing: -.025em !important; line-height: 1.2 !important;
 }
 main .section-lead, main .section-heading > p, main .hero-subtitle, main .regional-insight-panel > p {
- max-width: 42rem; color: #A0AEC0 !important; font-size: 1rem !important; line-height: 1.65 !important;
+ max-width: 42rem; color: #808792 !important; font-size: 1rem !important; line-height: 1.65 !important;
 }
 .process-cards, .product-grid, .pricing-grid, .audience-grid, .feature-grid, .methodology-grid, .audit-trust, .faq-grid, .service-grid, .infrastructure-trust-grid { gap: 0 !important; }
 .product-grid { display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
@@ -567,3 +567,14 @@ nav { background: #000000 !important; }
 #menu-toggle.menu-toggle::after { content: none !important; display: none !important; }
 #menu-toggle.menu-toggle span { display: block; width: 24px; height: 2px; border-radius: 0; background: #FFFFFF; }
 #menu-toggle.menu-toggle:hover span, #menu-toggle.menu-toggle:focus-visible span { background: #38A1E0; }
+
+
+/* Keep compact headings inside editorial sections within the defined ratio bands. */
+html body main > section h1:not(.guardrail-exempt),
+html body main > section h2:not(.guardrail-exempt),
+html body main > section h3:not(.guardrail-exempt),
+html body main > section h4:not(.guardrail-exempt) { line-height: 1.2 !important; }
+
+
+/* The regional title has an ID-specific legacy rule; retain the same 1.2 ratio. */
+html body #regional-performance-title { line-height: 1.2 !important; }

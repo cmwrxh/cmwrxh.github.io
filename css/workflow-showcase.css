@@ -58,10 +58,10 @@
 .workflow-grade-row { display: flex; align-items: baseline; gap: 7px; color: #4ade80; }
 .workflow-grade { color: #4ade80; font-size: 1.6rem; font-weight: 850; line-height: 1.3; }
 .workflow-grade-row strong { font-size: 1.03rem; }
-.workflow-metric-card > small { display: block; margin-top: 4px; color: #71859e; font-size: .57rem; line-height: 1.45; }
+.workflow-metric-card > small { display: block; margin-top: 4px; color: #71859e; font-size: max(12px, .8rem); line-height: 1.45; }
 .workflow-metric-main { display: block; margin-top: 5px; color: #5ed6f3; font-size: 1.35rem; letter-spacing: -.04em; }
-.workflow-metric-main span { margin-left: 2px; font-size: .72rem; }
-.workflow-metric-secondary { margin-top: 6px; color: #8adcf4; font-size: .58rem; line-height: 1.4; }
+.workflow-metric-main span { margin-left: 2px; font-size: max(12px, .8rem); }
+.workflow-metric-secondary { margin-top: 6px; color: #8adcf4; font-size: max(12px, .8rem); line-height: 1.4; }
 .workflow-metric-secondary em { color: #71859e; font-style: normal; }
 .workflow-vitals-main { display: block; margin-top: 7px; color: #d6e6f9; font-size: .9rem; }
 .workflow-metric-card .workflow-metric-note { color: #e9bc60; }
@@ -84,9 +84,9 @@
 .bar-nairobi { background: #38bdf8; } .bar-johannesburg { background: #818cf8; } .bar-lagos { background: #2dd4bf; }
 .bar-one { left: 0; width: 20%; } .bar-two { left: 22%; width: 27%; opacity: .7; } .bar-three { left: 52%; width: 17%; opacity: .5; }
 .workflow-time-axis { display: flex; justify-content: space-between; margin: 9px 45px 0 86px; color: #586e88; font-size: .52rem; }
-.workflow-report-footnote { display: flex; align-items: flex-start; gap: 7px; padding: 10px 15px 13px; border-top: 1px solid #1e293b; color: #9caec2; font-size: .62rem; line-height: 1.55; }
+.workflow-report-footnote { display: flex; align-items: flex-start; gap: 7px; padding: 10px 15px 13px; border-top: 1px solid #1e293b; color: #9caec2; font-size: max(12px, .8rem); line-height: 1.55; }
 .workflow-report-footnote svg { width: 14px; height: 14px; flex: 0 0 14px; margin-top: 1px; color: #fbbf24; }
-.workflow-preview-caption { position: relative; margin: 12px 0 0; color: #7489a3; font-size: .7rem; text-align: center; }
+.workflow-preview-caption { position: relative; margin: 12px 0 0; color: #7489a3; font-size: max(12px, .8rem); text-align: center; }
 @media (max-width: 1050px) {
   .workflow-panel { grid-template-columns: minmax(0,1fr); }
   .workflow-copy { max-width: 760px; }

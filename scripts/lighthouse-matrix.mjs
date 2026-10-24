@@ -44,7 +44,145 @@ async function inspectTypography(page) {
       && regularLoaded
       && boldLoaded
       && fontResources.length > 0;
-    return { bodyFontFamily, headingFontFamily, regularLoaded, boldLoaded, fontResources, fontVerified };
+
+    const root = getComputedStyle(document.documentElement);
+    const parseColor = (value, underlay = null) => {
+      const text = String(value || '').trim();
+      const hex = text.match(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i);
+      if (hex) {
+        const raw = hex[1].length === 3 ? [...hex[1]].map(ch => ch + ch).join('') : hex[1];
+        return [0, 2, 4].map(index => parseInt(raw.slice(index, index + 2), 16));
+      }
+      const rgb = text.match(/^rgba?\(\s*(\d+(?:\.\d+)?)\s*(?:,|\s)\s*(\d+(?:\.\d+)?)\s*(?:,|\s)\s*(\d+(?:\.\d+)?)(?:\s*[,/]\s*(\d*\.?\d+))?\s*\)$/i);
+      if (!rgb) return null;
+      const channels = [Number(rgb[1]), Number(rgb[2]), Number(rgb[3])];
+      const alpha = rgb[4] === undefined ? 1 : Number(rgb[4]);
+      return alpha < 1 && underlay
+        ? channels.map((channel, index) => channel * alpha + underlay[index] * (1 - alpha))
+        : channels;
+    };
+    const luminance = rgb => {
+      if (!rgb) return null;
+      const channels = rgb.map(value => {
+        const channel = value / 255;
+        return channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4;
+      });
+      return 0.2126 * channels[0] + 0.7152 * channels[1] + 0.0722 * channels[2];
+    };
+    const contrast = (foreground, background) => {
+      const base = parseColor(resolveCssColor('--bg', 'backgroundColor')) || [10, 10, 13];
+      const a = luminance(parseColor(foreground, base));
+      const b = luminance(parseColor(background, base));
+      return a === null || b === null ? null : Number(((Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05)).toFixed(2));
+    };
+    const resolveCssColor = (property, kind) => {
+      const probe = document.createElement('span');
+      probe.style[kind] = `var(${property})`;
+      document.body.append(probe);
+      const resolved = getComputedStyle(probe)[kind];
+      probe.remove();
+      return resolved;
+    };
+    const dimColor = resolveCssColor('--text-dim', 'color');
+    const pageBackground = resolveCssColor('--bg', 'backgroundColor');
+    const rawCardBackground = root.getPropertyValue('--bg-card').trim().toLowerCase();
+    const describeSelector = element => {
+      const parts = [];
+      let current = element;
+      while (current && current !== document.body && parts.length < 6) {
+        let part = current.tagName.toLowerCase();
+        if (current.id) {
+          part += `#${current.id}`;
+        } else if (current.classList && current.classList.length) {
+          part += '.' + [...current.classList].slice(0, 3).join('.');
+        } else if (current.parentElement) {
+          const sameTag = [...current.parentElement.children].filter(sibling => sibling.tagName === current.tagName);
+          if (sameTag.length > 1) part += `:nth-of-type(${sameTag.indexOf(current) + 1})`;
+        }
+        parts.unshift(part);
+        current = current.parentElement;
+      }
+      return parts.join(' > ');
+    };
+    const cardSurfaceSelector = '.plan-card, .sample-card, .card, .terminal, .login-card, .faq-item, .about-signal, .trust-card, .visibility-report-chart, .visibility-report-panel, .get-started-url-row, .table-wrapper';
+    const cardSurfaces = [...document.querySelectorAll(cardSurfaceSelector)].filter(element => element.getClientRects().length > 0);
+    const backgroundColorsFor = element => {
+      const style = getComputedStyle(element);
+      const base = parseColor(resolveCssColor('--bg', 'backgroundColor')) || [10, 10, 13];
+      const colors = [];
+      if (style.backgroundImage && style.backgroundImage !== 'none') {
+        const stops = [...style.backgroundImage.matchAll(/rgba?\([^)]+\)|#[0-9a-f]{3,8}/gi)].map(match => match[0]);
+        for (const stop of stops) {
+          const color = parseColor(stop, base);
+          if (color) colors.push({ color: stop, rgb: color });
+        }
+      }
+      const background = parseColor(style.backgroundColor, base);
+      if (background) colors.push({ color: style.backgroundColor, rgb: background });
+      return colors;
+    };
+    const cardBackgroundMeasurements = cardSurfaces.map(element => ({
+      selector: describeSelector(element),
+      backgroundColor: getComputedStyle(element).backgroundColor,
+      backgroundImage: getComputedStyle(element).backgroundImage,
+      ratios: backgroundColorsFor(element).map(item => contrast(dimColor, item.color)).filter(value => value !== null)
+    }));
+    const unmeasurableCardBackgrounds = cardBackgroundMeasurements
+      .filter(item => item.ratios.length === 0)
+      .map(item => item.selector);
+    const measuredCardRatios = cardBackgroundMeasurements.flatMap(item => item.ratios);
+    let cardBackground = cardSurfaces.length
+      ? getComputedStyle(cardSurfaces[0]).backgroundColor
+      : resolveCssColor('--bg-card', 'backgroundColor');
+    if (!cardBackground || cardBackground === 'rgba(0, 0, 0, 0)') {
+      // Transparent card tokens inherit the real page surface; unresolved non-transparent tokens fail closed.
+      cardBackground = rawCardBackground === 'transparent'
+        ? getComputedStyle(document.body).backgroundColor
+        : null;
+    }
+    const textLeaves = [...document.querySelectorAll('body *')].filter(element =>
+      element.children.length === 0
+      && (element.innerText || element.textContent || '').trim()
+      && element.getClientRects().length > 0
+    );
+    const textBelow12 = textLeaves.filter(element => parseFloat(getComputedStyle(element).fontSize) < 12)
+      .map(element => ({ selector: describeSelector(element), tag: element.tagName.toLowerCase(), className: String(element.className || '').slice(0, 120), text: (element.innerText || element.textContent || '').trim().slice(0, 100), fontSize: getComputedStyle(element).fontSize }));
+    const negativeTracking = textLeaves.filter(element => {
+      const style = getComputedStyle(element);
+      const size = parseFloat(style.fontSize);
+      return (element.tagName.toLowerCase() === 'p' || size < 24)
+        && parseFloat(style.letterSpacing) < 0;
+    }).map(element => ({ selector: describeSelector(element), tag: element.tagName.toLowerCase(), className: String(element.className || '').slice(0, 120), text: (element.innerText || element.textContent || '').trim().slice(0, 100), fontSize: getComputedStyle(element).fontSize, letterSpacing: getComputedStyle(element).letterSpacing })).slice(0, 20);
+    const bodyStyle = getComputedStyle(document.body);
+    const bodyLineHeightRatio = Number((parseFloat(bodyStyle.lineHeight) / parseFloat(bodyStyle.fontSize)).toFixed(2));
+    const headingLineHeights = [...document.querySelectorAll('h1, h2, h3, h4')].map(element => {
+      const style = getComputedStyle(element);
+      return { selector: describeSelector(element), tag: element.tagName.toLowerCase(), className: String(element.className || '').slice(0, 120), ratio: Number((parseFloat(style.lineHeight) / parseFloat(style.fontSize)).toFixed(2)), fontSize: style.fontSize, lineHeight: style.lineHeight };
+    });
+    const dimPageContrast = contrast(dimColor, pageBackground);
+    const dimCardContrast = measuredCardRatios.length
+      ? Math.min(...measuredCardRatios)
+      : contrast(dimColor, cardBackground);
+    const designGuardrails = {
+      dimColor,
+      dimPageContrast,
+      dimCardContrast,
+      contrastPassed: dimPageContrast !== null && dimCardContrast !== null && dimPageContrast >= 4.5 && dimCardContrast >= 4.5 && unmeasurableCardBackgrounds.length === 0,
+      cardBackgroundMeasurements,
+      unmeasurableCardBackgrounds,
+      bodyLineHeightRatio,
+      bodyLineHeightPassed: bodyLineHeightRatio >= 1.6 && bodyLineHeightRatio <= 1.7,
+      headingLineHeights,
+      headingLineHeightsPassed: headingLineHeights.length > 0 && headingLineHeights.every(item => {
+        const size = parseFloat(item.fontSize);
+        return size > 32 ? item.ratio >= 1.1 && item.ratio <= 1.2 : item.ratio >= 1.2 && item.ratio <= 1.3;
+      }),
+      textBelow12,
+      negativeTracking,
+      textSizePassed: textBelow12.length === 0,
+      trackingPassed: negativeTracking.length === 0
+    };
+    return { bodyFontFamily, headingFontFamily, regularLoaded, boldLoaded, fontResources, fontVerified, designGuardrails };
   });
 }
 
@@ -182,9 +320,19 @@ const typographyChecks = states.map(state => ({
 }));
 await writeFile(resolve(artifacts, 'lighthouse', 'summary.json'), JSON.stringify({ scores, comparisons }, null, 2) + '\n');
 const typographyFailures = typographyChecks.filter(check => check.version === 'pr' && !check.fontVerified);
+const designFailures = typographyChecks.filter(check => {
+  if (check.version !== 'pr') return false;
+  const guardrails = check.designGuardrails;
+  return !guardrails
+    || !guardrails.contrastPassed
+    || !guardrails.bodyLineHeightPassed
+    || !guardrails.headingLineHeightsPassed
+    || !guardrails.textSizePassed
+    || !guardrails.trackingPassed;
+});
 await writeFile(
   resolve(artifacts, 'lighthouse', 'typography-checks.json'),
-  JSON.stringify({ checks: typographyChecks, failures: typographyFailures }, null, 2) + '\n'
+  JSON.stringify({ checks: typographyChecks, failures: typographyFailures, designFailures }, null, 2) + '\n'
 );
 await writeFile(
   resolve(artifacts, 'lighthouse', 'run-metadata.json'),
@@ -203,5 +351,35 @@ if (typographyFailures.length) {
   console.error('Plus Jakarta Sans verification failures:', JSON.stringify(typographyFailures.map(check => ({ page: check.page, viewport: check.viewport, finalUrl: check.finalUrl, bodyFontFamily: check.bodyFontFamily, headingFontFamily: check.headingFontFamily, fontResources: check.fontResources }))));
 } else {
   console.log('Plus Jakarta Sans verified for every post-migration screenshot check.');
+}
+if (designFailures.length) {
+  console.error('Typography design guardrail failures:');
+  for (const check of designFailures) {
+    const g = check.designGuardrails;
+    const context = `${check.page} @ ${check.viewport}px`;
+    if (!g.contrastPassed) {
+      console.error(`- ${context}: dim text contrast failed (color ${g.dimColor}, page ${g.dimPageContrast}, minimum measured card ${g.dimCardContrast}); unmeasurable card elements: ${g.unmeasurableCardBackgrounds.join(', ') || 'none'}`);
+    }
+    if (!g.bodyLineHeightPassed) {
+      console.error(`- ${context}: body line-height ratio ${g.bodyLineHeightRatio}; expected 1.60–1.70`);
+    }
+    for (const item of g.headingLineHeights.filter(item => {
+      const size = parseFloat(item.fontSize);
+      return size > 32 ? item.ratio < 1.1 || item.ratio > 1.2 : item.ratio < 1.2 || item.ratio > 1.3;
+    })) {
+      const size = parseFloat(item.fontSize);
+      const expected = size > 32 ? '1.10–1.20 for headings above 32px' : '1.20–1.30 for headings at or below 32px';
+      console.error(`- ${context}: ${item.selector} line-height ${item.lineHeight} / font-size ${item.fontSize} = ${item.ratio}; expected ${expected}`);
+    }
+    for (const item of g.textBelow12) {
+      console.error(`- ${context}: ${item.selector} font-size ${item.fontSize}; text="${item.text.replace(/\\s+/g, ' ').slice(0, 70)}"`);
+    }
+    for (const item of g.negativeTracking) {
+      console.error(`- ${context}: ${item.selector} letter-spacing ${item.letterSpacing}; text="${item.text.replace(/\\s+/g, ' ').slice(0, 70)}"`);
+    }
+  }
+  process.exitCode = 1;
+} else {
+  console.log('Typography size, tracking, line-height and contrast guardrails passed for every post-migration screenshot check.');
 }
 console.log('Wrote raw Lighthouse JSON/HTML, screenshots, score comparisons, typography verification and metadata.');
