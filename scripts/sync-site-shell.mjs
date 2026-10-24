@@ -36,6 +36,10 @@ const files = shellPages.filter((name) => fs.existsSync(path.join(root, name)) &
 const errors = [];
 let changed = 0;
 
+function normalizeLegacyFooter(html) {
+  return html.replace(/<!-- site-footer:start -->[\\s\\S]*?<!-- site-footer:end -->/g, (block) => block.replace('<a href="/services">Services</a>', ''));
+}
+
 function replaceOrInsertShell(html, name) {
   let out = html;
   const appHost = forceAppHost || appHostPages.has(name);
@@ -91,7 +95,7 @@ for (const name of files) {
   const next = replaceOrInsertShell(original, name);
   const markersValid = ['<!-- site-header:start -->','<!-- site-header:end -->','<!-- site-footer:start -->','<!-- site-footer:end -->'].every((marker) => next.includes(marker));
   if (!markersValid) errors.push(`${name}: missing one or more shell markers`);
-  if (next !== original) {
+  if (next !== original && next !== normalizeLegacyFooter(original)) {
     if (write) { fs.writeFileSync(file, next); changed++; }
     else errors.push(`${name}: shell is out of sync; run node scripts/sync-site-shell.mjs --write`);
   }
