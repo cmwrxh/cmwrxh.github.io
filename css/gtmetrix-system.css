@@ -28,3 +28,38 @@ html{scroll-behavior:smooth}body{font-family:"Plus Jakarta Sans",system-ui,sans-
 /* QA: ensure primary action labels meet WCAG AA contrast without weakening checks. */
 .al-site-header .al-try{background:#075985!important;border-color:#075985!important;color:#fff!important}
 .pricing-page .btn-primary,.pricing-page .plan-cta,.pricing-page button.primary,.auth-card button,.login-card button{background:#075985!important;border-color:#075985!important;color:#fff!important}
+
+
+/* Phase 2 Item 1: approved design tokens and dark-surface parity. */
+:root{--gt-bg:#121212;--gt-surface:#202125;--gt-line:rgba(255,255,255,.08);--gt-blue:#2a94fa;--gt-blue-hover:#3da0ff;--al-plan-lite:#646464;--al-plan-lite-name:#a6a6a6;--al-plan-core:#5cb9b1;--al-plan-core-name:#7fd0c9;--al-plan-advanced:#67a7d5;--al-plan-advanced-name:#72a4c9;--al-plan-expert:#a17ed2;--al-plan-expert-name:#b79be0}
+html,body{background:#121212!important}body{color:#ececec}
+.al-primary-cta,.al-panel-link,.visibility-report-cta,.get-started-primary,.al-site-header .al-try,.pricing-page .plan-cta,.pricing-page .btn-primary{background:#2a94fa!important;border-color:#2a94fa!important;color:#fff!important}
+.al-primary-cta *,.al-panel-link *,.visibility-report-cta *,.get-started-primary *{color:#fff!important}
+.al-primary-cta:hover,.al-panel-link:hover,.visibility-report-cta:hover,.get-started-primary:hover{background:#3da0ff!important}
+.al-primary-cta,.al-panel-link,.visibility-report-cta,.get-started-primary,.plan-select{border-radius:3px!important}
+.pricing-heading h1{color:#fff}
+.pricing-comparison{border-collapse:collapse}
+.pricing-comparison thead th{background:#171619!important;color:#ececec!important;border-color:rgba(255,255,255,.08)!important}
+.pricing-comparison tbody tr:nth-child(odd) th,.pricing-comparison tbody tr:nth-child(odd) td{background:#202125!important}
+.pricing-comparison tbody tr:nth-child(even) th,.pricing-comparison tbody tr:nth-child(even) td{background:#1a1b1e!important}
+.pricing-comparison tbody th,.pricing-comparison tbody td{border-color:rgba(255,255,255,.08)!important;color:#ececec!important}
+.pricing-comparison thead .plan-free>span{color:var(--al-plan-lite-name)!important}.pricing-comparison thead .plan-developer>span{color:var(--al-plan-core-name)!important}.pricing-comparison thead .plan-business>span{color:var(--al-plan-advanced-name)!important}.pricing-comparison thead .plan-enterprise>span{color:var(--al-plan-expert-name)!important}
+.pricing-comparison .plan-select{background:var(--plan-color,#2a94fa)!important;color:#fff!important;border:1px solid var(--plan-color,#2a94fa)!important}
+.coming-soon{display:inline-block;margin-inline-start:.35em;padding:.18em .45em;border-radius:3px;background:#202328;color:#ececec;border:1px solid #454a53;font-size:11px;font-weight:700;white-space:nowrap}
+.al-audit-offer a{background:#dc59a5!important;color:#fff!important;border-color:#dc59a5!important}
+.regional-performance-section.regional-network-atmosphere{background:#121212!important;background-image:none!important;padding-block:64px!important;min-height:0!important}
+.regional-performance-section .container,.regional-performance-section .regional-performance-container{background:transparent!important;min-height:0!important}
+.faq-section .faq-item,.faq-section .faq-answer{height:auto!important}.faq-section .faq-answer{max-height:none!important;overflow:visible!important;white-space:normal!important}.faq-section .faq-item.open .faq-answer,.faq-section .faq-item.is-open .faq-answer{display:block!important;max-height:none!important;overflow:visible!important}
+.al-site-footer{background:linear-gradient(120deg,#12314d,#112131)!important;color:#ececec!important}
+.al-site-footer .al-footer-inner{display:grid!important;grid-template-columns:1.3fr repeat(3,minmax(0,1fr));gap:30px!important;width:min(100% - 72px,1080px)!important}
+.al-site-footer .al-footer-links{display:flex!important;flex-direction:column!important;align-items:flex-start!important;gap:12px!important}
+.al-site-footer .al-footer-links strong{color:#a6a6a6!important;font-size:14px!important;font-weight:500!important}
+.al-site-footer .al-footer-links a{color:#ececec!important;font-size:12px!important;line-height:16px!important;text-decoration:none!important}
+.al-site-footer .al-footer-bottom{grid-column:1/-1!important;border-top:1px solid rgba(255,255,255,.12)!important;padding-top:20px!important;display:flex!important;justify-content:space-between!important;gap:18px!important}
+.al-site-footer nav[aria-label="Legal"]{display:flex!important;flex-direction:row!important;gap:16px!important}
+.table-wrap,.empty-state,.product-card,.preview-wireframe,.report-preview,.founder-copy,.methodology-summary,.data-article-chart{background:#111318!important;border-color:#2c2c2e!important;color:#c2cfde!important}
+.table-wrap .data-table thead th,.table-wrap .data-table thead td{background:#171619!important;color:#fff!important;border-color:#2c2c2e!important}
+.table-wrap .data-table tbody th,.table-wrap .data-table tbody td{background:#111318!important;color:#c2cfde!important;border-color:#2c2c2e!important}
+.table-wrap .data-table tbody th,.empty-state h2,.empty-state h3,.product-card h2,.product-card h3,.methodology-summary h2,.methodology-summary h3,.data-article-chart figcaption{color:#fff!important}
+@media(max-width:720px){.al-site-footer .al-footer-inner{grid-template-columns:1fr 1fr!important;width:calc(100% - 40px)!important}.al-site-footer .al-footer-brand{grid-column:1/-1}.al-site-footer .al-footer-bottom{flex-direction:column!important}}
+@media(max-width:520px){.al-site-footer .al-footer-inner{grid-template-columns:1fr!important}.al-site-footer .al-footer-brand{grid-column:auto}.al-site-footer .al-footer-bottom{align-items:flex-start!important}}
