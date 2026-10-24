@@ -1,0 +1,34 @@
+name: Guest scan proof tests
+
+on:
+  pull_request:
+    paths:
+      - 'api/scan.js'
+      - 'api/scan-status.js'
+      - 'lib/guest-scan-proof.js'
+      - 'tests/guest-scan-proof.test.js'
+      - 'worker/index.js'
+      - 'package.json'
+      - '.github/workflows/guest-scan-proof-tests.yml'
+  push:
+    branches:
+      - feat/guest-one-free-scan-proof-claim
+    paths:
+      - 'api/scan.js'
+      - 'api/scan-status.js'
+      - 'lib/guest-scan-proof.js'
+      - 'tests/guest-scan-proof.test.js'
+      - 'worker/index.js'
+      - 'package.json'
+      - '.github/workflows/guest-scan-proof-tests.yml'
+
+jobs:
+  guest-scan-proof:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Test signed guest scan proof
+        run: node --test tests/*.test.js
