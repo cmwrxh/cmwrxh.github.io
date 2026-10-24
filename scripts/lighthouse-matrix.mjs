@@ -44,7 +44,71 @@ async function inspectTypography(page) {
       && regularLoaded
       && boldLoaded
       && fontResources.length > 0;
-    return { bodyFontFamily, headingFontFamily, regularLoaded, boldLoaded, fontResources, fontVerified };
+
+    const root = getComputedStyle(document.documentElement);
+    const parseColor = value => {
+      const text = String(value || '').trim();
+      const hex = text.match(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i);
+      if (hex) {
+        const raw = hex[1].length === 3 ? [...hex[1]].map(ch => ch + ch).join('') : hex[1];
+        return [0, 2, 4].map(index => parseInt(raw.slice(index, index + 2), 16));
+      }
+      const rgb = text.match(/^rgba?\\(\\s*(\\d+)\\s*,\\s*(\\d+)\\s*,\\s*(\\d+)/i);
+      return rgb ? [Number(rgb[1]), Number(rgb[2]), Number(rgb[3])] : null;
+    };
+    const luminance = rgb => {
+      if (!rgb) return null;
+      const channels = rgb.map(value => {
+        const channel = value / 255;
+        return channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4;
+      });
+      return 0.2126 * channels[0] + 0.7152 * channels[1] + 0.0722 * channels[2];
+    };
+    const contrast = (foreground, background) => {
+      const a = luminance(parseColor(foreground));
+      const b = luminance(parseColor(background));
+      return a === null || b === null ? null : Number(((Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05)).toFixed(2));
+    };
+    const dimColor = root.getPropertyValue('--text-dim').trim();
+    const pageBackground = root.getPropertyValue('--bg').trim();
+    const cardBackground = root.getPropertyValue('--bg-card').trim();
+    const textLeaves = [...document.querySelectorAll('body *')].filter(element =>
+      element.children.length === 0
+      && (element.innerText || element.textContent || '').trim()
+      && element.getClientRects().length > 0
+    );
+    const textBelow12 = textLeaves.filter(element => parseFloat(getComputedStyle(element).fontSize) < 12)
+      .map(element => ({ tag: element.tagName.toLowerCase(), className: String(element.className || '').slice(0, 80), text: (element.innerText || element.textContent || '').trim().slice(0, 80), fontSize: getComputedStyle(element).fontSize }))
+      .slice(0, 20);
+    const negativeTracking = textLeaves.filter(element => {
+      const style = getComputedStyle(element);
+      const size = parseFloat(style.fontSize);
+      return (element.tagName.toLowerCase() === 'p' || size < 24)
+        && parseFloat(style.letterSpacing) < 0;
+    }).map(element => ({ tag: element.tagName.toLowerCase(), className: String(element.className || '').slice(0, 80), text: (element.innerText || element.textContent || '').trim().slice(0, 80), fontSize: getComputedStyle(element).fontSize, letterSpacing: getComputedStyle(element).letterSpacing })).slice(0, 20);
+    const bodyStyle = getComputedStyle(document.body);
+    const bodyLineHeightRatio = Number((parseFloat(bodyStyle.lineHeight) / parseFloat(bodyStyle.fontSize)).toFixed(2));
+    const headingLineHeights = [...document.querySelectorAll('h1, h2, h3, h4')].map(element => {
+      const style = getComputedStyle(element);
+      return { tag: element.tagName.toLowerCase(), ratio: Number((parseFloat(style.lineHeight) / parseFloat(style.fontSize)).toFixed(2)), fontSize: style.fontSize };
+    });
+    const dimPageContrast = contrast(dimColor, pageBackground);
+    const dimCardContrast = contrast(dimColor, cardBackground);
+    const designGuardrails = {
+      dimColor,
+      dimPageContrast,
+      dimCardContrast,
+      contrastPassed: dimPageContrast !== null && dimCardContrast !== null && dimPageContrast >= 4.5 && dimCardContrast >= 4.5,
+      bodyLineHeightRatio,
+      bodyLineHeightPassed: bodyLineHeightRatio >= 1.6 && bodyLineHeightRatio <= 1.7,
+      headingLineHeights,
+      headingLineHeightsPassed: headingLineHeights.length > 0 && headingLineHeights.every(item => item.ratio >= 1.2 && item.ratio <= 1.3),
+      textBelow12,
+      negativeTracking,
+      textSizePassed: textBelow12.length === 0,
+      trackingPassed: negativeTracking.length === 0
+    };
+    return { bodyFontFamily, headingFontFamily, regularLoaded, boldLoaded, fontResources, fontVerified, designGuardrails };
   });
 }
 
