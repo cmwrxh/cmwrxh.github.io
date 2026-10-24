@@ -503,7 +503,7 @@ main .section-lead, main .section-heading > p, main .hero-subtitle, main .region
 .cookie-consent-banner { position: fixed; z-index: 100000; left: 0; right: 0; bottom: 0; display: flex; align-items: center; justify-content: space-between; gap: 1.25rem; padding: 1rem max(1.25rem, calc((100vw - 1160px)/2)); background: #0D131D; border-top: 1px solid rgba(255,255,255,.12); color: #A0AEC0; font-size: .875rem; line-height: 1.45; }
 .cookie-consent-copy { max-width: 60rem; }
 .cookie-consent-actions { display: flex; flex: 0 0 auto; align-items: center; gap: .6rem; }
-.cookie-consent-actions button { min-height: 40px; padding: .55rem .85rem; border: 1px solid rgba(255,255,255,.22); border-radius: 4px; background: transparent; color: #fff; font: 600 .8rem/1.2 Inter, sans-serif; cursor: pointer; }
+.cookie-consent-actions button { min-height: 40px; padding: .55rem .85rem; border: 1px solid rgba(255,255,255,.22); border-radius: 4px; background: transparent; color: #fff; font: 600 .8rem/1.2 "Plus Jakarta Sans", sans-serif; cursor: pointer; }
 .cookie-consent-actions button[data-consent="accept"] { background: #2B80C5; border-color: #2B80C5; }
 .cookie-consent-actions button:focus-visible { outline: 2px solid #60A5FA; outline-offset: 2px; }
 @media (max-width: 767px) { .product-grid, .infrastructure-trust-grid { grid-template-columns: minmax(0,1fr) !important; } .product-grid .product-card:nth-child(odd), .infrastructure-trust-item:not(:nth-child(3n)) { border-right: 0 !important; } .cookie-consent-banner { align-items: stretch; flex-direction: column; gap: .75rem; padding: .9rem 1rem; } .cookie-consent-actions { display: flex; } .cookie-consent-actions button { flex: 1; } }
