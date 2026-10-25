@@ -321,3 +321,6 @@ a:focus-visible, button:focus-visible, input:focus-visible, [role="tabpanel"]:fo
 .al-africa-map-section .al-africa-map-caption{color:#aeb8c5!important;-webkit-text-fill-color:#aeb8c5!important}
 .al-africa-map-section .al-africa-map-current{color:#fff!important;-webkit-text-fill-color:#fff!important}
 .al-africa-map-section .al-africa-map-link{color:#8bc6ff!important;-webkit-text-fill-color:#8bc6ff!important}
+
+/* Suppress the legacy blue ambient overlay on this replaced homepage section. */
+.al-africa-map-section::before,.al-africa-map-section::after{content:none!important;display:none!important;background:none!important;opacity:0!important}
