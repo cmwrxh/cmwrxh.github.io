@@ -101,8 +101,8 @@
 </div>
 
 <main class="login-page">
-  <section class="login-card" aria-labelledby="login-title">
-    <div class="label">Sign in</div>
+  <section class="login-card auth-card" aria-labelledby="login-title">
+    <nav class="auth-tabs" aria-label="Account access"><a id="login-tab-login" class="is-active" aria-current="page" href="/login">Log in</a><a id="login-tab-signup" href="/signup">Create account</a></nav>
     <h1 id="login-title">Sign in to your account</h1>
     <p class="hero-subtitle">Welcome back.</p>
 
@@ -123,7 +123,7 @@
 
       <div class="google-signin-wrap" id="google-login" aria-label="Continue with Google"></div>
       <div class="login-links">
-        <a href="mailto:support@africalatency.dev?subject=Password%20reset">Forgot your password?</a>
+        <a href="mailto:support@africalatency.dev?subject=Password%20reset" aria-label="Password reset help (email support; self-service reset is not available)">Forgot your password?</a><small class="auth-reset-note">Self-service password reset is not available yet. Email support for help.</small>
         <span>New to AfricaLatency? <a id="signup-link" href="/signup">Sign up</a></span>
       </div>
       <button class="btn btn-primary" id="login-submit" type="submit">Sign in</button>
@@ -144,6 +144,7 @@
 
 
 <script src="/js/main.js?v=7"></script>
+<script src="/js/auth-next.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
   // Supabase settings — unchanged from your existing login page
@@ -155,10 +156,8 @@
 
   const form = document.getElementById('login-form');
   const params = new URLSearchParams(window.location.search);
-  const requestedNext = params.get('next') || '/dashboard';
-  // Authentication should always land in the dashboard, never send users back to the public homepage.
-  const safeNext = ['/dashboard', '/dashboard.html'].includes(requestedNext) ? requestedNext : '/dashboard';
-  document.getElementById('signup-link').href = '/signup?next=' + encodeURIComponent(safeNext);
+  const safeNext = window.AfricaLatencyAuthNext.getSafeNext(params.get('next'));
+  document.getElementById('signup-link').href = window.AfricaLatencyAuthNext.buildAuthTabHref('/signup',safeNext);document.getElementById('login-tab-login').href=window.AfricaLatencyAuthNext.buildAuthTabHref('/login',safeNext);document.getElementById('login-tab-signup').href=window.AfricaLatencyAuthNext.buildAuthTabHref('/signup',safeNext);
   const status = document.getElementById('login-status');
   const submit = document.getElementById('login-submit');
   const password = document.getElementById('password');
