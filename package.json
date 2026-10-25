@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "start": "node server.js",
-    "test:auth-next": "node --test tests/auth-next.test.cjs"
+    "test:auth-next": "node --test tests/auth-next.test.cjs",
+    "test:report-filmstrip": "node --test tests/report-filmstrip.test.cjs"
   },
   "dependencies": {
     "@sparticuz/chromium": "^138.0.0",
