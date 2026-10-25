@@ -309,3 +309,15 @@ a:focus-visible, button:focus-visible, input:focus-visible, [role="tabpanel"]:fo
 /* Override the legacy main-link color rule only for the capability CTA. */
 .al-capabilities-section a.al-primary-cta.al-primary-button{display:inline-flex!important;min-height:46px!important;align-items:center!important;justify-content:center!important;padding:0 20px!important;border:0!important;border-radius:5px!important;background:#1769c9!important;color:#fff!important;-webkit-text-fill-color:#fff!important;font-size:15px!important;line-height:1.35!important;font-weight:650!important;letter-spacing:0!important;text-decoration:none!important}
 .al-capabilities-section a.al-primary-cta.al-primary-button:hover{background:#135cb0!important;color:#fff!important;-webkit-text-fill-color:#fff!important}
+
+/* Keep the new section's intended contrast above legacy global link/text rules. */
+.al-capabilities-heading p{color:#c6ccd5!important;-webkit-text-fill-color:#c6ccd5!important}
+.al-capabilities-section .al-capability-copy .al-capability-subtitle{color:#8bc6ff!important;-webkit-text-fill-color:#8bc6ff!important}
+.al-africa-map-section{background:#121212!important}
+.al-africa-map-section .al-africa-map-copy{background:transparent!important;border:0!important;box-shadow:none!important;padding:0!important;border-radius:0!important}
+.al-africa-map-section .al-africa-map-copy h2{color:#fff!important;-webkit-text-fill-color:#fff!important}
+.al-africa-map-section .al-africa-map-copy .section-lead{color:#c6ccd5!important;-webkit-text-fill-color:#c6ccd5!important}
+.al-africa-map-section .al-probe-country-list,.al-africa-map-section .al-probe-country-list li{color:#edf3fa!important;-webkit-text-fill-color:#edf3fa!important}
+.al-africa-map-section .al-africa-map-caption{color:#aeb8c5!important;-webkit-text-fill-color:#aeb8c5!important}
+.al-africa-map-section .al-africa-map-current{color:#fff!important;-webkit-text-fill-color:#fff!important}
+.al-africa-map-section .al-africa-map-link{color:#8bc6ff!important;-webkit-text-fill-color:#8bc6ff!important}
