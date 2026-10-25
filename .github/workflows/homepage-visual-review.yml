@@ -10,6 +10,9 @@ on:
       - 'js/compliance.js'
       - 'js/main.js'
       - 'js/homepage-reference-redesign.js'
+      - 'scripts/homepage-dotfield-test.mjs'
+      - 'data/africa-110m.geojson'
+      - 'data/NATURAL_EARTH_LICENSE.md'
       - 'docs/visual-review/reference.html'
       - 'scripts/visual-review.mjs'
       - '.github/workflows/homepage-visual-review.yml'
@@ -55,8 +58,14 @@ jobs:
           exit 1
       - name: Check homepage script syntax
         run: node --check js/homepage-reference-redesign.js
+      - name: Test stable DotField parameters, map data, tabs and mobile overflow
+        run: node scripts/homepage-dotfield-test.mjs
       - name: Capture viewport and full-page reference comparisons at desktop, tablet, and mobile widths
         run: node scripts/visual-review.mjs
+      - name: Run Lighthouse mobile performance audit for homepage
+        run: |
+          npx --yes lighthouse http://127.0.0.1:4173/ --chrome-flags='--headless --no-sandbox' --only-categories=performance --output=json --output-path=/tmp/home-lighthouse.json --quiet
+          node -e 'const r=require("/tmp/home-lighthouse.json"); const score=Math.round(r.categories.performance.score*100); console.log("Lighthouse mobile performance score: "+score); console.log("Lighthouse form factor: "+r.configSettings.formFactor+"; URL: "+r.finalDisplayedUrl); if(score<95)process.exit(1)'
       - name: Upload visual comparisons
         uses: actions/upload-artifact@v4
         with:
