@@ -142,4 +142,5 @@ fs.writeFileSync(path.join(outDir,'routes.json'),JSON.stringify(routeResults,nul
 fs.writeFileSync(path.join(outDir,'routes.md'),['| Route | HTTP | Redirect | Result |','|---|---:|---|---|',...routeResults.map(r=>`| ${r.route} | ${r.status} | ${r.location||'—'} | ${r.ok?'OK':'ISSUE'} |`)].join('\n'));
 console.log('Route checks:',JSON.stringify(routeResults));
 const reportRows=results.filter(r=>r.page===reportFixtureRoute);
-if(reportRows.length!==4||reportRows.some(r=>!r.ok||r.horizontalScroll||!r.reportLoaded||!r.reportEmptyFallback||r.whiteSurfaces?.length||r.contrastIssues?.length)) {console.error('Fixture report visual QA failed: expected 4 widths with no horizontal overflow, contrast failures, white surfaces, and with filmstrip fallback.');process.exitCode=1;}\nif(results.some(r=>!r.ok)||routeResults.some(r=>!r.ok)) process.exit(1);
+if(reportRows.length!==4||reportRows.some(r=>!r.ok||r.horizontalScroll||!r.reportLoaded||!r.reportEmptyFallback||r.whiteSurfaces?.length||r.contrastIssues?.length)) {console.error('Fixture report visual QA failed: expected 4 widths with no horizontal overflow, contrast failures, white surfaces, and with filmstrip fallback.');process.exitCode=1;}
+if(results.some(r=>!r.ok)||routeResults.some(r=>!r.ok)) process.exit(1);
