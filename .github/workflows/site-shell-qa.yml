@@ -1,7 +1,7 @@
 name: Site shell and responsive QA
 on:
   pull_request:
-    branches: [main]
+    branches: [main, feat/scan-filmstrip-v2]
   push:
     branches: [fix/sitewide-header-and-pages]
 permissions:
@@ -29,6 +29,8 @@ jobs:
           fi
       - name: Run auth return-path tests
         run: npm run test:auth-next
+      - name: Run report filmstrip and playback tests
+        run: npm run test:report-filmstrip
       - name: Verify static shell is synchronized
         run: node scripts/sync-site-shell.mjs --check
       - name: Install browser QA dependencies

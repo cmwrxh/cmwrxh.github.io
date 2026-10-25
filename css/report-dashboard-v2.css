@@ -1,0 +1,41 @@
+/* Dashboard v2: real filmstrip, score explanation, and compact action toolbar. */
+.rd-actions{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+.rd-actions .rd-button{gap:7px;min-height:40px}
+.rd-actions .rd-button [aria-hidden=true]{font-size:1.05rem;line-height:1}
+.rd-score-breakdown-trigger{display:inline-flex;align-items:center;gap:8px;margin:-8px 0 16px;padding:9px 12px;border:1px solid var(--rd-border);border-radius:6px;background:#111a27;color:var(--rd-text);font:inherit;font-size:.86rem;font-weight:700;cursor:pointer}
+.rd-score-breakdown-trigger:focus-visible,.rd-player-controls button:focus-visible,.rd-player-frame-labels button:focus-visible{outline:2px solid #93c5fd;outline-offset:3px}
+.rd-score-breakdown{border:1px solid var(--rd-border);background:var(--rd-card);padding:16px;margin:0 0 20px}
+.rd-breakdown-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.rd-breakdown-grid article{min-width:0}
+.rd-breakdown-grid h3{margin:0 0 10px}
+.rd-breakdown-equation{font-variant-numeric:tabular-nums;font-weight:750}
+.rd-score-weight-list{list-style:none;margin:12px 0 0;padding:0}
+.rd-score-weight-list li{display:grid;grid-template-columns:minmax(70px,1fr) 50px minmax(90px,auto);gap:10px;padding:9px 0;border-bottom:1px solid var(--rd-border);align-items:center}
+.rd-score-weight-list li:last-child{border-bottom:0}
+.rd-score-weight-list li span:last-child{text-align:right;color:var(--rd-muted);font-size:.84rem}
+.rd-status-good{color:#6ee7b7!important}.rd-status-needs-improvement{color:#fcd34d!important}.rd-status-poor{color:#fca5a5!important}.rd-status-not-returned-for-this-scan{color:var(--rd-muted)!important}
+.rd-vital{min-width:0}.rd-vital .metric{overflow-wrap:anywhere;font-size:clamp(1.1rem,2vw,1.7rem)}
+.rd-vital p{font-size:.78rem}
+.rd-filmstrip{display:flex;gap:10px;overflow-x:auto;padding:4px 2px 12px;scroll-snap-type:x mandatory;max-width:100%;overscroll-behavior-x:contain}
+.rd-filmstrip-frame{flex:0 0 min(210px,72vw);min-width:0;margin:0;border:1px solid var(--rd-border);background:#0D131D;scroll-snap-align:start}
+.rd-filmstrip-frame img{display:block;width:100%;height:auto;max-height:300px;object-fit:contain;object-position:top;background:#111a27}
+.rd-filmstrip-frame figcaption{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:8px;font-size:.78rem;color:var(--rd-muted)}
+.rd-filmstrip-marker{font-size:.68rem;border-radius:4px;padding:3px 5px;color:#07111d}
+.rd-marker-fcp{background:#93c5fd}.rd-marker-lcp{background:#c4b5fd}
+.rd-final-screenshot{margin:0 0 14px}.rd-final-screenshot img{width:100%;max-width:100%;max-height:340px;object-fit:contain;object-position:top;background:#111a27}
+.rd-filmstrip-player{max-width:900px;min-width:0}
+.rd-player-frame{margin:0;border:1px solid var(--rd-border);background:#0D131D}
+.rd-player-frame img{display:block;width:100%;max-height:520px;object-fit:contain;object-position:top;background:#111a27}
+.rd-player-frame figcaption{padding:9px 12px;color:var(--rd-muted);font-variant-numeric:tabular-nums}
+.rd-player-controls{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:12px 0}
+.rd-player-controls label{display:flex;align-items:center;gap:8px;flex:1 1 180px;min-width:0}
+.rd-player-controls input{width:100%;min-width:60px;accent-color:#60a5fa}
+.rd-player-controls output{font-variant-numeric:tabular-nums;color:var(--rd-muted)}
+.rd-player-frame-labels{display:flex;gap:6px;overflow-x:auto;padding:3px 0 8px}
+.rd-player-frame-labels button{flex:0 0 auto;border:1px solid var(--rd-border);background:#111a27;color:var(--rd-text);border-radius:4px;padding:7px 9px;cursor:pointer}
+.rd-player-frame-labels button[aria-pressed=true]{border-color:#60a5fa;background:#172a43}
+.rd-playback-locked{border:1px solid var(--rd-border);background:var(--rd-card);padding:18px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.rd-playback-locked p{margin:0;color:var(--rd-muted)}
+.rd-filmstrip [data-filmstrip-frame][hidden]{display:none}
+@media(max-width:620px){.rd-breakdown-grid{grid-template-columns:1fr}.rd-actions .rd-button{flex:1 1 40%;justify-content:flex-start}.rd-score-weight-list li{grid-template-columns:minmax(60px,1fr) 40px minmax(78px,auto);gap:6px}.rd-player-controls{align-items:stretch}.rd-player-controls label{flex-basis:100%}}
+@media print{.rd-score-breakdown-trigger{display:none!important}.rd-score-breakdown[hidden]{display:block!important}.rd-filmstrip{overflow:visible;flex-wrap:wrap}.rd-filmstrip-frame{flex-basis:30%}.rd-player-controls,.rd-player-frame-labels{display:none!important}}

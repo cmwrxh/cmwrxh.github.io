@@ -3,7 +3,9 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const base = process.env.SITE_BASE_URL || 'http://127.0.0.1:4173';
-const pages = ['/', '/pricing', '/scan', '/tools', '/services', '/sample-report', '/about', '/contact', '/compare', '/methodology', '/docs', '/blog', '/cases', '/login', '/signup', '/locations', '/why-africa-latency'];
+const reportFixtureRoute='/reports/123e4567-e89b-12d3-a456-426614174000';
+const reportFixture={jobId:'fixture-job',reportId:'123e4567-e89b-12d3-a456-426614174000',url:'https://example.com/',device:'mobile',status:'completed',stage:'completed',progress:100,createdAt:'2026-10-25T08:00:00.000Z',completedAt:'2026-10-25T08:00:02.000Z',lighthouseVersion:'12.8.2',chromeVersion:'138',summary:{grade:'B',performance:82,structure:86,metrics:{fcpMs:1700,lcpMs:2400,cls:0.08,tbtMs:180,ttfbMs:700,speedIndexMs:3200},auditList:[],opportunities:[]},fullReport:{metrics:{speedIndexMs:3200},auditList:[],opportunities:[],resourceDetails:[]},screenshotUrl:'https://fixture.invalid/screenshot.jpg',filmstrip:Array.from({length:3},(_,i)=>({timing_ms:i*500,url:'https://fixture.invalid/frame-'+i+'.jpg'})),africaLatency:[],locked:true};
+const pages = ['/', '/pricing', '/scan', '/tools', '/services', '/sample-report', '/about', '/contact', '/compare', '/methodology', '/docs', '/blog', '/cases', '/login', '/signup', '/locations', '/why-africa-latency', reportFixtureRoute];
 const widths = [1280, 820, 720, 390];
 const routeChecks = ['/performance-index','/data-centers','/data-centers.html','/kenya','/kenya.html'];
 const results = [];
@@ -24,10 +26,12 @@ for (const route of pages) {
     const errors = [];
     const environmentWarnings = [];
     page.on('pageerror', e => errors.push('pageerror: '+e.message));
-    page.on('console', msg => { if (msg.type() === 'error') { const value='console: '+msg.text(); if ((route==='/login'||route==='/signup') && (/GSI_LOGGER|status of 403/.test(value))) environmentWarnings.push(value); else errors.push(value); } });
+    page.on('console', msg => { if (msg.type() === 'error') { const value='console: '+msg.text(); if ((route==='/login'||route==='/signup') && (/GSI_LOGGER|status of 403/.test(value))) environmentWarnings.push(value); else if(route===reportFixtureRoute&&(/fixture\.invalid|Failed to load resource|net::ERR_FAILED/.test(value))) environmentWarnings.push(value); else errors.push(value); } });
     let status = 0;
     try {
+      if(route===reportFixtureRoute){await page.route('**/api/scan/**',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(reportFixture)}));await page.route('https://fixture.invalid/**',route=>route.abort('failed'));await page.route('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2',route=>route.fulfill({status:200,contentType:'application/javascript',body:'window.supabase={createClient:()=>({auth:{getSession:async()=>({data:{session:null}})}})};'}));}
       const response = await page.goto(base+route, { waitUntil: 'networkidle', timeout: 45000 });
+      if(route===reportFixtureRoute){await page.waitForSelector('#rd-app:not([hidden])',{timeout:10000});await page.evaluate(()=>{const banner=document.createElement('div');banner.textContent='VISUAL QA FIXTURE · MOCKED SCAN DATA';banner.dataset.qaFixture='true';banner.style.cssText='background:#273244;color:#ffffff;border-bottom:1px solid #52627a;padding:8px 14px;font:700 12px/1.4 sans-serif;letter-spacing:.06em;text-align:center';document.body.prepend(banner);});await page.locator('#rd-filmstrip img').evaluateAll(imgs=>imgs.forEach(img=>{img.loading='eager';}));await page.waitForFunction(()=>[...document.querySelectorAll('[data-filmstrip-empty]')].some(el=>el.textContent.includes('No filmstrip frames were returned for this scan.')),null,{timeout:8000}).catch(()=>{});}
       status = response?.status() ?? 0;
       await page.screenshot({ path: path.join(outDir, route === '/' ? 'home' : route.slice(1), `${width}.png`), fullPage: true }).catch(async () => {
         const dir=path.join(outDir, route === '/' ? 'home' : route.slice(1)); fs.mkdirSync(dir,{recursive:true});
@@ -41,6 +45,10 @@ for (const route of pages) {
           return bg && bg.length>=3 && bg.slice(0,3).map(Number).every(v=>v>=245) && (bg.length<4 || Number(bg[3])>=0.8) && s.backgroundImage==='none';
         }).map(el=>({tag:el.tagName.toLowerCase(),className:typeof el.className==='string'?el.className:'',width:Math.round(el.getBoundingClientRect().width),height:Math.round(el.getBoundingClientRect().height)}));
         const headers = document.querySelectorAll('[data-site-header], header.al-site-header').length;
+        const reportDashboard = routePath.startsWith('/reports/');
+        const reportLoaded = !reportDashboard || (!document.querySelector('#rd-app')?.hidden && document.querySelectorAll('[data-panel]').length>0);
+        const reportEmptyFallback = !reportDashboard || [...document.querySelectorAll('[data-filmstrip-empty]')].some(el=>el.textContent.includes('No filmstrip frames were returned for this scan.'));
+        const reportReturnPathValid = !reportDashboard || document.querySelector('#rd-video a[href]')?.getAttribute('href') === '/login?next=%2Freports%2F123e4567-e89b-12d3-a456-426614174000';
         const bodyBg = getComputedStyle(document.body).backgroundColor;
         const effectiveBg = bodyBg === 'rgba(0, 0, 0, 0)' ? '#ffffff' : bodyBg;
         const bgChannels = effectiveBg.match(/[\d.]+/g);
@@ -72,7 +80,7 @@ for (const route of pages) {
           return {tag:el.tagName.toLowerCase(),className:typeof el.className==='string'?el.className:'',text:(el.innerText||el.getAttribute('aria-label')||'').trim().slice(0,60),fg:s.color,bg};
         }).filter(Boolean);
         const links = [...document.querySelectorAll('[data-site-header] a[href], [data-site-footer] a[href]')].map(a=>a.href);
-        return {headers,whiteSurfaces,toggles,horizontal,overflowNodes,cookieBounds,preOverflow,sampleCards,sampleCardIssues,dotCanvasIssues,textCoveredByDot,buttons,links,whiteSurface};
+        return {headers,whiteSurfaces,toggles,horizontal,overflowNodes,cookieBounds,preOverflow,sampleCards,sampleCardIssues,dotCanvasIssues,textCoveredByDot,buttons,links,whiteSurface,reportLoaded,reportEmptyFallback,reportReturnPathValid};
       }, { isHome: route === '/', routePath: route });
       const linkResults = await Promise.all([...new Set(metrics.links)].map(url => {
         if (!linkStatusCache.has(url)) {
@@ -93,8 +101,8 @@ for (const route of pages) {
         return linkStatusCache.get(url);
       }));
       const contrastIssues = metrics.buttons.filter(b => {const ratio=contrastRatio(b.fg,b.bg);return ratio!==null&&ratio<4.5;}).map(b=>({...b,ratio:Number(contrastRatio(b.fg,b.bg).toFixed(2))}));
-      const row = {page:route,width,status,headerCount:metrics.headers,hamburgerCount:metrics.toggles,horizontalScroll:metrics.horizontal,overflowNodes:metrics.overflowNodes,cookieBounds:metrics.cookieBounds,preOverflow:metrics.preOverflow,sampleCardIssues:metrics.sampleCardIssues,dotCanvasIssues:metrics.dotCanvasIssues,textCoveredByDot:metrics.textCoveredByDot,whiteSurface:metrics.whiteSurface,whiteSurfaces:metrics.whiteSurfaces,consoleErrors:errors,environmentWarnings,linkFailures:linkResults.filter(x=>!x.ok),contrastTargets:metrics.buttons.length,contrastIssues};
-      row.ok = status>=200&&status<400&&row.headerCount===1&&row.hamburgerCount===1&&!row.horizontalScroll&&row.cookieBounds&&!row.preOverflow.length&&!row.sampleCardIssues.length&&!row.dotCanvasIssues.length&&!row.textCoveredByDot&&row.whiteSurface&&!row.whiteSurfaces.length&&!errors.length&&!row.linkFailures.length&&row.contrastTargets>0&&!row.contrastIssues.length;
+      const row = {page:route,width,status,headerCount:metrics.headers,reportLoaded:metrics.reportLoaded,reportEmptyFallback:metrics.reportEmptyFallback,reportReturnPathValid:metrics.reportReturnPathValid,hamburgerCount:metrics.toggles,horizontalScroll:metrics.horizontal,overflowNodes:metrics.overflowNodes,cookieBounds:metrics.cookieBounds,preOverflow:metrics.preOverflow,sampleCardIssues:metrics.sampleCardIssues,dotCanvasIssues:metrics.dotCanvasIssues,textCoveredByDot:metrics.textCoveredByDot,whiteSurface:metrics.whiteSurface,whiteSurfaces:metrics.whiteSurfaces,consoleErrors:errors,environmentWarnings,linkFailures:linkResults.filter(x=>!x.ok),contrastTargets:metrics.buttons.length,contrastIssues};
+      row.ok = status>=200&&status<400&&(route.startsWith('/reports/')?(row.reportLoaded&&row.reportEmptyFallback):row.headerCount===1&&row.hamburgerCount===1)&&!row.horizontalScroll&&row.cookieBounds&&!row.preOverflow.length&&!row.sampleCardIssues.length&&!row.dotCanvasIssues.length&&!row.textCoveredByDot&&row.whiteSurface&&!row.whiteSurfaces.length&&!errors.length&&!row.linkFailures.length&&row.contrastTargets>0&&!row.contrastIssues.length;
       results.push(row);
       await page.close();
     } catch(e) {
@@ -133,4 +141,6 @@ for(const route of routeChecks){try{const response=await fetch(base+route,{redir
 fs.writeFileSync(path.join(outDir,'routes.json'),JSON.stringify(routeResults,null,2));
 fs.writeFileSync(path.join(outDir,'routes.md'),['| Route | HTTP | Redirect | Result |','|---|---:|---|---|',...routeResults.map(r=>`| ${r.route} | ${r.status} | ${r.location||'—'} | ${r.ok?'OK':'ISSUE'} |`)].join('\n'));
 console.log('Route checks:',JSON.stringify(routeResults));
+const reportRows=results.filter(r=>r.page===reportFixtureRoute);
+if(reportRows.length!==4||reportRows.some(r=>!r.ok||r.horizontalScroll||!r.reportLoaded||!r.reportEmptyFallback||r.whiteSurfaces?.length||r.contrastIssues?.length)) {console.error('Fixture report visual QA failed: expected 4 widths with no horizontal overflow, contrast failures, white surfaces, and with filmstrip fallback.');process.exitCode=1;}
 if(results.some(r=>!r.ok)||routeResults.some(r=>!r.ok)) process.exit(1);
