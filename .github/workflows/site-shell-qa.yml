@@ -14,6 +14,19 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - name: Search repository for legacy privacy-policy.html links
+        run: |
+          if git grep -nE 'href="[^"]*privacy-policy\.html' -- '*.html' '*.js' '*.mjs'; then
+            echo 'FAIL: legacy privacy-policy.html links remain.'
+            exit 1
+          else
+            result=$?
+            if [ "$result" -eq 1 ]; then
+              echo 'PASS: no remaining privacy-policy.html links.'
+            else
+              exit "$result"
+            fi
+          fi
       - name: Verify static shell is synchronized
         run: node scripts/sync-site-shell.mjs --check
       - name: Install browser QA dependencies

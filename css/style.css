@@ -23,7 +23,7 @@
   border: 0 !important;
   border-radius: 0 !important;
   box-shadow: none !important;
-  color: #38A1E0 !important;
+  color: #38A1E0;
   font-size: 0.75rem !important;
   font-weight: 600 !important;
   line-height: 1.4;
@@ -140,10 +140,10 @@ html body main > section h4:not(.guardrail-exempt) { line-height: 1.2 !important
 
 
 /* Inline links in prose remain distinguishable without relying on colour alone. */
-html body main p a:not(.btn):not(.btn-primary),
-html body main li a:not(.btn):not(.btn-primary),
-html body main dd a:not(.btn):not(.btn-primary),
-html body main dt a:not(.btn):not(.btn-primary) {
+html body main p a:not(.btn):not(.btn-primary):not(.plan-cta):not(.plan-select):not(.al-primary-cta):not(.al-panel-link):not(.visibility-report-cta):not(.get-started-primary),
+html body main li a:not(.btn):not(.btn-primary):not(.plan-cta):not(.plan-select):not(.al-primary-cta):not(.al-panel-link):not(.visibility-report-cta):not(.get-started-primary),
+html body main dd a:not(.btn):not(.btn-primary):not(.plan-cta):not(.plan-select):not(.al-primary-cta):not(.al-panel-link):not(.visibility-report-cta):not(.get-started-primary),
+html body main dt a:not(.btn):not(.btn-primary):not(.plan-cta):not(.plan-select):not(.al-primary-cta):not(.al-panel-link):not(.visibility-report-cta):not(.get-started-primary) {
   text-decoration: underline !important;
   text-underline-offset: 0.15em;
   text-decoration-thickness: 1px;

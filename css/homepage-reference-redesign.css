@@ -10,7 +10,7 @@
   --al-feature-top: #123352;
   --al-feature-mid: #0e2a3f;
   --al-feature-bottom: #0b1e31;
-  --al-blue-cta: #2993fb;
+  --al-blue-cta: #1769c9;
   --al-blue-test: #3a98da;
   --al-blue-dot: #3898dc;
   --al-blue-logo: #4a90d6;
@@ -63,7 +63,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, [role="tabpanel"]:fo
 .al-url-form input::placeholder { color: var(--al-muted); opacity: 1; }
 .al-url-form input:focus { border-color: var(--al-blue-test); box-shadow: 0 0 0 1px var(--al-blue-test); }
 .al-test-button { flex: 0 0 140px; border: 0; border-radius: 6px; background: var(--al-blue-test); color: #fff; font-size: 21px; font-weight: 500; letter-spacing: -.03em; cursor: pointer; }
-.al-test-button:hover { filter: brightness(1.08); }
+.al-test-button:hover { background: #135cb0; filter: none; }
 .al-test-button:disabled { cursor: wait; opacity: .7; }
 .al-form-help { min-height: 18px; margin: 8px 0 0; color: #b8c4d1; text-align: left; font-size: 12px; line-height: 18px; }
 .al-analysis-options { min-height: 28px; margin-top: 14px; display: flex; justify-content: center; align-items: center; gap: 24px; font-size: 14.5px; letter-spacing: -.03em; }
@@ -78,7 +78,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, [role="tabpanel"]:fo
 .al-section-subtitle { margin: 0; color: var(--al-text-sub); font-size: 20px; line-height: 28px; letter-spacing: -.04em; font-weight: 400; }
 .al-primary-cta { display: flex; align-items: center; min-height: 79px; margin-top: 20px; padding: 14px 32px; border-radius: 3px; background: var(--al-blue-cta); color: #fff; font-size: 18px; line-height: 24px; font-weight: 500; letter-spacing: -.045em; }
 .al-primary-cta span { margin-left: auto; padding-left: 10px; font-size: 12px; line-height: 16px; font-weight: 400; letter-spacing: -.01em; text-align: right; }
-.al-primary-cta:hover { filter: brightness(1.07); }
+.al-primary-cta:hover { background: #135cb0; filter: none; }
 .al-feature-grid { margin-top: 64px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: 0; row-gap: 24px; }
 .al-feature-card { min-width: 0; padding: 18px 20px 20px; border-radius: 4px; background: rgba(255,255,255,.015); }
 .al-feature-card h3 { display: flex; align-items: center; gap: 14px; margin: 0 0 12px; font-size: 20px; line-height: 22px; font-weight: 600; letter-spacing: -.04em; }
@@ -252,3 +252,45 @@ a:focus-visible, button:focus-visible, input:focus-visible, [role="tabpanel"]:fo
 
 /* Keep the CTA reassurance readable at narrow viewport sizes. */
 .al-primary-cta > span { font-size: max(12px, 0.8rem) !important; }
+
+/* Item 1 repairs: accessible CTAs, stable mobile type, and feature-card contrast. */
+.al-test-button,.al-primary-cta,.al-feature-grid .al-primary-cta{background:#1769c9!important;color:#fff!important}
+.al-primary-cta{gap:12px;flex-wrap:wrap}
+.al-primary-cta>span{color:#fff!important}
+.al-feature-card h3,.al-feature-card h3 span{color:#fff!important}
+.visibility-feature-card,.visibility-feature-card-title{color:#f1f5f9!important}
+.visibility-feature-card-copy{color:#cbd5e1!important}
+.visibility-feature-icon{color:#e2e8f0!important;display:inline-flex!important;align-items:center;justify-content:center}
+.visibility-feature-icon svg,.visibility-feature-icon i{width:24px;height:24px;color:currentColor;stroke:currentColor}
+.al-tab-panel p{line-height:1.65}
+.al-hero h1{text-wrap:balance}
+.al-feature-card h3{line-height:1.3}
+@media(max-width:760px){.al-hero h1{line-height:1.2;margin-bottom:8px}.al-features-intro{gap:18px}.al-primary-cta{align-items:center}}
+
+
+/* Approved CTA and layout defect fixes */
+.al-primary-cta,
+.visibility-report-cta,
+.get-started-primary {
+  background: #1769c9 !important;
+  color: #fff !important;
+}
+.al-primary-cta *,
+.visibility-report-cta *,
+.get-started-primary * { color: #fff !important; }
+.faq-section .faq-item.is-open .faq-answer,
+.faq-section .faq-item.open .faq-answer {
+  display: block !important;
+  max-height: none !important;
+  height: auto !important;
+  overflow: visible !important;
+  white-space: normal !important;
+  -webkit-line-clamp: unset !important;
+}
+.regional-performance-layout { grid-template-columns: minmax(0, 1fr) !important; }
+.regional-performance-layout .regional-insight-panel { min-width: 0; }
+
+/* WCAG AA primary CTA hover state. */
+.al-primary-cta:hover,
+.visibility-report-cta:hover,
+.get-started-primary:hover { background: #135cb0 !important; filter: none !important; }

@@ -34,11 +34,17 @@ for (const route of pages) {
         await page.screenshot({path:path.join(dir,`${width}.png`),fullPage:true});
       });
       const metrics = await page.evaluate(({isHome, routePath}) => {
+        const whiteSurfaces = [...document.querySelectorAll('body *')].filter(el => {
+          const r=el.getBoundingClientRect(), s=getComputedStyle(el);
+          if(r.width<200||r.height<60||s.display==='none'||s.visibility==='hidden'||Number(s.opacity)===0) return false;
+          const bg=s.backgroundColor.match(/[\d.]+/g);
+          return bg && bg.length>=3 && bg.slice(0,3).map(Number).every(v=>v>=245) && (bg.length<4 || Number(bg[3])>=0.8) && s.backgroundImage==='none';
+        }).map(el=>({tag:el.tagName.toLowerCase(),className:typeof el.className==='string'?el.className:'',width:Math.round(el.getBoundingClientRect().width),height:Math.round(el.getBoundingClientRect().height)}));
         const headers = document.querySelectorAll('[data-site-header], header.al-site-header').length;
         const bodyBg = getComputedStyle(document.body).backgroundColor;
         const effectiveBg = bodyBg === 'rgba(0, 0, 0, 0)' ? '#ffffff' : bodyBg;
         const bgChannels = effectiveBg.match(/[\d.]+/g);
-        const whiteSurface = !['/compare','/cases'].includes(routePath) || Boolean(bgChannels && bgChannels.slice(0,3).map(Number).every(v => v >= 200));
+        const whiteSurface = !['/compare','/cases'].includes(routePath) || !Boolean(bgChannels && bgChannels.slice(0,3).map(Number).every(v => v >= 200));
         const toggles = document.querySelectorAll('.al-menu-toggle,.al-mobile-toggle').length;
         const horizontal = document.documentElement.scrollWidth > window.innerWidth + 1;
         const overflowNodes = horizontal ? [...document.querySelectorAll('body *')].map(el=>{const r=el.getBoundingClientRect(),s=getComputedStyle(el);return {tag:el.tagName.toLowerCase(),id:el.id||'',className:typeof el.className==='string'?el.className:'',left:Math.round(r.left),right:Math.round(r.right),width:Math.round(r.width),position:s.position,overflowX:s.overflowX};}).filter(x=>x.right>window.innerWidth+1||x.left< -1).filter(x=>x.tag!=='script'&&x.tag!=='style').sort((a,b)=>b.right-a.right).slice(0,12):[];
@@ -50,12 +56,23 @@ for (const route of pages) {
         const dot = document.querySelector('.al-sitewide-dot-canvas');
         const dotCanvasIssues = dot ? (()=>{const s=getComputedStyle(dot),issues=[];if(s.zIndex!=='-1')issues.push('z-index');if(s.pointerEvents!=='none')issues.push('pointer-events');if(!isHome&&Math.abs(Number(s.opacity)-.35)>.02)issues.push('content opacity');return issues;})() : [];
         const textCoveredByDot = dot ? [...document.querySelectorAll('h1,h2,h3,p')].some(el=>{const r=el.getBoundingClientRect();if(r.width<1||r.height<1||r.bottom<0||r.top>window.innerHeight)return false;return document.elementFromPoint(Math.min(window.innerWidth-1,Math.max(0,r.left+r.width/2)),Math.min(window.innerHeight-1,Math.max(0,r.top+r.height/2)))===dot;}) : false;
-        const buttons = [...document.querySelectorAll('button,a.al-try,a.al-login,.btn,.btn-primary,.plan-cta')].filter(el => {
+        const buttons = [...document.querySelectorAll('a,button,[role="button"]')].filter(el => {
           const r=el.getBoundingClientRect(), s=getComputedStyle(el);
           return r.width>0 && r.height>0 && s.visibility!=='hidden' && s.display!=='none';
-        }).map(el => {const s=getComputedStyle(el);let node=el,bg=s.backgroundColor;while((bg==='rgba(0, 0, 0, 0)'||bg==='transparent')&&node.parentElement){node=node.parentElement;bg=getComputedStyle(node).backgroundColor;}if(bg==='rgba(0, 0, 0, 0)'||bg==='transparent')bg=getComputedStyle(document.body).backgroundColor;if(bg==='rgba(0, 0, 0, 0)'||bg==='transparent')bg='#ffffff';return {text:(el.innerText||el.getAttribute('aria-label')||'').trim().slice(0,60),fg:s.color,bg};});
+        }).map(el => {
+          const s=getComputedStyle(el), own=s.backgroundColor;
+          const rgba=(value)=>{const v=value.match(/[\d.]+/g);return v&&v.length>=3?{r:Number(v[0]),g:Number(v[1]),b:Number(v[2]),a:v.length>3?Number(v[3]):1}:null;};
+          const blend=(front,back)=>{const a=front.a+(back.a||1)*(1-front.a);return {r:Math.round((front.r*front.a+back.r*(back.a||1)*(1-front.a))/a),g:Math.round((front.g*front.a+back.g*(back.a||1)*(1-front.a))/a),b:Math.round((front.b*front.a+back.b*(back.a||1)*(1-front.a))/a),a};};
+          const ownRgb=rgba(own);
+          if(!ownRgb || ownRgb.a===0) return null;
+          let composite=ownRgb, ancestor=el.parentElement;
+          while(composite.a<.999&&ancestor){const ab=rgba(getComputedStyle(ancestor).backgroundColor);if(ab&&ab.a>0)composite=blend(composite,ab);ancestor=ancestor.parentElement;}
+          if(composite.a<.999)composite=blend(composite,{r:255,g:255,b:255,a:1});
+          const bg='rgb('+composite.r+', '+composite.g+', '+composite.b+')';
+          return {tag:el.tagName.toLowerCase(),className:typeof el.className==='string'?el.className:'',text:(el.innerText||el.getAttribute('aria-label')||'').trim().slice(0,60),fg:s.color,bg};
+        }).filter(Boolean);
         const links = [...document.querySelectorAll('[data-site-header] a[href], [data-site-footer] a[href]')].map(a=>a.href);
-        return {headers,toggles,horizontal,overflowNodes,cookieBounds,preOverflow,sampleCards,sampleCardIssues,dotCanvasIssues,textCoveredByDot,buttons,links,whiteSurface};
+        return {headers,whiteSurfaces,toggles,horizontal,overflowNodes,cookieBounds,preOverflow,sampleCards,sampleCardIssues,dotCanvasIssues,textCoveredByDot,buttons,links,whiteSurface};
       }, { isHome: route === '/', routePath: route });
       const linkResults = await Promise.all([...new Set(metrics.links)].map(url => {
         if (!linkStatusCache.has(url)) {
@@ -75,9 +92,9 @@ for (const route of pages) {
         }
         return linkStatusCache.get(url);
       }));
-      const contrastIssues = metrics.buttons.filter(b => {const ratio=contrastRatio(b.fg,b.bg);return ratio!==null&&ratio<4.5;}).map(b=>({...b,ratio:contrastRatio(b.fg,b.bg)}));
-      const row = {page:route,width,status,headerCount:metrics.headers,hamburgerCount:metrics.toggles,horizontalScroll:metrics.horizontal,overflowNodes:metrics.overflowNodes,cookieBounds:metrics.cookieBounds,preOverflow:metrics.preOverflow,sampleCardIssues:metrics.sampleCardIssues,dotCanvasIssues:metrics.dotCanvasIssues,textCoveredByDot:metrics.textCoveredByDot,whiteSurface:metrics.whiteSurface,consoleErrors:errors,environmentWarnings,linkFailures:linkResults.filter(x=>!x.ok),contrastIssues};
-      row.ok = status>=200&&status<400&&row.headerCount===1&&row.hamburgerCount===1&&!row.horizontalScroll&&row.cookieBounds&&!row.preOverflow.length&&!row.sampleCardIssues.length&&!row.dotCanvasIssues.length&&!row.textCoveredByDot&&row.whiteSurface&&!errors.length&&!row.linkFailures.length&&!row.contrastIssues.length;
+      const contrastIssues = metrics.buttons.filter(b => {const ratio=contrastRatio(b.fg,b.bg);return ratio!==null&&ratio<4.5;}).map(b=>({...b,ratio:Number(contrastRatio(b.fg,b.bg).toFixed(2))}));
+      const row = {page:route,width,status,headerCount:metrics.headers,hamburgerCount:metrics.toggles,horizontalScroll:metrics.horizontal,overflowNodes:metrics.overflowNodes,cookieBounds:metrics.cookieBounds,preOverflow:metrics.preOverflow,sampleCardIssues:metrics.sampleCardIssues,dotCanvasIssues:metrics.dotCanvasIssues,textCoveredByDot:metrics.textCoveredByDot,whiteSurface:metrics.whiteSurface,whiteSurfaces:metrics.whiteSurfaces,consoleErrors:errors,environmentWarnings,linkFailures:linkResults.filter(x=>!x.ok),contrastTargets:metrics.buttons.length,contrastIssues};
+      row.ok = status>=200&&status<400&&row.headerCount===1&&row.hamburgerCount===1&&!row.horizontalScroll&&row.cookieBounds&&!row.preOverflow.length&&!row.sampleCardIssues.length&&!row.dotCanvasIssues.length&&!row.textCoveredByDot&&row.whiteSurface&&!row.whiteSurfaces.length&&!errors.length&&!row.linkFailures.length&&row.contrastTargets>0&&!row.contrastIssues.length;
       results.push(row);
       await page.close();
     } catch(e) {
@@ -90,9 +107,27 @@ await browser.close();
 fs.writeFileSync(path.join(outDir,'results.json'),JSON.stringify(results,null,2));
 fs.writeFileSync(path.join(outDir,'links.json'),JSON.stringify([...allLinkResults.values()],null,2));
 fs.writeFileSync(path.join(outDir,'links.md'),['| URL | Status | Result / note |','|---|---:|---|',...[...allLinkResults.values()].map(r=>'| '+r.url+' | '+r.status+' | '+(r.warning|| (r.ok?'OK':'ISSUE'))+' |')].join('\n'));
-const markdown = ['| Page | Width | HTTP | Headers | Hamburgers | Horizontal scroll | Cookie bounds | Pre overflow | Sample cards | Dot canvas issues | Text covered | White surface | Console errors | Link failures | Contrast failures | Result |','|---|---:|---:|---:|---:|---|---|---:|---:|---:|---|---|---:|---:|---:|---|',...results.map(r => '| '+r.page+' | '+r.width+' | '+(r.status??0)+' | '+(r.headerCount??'-')+' | '+(r.hamburgerCount??'-')+' | '+(r.horizontalScroll?'FAIL':'OK')+' | '+(r.cookieBounds===false?'FAIL':'OK')+' | '+(r.preOverflow?.length??'-')+' | '+(r.sampleCardIssues?.length??'-')+' | '+(r.dotCanvasIssues?.length??'-')+' | '+(r.textCoveredByDot?'FAIL':'OK')+' | '+(r.whiteSurface?'PASS':'FAIL')+' | '+(r.consoleErrors?.length??(r.error?1:0))+' | '+(r.linkFailures?.length??'-')+' | '+(r.contrastIssues?.length??'-')+' | '+(r.ok?'OK':'ISSUE')+' |')];
-fs.writeFileSync(path.join(outDir,'results.md'),markdown.join('\n'));
+const markdown = ['| Page | Width | HTTP | Headers | Hamburgers | Horizontal scroll | Cookie bounds | Pre overflow | Sample cards | Dot canvas issues | Text covered | White surface | Large white surfaces | Console errors | Link failures | Contrast targets | Contrast failures | Result |','|---|---:|---:|---:|---|---|---:|---:|---:|---|---:|---|---:|---:|---:|---:|---:|---|',...results.map(r => '| '+r.page+' | '+r.width+' | '+(r.status??0)+' | '+(r.headerCount??'-')+' | '+(r.hamburgerCount??'-')+' | '+(r.horizontalScroll?'FAIL':'OK')+' | '+(r.cookieBounds===false?'FAIL':'OK')+' | '+(r.preOverflow?.length??'-')+' | '+(r.sampleCardIssues?.length??'-')+' | '+(r.dotCanvasIssues?.length??'-')+' | '+(r.textCoveredByDot?'FAIL':'OK')+' | '+(r.whiteSurface?'PASS':'FAIL')+' | '+(r.whiteSurfaces?.length??'-')+' | '+(r.consoleErrors?.length??(r.error?1:0))+' | '+(r.linkFailures?.length??'-')+' | '+(r.contrastTargets??'-')+' | '+(r.contrastIssues?.length??'-')+' | '+(r.ok?'OK':'ISSUE')+' |')];
 console.log(markdown.join('\n'));
+const contrastDetails = ['| Page | Width | Visible links/buttons with non-transparent backgrounds | Failures below 4.5:1 | Details |','|---|---:|---:|---:|---|',...results.map(r => '| '+r.page+' | '+r.width+' | '+(r.contrastTargets??'-')+' | '+(r.contrastIssues?.length??'-')+' | '+((r.contrastIssues||[]).map(x=>String(x.ratio)+':1 '+x.tag+'.'+String(x.className||'').trim().replace(/\\s+/g,'.')+' "'+x.text+'"').join('; ')||'None')+' |')];
+fs.writeFileSync(path.join(outDir,'contrast.md'),contrastDetails.join('\n'));
+const contrastRoutes = new Set(['/','/pricing','/why-africa-latency','/locations','/compare','/cases','/about','/tools']);
+const contrastWidths = new Set([1280,720,390]);
+const contrastRows = results.filter(r => contrastRoutes.has(r.page) && contrastWidths.has(r.width));
+const contrastMarkdown = [
+  '| Route | Viewport | Visible buttons/links checked | Failures below 4.5:1 | Result |',
+  '|---|---:|---:|---:|---|',
+  ...contrastRows.map(r => '| '+(r.page)+' | '+r.width+'px | '+(r.contrastTargets??'-')+' | '+(r.contrastIssues?.length??'-')+' | '+(r.contrastIssues?.length===0?'PASS':'FAIL')+' |')
+];
+fs.writeFileSync(path.join(outDir,'all-buttons-contrast.md'),contrastMarkdown.join('\n'));
+console.log('Requested all-buttons contrast matrix:');
+console.log(contrastMarkdown.join('\\n'));
+if (contrastRows.length !== 24 || contrastRows.some(r => !r.contrastIssues || r.contrastIssues.length > 0)) {
+  console.error('All-buttons contrast check failed or did not cover all 24 requested route/viewport combinations.');
+  process.exitCode = 1;
+}
+
+console.log('Contrast matrix written to artifacts/site-shell/contrast.md');
 const routeResults=[];
 for(const route of routeChecks){try{const response=await fetch(base+route,{redirect:'manual'});routeResults.push({route,status:response.status,location:response.headers.get('location'),ok:response.status>=200&&response.status<400});}catch(e){routeResults.push({route,status:0,error:e.message,ok:false});}}
 fs.writeFileSync(path.join(outDir,'routes.json'),JSON.stringify(routeResults,null,2));

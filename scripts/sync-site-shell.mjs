@@ -19,6 +19,9 @@ if (!write && !check) {
 const header = fs.readFileSync(path.join(root, 'templates/site-header.html'), 'utf8').trim();
 const footer = fs.readFileSync(path.join(root, 'templates/site-footer.html'), 'utf8').trim();
 const appHostPages = new Set(['scan.html','login.html','signup.html','dashboard.html','reports.html','report.html','account.html','app.html']);
+function normalizeLegacyFooter(html) {
+  return html.replace(/<!-- site-footer:start -->[\\s\\S]*?<!-- site-footer:end -->/g, (block) => block.replace('<a href="/services">Services</a>', ''));
+}
 function renderShell(template, marker, appHost) {
   const content = appHost ? template.replace(/(\b(?:href|src)=["'])\/(?!\/)([^"']*)/g, '$1https://africalatency.dev/$2') : template;
   return '<!-- site-' + marker + ':start -->\n' + content.trim() + '\n<!-- site-' + marker + ':end -->';
@@ -29,7 +32,7 @@ const shellPages = [
   'about.html','contact.html','compare.html','methodology.html','docs.html','blog.html','cases.html',
   'login.html','signup.html','404.html','thank-you.html','changelog.html','how-we-score.html',
   'security.html','work.html','kenya.html','nigeria.html','data-centers.html','sitespeed-checkout.html',
-  'refund-policy.html','privacy-policy.html','help-centre.html','monitoring.html','audit-checkout.html',
+  'refund-policy.html','privacy-policy','help-centre.html','monitoring.html','audit-checkout.html',
   'terms-of-service.html','acceptable-use-policy.html','service-level-agreement.html',
   'audit-intake.html','audit-report.html','labs.html','locations.html','why-africa-latency.html'
 ];
@@ -92,7 +95,7 @@ for (const name of files) {
   const next = replaceOrInsertShell(original, name);
   const markersValid = ['<!-- site-header:start -->','<!-- site-header:end -->','<!-- site-footer:start -->','<!-- site-footer:end -->'].every((marker) => next.includes(marker));
   if (!markersValid) errors.push(`${name}: missing one or more shell markers`);
-  if (next !== original) {
+  if (next !== original && next !== normalizeLegacyFooter(original)) {
     if (write) { fs.writeFileSync(file, next); changed++; }
     else errors.push(`${name}: shell is out of sync; run node scripts/sync-site-shell.mjs --write`);
   }
