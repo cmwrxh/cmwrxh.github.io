@@ -119,6 +119,8 @@ export function summarizeRun(lhr) {
     .slice(0, 8)
     .map(a => ({ id: a.id, title: String(a.title || a.id).slice(0, 180), description: String(a.description || '').slice(0, 500), savingsMs: Number(a.details?.overallSavingsMs) || null }));
   const screenshot = audits['final-screenshot']?.details?.data || null;
+  const thumbnailItems = audits['screenshot-thumbnails']?.details?.items;
+  const filmstripFrames = (Array.isArray(thumbnailItems) ? thumbnailItems : []).slice(0, 10).map((item, index) => ({ timingMs: Number.isFinite(Number(item?.timing)) ? Math.max(0, Math.round(Number(item.timing))) : index, dataUrl: typeof item?.data === 'string' && /^data:image\/(?:png|jpeg|webp);base64,/.test(item.data) ? item.data : null })).filter(frame => frame.dataUrl);
   const requestItems = audits['network-requests']?.details?.items;
   const hasRequestItems = Array.isArray(requestItems);
   const requests = hasRequestItems ? requestItems : [];
@@ -180,6 +182,7 @@ export function summarizeRun(lhr) {
     opportunities,
     auditList,
     resourceDetails,
-    screenshotDataUrl: typeof screenshot === 'string' && screenshot.startsWith('data:image/') ? screenshot : null
+    screenshotDataUrl: typeof screenshot === 'string' && screenshot.startsWith('data:image/') ? screenshot : null,
+    filmstripFrames
   };
 }
