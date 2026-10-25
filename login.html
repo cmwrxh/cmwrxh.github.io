@@ -102,8 +102,7 @@
 
 <main class="login-page">
   <section class="login-card auth-card" aria-labelledby="login-title">
-    <nav class="auth-tabs" aria-label="Account access"><a class="is-active" aria-current="page" href="/login">Log in</a><a href="/signup">Create account</a></nav>
-    <div class="label">Sign in</div>
+    <nav class="auth-tabs" aria-label="Account access"><a id="login-tab-login" class="is-active" aria-current="page" href="/login">Log in</a><a id="login-tab-signup" href="/signup">Create account</a></nav>
     <h1 id="login-title">Sign in to your account</h1>
     <p class="hero-subtitle">Welcome back.</p>
 
@@ -158,7 +157,7 @@
   const form = document.getElementById('login-form');
   const params = new URLSearchParams(window.location.search);
   const safeNext = window.AfricaLatencyAuthNext.getSafeNext(params.get('next'));
-  document.getElementById('signup-link').href = '/signup?next=' + encodeURIComponent(safeNext);
+  document.getElementById('signup-link').href = window.AfricaLatencyAuthNext.buildAuthTabHref('/signup',safeNext);document.getElementById('login-tab-login').href=window.AfricaLatencyAuthNext.buildAuthTabHref('/login',safeNext);document.getElementById('login-tab-signup').href=window.AfricaLatencyAuthNext.buildAuthTabHref('/signup',safeNext);
   const status = document.getElementById('login-status');
   const submit = document.getElementById('login-submit');
   const password = document.getElementById('password');
