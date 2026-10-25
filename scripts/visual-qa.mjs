@@ -26,7 +26,7 @@ for (const route of pages) {
     const errors = [];
     const environmentWarnings = [];
     page.on('pageerror', e => errors.push('pageerror: '+e.message));
-    page.on('console', msg => { if (msg.type() === 'error') { const value='console: '+msg.text(); if ((route==='/login'||route==='/signup') && (/GSI_LOGGER|status of 403/.test(value))) environmentWarnings.push(value); else if(route===reportFixtureRoute&&(/fixture\\.invalid|Failed to load resource|net::ERR_FAILED/.test(value))) environmentWarnings.push(value); else errors.push(value); } });
+    page.on('console', msg => { if (msg.type() === 'error') { const value='console: '+msg.text(); if ((route==='/login'||route==='/signup') && (/GSI_LOGGER|status of 403/.test(value))) environmentWarnings.push(value); else if(route===reportFixtureRoute&&(/fixture\.invalid|Failed to load resource|net::ERR_FAILED/.test(value))) environmentWarnings.push(value); else errors.push(value); } });
     let status = 0;
     try {
       if(route===reportFixtureRoute){await page.route('**/api/scan/**',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(reportFixture)}));await page.route('https://fixture.invalid/**',route=>route.abort('failed'));await page.route('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2',route=>route.fulfill({status:200,contentType:'application/javascript',body:'window.supabase={createClient:()=>({auth:{getSession:async()=>({data:{session:null}})}})};'}));}
