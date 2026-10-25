@@ -10,6 +10,7 @@ const browser = await chromium.launch({ headless: true, channel: 'chrome' });
 const sizes = [
   { label: '1280', width: 1280, height: 900 },
   { label: '820', width: 820, height: 1000 },
+  { label: '720', width: 720, height: 900 },
   { label: '390', width: 390, height: 844 }
 ];
 
@@ -34,6 +35,11 @@ try {
     };
     const reference = await capture(base + '/docs/visual-review/reference.html', 'reference-' + size.label + '.png');
     const homepage = await capture(base + '/', 'homepage-' + size.label + '.png');
+    if (['1280','820','720','390'].includes(size.label)) {
+      const area=async(url,selector,name)=>{const p=await browser.newPage({viewport:{width:size.width,height:size.height},deviceScaleFactor:1});await p.addInitScript(()=>{localStorage.setItem('africalatency_analytics_consent_v1','rejected');localStorage.setItem('africalatency-analytics-consent','rejected')});await p.goto(url,{waitUntil:'networkidle',timeout:45000});const el=p.locator(selector).first();if(!await el.count())throw Error('Missing visual proof area '+selector);const b=await el.screenshot({animations:'disabled'});await import('node:fs/promises').then(fs=>fs.writeFile(resolve(output,name+'-'+size.label+'.png'),b));await p.close()};
+      await area(mainBase+'/', '.al-hero', 'before-hero-dotfield');await area(base+'/', '.al-hero', 'after-hero-dotfield');await area(mainBase+'/', '.al-tabs-section', 'before-four-tabs');await area(base+'/', '.al-capabilities-section', 'after-four-tabs');await area(mainBase+'/', '.regional-performance-section', 'before-africa-section');await area(base+'/', '.al-africa-map-section', 'after-africa-map');
+    }
+    if (size.label === '390' || size.label === '1280') {const d=await browser.newPage({viewport:{width:size.width,height:size.label==='390'?844:900},deviceScaleFactor:1});await d.goto(base+'/?dotfield-test=1',{waitUntil:'networkidle',timeout:45000});await d.waitForTimeout(1000);for(let i=1;i<=6;i++){await d.screenshot({path:resolve(output,'dotfield-drift-'+size.label+'-'+i+'.png'),animations:'disabled'});if(i<6)await d.waitForTimeout(1000)}await d.close()}
     const comparison = await browser.newPage({
       viewport: { width: size.width * 2, height: size.height },
       deviceScaleFactor: 1
@@ -43,9 +49,8 @@ try {
     await comparison.close();
 
     // Compare every restored legacy section directly with main at desktop and mobile widths.
-    if (size.label === '1280' || size.label === '390') {
+    if (size.label === '1280' || size.label === '820' || size.label === '720' || size.label === '390') {
       const sectionSelectors = [
-        ['regional-performance', '.regional-performance-section'],
         ['workflow-showcase', '.visibility-feature-section'],
         ['audit-baseline', '.section-band-audit'],
         ['trust', '.infrastructure-trust-section'],
@@ -116,4 +121,4 @@ try {
   await browser.close();
 }
 // Both the legacy and current consent keys are rejected for a clean visual comparison.
-console.log('Captured viewport/full-page screenshots at 1280px, 820px and 390px, plus seven restored-section comparisons against main at 1280px and 390px.');
+console.log('Captured viewport/full-page screenshots at 1280px, 820px, 720px and 390px, area before/after screenshots, unchanged-section comparisons, and six one-second DotField frames at 390px and 1280px.');
