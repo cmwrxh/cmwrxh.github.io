@@ -43,7 +43,7 @@
           var xx=snap(col*gap+gap*.5),ex=(xx-cx)/rx,ey=(y-cy)/ry,env=1-Math.sqrt(ex*ex+ey*ey);
           if(env<=0)continue;
           var i=r*cols+col;
-          var wave=sm((noise(xx*.01+t*.02,y*.01+t*.007)-.2)/.72);
+          var wave=.3+.7*sm((noise(xx*.01+t*.02,y*.01+t*.007)-.15)/.65);
           var tw=.15+.85*(.5+.5*Math.sin(t*Math.PI*2*freq[i]+phase[i]));
           var blink=1;
           if(glitch[i]){
