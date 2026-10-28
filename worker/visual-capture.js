@@ -39,7 +39,7 @@ async function captureProfile(url, profile) {
       try {
         const data = await page.screenshot({ type: final ? 'png' : 'webp', quality: final ? undefined : 90, fullPage: false, captureBeyondViewport: false });
         const overlayDetected = await page.evaluate(() => Boolean(document.querySelector('[role="dialog"], [aria-modal="true"], [id*="cookie" i], [class*="cookie" i], [class*="consent" i]')));
-        frames.push({ timingMs: Math.max(0, Math.round(timingMs)), label, profile, overlayDetected, dataUrl: 'data:image/' + (final ? 'png' : 'webp') + ';base64,' + data.toString('base64') });
+        frames.push({ timingMs: Math.max(0, Math.round(timingMs)), label, profile, overlayDetected, dataUrl: 'data:image/' + (final ? 'png' : 'webp') + ';base64,' + Buffer.from(data).toString('base64') });
       } catch (error) {
         console.warn('[scan-worker] visual frame capture failed:', String(error?.message || error).slice(0, 120));
       }
