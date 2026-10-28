@@ -1,7 +1,15 @@
 export function parseFilmstripFilename(name) {
-  const match = String(name || '').match(/^(mobile|desktop)-(\d{2})-(\d+)\.(webp|png)$/);
+  const match = String(name || '').match(/^(mobile|desktop)-(\d{2})-(\d+)(?:-([a-z0-9-]+))?\.(webp|png)$/);
   if (!match) return null;
-  return { profile: match[1], index: Number(match[2]), timing_ms: Number(match[3]), format: match[4] };
+  const label = match[4] || '';
+  return {
+    profile: match[1],
+    index: Number(match[2]),
+    timing_ms: Number(match[3]),
+    label,
+    format: match[5],
+    overlayDetected: label.split('-').includes('overlay')
+  };
 }
 
 export async function signFilmstripFiles(files, storage, jobId, expiresIn = 3600) {
