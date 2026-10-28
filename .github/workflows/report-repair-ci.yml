@@ -1,0 +1,86 @@
+name: Report repair CI
+
+on:
+  pull_request:
+    branches: [main, integration/report-repair]
+  push:
+    branches: [main, integration/report-repair]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: report-repair-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: Lint and syntax
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check worker JavaScript syntax
+        run: |
+          node --check worker/index.js
+          node --check worker/scoring.js
+          node --check worker/provider.js
+          node --check worker/url-safety.js
+      - name: Check scan and report scripts syntax
+        run: |
+          node --check js/report-dashboard.js
+          node --check scripts/scan-failure-states-test.mjs
+          node --check tests/report-filmstrip.test.cjs
+          node --check tests/auth-next.test.cjs
+
+  unit-tests:
+    name: Site unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install browser test dependency
+        run: npm install --no-save playwright
+      - name: Run auth return-path tests
+        run: npm run test:auth-next
+      - name: Run report filmstrip tests
+        run: npm run test:report-filmstrip
+
+  build:
+    name: Static build validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Verify generated legacy CSS is committed
+        run: |
+          node scripts/build-legacy-home-css.mjs
+          git diff --exit-code -- css/legacy-home.css
+      - name: Validate report and scan entrypoints
+        run: |
+          test -s index.html
+          test -s scan.html
+          test -s report.html
+          test -s reports.html
+          node --check js/report-dashboard.js
+
+  worker-tests:
+    name: Lighthouse worker tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: worker
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install
+      - run: npm test
