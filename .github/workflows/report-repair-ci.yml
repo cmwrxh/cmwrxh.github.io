@@ -4,7 +4,9 @@ on:
   pull_request:
     branches: [integration/report-repair]
   push:
-    branches: [integration/report-repair]
+    branches:
+      - 'task/**'
+      - 'integration/**'
   workflow_dispatch:
 
 permissions:
@@ -12,7 +14,7 @@ permissions:
 
 concurrency:
   group: report-repair-ci-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   lint:
