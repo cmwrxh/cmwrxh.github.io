@@ -265,6 +265,9 @@ async function executeJob(job) {
     requestCount: lighthouseResult.requestCount,
     pageWeightBytes: lighthouseResult.pageWeightBytes,
     requestAnalysis: lighthouseResult.requestAnalysis || null,
+    opportunities: lighthouseResult.opportunities || [],
+    auditList: lighthouseResult.auditList || [],
+    resourceDetails: lighthouseResult.resourceDetails || [],
     runCount: lighthouseResult.runCount || 1,
     aggregation: lighthouseResult.aggregation || 'single Lighthouse run'
   };
