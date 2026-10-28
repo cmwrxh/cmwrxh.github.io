@@ -120,7 +120,7 @@ async function reportFor(req, job) {
     unlocked = job.user_id === user.id;
   }
   const screenshotUrl = await signedScreenshot(job).catch(() => null);
-  const response = publicSummary(job, screenshotUrl, job.status === 'completed' ? await signedFilmstrip(job.id) : []);
+  const response = publicSummary(job, screenshotUrl, job.status === 'completed' ? await signedFilmstrip(job.id, req.query?.refreshFilmstrip === '1') : []);
   response.locked = !unlocked;
   if (unlocked) response.fullReport = job.result?.fullReport || null;
   return response;
