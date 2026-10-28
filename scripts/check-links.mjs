@@ -24,7 +24,12 @@ for (const file of files) {
 }
 for (const rule of [...(config.rewrites || []), ...(config.redirects || [])]) {
   if (rule.source && rule.destination && !rule.source.includes(':')) {
-    routeMap.set(rule.source, rule.destination.replace(/^\//, ''));
+    const destinationPath = rule.destination.split('?')[0];
+    const mappedDestination = routeMap.get(destinationPath)
+      || routeMap.get(destinationPath.replace(/\/$/, ''))
+      || routeMap.get(destinationPath + '.html')
+      || destinationPath.replace(/^\//, '');
+    routeMap.set(rule.source, mappedDestination);
   }
 }
 
