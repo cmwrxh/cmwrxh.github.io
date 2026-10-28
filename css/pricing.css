@@ -105,3 +105,28 @@ html body .pricing-comparison a.plan-select:not([style*="#646464"]) {
 html body .pricing-comparison a.plan-select[style*="#646464"] {
   color: #fff !important;
 }
+
+
+/* Stage 3: keep the comparison matrix readable without forcing page-wide overflow. */
+.pricing-comparison-scroll {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+}
+.pricing-comparison {
+  width: 100%;
+  min-width: 760px;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+.pricing-comparison th,
+.pricing-comparison td {
+  overflow-wrap: anywhere;
+}
+@media (max-width: 420px) {
+  .pricing-main { padding-right: 12px; padding-left: 12px; }
+  .pricing-heading h1 { overflow-wrap: anywhere; }
+  .pricing-comparison-scroll { margin-right: -2px; }
+}
