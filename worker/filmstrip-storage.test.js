@@ -29,3 +29,41 @@ test('valid stored frames are signed; invalid names are skipped', async () => {
 test('visual capture schedule contains the seven required timed frames', () => {
   assert.deepEqual(visualCaptureSchedule().map(frame => frame.timingMs), [250, 500, 1000, 1500, 2000, 3000, 5000]);
 });
+
+test('empty and malformed storage listings return no frames', async () => {
+  const storage = { createSignedUrl: async () => ({ data: null, error: new Error('missing') }) };
+  assert.deepEqual(await signFilmstripFiles([], storage, 'job-empty'), []);
+  assert.deepEqual(await signFilmstripFiles(null, storage, 'job-empty'), []);
+  assert.deepEqual(await signFilmstripFiles([{ name: '../escape.webp' }, { name: 'desktop-00-100.webp' }], storage, 'job-empty'), []);
+});
+
+test('partial signing failure keeps successfully signed frames', async () => {
+  const storage = { createSignedUrl: async path => path.includes('desktop')
+    ? { data: null, error: new Error('expired/missing object') }
+    : path.endsWith('-thumb.webp') || path.endsWith('-640.webp')
+      ? { data: null, error: new Error('thumbnail missing') }
+      : { data: { signedUrl: 'https://storage.test/frame.webp' }, error: null } };
+  const frames = await signFilmstripFiles([{ name: 'mobile-00-250.webp' }, { name: 'desktop-01-500.webp' }], storage, 'job-partial');
+  assert.equal(frames.length, 1);
+  assert.equal(frames[0].url, 'https://storage.test/frame.webp');
+  assert.equal(frames[0].thumbnailUrl, frames[0].url);
+});
+
+test('overlay flag is preserved in stored filename metadata', () => {
+  assert.equal(parseFilmstripFilename('mobile-00-250-fcp-overlay.webp').overlayDetected, true);
+  assert.equal(parseFilmstripFilename('desktop-02-1000-lcp.webp').overlayDetected, false);
+});
+
+test('signed frame URLs can be regenerated after an expiry by repeating the signing lookup', async () => {
+  let generation = 0;
+  const storage = { createSignedUrl: async path => {
+    if (path.endsWith('-thumb.webp') || path.endsWith('-640.webp')) return { data: null, error: new Error('optional derivative absent') };
+    generation++;
+    return { data: { signedUrl: 'https://storage.test/frame-' + generation + '.webp' }, error: null };
+  }};
+  const files = [{ name: 'mobile-00-250.webp' }];
+  const expired = await signFilmstripFiles(files, storage, 'job-expire');
+  const refreshed = await signFilmstripFiles(files, storage, 'job-expire');
+  assert.equal(expired[0].url, 'https://storage.test/frame-1.webp');
+  assert.equal(refreshed[0].url, 'https://storage.test/frame-2.webp');
+});
