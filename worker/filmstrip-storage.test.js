@@ -7,6 +7,7 @@ test('stored desktop/mobile WebP and PNG frames pass filename validation', () =>
   assert.deepEqual(parseFilmstripFilename('mobile-00-250.webp'), { profile: 'mobile', index: 0, timing_ms: 250, label: '', format: 'webp', overlayDetected: false });
   assert.deepEqual(parseFilmstripFilename('desktop-10-5200.png'), { profile: 'desktop', index: 10, timing_ms: 5200, label: '', format: 'png', overlayDetected: false });
   assert.equal(parseFilmstripFilename('mobile-00-250-thumb.webp'), null);
+  assert.equal(parseFilmstripFilename('mobile-00-250-640.webp'), null);
   assert.equal(parseFilmstripFilename('other-00-250.webp'), null);
 });
 
