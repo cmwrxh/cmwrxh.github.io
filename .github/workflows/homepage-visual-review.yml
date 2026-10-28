@@ -10,7 +10,7 @@ on:
       - 'js/compliance.js'
       - 'js/main.js'
       - 'js/homepage-reference-redesign.js'
-      - 'scripts/homepage-dotfield-test.mjs'
+      - 'scripts/homepage-dotfield-test.mjs'\n      - 'scripts/dot-live-test.mjs'
       - 'data/africa-110m.geojson'
       - 'data/NATURAL_EARTH_LICENSE.md'
       - 'docs/visual-review/reference.html'
