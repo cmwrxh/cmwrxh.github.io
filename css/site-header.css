@@ -90,3 +90,31 @@ body:not(.home-page) .al-mobile-menu.is-open:not([hidden]){display:flex!importan
 .al-mobile-menu summary {
   cursor: pointer;
 }
+
+/* Apply accessible 44px targets to the shared shell on country and planned pages too. */
+.al-site-header a,
+.al-site-footer a,
+.al-site-header button,
+.al-site-footer button,
+.al-site-header summary,
+.al-site-footer summary,
+[data-site-header] a,
+[data-site-footer] a {
+  box-sizing: border-box;
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+}
+.al-site-header a,
+.al-site-footer a {
+  padding-block: 10px;
+}
+.al-site-header .al-brand,
+.al-site-header .al-brand img {
+  flex-shrink: 0;
+}
+.al-site-header .al-mobile-menu a,
+.al-site-header .al-mobile-menu summary {
+  align-self: stretch;
+}
