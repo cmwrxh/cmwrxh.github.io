@@ -295,6 +295,42 @@
     {
       "source": "/kenya",
       "destination": "/kenya.html"
+    },
+    {
+      "source": "/locations/egypt",
+      "destination": "/locations/egypt.html"
+    },
+    {
+      "source": "/locations/morocco",
+      "destination": "/locations/morocco.html"
+    },
+    {
+      "source": "/locations/nigeria",
+      "destination": "/locations/nigeria.html"
+    },
+    {
+      "source": "/locations/ghana",
+      "destination": "/locations/ghana.html"
+    },
+    {
+      "source": "/locations/senegal",
+      "destination": "/locations/senegal.html"
+    },
+    {
+      "source": "/locations/kenya",
+      "destination": "/locations/kenya.html"
+    },
+    {
+      "source": "/locations/tanzania",
+      "destination": "/locations/tanzania.html"
+    },
+    {
+      "source": "/locations/uganda",
+      "destination": "/locations/uganda.html"
+    },
+    {
+      "source": "/locations/south-africa",
+      "destination": "/locations/south-africa.html"
     }
   ]
 }
