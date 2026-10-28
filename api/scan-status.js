@@ -13,7 +13,8 @@ export default async function handler(req, res) {
   if (userToken) headers['x-user-token'] = userToken;
   if (typeof req.headers['x-api-key'] === 'string') headers['x-api-key'] = req.headers['x-api-key'];
   try {
-    const response = await fetch(workerUrl() + '/internal/jobs/' + encodeURIComponent(id), { headers, signal: AbortSignal.timeout(8000) });
+    const refresh = req.query?.refreshFilmstrip === '1' ? '?refreshFilmstrip=1' : '';
+    const response = await fetch(workerUrl() + '/internal/jobs/' + encodeURIComponent(id) + refresh, { headers, signal: AbortSignal.timeout(8000) });
     const payload = await response.json().catch(() => ({}));
     return res.status(response.status).json(payload);
   } catch {
