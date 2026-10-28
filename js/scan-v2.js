@@ -17,7 +17,9 @@
       return;
     }
   }
-  const scanTestMode = location.hostname === '127.0.0.1' && new URLSearchParams(location.search).has('scan-test');
+  const scanTestParams = new URLSearchParams(location.search);
+  const scanTestMode = location.hostname === '127.0.0.1' && scanTestParams.has('scan-test');
+  const scanTestTurnstileFailure = scanTestMode && scanTestParams.has('turnstile-fail');
   const form = document.getElementById('scan-form-v2');
   if (!form) return;
   const input = document.getElementById('scan-url');
@@ -100,7 +102,7 @@
     preview.replaceChildren(img);
   }
   async function getToken() {
-    if (scanTestMode) return 'qa-token';
+    if (scanTestMode) return scanTestTurnstileFailure ? '' : 'qa-token';
     if (!supabaseClient) return '';
     const { data } = await supabaseClient.auth.getSession();
     return data?.session?.access_token || '';
@@ -193,6 +195,8 @@
         body:JSON.stringify(payload)
       });
       const data = await response.json().catch(() => ({}));
+      if (response.status === 503) throw new Error('The scan service is temporarily unavailable (HTTP 503). No result is being claimed. Please try again shortly.');
+      if (response.status === 429) throw new Error(data.error || 'Scan rate limit reached. Wait before trying again.');
       if (!response.ok) throw new Error(data.error || 'Could not start the scan.');
       if (data.cacheHit) stageCopy.textContent = 'A recent scan of this URL and device is available. Reusing that result.';
       setStage('queued', data.queuePosition);
@@ -202,7 +206,9 @@
       work.setAttribute('aria-busy','false');
       const message = e.message || 'The scan could not be started.';
       setError(message);
-      if (/temporarily unavailable|HTTP 503|worker unavailable/i.test(message)) { stageTitle.textContent = 'Service temporarily unavailable'; stageCopy.textContent = 'The scan service did not return a usable result. No score is shown. You can retry shortly.'; }
+      if (/queue is full|queue full/i.test(message)) { stageTitle.textContent = 'Scan queue is full'; stageCopy.textContent = 'No scan job was accepted. Wait briefly and retry.'; }
+      else if (/rate limit/i.test(message)) { stageTitle.textContent = 'Scan rate limit reached'; stageCopy.textContent = 'No additional scan was started. Wait for the limit window to reset before retrying.'; }
+      else if (/temporarily unavailable|HTTP 503|worker unavailable/i.test(message)) { stageTitle.textContent = 'Service temporarily unavailable'; stageCopy.textContent = 'The scan service did not return a usable result. No score is shown. You can retry shortly.'; }
       else if (/taking longer than expected|reopen the report link/i.test(message)) { stageTitle.textContent = 'Scan timed out'; stageCopy.textContent = 'Polling has stopped. No final result is being claimed; you can retry the scan.'; }
       else if (/Scan failed:/i.test(message)) { stageTitle.textContent = 'Scan failed'; stageCopy.textContent = 'The reason is shown above. No missing measurements or scores are invented.'; }
       else { stageTitle.textContent = 'Scan paused'; stageCopy.textContent = 'Correct the issue above and try again.'; }
