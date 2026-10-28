@@ -326,8 +326,8 @@ async function runScan() {
   output.innerHTML = `<div class="terminal-header"><div class="terminal-dot red"></div><div class="terminal-dot yellow"></div><div class="terminal-dot green"></div><div class="terminal-title">africalatency-scan ~ ${domain}</div></div><div class="terminal-body" id="scan-body"></div>`;
 
   const body = document.getElementById('scan-body');
-  appendLine(body, `Requesting live measurements for ${domain} from up to 31 African countries…`);
-  appendLine(body, 'Only locations with available probes return live results. The 31-country list is a request scope, not a guarantee of probe availability.');
+  appendLine(body, `Requesting live measurements for ${domain} from nine requested African probe countries…`);
+  appendLine(body, 'Only locations with an available Globalping community probe return live results. AfricaLatency does not operate these probes; unavailable results are reported as unavailable.');
 
   const results = await Promise.all(AFRICA_PROBE_CITIES.map(city =>
     runCityDiagnostic(city, domain).then(result => {
