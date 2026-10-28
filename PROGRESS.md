@@ -5,7 +5,7 @@
 | F0 CI gates | in-PR | #141 | 0dfaf5ac1fdde2f2f88cdea582bc36a3d0ea6c26 |
 | F1 normalized report schema/statuses | ci-green | #142 | 04f07f5768db9862dc4334cee6ff213bc972a111 |
 | F2 Lighthouse audits/opportunities/resource summary | ci-green | #143 | 2100404b28b6efb525ace309875890eaa52227b9 |
-| F3 screenshot/filmstrip capture and playback states | in-PR | #144 | b43e3beda837b63b25c360d966a046b01e177a8c |
+| F3 screenshot/filmstrip capture and playback states | ci-green | #144 | 8437c3a09b4f351fde1619c7a422708f12aca19e |
 | F4 scan profiles and optional repeat runs | todo | — | — |
 | F5 truthful network waterfall | todo | — | — |
 | F6 regional Globalping probes | todo | — | — |
