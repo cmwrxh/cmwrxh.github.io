@@ -12,9 +12,6 @@ on:
 permissions:
   contents: read
 
-concurrency:
-  group: report-repair-ci-${{ github.ref }}
-  cancel-in-progress: false
 
 jobs:
   lint:
