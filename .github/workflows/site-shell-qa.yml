@@ -57,6 +57,8 @@ jobs:
         run: node scripts/visual-qa.mjs
       - name: Test scan failure and partial-result states with mocked API responses
         run: node scripts/scan-failure-states-test.mjs
+      - name: Test report dashboard failure and partial states with mocked API responses
+        run: node scripts/report-state-test.mjs
       - name: Run Lighthouse desktop audits
         run: |
           export CHROME_PATH="$(find "$HOME/.cache/ms-playwright" -type f -path '*/chrome-linux64/chrome' -print -quit)"

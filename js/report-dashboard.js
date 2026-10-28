@@ -1,12 +1,12 @@
 (()=>{'use strict';
-const status=document.getElementById('rd-status'),app=document.getElementById('rd-app');
+const status=document.getElementById('rd-status'),app=document.getElementById('rd-app'),retry=document.getElementById('rd-retry');
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const finite=v=>v!==null&&v!==undefined&&v!==''&&Number.isFinite(Number(v));
 const ms=v=>finite(v)?(Number(v)>=1000?(Number(v)/1000).toFixed(2)+' s':Math.round(Number(v))+' ms'):'Unavailable';
 const score=v=>finite(v)?Math.round(Number(v))+'%':'Unavailable';
 const bytes=v=>finite(v)?(Number(v)===0?'0 B':Number(v)>=1048576?(Number(v)/1048576).toFixed(2)+' MB':Number(v)>=1024?(Number(v)/1024).toFixed(1)+' KB':Math.round(Number(v))+' B'):'Unavailable';
 const fmtDate=v=>v?new Date(v).toLocaleString():'Timestamp unavailable';
-const setStatus=t=>{status.hidden=false;status.textContent=t};
+const setStatus=t=>{status.hidden=false;status.textContent=t;if(retry)retry.hidden=false};
 const table=(headers,rows)=>'<div class="rd-table-wrap"><table class="rd-table"><thead><tr>'+headers.map(h=>'<th>'+esc(h)+'</th>').join('')+'</tr></thead><tbody>'+(rows.length?rows.map(row=>'<tr>'+row.map(c=>'<td>'+c+'</td>').join('')+'</tr>').join(''):'<tr><td colspan="'+headers.length+'">No data returned by this scan.</td></tr>')+'</tbody></table></div>';
 const params=new URLSearchParams(location.search);
 const pathMatch=location.pathname.match(/^\/reports\/([a-f0-9-]{36})\/?$/i);
@@ -26,8 +26,14 @@ document.querySelectorAll('[data-tab]').forEach(button=>button.addEventListener(
 (async()=>{try{
 let token='',user=null;if(client){const {data}=await client.auth.getSession();token=data?.session?.access_token||'';user=data?.session?.user||null;}
 const response=await fetch('/api/scan/'+encodeURIComponent(id),{headers:token?{Authorization:'Bearer '+token}:{}});const data=await response.json().catch(()=>({}));
+if(response.status===503)throw new Error('The report service is temporarily unavailable (HTTP 503). No result is being claimed. Retry shortly.');
+if(response.status===429)throw new Error('Report request rate limit reached. Wait before refreshing.');
 if(!response.ok)throw new Error(data.error||'Unable to load this report.');
-if(data.status!=='completed'){setStatus(data.status==='failed'?(data.error||'The scan failed; no scores are shown.'):'This scan is still running. Refresh this page shortly. Current stage: '+(data.stage||'queued')+'.');return;}
+if(data.status==='failed'){setStatus('Scan failed: '+(data.error||'the scan could not be completed')+'. No final scores are shown. Use Retry scan to start a new scan.');return;}
+if(data.status==='partial'||data.partial===true){setStatus('Partial report: some measurements are unavailable. Missing values are not inferred. Use Retry scan if you need a fresh run.');return;}
+if(data.status==='queued'){setStatus('Scan queued'+(finite(data.queuePosition)?' (position '+Math.round(Number(data.queuePosition))+')':'')+'. Current status only; this page does not poll indefinitely. Refresh later or retry.');return;}
+if(data.status==='running'){setStatus('Scan running. Current stage: '+(data.stage||'in progress')+(finite(data.progress)?' ('+Math.round(Number(data.progress))+'% complete)':'')+'. Refresh later for an update.');return;}
+if(data.status!=='completed'){setStatus('Scan status is unavailable. No final scores are shown. Refresh later or retry the scan.');return;}
 status.hidden=true;app.hidden=false;
 const summary=data.summary||{},m=summary.metrics||{},full=data.fullReport||{},fm=full.metrics||m;
 document.title='Scan Results: '+(data.url||'Website')+' | AfricaLatency';

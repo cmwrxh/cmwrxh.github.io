@@ -4,6 +4,13 @@ on:
     paths:
       - 'worker/**'
       - 'sql/scan-v2.sql'
+      - 'js/scan-v2.js'
+      - 'reports.html'
+      - 'js/report-dashboard.js'
+      - 'scripts/scan-failure-states-test.mjs'
+      - 'scripts/report-state-test.mjs'
+      - 'scripts/visual-qa.mjs'
+      - '.github/workflows/site-shell-qa.yml'
       - '.github/workflows/scan-v2-tests.yml'
 concurrency:
   group: scan-v2-tests-${{ github.event.pull_request.number || github.ref }}
