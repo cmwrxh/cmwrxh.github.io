@@ -672,3 +672,37 @@ a[class*="feature-card-link"] {
   padding-block: 10px !important;
   line-height: 1.5 !important;
 }
+
+/* QA fixes: readable labels, accessible targets, and dark-theme empty states. */
+.audit-trust,
+.audit-trust *,
+.audit-scope-note,
+.audit-scope-note *,
+.audit-form .hint { font-size: max(12px, .75rem) !important; }
+.preview-chart svg text { font-size: 12px !important; }
+html body.pricing-page a.plan-select {
+  display: inline-flex !important; align-items: center !important; justify-content: center !important;
+  box-sizing: border-box !important; min-height: 44px !important; height: auto !important;
+  padding-block: 11px !important; line-height: 1.5 !important;
+}
+html body #index-signup-email { min-width: 44px !important; }
+html body .table-wrap {
+  background: #202125 !important; border-color: #383a40 !important; color: #e7eaf0 !important;
+}
+html body .table-wrap .data-table th,
+html body .table-wrap .data-table td {
+  background: #202125 !important; color: #e7eaf0 !important; border-color: #383a40 !important;
+}
+html body .table-wrap .data-table thead th,
+html body .table-wrap .data-table td.table-empty { background: #1a1b1e !important; color: #e7eaf0 !important; }
+html body .empty-state {
+  background: #202125 !important; border-color: #383a40 !important; color: #e7eaf0 !important;
+}
+html body .empty-state p { color: #cbd5e1 !important; }
+
+/* Final touch-target corrections for payment copy and the off-screen honeypot field. */
+html body .payment-methods-note span { font-size: 12px !important; }
+html body .honeypot input {
+  width: 44px !important; min-width: 44px !important;
+  height: 44px !important; min-height: 44px !important;
+}
