@@ -35,6 +35,8 @@ jobs:
         run: node scripts/sync-site-shell.mjs --check
       - name: Run repository internal-link integrity check
         run: node scripts/check-links.mjs
+      - name: Verify country coverage pages, rewrites and sitemap
+        run: node scripts/country-coverage-test.mjs
       - name: Install browser QA dependencies
         run: npm install --no-save playwright http-server lighthouse
       - name: Install Chromium
