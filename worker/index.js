@@ -214,7 +214,8 @@ async function saveFilmstrip(jobId, frames) {
       const label = String(frame.label || ('t+' + timing + 'ms')).toLowerCase().replace(/[^a-z0-9-]+/g, '-').replace(/^-|-$/g, '').slice(0, 32) || 'frame';
       const finalFrame = label === 'visually-complete';
       const format = finalFrame ? 'png' : 'webp';
-      const base = profile + '-' + String(index).padStart(2, '0') + '-' + timing + '-' + label;
+      const storedLabel = label + (frame.overlayDetected ? '-overlay' : '');
+      const base = profile + '-' + String(index).padStart(2, '0') + '-' + timing + '-' + storedLabel;
       let full = sharp(source, { limitInputPixels: 40000000 });
       const output = finalFrame
         ? await full.png({ compressionLevel: 8 }).toBuffer()
