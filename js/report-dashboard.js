@@ -176,11 +176,14 @@ const reportPath='/reports/'+id;
 const safeNext=window.AfricaLatencyAuthNext?.getSafeNext(reportPath)||'/dashboard';
 const signInHref='/login?next='+encodeURIComponent(safeNext);
 const filmstrip=window.AfricaLatencyReportFilmstrip;
-const filmstripOptions={screenshotUrl:data.screenshotUrl,metrics:{fcpMs:m.fcpMs,lcpMs:m.lcpMs},loggedIn:Boolean(user),signInHref};
+const filmstripOptions={screenshotUrl:data.screenshotUrl,metrics:{fcpMs:m.fcpMs,lcpMs:m.lcpMs,speedIndexMs:m.speedIndexMs},loggedIn:Boolean(user),signInHref};
 const filmstripFrames=filmstrip?filmstrip.normalizeFrames(data.filmstrip):[];
-document.getElementById('rd-filmstrip').innerHTML=filmstrip?filmstrip.renderFilmstrip(filmstripFrames,filmstripOptions):'<div class="rd-empty">No filmstrip frames were returned for this scan.</div>';
-filmstrip?.bindImageFailures(document.getElementById('rd-filmstrip'));
-if(user){document.getElementById('rd-video').innerHTML=filmstrip?filmstrip.renderPlayer(filmstripFrames,filmstripOptions):'<div class="rd-empty">No filmstrip frames were returned for this scan.</div>';filmstrip?.bindPlayer(document.getElementById('rd-video'));filmstrip?.bindImageFailures(document.getElementById('rd-video'));}
+const refreshFilmstrip=async()=>{const response=await fetch('/api/scan/'+encodeURIComponent(id)+'?refreshFilmstrip=1');if(!response.ok)throw new Error('Could not refresh signed frame URLs');const payload=await response.json();return payload.filmstrip||[];};
+const filmstripRoot=document.getElementById('rd-filmstrip');
+filmstripRoot.innerHTML=filmstrip?filmstrip.renderFilmstrip(filmstripFrames,filmstripOptions):'<div class="rd-empty">No filmstrip frames were returned for this scan.</div>';
+filmstrip?.bindImageFailures(filmstripRoot,{refreshFilmstrip});
+filmstrip?.bindInteractions(filmstripRoot);
+if(user){const videoRoot=document.getElementById('rd-video');videoRoot.innerHTML=filmstrip?filmstrip.renderPlayer(filmstripFrames,filmstripOptions):'<div class="rd-empty">No filmstrip frames were returned for this scan.</div>';filmstrip?.bindPlayer(videoRoot);filmstrip?.bindImageFailures(videoRoot,{refreshFilmstrip});}
 else{document.getElementById('rd-video').innerHTML='<div class="rd-playback-locked"><p>Sign in to play this scan frame by frame.</p><a class="rd-button" href="'+esc(signInHref)+'">Sign in to play</a></div>';}
 
 if(user&&client){try{const {data:history,error}=await client.from('scans').select('public_id,target_url,ali_grade,performance_score,fully_loaded_time_ms,total_requests,created_at').eq('user_id',user.id).order('created_at',{ascending:false}).limit(20);if(!error&&history?.length){document.getElementById('rd-history').innerHTML=table(['Date','Target','Grade','Performance','Load time','Requests'],history.map(x=>['<a href="/reports/'+encodeURIComponent(x.public_id)+'">'+esc(fmtDate(x.created_at))+'</a>',esc(x.target_url),esc(x.ali_grade||'—'),esc(score(x.performance_score)),esc(ms(x.fully_loaded_time_ms)),esc(x.total_requests??'Unavailable')]));}else{document.getElementById('rd-history').textContent=error?'History is not available for this account yet.':'No saved scan history is available yet.'}}catch{document.getElementById('rd-history').textContent='History is not available for this account yet.'}}else{document.getElementById('rd-history').innerHTML='Sign in to see saved reports. <a href="/login?next='+encodeURIComponent('/reports/'+id)+'">Log in</a>.'}
