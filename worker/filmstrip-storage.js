@@ -2,6 +2,7 @@ export function parseFilmstripFilename(name) {
   const match = String(name || '').match(/^(mobile|desktop)-(\d{2})-(\d+)(?:-([a-z0-9-]+))?\.(webp|png)$/);
   if (!match) return null;
   const label = match[4] || '';
+  if (label === 'thumb' || label === '640') return null;
   return {
     profile: match[1],
     index: Number(match[2]),
