@@ -184,12 +184,7 @@
             <div class="visibility-report-selected"><span class="visibility-report-selected-icon"><i data-lucide="activity" aria-hidden="true"></i></span><div><span>SELECTED CAPABILITY</span><strong data-feature-preview-title>Web Vitals &amp; Regional Metrics</strong></div></div>
             <p data-feature-preview-summary>Compare returned DNS, TCP, TLS, HTTP and TTFB measurements by available probe. Core Web Vitals require browser-based data and are never inferred from connection timings alone.</p>
             <div class="visibility-report-detail-row"><span>Capability status</span><strong data-feature-preview-status>Available data varies</strong></div>
-            <div class="visibility-report-chart" aria-label="Illustrative performance timing chart, not live scan data">
-              <div class="visibility-report-chart-top"><strong>Regional timing profile</strong><span>Illustrative only</span></div>
-              <div class="visibility-report-chart-row" style="grid-template-columns:minmax(0,110px) minmax(0,1fr) 48px;gap:8px;align-items:center"><span style="min-width:0;white-space:normal;overflow-wrap:anywhere">Nairobi</span><i><b style="width:48%"></b></i><em>example</em></div>
-              <div class="visibility-report-chart-row" style="grid-template-columns:minmax(0,110px) minmax(0,1fr) 48px;gap:8px;align-items:center"><span style="min-width:0;white-space:normal;overflow-wrap:anywhere">Lagos</span><i><b style="width:72%"></b></i><em>example</em></div>
-              <div class="visibility-report-chart-row" style="grid-template-columns:minmax(0,110px) minmax(0,1fr) 48px;gap:8px;align-items:center"><span style="min-width:0;white-space:normal;overflow-wrap:anywhere">Johannesburg</span><i><b style="width:59%"></b></i><em>example</em></div>
-            </div>
+            <div class="visibility-report-chart" data-regional-sample="profile" aria-label="Regional sample measurements when enough verified data is available"><div class="visibility-report-chart-top"><strong>Regional timing profile</strong><span>Verified samples only</span></div><p class="regional-sample-empty">Not enough data yet. Regional samples will appear after enough independent runs and successful probes.</p></div>
             <div class="visibility-report-disclaimer"><i data-lucide="info" aria-hidden="true"></i> Preview only. Bars and labels are illustrative, not measurements. Real results depend on available probes and returned data.</div>
           </div>
           <a class="visibility-report-cta" href="/scan">Run a free scan <i data-lucide="arrow-right" aria-hidden="true"></i></a>
@@ -288,15 +283,10 @@
             </div>
             <div class="get-started-node-status"><span class="get-started-status-dot"></span><strong>Node preview: Nairobi</strong><span>Illustrative</span></div>
             <div class="get-started-latency-title"><span>Regional response phases</span><span>Example timings</span></div>
-            <div class="get-started-latency-bars" aria-label="Illustrative latency timing bars, not live measurements">
-              <div class="get-started-latency-row"><span>DNS lookup</span><div class="get-started-latency-track"><i class="latency-cyan"></i></div><strong>8 ms</strong></div>
-              <div class="get-started-latency-row"><span>TCP connect</span><div class="get-started-latency-track"><i class="latency-green"></i></div><strong>12 ms</strong></div>
-              <div class="get-started-latency-row"><span>TLS setup</span><div class="get-started-latency-track"><i class="latency-yellow"></i></div><strong>19 ms</strong></div>
-              <div class="get-started-latency-row"><span>First byte</span><div class="get-started-latency-track"><i class="latency-blue"></i></div><strong>28 ms</strong></div>
-            </div>
+            <div class="get-started-latency-bars" data-regional-sample="summary" aria-label="Verified regional sample measurements"><p class="regional-sample-empty">Not enough data yet. No regional timings are displayed until enough verified samples are available.</p></div>
             <div class="get-started-report-foot"><span><i data-lucide="activity" aria-hidden="true"></i> Regional probe preview</span><span>Sample values only</span></div>
           </div>
-          <div class="get-started-floating-metric"><span class="get-started-floating-icon">↯</span><span><strong>28 ms TTFB</strong><small>Illustrative example, not live data</small></span></div>
+          <div class="get-started-floating-metric"><span class="get-started-floating-icon">↯</span><span><strong data-regional-sample-status>Sample data pending</strong><small>Only verified measurements will be shown</small></span></div>
           <div class="get-started-visual-caption"><i data-lucide="info" aria-hidden="true"></i> Illustration only. No live scan data is shown.</div>
         </div>
       </div>
@@ -320,6 +310,7 @@
     <script src="/js/marketing-infrastructure-banner.js?v=1" defer></script>
     <script src="/js/workflow-showcase.js?v=2" defer></script>
 <script src="/js/compliance.js?v=1" defer></script>
+  <script src="/js/regional-sample.js?v=1" defer></script>
   <script src="/js/homepage-reference-redesign.js?v=4" defer></script>
   <script src="/js/site-header.js" defer></script>
 </body>

@@ -37,6 +37,8 @@ jobs:
         run: node scripts/check-links.mjs
       - name: Verify country coverage pages, rewrites and sitemap
         run: node scripts/country-coverage-test.mjs
+      - name: Verify regional sample data never invents measurements
+        run: node scripts/regional-sample-test.mjs
       - name: Smoke-test Performance Index and legacy /index route
         run: node scripts/route-smoke-test.mjs
       - name: Install browser QA dependencies

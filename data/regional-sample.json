@@ -1,0 +1,105 @@
+{
+  "schemaVersion": 1,
+  "source": "Globalping community probes",
+  "targetUrl": "https://africalatency.dev/",
+  "generatedAt": null,
+  "minimumRunCount": 3,
+  "minimumSuccessfulProbeCount": 3,
+  "notes": [
+    "No measurement samples have been committed yet.",
+    "Only results produced by actual Globalping HTTP measurements should populate country medians.",
+    "A country is shown only after at least three distinct measurement runs and three successful probes."
+  ],
+  "countries": [
+    {
+      "countryCode": "KE",
+      "country": "Kenya",
+      "medianHttpTotalMs": null,
+      "medianTtfbMs": null,
+      "probeCount": 0,
+      "runCount": 0,
+      "measurementDate": null,
+      "status": "not_enough_data"
+    },
+    {
+      "countryCode": "NG",
+      "country": "Nigeria",
+      "medianHttpTotalMs": null,
+      "medianTtfbMs": null,
+      "probeCount": 0,
+      "runCount": 0,
+      "measurementDate": null,
+      "status": "not_enough_data"
+    },
+    {
+      "countryCode": "ZA",
+      "country": "South Africa",
+      "medianHttpTotalMs": null,
+      "medianTtfbMs": null,
+      "probeCount": 0,
+      "runCount": 0,
+      "measurementDate": null,
+      "status": "not_enough_data"
+    },
+    {
+      "countryCode": "EG",
+      "country": "Egypt",
+      "medianHttpTotalMs": null,
+      "medianTtfbMs": null,
+      "probeCount": 0,
+      "runCount": 0,
+      "measurementDate": null,
+      "status": "not_enough_data"
+    },
+    {
+      "countryCode": "GH",
+      "country": "Ghana",
+      "medianHttpTotalMs": null,
+      "medianTtfbMs": null,
+      "probeCount": 0,
+      "runCount": 0,
+      "measurementDate": null,
+      "status": "not_enough_data"
+    },
+    {
+      "countryCode": "MA",
+      "country": "Morocco",
+      "medianHttpTotalMs": null,
+      "medianTtfbMs": null,
+      "probeCount": 0,
+      "runCount": 0,
+      "measurementDate": null,
+      "status": "not_enough_data"
+    },
+    {
+      "countryCode": "TZ",
+      "country": "Tanzania",
+      "medianHttpTotalMs": null,
+      "medianTtfbMs": null,
+      "probeCount": 0,
+      "runCount": 0,
+      "measurementDate": null,
+      "status": "not_enough_data"
+    },
+    {
+      "countryCode": "UG",
+      "country": "Uganda",
+      "medianHttpTotalMs": null,
+      "medianTtfbMs": null,
+      "probeCount": 0,
+      "runCount": 0,
+      "measurementDate": null,
+      "status": "not_enough_data"
+    },
+    {
+      "countryCode": "SN",
+      "country": "Senegal",
+      "medianHttpTotalMs": null,
+      "medianTtfbMs": null,
+      "probeCount": 0,
+      "runCount": 0,
+      "measurementDate": null,
+      "status": "not_enough_data"
+    }
+  ]
+}
