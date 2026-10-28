@@ -228,7 +228,7 @@ async function saveFilmstrip(jobId, frames) {
       const medium = await sharp(source, { limitInputPixels: 40000000 }).resize({ width: 640, withoutEnlargement: true }).webp({ quality: 72 }).toBuffer();
       await Promise.all([
         storage.upload(jobId + '/filmstrip/' + base + '-thumb.webp', thumbnail, { contentType: 'image/webp', cacheControl: '31536000', upsert: true }),
-        storage.upload(jobId + '/filmstrip/' + base + '-640.webp', medium, { contentType: 'image/webp', upsert: true })
+        storage.upload(jobId + '/filmstrip/' + base + '-640.webp', medium, { contentType: 'image/webp', cacheControl: '31536000', upsert: true })
       ]);
       saved++;
     } catch (error) {
