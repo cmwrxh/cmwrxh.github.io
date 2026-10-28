@@ -39,6 +39,8 @@ jobs:
         run: node scripts/country-coverage-test.mjs
       - name: Verify regional sample data never invents measurements
         run: node scripts/regional-sample-test.mjs
+      - name: Verify sample aggregation requires real repeated measurements
+        run: node scripts/regional-sample-builder-test.mjs
       - name: Smoke-test Performance Index and legacy /index route
         run: node scripts/route-smoke-test.mjs
       - name: Install browser QA dependencies
