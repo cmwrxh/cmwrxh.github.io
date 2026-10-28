@@ -87,7 +87,7 @@
       segment.classList.toggle('is-done', i < data.index || stage === 'completed');
       segment.classList.toggle('is-active', i === data.index && stage !== 'completed' && stage !== 'failed');
     });
-    count.textContent = stage === 'queued' && queuePosition ? 'You are #' + queuePosition + ' in the queue' : (Number.isFinite(Number(progress)) && progress !== null && progress !== '' ? Math.max(0,Math.min(100,Math.round(Number(progress))) + '% complete') : '');
+    count.textContent = stage === 'queued' && queuePosition ? 'You are #' + queuePosition + ' in the queue' : (Number.isFinite(Number(progress)) && progress !== null && progress !== '' ? (Math.max(0,Math.min(100,Math.round(Number(progress)))) + '% complete') : '');
   }
   function showScreenshot(url) {
     if (!url || !/^https:\/\//i.test(url)) return;
@@ -118,7 +118,7 @@
       if (!response.ok) throw new Error(payload.error || 'Unable to retrieve scan status.');
       if (payload.screenshotUrl) showScreenshot(payload.screenshotUrl);
       if (payload.stage !== lastStage) { lastStage = payload.stage; setStage(payload.stage, payload.stage === 'queued' ? (payload.queuePosition || initialPosition) : null, payload.progress); }
-      else if (payload.progress !== undefined) count.textContent = Number.isFinite(Number(payload.progress)) ? Math.max(0,Math.min(100,Math.round(Number(payload.progress))) + '% complete') : '';
+      else if (payload.progress !== undefined) count.textContent = Number.isFinite(Number(payload.progress)) ? (Math.max(0,Math.min(100,Math.round(Number(payload.progress)))) + '% complete') : '';
       if (payload.status === 'partial' || payload.partial === true) { stageTitle.textContent = 'Partial results available'; stageCopy.textContent = 'Some checks returned evidence while others remain unavailable. Waiting for the scan to finish; missing values are not inferred.'; }
       if (payload.status === 'failed') throw new Error('Scan failed: ' + (payload.error || 'The scan could not be completed.'));
       if (payload.status === 'completed') {
