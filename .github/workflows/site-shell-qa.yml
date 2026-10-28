@@ -1,9 +1,9 @@
 name: Site shell and responsive QA
 on:
   pull_request:
-    branches: [main, feat/scan-filmstrip-v2]
+    branches: [main, feat/scan-filmstrip-v2, integration/finish-all]
   push:
-    branches: [fix/sitewide-header-and-pages]
+    branches: [fix/sitewide-header-and-pages, integration/finish-all]
 permissions:
   contents: read
 jobs:
