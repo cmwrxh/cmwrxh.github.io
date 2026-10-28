@@ -264,6 +264,7 @@ async function executeJob(job) {
     metrics: lighthouseResult.metrics,
     requestCount: lighthouseResult.requestCount,
     pageWeightBytes: lighthouseResult.pageWeightBytes,
+    metricStatus: lighthouseResult.metricStatus || null,
     requestAnalysis: lighthouseResult.requestAnalysis || null,
     runCount: lighthouseResult.runCount || 1,
     aggregation: lighthouseResult.aggregation || 'single Lighthouse run'
@@ -283,6 +284,7 @@ async function executeJob(job) {
       metrics: lighthouseResult.metrics,
       requestCount: lighthouseResult.requestCount,
       pageWeightBytes: lighthouseResult.pageWeightBytes,
+      metricStatus: lighthouseResult.metricStatus || null,
       requestAnalysis: lighthouseResult.requestAnalysis || null,
       opportunities: lighthouseResult.opportunities,
       auditList: lighthouseResult.auditList || [],
