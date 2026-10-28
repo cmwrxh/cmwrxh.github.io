@@ -222,12 +222,12 @@ async function saveFilmstrip(jobId, frames) {
         : await full.webp({ quality: 90, effort: 4 }).toBuffer();
       if (!output.length || output.length > 8 * 1024 * 1024) { failed++; continue; }
       const fullPath = jobId + '/filmstrip/' + base + '.' + format;
-      const { error: fullError } = await storage.upload(fullPath, output, { contentType: finalFrame ? 'image/png' : 'image/webp', upsert: true });
+      const { error: fullError } = await storage.upload(fullPath, output, { contentType: finalFrame ? 'image/png' : 'image/webp', cacheControl: '31536000', upsert: true });
       if (fullError) { failed++; continue; }
       const thumbnail = await sharp(source, { limitInputPixels: 40000000 }).resize({ width: 320, withoutEnlargement: true }).blur(0.35).webp({ quality: 48 }).toBuffer();
       const medium = await sharp(source, { limitInputPixels: 40000000 }).resize({ width: 640, withoutEnlargement: true }).webp({ quality: 72 }).toBuffer();
       await Promise.all([
-        storage.upload(jobId + '/filmstrip/' + base + '-thumb.webp', thumbnail, { contentType: 'image/webp', upsert: true }),
+        storage.upload(jobId + '/filmstrip/' + base + '-thumb.webp', thumbnail, { contentType: 'image/webp', cacheControl: '31536000', upsert: true }),
         storage.upload(jobId + '/filmstrip/' + base + '-640.webp', medium, { contentType: 'image/webp', upsert: true })
       ]);
       saved++;
