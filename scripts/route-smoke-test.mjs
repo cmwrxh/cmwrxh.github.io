@@ -22,7 +22,7 @@ try {
   const page = await index.text();
   assert.match(page, /Africa Internet Performance Index/);
   const serverSource = fs.readFileSync('server.js', 'utf8');
-  assert.match(serverSource, /app\\.get\\(['"]\\/performance-index['"]/);
-  assert.match(serverSource, /app\\.get\\(['"]\\/index['"]/);
+  assert.ok(serverSource.includes("app.get('/performance-index'"), 'Express host must serve /performance-index');
+  assert.ok(serverSource.includes("app.get('/index'"), 'Express host must redirect /index');
   console.log('PASS: preview HTTP statuses verified; Express production-host routes are explicitly configured.');
 } finally { preview.kill('SIGTERM'); }
