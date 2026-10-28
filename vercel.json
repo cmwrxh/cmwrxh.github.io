@@ -6,6 +6,11 @@
   },
   "redirects": [
     {
+      "source": "/index",
+      "destination": "/performance-index",
+      "permanent": true
+    },
+    {
       "source": "/why-africa-latency",
       "destination": "/why-africa-latency.html",
       "permanent": false
