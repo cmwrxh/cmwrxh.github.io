@@ -201,7 +201,7 @@ async function saveFilmstrip(jobId, frames) {
   for (let i = 0; i < Math.min(frames.length, 10) && Date.now() < deadline; i++) {
     try {
       const frame = frames[i];
-      const match = String(frame?.dataUrl || '').match(/^data:image\\/(png|jpeg|webp);base64,([A-Za-z0-9+/=]+)$/);
+      const match = String(frame?.dataUrl || '').match(/^data:image\/(png|jpeg|webp);base64,([A-Za-z0-9+/=]+)$/);
       if (!match) { dropped++; continue; }
       const remainingMs = deadline - Date.now();
       if (remainingMs <= 0) { dropped += Math.min(frames.length, 10) - i; break; }
