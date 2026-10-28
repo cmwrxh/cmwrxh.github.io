@@ -17,6 +17,7 @@ try {
   console.log('GET /index -> HTTP ' + legacy.status + (legacy.headers.get('location') ? ' Location: ' + legacy.headers.get('location') : ''));
   assert.equal(legacy.status, 301, 'legacy /index should redirect instead of opening the homepage');
   assert.equal(legacy.headers.get('location'), '/performance-index');
+  for (const route of ['/teams','/api','/real-user-metrics','/use-cases/fintech']) { const response = await fetch('http://127.0.0.1:4173' + route, { redirect: 'manual' }); console.log('GET ' + route + ' -> HTTP ' + response.status); assert.equal(response.status, 200, route + ' should render'); }
   const page = await index.text();
   assert.match(page, /Africa Internet Performance Index/);
   console.log('PASS: Performance Index route and legacy alias behave as expected.');

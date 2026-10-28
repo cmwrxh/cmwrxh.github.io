@@ -54,7 +54,7 @@ jobs:
           export CHROME_PATH="$(find "$HOME/.cache/ms-playwright" -type f -path '*/chrome-linux64/chrome' -print -quit)"
           test -n "$CHROME_PATH"
           mkdir -p artifacts/site-shell/lighthouse
-          for pair in "home|/" "pricing|/pricing" "locations|/locations" "why-africa-latency|/why-africa-latency" "audit-checkout|/audit-checkout" "sitespeed-checkout|/sitespeed-checkout" "location-egypt|/locations/egypt"; do
+          for pair in "home|/" "pricing|/pricing" "locations|/locations" "why-africa-latency|/why-africa-latency" "audit-checkout|/audit-checkout" "sitespeed-checkout|/sitespeed-checkout" "location-egypt|/locations/egypt" "teams|/teams" "api|/api" "real-user-metrics|/real-user-metrics" "fintech-use-case|/use-cases/fintech"; do
             name="${pair%%|*}"
             route="${pair#*|}"
             npx lighthouse "http://127.0.0.1:4173${route}" --quiet --preset=desktop --chrome-flags="--headless --no-sandbox" --output=json --output-path="artifacts/site-shell/lighthouse/${name}-desktop.json"

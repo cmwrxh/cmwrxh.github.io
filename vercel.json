@@ -336,6 +336,22 @@
     {
       "source": "/locations/south-africa",
       "destination": "/locations/south-africa.html"
+    },
+    {
+      "source": "/teams",
+      "destination": "/teams.html"
+    },
+    {
+      "source": "/api",
+      "destination": "/api.html"
+    },
+    {
+      "source": "/real-user-metrics",
+      "destination": "/real-user-metrics.html"
+    },
+    {
+      "source": "/use-cases/fintech",
+      "destination": "/use-cases/fintech.html"
     }
   ]
 }
