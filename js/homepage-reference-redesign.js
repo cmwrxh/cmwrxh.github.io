@@ -24,7 +24,7 @@
       for(var r=0;r<nr;r++)for(var col=0;col<nc;col++){
         var i=r*nc+col,seed=hash(col,r,37);
         pp[i]=hash(col,r,11)*Math.PI*2;
-        ff[i]=1/(2+hash(col,r,23)*4);
+        ff[i]=1/(1.25+hash(col,r,23)*2.25);
         bo[i]=hash(col,r,41)*12;
         bp[i]=4+hash(col,r,43)*8;
         bl[i]=.3+hash(col,r,47)*.5;
@@ -43,7 +43,7 @@
           var xx=snap(col*gap+gap*.5),ex=(xx-cx)/rx,ey=(y-cy)/ry,env=1-Math.sqrt(ex*ex+ey*ey);
           if(env<=0)continue;
           var i=r*cols+col;
-          var wave=.3+.7*sm((noise(xx*.01+t*.02,y*.01+t*.007)-.15)/.65);
+          var wave=.3+.7*sm((noise(xx*.014+t*.04,y*.014+t*.016)-.15)/.65);
           var tw=.15+.85*(.5+.5*Math.sin(t*Math.PI*2*freq[i]+phase[i]));
           var blink=1;
           if(glitch[i]){
