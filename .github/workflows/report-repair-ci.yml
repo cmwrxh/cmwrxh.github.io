@@ -2,11 +2,9 @@ name: Report repair CI
 
 on:
   pull_request:
-    branches:
-      - integration/report-repair
+    branches: [integration/report-repair]
   push:
-    branches:
-      - integration/report-repair
+    branches: [integration/report-repair]
   workflow_dispatch:
 
 permissions:
@@ -84,7 +82,5 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
-          cache-dependency-path: worker/package-lock.json
-      - run: npm ci
+      - run: npm install
       - run: npm test
