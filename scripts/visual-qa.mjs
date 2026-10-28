@@ -6,8 +6,8 @@ const base = process.env.SITE_BASE_URL || 'http://127.0.0.1:4173';
 const reportFixtureRoute='/reports/123e4567-e89b-12d3-a456-426614174000';
 const reportFixture={jobId:'fixture-job',reportId:'123e4567-e89b-12d3-a456-426614174000',url:'https://example.com/',device:'mobile',status:'completed',stage:'completed',progress:100,createdAt:'2026-10-25T08:00:00.000Z',completedAt:'2026-10-25T08:00:02.000Z',lighthouseVersion:'12.8.2',chromeVersion:'138',summary:{grade:'B',performance:82,structure:86,metrics:{fcpMs:1700,lcpMs:2400,cls:0.08,tbtMs:180,ttfbMs:700,speedIndexMs:3200},auditList:[],opportunities:[]},fullReport:{metrics:{speedIndexMs:3200},auditList:[],opportunities:[],resourceDetails:[]},screenshotUrl:'https://fixture.invalid/screenshot.jpg',filmstrip:Array.from({length:3},(_,i)=>({timing_ms:i*500,url:'https://fixture.invalid/frame-'+i+'.jpg'})),africaLatency:[],locked:true};
 const pages = ['/', '/pricing', '/scan', '/tools', '/services', '/sample-report', '/about', '/contact', '/compare', '/methodology', '/docs', '/blog', '/cases', '/login', '/signup', '/locations', '/locations/egypt', '/locations/morocco', '/locations/nigeria', '/locations/ghana', '/locations/senegal', '/locations/kenya', '/locations/tanzania', '/locations/uganda', '/locations/south-africa', '/why-africa-latency', reportFixtureRoute];
-const widths = [1280, 820, 720, 390];
-const routeChecks = ['/performance-index','/data-centers','/data-centers.html','/kenya','/kenya.html'];
+const widths = [1280, 820, 720, 390, 320];
+const routeChecks = ['/performance-index','/data-centers','/data-centers.html','/kenya','/kenya.html','/locations/egypt','/locations/morocco','/locations/nigeria','/locations/ghana','/locations/senegal','/locations/kenya','/locations/tanzania','/locations/uganda','/locations/south-africa'];
 const results = [];
 const linkStatusCache = new Map();
 const allLinkResults = new Map();
@@ -142,5 +142,5 @@ fs.writeFileSync(path.join(outDir,'routes.json'),JSON.stringify(routeResults,nul
 fs.writeFileSync(path.join(outDir,'routes.md'),['| Route | HTTP | Redirect | Result |','|---|---:|---|---|',...routeResults.map(r=>`| ${r.route} | ${r.status} | ${r.location||'—'} | ${r.ok?'OK':'ISSUE'} |`)].join('\n'));
 console.log('Route checks:',JSON.stringify(routeResults));
 const reportRows=results.filter(r=>r.page===reportFixtureRoute);
-if(reportRows.length!==4||reportRows.some(r=>!r.ok||r.horizontalScroll||!r.reportLoaded||!r.reportEmptyFallback||r.whiteSurfaces?.length||r.contrastIssues?.length)) {console.error('Fixture report visual QA failed: expected 4 widths with no horizontal overflow, contrast failures, white surfaces, and with filmstrip fallback.');process.exitCode=1;}
+if(reportRows.length!==5||reportRows.some(r=>!r.ok||r.horizontalScroll||!r.reportLoaded||!r.reportEmptyFallback||r.whiteSurfaces?.length||r.contrastIssues?.length)) {console.error('Fixture report visual QA failed: expected 5 widths with no horizontal overflow, contrast failures, white surfaces, and with filmstrip fallback.');process.exitCode=1;}
 if(results.some(r=>!r.ok)||routeResults.some(r=>!r.ok)) process.exit(1);
