@@ -24,7 +24,7 @@
       for(var r=0;r<nr;r++)for(var col=0;col<nc;col++){
         var i=r*nc+col,seed=hash(col,r,37);
         pp[i]=hash(col,r,11)*Math.PI*2;
-        ff[i]=1/(1.25+hash(col,r,23)*2.25);
+        ff[i]=1/(2+hash(col,r,23)*4);
         bo[i]=hash(col,r,41)*12;
         bp[i]=4+hash(col,r,43)*8;
         bl[i]=.3+hash(col,r,47)*.5;
