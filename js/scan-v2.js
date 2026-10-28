@@ -17,6 +17,7 @@
       return;
     }
   }
+  const scanTestMode = location.hostname === '127.0.0.1' && new URLSearchParams(location.search).has('scan-test');
   const form = document.getElementById('scan-form-v2');
   if (!form) return;
   const input = document.getElementById('scan-url');
@@ -78,7 +79,7 @@
     parsed.hash = '';
     return parsed.toString();
   }
-  function setStage(stage, queuePosition) {
+  function setStage(stage, queuePosition, progress) {
     const data = stageMap[stage] || stageMap.queued;
     stageTitle.textContent = data.label;
     stageCopy.textContent = data.copy;
@@ -86,7 +87,7 @@
       segment.classList.toggle('is-done', i < data.index || stage === 'completed');
       segment.classList.toggle('is-active', i === data.index && stage !== 'completed' && stage !== 'failed');
     });
-    count.textContent = stage === 'queued' && queuePosition ? 'You are #' + queuePosition + ' in the queue' : '';
+    count.textContent = stage === 'queued' && queuePosition ? 'You are #' + queuePosition + ' in the queue' : (Number.isFinite(Number(progress)) && progress !== null && progress !== '' ? Math.max(0,Math.min(100,Math.round(Number(progress))) + '% complete') : '');
   }
   function showScreenshot(url) {
     if (!url || !/^https:\/\//i.test(url)) return;
@@ -99,20 +100,27 @@
     preview.replaceChildren(img);
   }
   async function getToken() {
+    if (scanTestMode) return 'qa-token';
     if (!supabaseClient) return '';
     const { data } = await supabaseClient.auth.getSession();
     return data?.session?.access_token || '';
   }
   async function poll(jobId, reportId, initialPosition) {
     let lastStage = 'queued';
-    for (let attempt = 0; attempt < 180; attempt++) {
+    const maxAttempts = scanTestMode ? 2 : 180;
+    const pollDelay = scanTestMode ? 500 : 2000;
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
       const token = await getToken();
       const response = await fetch('/api/scan/' + encodeURIComponent(jobId), { headers: token ? { Authorization: 'Bearer ' + token } : {} });
       const payload = await response.json().catch(() => ({}));
+      if (response.status === 503) throw new Error('The scan service is temporarily unavailable (HTTP 503). No result is being claimed. Please try again shortly.');
+      if (response.status === 429) throw new Error(payload.error || 'Scan rate limit reached. Wait before trying again.');
       if (!response.ok) throw new Error(payload.error || 'Unable to retrieve scan status.');
       if (payload.screenshotUrl) showScreenshot(payload.screenshotUrl);
-      if (payload.stage !== lastStage) { lastStage = payload.stage; setStage(payload.stage, payload.stage === 'queued' ? (payload.queuePosition || initialPosition) : null); }
-      if (payload.status === 'failed') throw new Error(payload.error || 'Site unreachable or scan timed out.');
+      if (payload.stage !== lastStage) { lastStage = payload.stage; setStage(payload.stage, payload.stage === 'queued' ? (payload.queuePosition || initialPosition) : null, payload.progress); }
+      else if (payload.progress !== undefined) count.textContent = Number.isFinite(Number(payload.progress)) ? Math.max(0,Math.min(100,Math.round(Number(payload.progress))) + '% complete') : '';
+      if (payload.status === 'partial' || payload.partial === true) { stageTitle.textContent = 'Partial results available'; stageCopy.textContent = 'Some checks returned evidence while others remain unavailable. Waiting for the scan to finish; missing values are not inferred.'; }
+      if (payload.status === 'failed') throw new Error('Scan failed: ' + (payload.error || 'The scan could not be completed.'));
       if (payload.status === 'completed') {
         stopElapsed();
         if (elapsedLabel) elapsedLabel.textContent = 'Completed in ' + elapsedLabel.textContent.replace(/^Elapsed /,'').replace(/ · typical duration.*$/,'');
@@ -122,7 +130,7 @@
         window.location.href = '/reports/' + encodeURIComponent(reportId || payload.reportId || jobId);
         return;
       }
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      await new Promise(resolve => setTimeout(resolve, pollDelay));
     }
     throw new Error('This scan is taking longer than expected. You can reopen the report link and check its status.');
   }
@@ -192,9 +200,12 @@
     } catch (e) {
       stopElapsed();
       work.setAttribute('aria-busy','false');
-      setError(e.message || 'The scan could not be started.');
-      stageTitle.textContent = 'Scan paused';
-      stageCopy.textContent = 'Correct the issue above and try again.';
+      const message = e.message || 'The scan could not be started.';
+      setError(message);
+      if (/temporarily unavailable|HTTP 503|worker unavailable/i.test(message)) { stageTitle.textContent = 'Service temporarily unavailable'; stageCopy.textContent = 'The scan service did not return a usable result. No score is shown. You can retry shortly.'; }
+      else if (/taking longer than expected|reopen the report link/i.test(message)) { stageTitle.textContent = 'Scan timed out'; stageCopy.textContent = 'Polling has stopped. No final result is being claimed; you can retry the scan.'; }
+      else if (/Scan failed:/i.test(message)) { stageTitle.textContent = 'Scan failed'; stageCopy.textContent = 'The reason is shown above. No missing measurements or scores are invented.'; }
+      else { stageTitle.textContent = 'Scan paused'; stageCopy.textContent = 'Correct the issue above and try again.'; }
       button.disabled = false;
       button.textContent = 'Run free scan';
       if (window.turnstile && turnstileWidget !== null) { window.turnstile.reset(turnstileWidget); turnstileToken = ''; }

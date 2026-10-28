@@ -51,6 +51,8 @@ jobs:
           for i in $(seq 1 30); do curl -fsS http://127.0.0.1:4173/ >/dev/null && break; sleep 1; done
       - name: Capture screenshots and assert responsive quality
         run: node scripts/visual-qa.mjs
+      - name: Test scan failure and partial-result states with mocked API responses
+        run: node scripts/scan-failure-states-test.mjs
       - name: Run Lighthouse desktop audits
         run: |
           export CHROME_PATH="$(find "$HOME/.cache/ms-playwright" -type f -path '*/chrome-linux64/chrome' -print -quit)"
