@@ -2,7 +2,8 @@ import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
 import { setTimeout as delay } from 'node:timers/promises';
 
-const server = spawn(process.execPath, ['scripts/preview-server.mjs'], { stdio: 'ignore' });
+const preview = spawn(process.execPath, ['scripts/preview-server.mjs'], { stdio: 'ignore' });
+const productionLike = spawn(process.execPath, ['server.js'], { stdio: 'ignore', env: { ...process.env, PORT: '4174' } });
 try {
   let ready = false;
   for (let i = 0; i < 40; i++) {
@@ -20,5 +21,18 @@ try {
   for (const route of ['/teams','/api','/real-user-metrics','/use-cases/fintech']) { const response = await fetch('http://127.0.0.1:4173' + route, { redirect: 'manual' }); console.log('GET ' + route + ' -> HTTP ' + response.status); assert.equal(response.status, 200, route + ' should render'); }
   const page = await index.text();
   assert.match(page, /Africa Internet Performance Index/);
-  console.log('PASS: Performance Index route and legacy alias behave as expected.');
-} finally { server.kill('SIGTERM'); }
+  let appReady = false;
+  for (let i = 0; i < 60; i++) {
+    try { const r = await fetch('http://127.0.0.1:4174/performance-index'); if (r.status === 200) { appReady = true; break; } } catch {}
+    await delay(250);
+  }
+  assert.ok(appReady, 'Express preview server did not start or /performance-index did not return 200');
+  const appIndex = await fetch('http://127.0.0.1:4174/performance-index', { redirect: 'manual' });
+  console.log('Express GET /performance-index -> HTTP ' + appIndex.status);
+  assert.equal(appIndex.status, 200);
+  const appLegacy = await fetch('http://127.0.0.1:4174/index', { redirect: 'manual' });
+  console.log('Express GET /index -> HTTP ' + appLegacy.status + (appLegacy.headers.get('location') ? ' Location: ' + appLegacy.headers.get('location') : ''));
+  assert.equal(appLegacy.status, 301);
+  assert.equal(appLegacy.headers.get('location'), '/performance-index');
+  console.log('PASS: static preview and Express-host Performance Index routes behave as expected.');
+} finally { preview.kill('SIGTERM'); productionLike.kill('SIGTERM'); }

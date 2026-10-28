@@ -86,6 +86,10 @@ app.get('/reports/:scanId', (req, res, next) => {
   return res.sendFile(path.join(__dirname, 'reports.html'));
 });
 
+// Canonical Performance Index routes for the Coolify/Express host. Vercel rewrites alone do not apply here.
+app.get('/performance-index', (_req, res) => res.sendFile(path.join(__dirname, 'internet-performance-index.html')));
+app.get('/index', (_req, res) => res.redirect(301, '/performance-index'));
+
 // 3. Static site, with extension fallback (/contact -> contact.html)
 app.use(express.static(__dirname, { extensions: ['html'] }));
 
