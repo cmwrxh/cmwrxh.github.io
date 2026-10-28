@@ -37,6 +37,8 @@ jobs:
         run: node scripts/check-links.mjs
       - name: Verify country coverage pages, rewrites and sitemap
         run: node scripts/country-coverage-test.mjs
+      - name: Reject stale probe-count claims and broken legacy index links
+        run: node scripts/coverage-claims-test.mjs
       - name: Verify regional sample data never invents measurements
         run: node scripts/regional-sample-test.mjs
       - name: Verify sample aggregation requires real repeated measurements

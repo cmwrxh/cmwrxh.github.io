@@ -88,7 +88,7 @@ No other application files are intended to change.
 
 ### Country-count audit and proposed wording
 
-The current product requests measurements from nine African probe countries: Kenya, Nigeria, South Africa, Egypt, Ghana, Morocco, Tanzania, Uganda and Senegal. Globalping probes are community-operated, not AfricaLatency-owned; live results depend on eligible probes being online and able to reach the target. This wording replaces the historical 31-country claim across customer-facing copy.
+The current product requests measurements from nine African probe countries: Kenya, Nigeria, South Africa, Egypt, Ghana, Morocco, Tanzania, Uganda and Senegal. Globalping probes are community-operated, not AfricaLatency-owned; live results depend on eligible probes being online and able to reach the target. This is the approved current wording for customer-facing copy.
 
 ### `js/main.js` homepage behavior review
 

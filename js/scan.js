@@ -356,7 +356,7 @@ async function runScan() {
       <div style="color:var(--text-muted);font-size:.75rem;text-align:right;">Started ${startedAt.toLocaleString()}<br>Completed ${completedAt.toLocaleString()}</div>
     </div>
     ${buildSummary(results, completedAt)}
-    <div style="color:var(--text-muted);font-size:.8rem;line-height:1.6;margin-bottom:1rem;">We request measurements from up to 31 countries. Only locations with available probes return live results. “Unavailable” means this scan returned no completed live HTTP measurement for that country; it does not mean the country’s networks are universally unavailable. Request errors and rate limits are identified separately where returned.</div>
+    <div style="color:var(--text-muted);font-size:.8rem;line-height:1.6;margin-bottom:1rem;">We request measurements from nine African probe countries. Only locations with available Globalping community probes return live results. “Unavailable” means this scan returned no completed live HTTP measurement for that country; it does not mean the country’s networks are universally unavailable. Request errors and rate limits are identified separately where returned.</div>
     ${results.map(renderCityBlock).join('')}
     <div style="padding:1.25rem;background:var(--bg);border-radius:6px;border:1px solid var(--border);margin-top:1rem;">
       <div style="font-size:.95rem;font-weight:600;margin-bottom:.35rem;">Want to know why the results look this way?</div>
