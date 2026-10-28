@@ -326,8 +326,8 @@ async function runScan() {
   output.innerHTML = `<div class="terminal-header"><div class="terminal-dot red"></div><div class="terminal-dot yellow"></div><div class="terminal-dot green"></div><div class="terminal-title">africalatency-scan ~ ${domain}</div></div><div class="terminal-body" id="scan-body"></div>`;
 
   const body = document.getElementById('scan-body');
-  appendLine(body, `Requesting live measurements for ${domain} from up to 31 African countries…`);
-  appendLine(body, 'Only locations with available probes return live results. The 31-country list is a request scope, not a guarantee of probe availability.');
+  appendLine(body, `Requesting live measurements for ${domain} from nine requested African probe countries…`);
+  appendLine(body, 'Only locations with an available Globalping community probe return live results. AfricaLatency does not operate these probes; unavailable results are reported as unavailable.');
 
   const results = await Promise.all(AFRICA_PROBE_CITIES.map(city =>
     runCityDiagnostic(city, domain).then(result => {
@@ -356,7 +356,7 @@ async function runScan() {
       <div style="color:var(--text-muted);font-size:.75rem;text-align:right;">Started ${startedAt.toLocaleString()}<br>Completed ${completedAt.toLocaleString()}</div>
     </div>
     ${buildSummary(results, completedAt)}
-    <div style="color:var(--text-muted);font-size:.8rem;line-height:1.6;margin-bottom:1rem;">We request measurements from up to 31 countries. Only locations with available probes return live results. “Unavailable” means this scan returned no completed live HTTP measurement for that country; it does not mean the country’s networks are universally unavailable. Request errors and rate limits are identified separately where returned.</div>
+    <div style="color:var(--text-muted);font-size:.8rem;line-height:1.6;margin-bottom:1rem;">We request measurements from nine African probe countries. Only locations with available Globalping community probes return live results. “Unavailable” means this scan returned no completed live HTTP measurement for that country; it does not mean the country’s networks are universally unavailable. Request errors and rate limits are identified separately where returned.</div>
     ${results.map(renderCityBlock).join('')}
     <div style="padding:1.25rem;background:var(--bg);border-radius:6px;border:1px solid var(--border);margin-top:1rem;">
       <div style="font-size:.95rem;font-weight:600;margin-bottom:.35rem;">Want to know why the results look this way?</div>

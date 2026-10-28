@@ -34,7 +34,10 @@ const shellPages = [
   'security.html','work.html','kenya.html','nigeria.html','data-centers.html','sitespeed-checkout.html',
   'refund-policy.html','privacy-policy','help-centre.html','monitoring.html','audit-checkout.html',
   'terms-of-service.html','acceptable-use-policy.html','service-level-agreement.html',
-  'audit-intake.html','audit-report.html','labs.html','locations.html','why-africa-latency.html'
+  'audit-intake.html','audit-report.html','labs.html','locations.html','why-africa-latency.html',
+  'locations/egypt.html','locations/ghana.html','locations/kenya.html','locations/morocco.html','locations/nigeria.html',
+  'locations/senegal.html','locations/south-africa.html','locations/tanzania.html','locations/uganda.html',
+  'teams.html','api.html','real-user-metrics.html','use-cases/fintech.html','privacy-policy.html','internet-performance-index.html','sitespeed.html'
 ];
 const files = shellPages.filter((name) => fs.existsSync(path.join(root, name)) && fs.statSync(path.join(root, name)).isFile());
 const errors = [];

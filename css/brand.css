@@ -122,12 +122,12 @@ h1, h2, h3, h4 { line-height: 1.2 !important; }
   --neutral-highlight: rgba(255,255,255,.06);
 }
 
-main a:not(.btn):not(.btn-primary):not(.plan-cta):not(.plan-select):not(.al-primary-cta):not(.al-panel-link):not(.visibility-report-cta):not(.get-started-primary):not(.al-try):not(.al-mobile-cta):not(.al-login):not(.btn-secondary),
-footer a:not(.btn):not(.btn-primary):not(.plan-cta):not(.plan-select):not(.al-primary-cta):not(.al-panel-link):not(.visibility-report-cta):not(.get-started-primary):not(.al-try):not(.al-mobile-cta):not(.al-login):not(.btn-secondary),
+main a:not(.btn):not(.btn-primary):not(.plan-cta):not(.plan-select):not(.al-primary-cta):not(.al-panel-link):not(.visibility-report-cta):not(.get-started-primary):not(.al-try):not(.al-mobile-cta):not(.al-login):not(.btn-secondary):not(.rd-button),
+footer a:not(.btn):not(.btn-primary):not(.plan-cta):not(.plan-select):not(.al-primary-cta):not(.al-panel-link):not(.visibility-report-cta):not(.get-started-primary):not(.al-try):not(.al-mobile-cta):not(.al-login):not(.btn-secondary):not(.rd-button),
 .legal-content a,
 .help-content a { color: var(--text-muted); }
-main a:not(.btn):not(.btn-primary):not(.plan-cta):not(.plan-select):not(.al-primary-cta):not(.al-panel-link):not(.visibility-report-cta):not(.get-started-primary):not(.al-try):not(.al-mobile-cta):not(.al-login):not(.btn-secondary):hover,
-footer a:not(.btn):not(.btn-primary):not(.plan-cta):not(.plan-select):not(.al-primary-cta):not(.al-panel-link):not(.visibility-report-cta):not(.get-started-primary):not(.al-try):not(.al-mobile-cta):not(.al-login):not(.btn-secondary):hover,
+main a:not(.btn):not(.btn-primary):not(.plan-cta):not(.plan-select):not(.al-primary-cta):not(.al-panel-link):not(.visibility-report-cta):not(.get-started-primary):not(.al-try):not(.al-mobile-cta):not(.al-login):not(.btn-secondary):not(.rd-button):hover,
+footer a:not(.btn):not(.btn-primary):not(.plan-cta):not(.plan-select):not(.al-primary-cta):not(.al-panel-link):not(.visibility-report-cta):not(.get-started-primary):not(.al-try):not(.al-mobile-cta):not(.al-login):not(.btn-secondary):not(.rd-button):hover,
 .legal-content a:hover,
 .help-content a:hover { color: var(--text); }
 .label,
@@ -187,8 +187,8 @@ h2{font-size:clamp(26px,6vw,40px)!important;line-height:1.15!important;font-weig
 h3{font-size:20px!important;line-height:1.3!important;font-weight:650!important}
 p{line-height:1.65}
 a{color:#38A1E0}
-main a:not(.btn):not(.btn-primary):not(.plan-cta):not(.plan-select):not(.al-primary-cta):not(.al-panel-link):not(.visibility-report-cta):not(.get-started-primary):not(.al-try):not(.al-mobile-cta):not(.al-login):not(.btn-secondary),footer a:not(.btn):not(.btn-primary):not(.plan-cta):not(.plan-select):not(.al-primary-cta):not(.al-panel-link):not(.visibility-report-cta):not(.get-started-primary):not(.al-try):not(.al-mobile-cta):not(.al-login):not(.btn-secondary),.legal-content a,.help-content a{color:#38A1E0}
-main a:not(.btn):not(.btn-primary):not(.plan-cta):not(.plan-select):not(.al-primary-cta):not(.al-panel-link):not(.visibility-report-cta):not(.get-started-primary):not(.al-try):not(.al-mobile-cta):not(.al-login):not(.btn-secondary):hover,footer a:not(.btn):not(.btn-primary):not(.plan-cta):not(.plan-select):not(.al-primary-cta):not(.al-panel-link):not(.visibility-report-cta):not(.get-started-primary):not(.al-try):not(.al-mobile-cta):not(.al-login):not(.btn-secondary):hover,.legal-content a:hover,.help-content a:hover{color:#e5f1fa}
+main a:not(.btn):not(.btn-primary):not(.plan-cta):not(.plan-select):not(.al-primary-cta):not(.al-panel-link):not(.visibility-report-cta):not(.get-started-primary):not(.al-try):not(.al-mobile-cta):not(.al-login):not(.btn-secondary):not(.rd-button),footer a:not(.btn):not(.btn-primary):not(.plan-cta):not(.plan-select):not(.al-primary-cta):not(.al-panel-link):not(.visibility-report-cta):not(.get-started-primary):not(.al-try):not(.al-mobile-cta):not(.al-login):not(.btn-secondary):not(.rd-button),.legal-content a,.help-content a{color:#38A1E0}
+main a:not(.btn):not(.btn-primary):not(.plan-cta):not(.plan-select):not(.al-primary-cta):not(.al-panel-link):not(.visibility-report-cta):not(.get-started-primary):not(.al-try):not(.al-mobile-cta):not(.al-login):not(.btn-secondary):not(.rd-button):hover,footer a:not(.btn):not(.btn-primary):not(.plan-cta):not(.plan-select):not(.al-primary-cta):not(.al-panel-link):not(.visibility-report-cta):not(.get-started-primary):not(.al-try):not(.al-mobile-cta):not(.al-login):not(.btn-secondary):not(.rd-button):hover,.legal-content a:hover,.help-content a:hover{color:#e5f1fa}
 .container{max-width:1120px!important;padding-left:20px!important;padding-right:20px!important}
 .section{padding:88px 0}
 .compact-section{padding:64px 0}
@@ -223,8 +223,8 @@ nav{background:rgba(15,17,20,.96)!important;border-bottom:1px solid rgba(255,255
 .homepage-footer,.contact-footer,footer{background:#102A43!important;background-image:none!important;color:#FFFFFF!important;border-color:rgba(255,255,255,.15)!important}
 .homepage-footer h3,.contact-footer h3,footer h3,footer h4{color:#FFFFFF!important}
 .homepage-footer p,.contact-footer p,footer p{color:#D8E3ED!important}
-.homepage-footer a:not(.btn):not(.btn-primary):not(.plan-cta):not(.plan-select):not(.al-primary-cta):not(.al-panel-link):not(.visibility-report-cta):not(.get-started-primary):not(.al-try):not(.al-mobile-cta):not(.al-login):not(.btn-secondary),.contact-footer a:not(.btn):not(.btn-primary):not(.plan-cta):not(.plan-select):not(.al-primary-cta):not(.al-panel-link):not(.visibility-report-cta):not(.get-started-primary):not(.al-try):not(.al-mobile-cta):not(.al-login):not(.btn-secondary),footer a:not(.btn):not(.btn-primary):not(.plan-cta):not(.plan-select):not(.al-primary-cta):not(.al-panel-link):not(.visibility-report-cta):not(.get-started-primary):not(.al-try):not(.al-mobile-cta):not(.al-login):not(.btn-secondary){color:#D8E3ED!important}
-.homepage-footer a:not(.btn):not(.btn-primary):not(.plan-cta):not(.plan-select):not(.al-primary-cta):not(.al-panel-link):not(.visibility-report-cta):not(.get-started-primary):not(.al-try):not(.al-mobile-cta):not(.al-login):not(.btn-secondary):hover,.contact-footer a:not(.btn):not(.btn-primary):not(.plan-cta):not(.plan-select):not(.al-primary-cta):not(.al-panel-link):not(.visibility-report-cta):not(.get-started-primary):not(.al-try):not(.al-mobile-cta):not(.al-login):not(.btn-secondary):hover,footer a:not(.btn):not(.btn-primary):not(.plan-cta):not(.plan-select):not(.al-primary-cta):not(.al-panel-link):not(.visibility-report-cta):not(.get-started-primary):not(.al-try):not(.al-mobile-cta):not(.al-login):not(.btn-secondary):hover{color:#FFFFFF!important}
+.homepage-footer a:not(.btn):not(.btn-primary):not(.plan-cta):not(.plan-select):not(.al-primary-cta):not(.al-panel-link):not(.visibility-report-cta):not(.get-started-primary):not(.al-try):not(.al-mobile-cta):not(.al-login):not(.btn-secondary):not(.rd-button),.contact-footer a:not(.btn):not(.btn-primary):not(.plan-cta):not(.plan-select):not(.al-primary-cta):not(.al-panel-link):not(.visibility-report-cta):not(.get-started-primary):not(.al-try):not(.al-mobile-cta):not(.al-login):not(.btn-secondary):not(.rd-button),footer a:not(.btn):not(.btn-primary):not(.plan-cta):not(.plan-select):not(.al-primary-cta):not(.al-panel-link):not(.visibility-report-cta):not(.get-started-primary):not(.al-try):not(.al-mobile-cta):not(.al-login):not(.btn-secondary):not(.rd-button){color:#D8E3ED!important}
+.homepage-footer a:not(.btn):not(.btn-primary):not(.plan-cta):not(.plan-select):not(.al-primary-cta):not(.al-panel-link):not(.visibility-report-cta):not(.get-started-primary):not(.al-try):not(.al-mobile-cta):not(.al-login):not(.btn-secondary):not(.rd-button):hover,.contact-footer a:not(.btn):not(.btn-primary):not(.plan-cta):not(.plan-select):not(.al-primary-cta):not(.al-panel-link):not(.visibility-report-cta):not(.get-started-primary):not(.al-try):not(.al-mobile-cta):not(.al-login):not(.btn-secondary):not(.rd-button):hover,footer a:not(.btn):not(.btn-primary):not(.plan-cta):not(.plan-select):not(.al-primary-cta):not(.al-panel-link):not(.visibility-report-cta):not(.get-started-primary):not(.al-try):not(.al-mobile-cta):not(.al-login):not(.btn-secondary):not(.rd-button):hover{color:#FFFFFF!important}
 .footer-wordmark{width:180px;height:auto;max-height:28px;margin-bottom:18px}
 input,select,textarea,.form-input{background:#0D131D!important;color:#FFFFFF!important;border:1px solid rgba(255,255,255,.12)!important;border-radius:8px!important;min-height:44px}
 input::placeholder,textarea::placeholder{color:#64748B!important}
@@ -358,13 +358,13 @@ p, .section-lead, .hero-subtitle, .card p, .principle p,
   -webkit-text-fill-color: #38A1E0 !important;
 }
 a { color: #38A1E0; }
-main a:not(.btn):not(.btn-primary):not(.plan-cta):not(.plan-select):not(.al-primary-cta):not(.al-panel-link):not(.visibility-report-cta):not(.get-started-primary):not(.al-try):not(.al-mobile-cta):not(.al-login):not(.btn-secondary), footer a:not(.btn):not(.btn-primary):not(.plan-cta):not(.plan-select):not(.al-primary-cta):not(.al-panel-link):not(.visibility-report-cta):not(.get-started-primary):not(.al-try):not(.al-mobile-cta):not(.al-login):not(.btn-secondary),
-.legal-content a:not(.btn):not(.btn-primary):not(.plan-cta):not(.plan-select):not(.al-primary-cta):not(.al-panel-link):not(.visibility-report-cta):not(.get-started-primary):not(.al-try):not(.al-mobile-cta):not(.al-login):not(.btn-secondary), .help-content a:not(.btn):not(.btn-primary):not(.plan-cta):not(.plan-select):not(.al-primary-cta):not(.al-panel-link):not(.visibility-report-cta):not(.get-started-primary):not(.al-try):not(.al-mobile-cta):not(.al-login):not(.btn-secondary),
-.data-centers-callout a:not(.btn):not(.btn-primary):not(.plan-cta):not(.plan-select):not(.al-primary-cta):not(.al-panel-link):not(.visibility-report-cta):not(.get-started-primary):not(.al-try):not(.al-mobile-cta):not(.al-login):not(.btn-secondary), .contact-form-note a:not(.btn):not(.btn-primary):not(.plan-cta):not(.plan-select):not(.al-primary-cta):not(.al-panel-link):not(.visibility-report-cta):not(.get-started-primary):not(.al-try):not(.al-mobile-cta):not(.al-login):not(.btn-secondary) {
+main a:not(.btn):not(.btn-primary):not(.plan-cta):not(.plan-select):not(.al-primary-cta):not(.al-panel-link):not(.visibility-report-cta):not(.get-started-primary):not(.al-try):not(.al-mobile-cta):not(.al-login):not(.btn-secondary):not(.rd-button), footer a:not(.btn):not(.btn-primary):not(.plan-cta):not(.plan-select):not(.al-primary-cta):not(.al-panel-link):not(.visibility-report-cta):not(.get-started-primary):not(.al-try):not(.al-mobile-cta):not(.al-login):not(.btn-secondary):not(.rd-button),
+.legal-content a:not(.btn):not(.btn-primary):not(.plan-cta):not(.plan-select):not(.al-primary-cta):not(.al-panel-link):not(.visibility-report-cta):not(.get-started-primary):not(.al-try):not(.al-mobile-cta):not(.al-login):not(.btn-secondary):not(.rd-button), .help-content a:not(.btn):not(.btn-primary):not(.plan-cta):not(.plan-select):not(.al-primary-cta):not(.al-panel-link):not(.visibility-report-cta):not(.get-started-primary):not(.al-try):not(.al-mobile-cta):not(.al-login):not(.btn-secondary):not(.rd-button),
+.data-centers-callout a:not(.btn):not(.btn-primary):not(.plan-cta):not(.plan-select):not(.al-primary-cta):not(.al-panel-link):not(.visibility-report-cta):not(.get-started-primary):not(.al-try):not(.al-mobile-cta):not(.al-login):not(.btn-secondary):not(.rd-button), .contact-form-note a:not(.btn):not(.btn-primary):not(.plan-cta):not(.plan-select):not(.al-primary-cta):not(.al-panel-link):not(.visibility-report-cta):not(.get-started-primary):not(.al-try):not(.al-mobile-cta):not(.al-login):not(.btn-secondary):not(.rd-button) {
   color: #38A1E0 !important;
 }
-main a:not(.btn):not(.btn-primary):not(.plan-cta):not(.plan-select):not(.al-primary-cta):not(.al-panel-link):not(.visibility-report-cta):not(.get-started-primary):not(.al-try):not(.al-mobile-cta):not(.al-login):not(.btn-secondary):hover, footer a:not(.btn):not(.btn-primary):not(.plan-cta):not(.plan-select):not(.al-primary-cta):not(.al-panel-link):not(.visibility-report-cta):not(.get-started-primary):not(.al-try):not(.al-mobile-cta):not(.al-login):not(.btn-secondary):hover,
-.legal-content a:not(.btn):not(.btn-primary):not(.plan-cta):not(.plan-select):not(.al-primary-cta):not(.al-panel-link):not(.visibility-report-cta):not(.get-started-primary):not(.al-try):not(.al-mobile-cta):not(.al-login):not(.btn-secondary):hover, .help-content a:not(.btn):not(.btn-primary):not(.plan-cta):not(.plan-select):not(.al-primary-cta):not(.al-panel-link):not(.visibility-report-cta):not(.get-started-primary):not(.al-try):not(.al-mobile-cta):not(.al-login):not(.btn-secondary):hover {
+main a:not(.btn):not(.btn-primary):not(.plan-cta):not(.plan-select):not(.al-primary-cta):not(.al-panel-link):not(.visibility-report-cta):not(.get-started-primary):not(.al-try):not(.al-mobile-cta):not(.al-login):not(.btn-secondary):not(.rd-button):hover, footer a:not(.btn):not(.btn-primary):not(.plan-cta):not(.plan-select):not(.al-primary-cta):not(.al-panel-link):not(.visibility-report-cta):not(.get-started-primary):not(.al-try):not(.al-mobile-cta):not(.al-login):not(.btn-secondary):not(.rd-button):hover,
+.legal-content a:not(.btn):not(.btn-primary):not(.plan-cta):not(.plan-select):not(.al-primary-cta):not(.al-panel-link):not(.visibility-report-cta):not(.get-started-primary):not(.al-try):not(.al-mobile-cta):not(.al-login):not(.btn-secondary):not(.rd-button):hover, .help-content a:not(.btn):not(.btn-primary):not(.plan-cta):not(.plan-select):not(.al-primary-cta):not(.al-panel-link):not(.visibility-report-cta):not(.get-started-primary):not(.al-try):not(.al-mobile-cta):not(.al-login):not(.btn-secondary):not(.rd-button):hover {
   color: #FFFFFF !important;
 }
 .btn-primary, button.btn-primary, .btn.btn-primary,
@@ -412,7 +412,7 @@ main .choice-card, main .audience-card, .faq-item, .pricing-card,
 }
 .hero-highlight .hero-subtitle, .contact-gradient .section-lead,
 .cta-section .section-lead, .homepage-footer p, .contact-footer p, footer p,
-.homepage-footer a:not(.btn):not(.btn-primary):not(.plan-cta):not(.plan-select):not(.al-primary-cta):not(.al-panel-link):not(.visibility-report-cta):not(.get-started-primary):not(.al-try):not(.al-mobile-cta):not(.al-login):not(.btn-secondary), .contact-footer a:not(.btn):not(.btn-primary):not(.plan-cta):not(.plan-select):not(.al-primary-cta):not(.al-panel-link):not(.visibility-report-cta):not(.get-started-primary):not(.al-try):not(.al-mobile-cta):not(.al-login):not(.btn-secondary), footer a:not(.btn):not(.btn-primary):not(.plan-cta):not(.plan-select):not(.al-primary-cta):not(.al-panel-link):not(.visibility-report-cta):not(.get-started-primary):not(.al-try):not(.al-mobile-cta):not(.al-login):not(.btn-secondary) {
+.homepage-footer a:not(.btn):not(.btn-primary):not(.plan-cta):not(.plan-select):not(.al-primary-cta):not(.al-panel-link):not(.visibility-report-cta):not(.get-started-primary):not(.al-try):not(.al-mobile-cta):not(.al-login):not(.btn-secondary):not(.rd-button), .contact-footer a:not(.btn):not(.btn-primary):not(.plan-cta):not(.plan-select):not(.al-primary-cta):not(.al-panel-link):not(.visibility-report-cta):not(.get-started-primary):not(.al-try):not(.al-mobile-cta):not(.al-login):not(.btn-secondary):not(.rd-button), footer a:not(.btn):not(.btn-primary):not(.plan-cta):not(.plan-select):not(.al-primary-cta):not(.al-panel-link):not(.visibility-report-cta):not(.get-started-primary):not(.al-try):not(.al-mobile-cta):not(.al-login):not(.btn-secondary):not(.rd-button) {
   color: #A0AEC0 !important;
 }
 input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]),
@@ -646,4 +646,63 @@ html body .al-login:hover,
 html body .visibility-report-cta:hover {
   background-color: #135cb0 !important;
   border-color: #135cb0 !important;
+}
+
+/* Accessible touch targets without changing the shared shell's visual treatment. */
+[data-site-header] a,
+[data-site-footer] a,
+.al-feature-card-link {
+  display: inline-flex !important;
+  align-items: center !important;
+}
+[data-site-header] a,
+[data-site-footer] a,
+.al-feature-card-link,
+.plan-select,
+summary,
+button,
+[role="button"],
+a.btn,
+a.button,
+a[class*="cta"],
+a[class*="primary-button"],
+a[class*="feature-card-link"] {
+  min-width: 44px !important;
+  min-height: 44px !important;
+  padding-block: 10px !important;
+  line-height: 1.5 !important;
+}
+
+/* QA fixes: readable labels, accessible targets, and dark-theme empty states. */
+.audit-trust,
+.audit-trust *,
+.audit-scope-note,
+.audit-scope-note *,
+.audit-form .hint { font-size: max(12px, .75rem) !important; }
+.preview-chart svg text { font-size: 12px !important; }
+html body.pricing-page a.plan-select {
+  display: inline-flex !important; align-items: center !important; justify-content: center !important;
+  box-sizing: border-box !important; min-height: 44px !important; height: auto !important;
+  padding-block: 11px !important; line-height: 1.5 !important;
+}
+html body #index-signup-email { min-width: 44px !important; }
+html body .table-wrap {
+  background: #202125 !important; border-color: #383a40 !important; color: #e7eaf0 !important;
+}
+html body .table-wrap .data-table th,
+html body .table-wrap .data-table td {
+  background: #202125 !important; color: #e7eaf0 !important; border-color: #383a40 !important;
+}
+html body .table-wrap .data-table thead th,
+html body .table-wrap .data-table td.table-empty { background: #1a1b1e !important; color: #e7eaf0 !important; }
+html body .empty-state {
+  background: #202125 !important; border-color: #383a40 !important; color: #e7eaf0 !important;
+}
+html body .empty-state p { color: #cbd5e1 !important; }
+
+/* Final touch-target corrections for payment copy and the off-screen honeypot field. */
+html body .payment-methods-note span { font-size: 12px !important; }
+html body .honeypot input {
+  width: 44px !important; min-width: 44px !important;
+  height: 44px !important; min-height: 44px !important;
 }

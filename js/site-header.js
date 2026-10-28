@@ -43,6 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!header.contains(event.target)) closeDropdowns();
     });
     menu?.querySelectorAll('a').forEach((link) => link.addEventListener('click', closeMobile));
+    closeMobile(); /* start closed: homepage menu markup has no `hidden` attribute */
   });
   document.querySelectorAll('[data-year]').forEach((node) => { node.textContent = String(new Date().getFullYear()); });
 });

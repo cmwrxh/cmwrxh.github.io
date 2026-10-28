@@ -6,6 +6,11 @@
   },
   "redirects": [
     {
+      "source": "/index",
+      "destination": "/performance-index",
+      "permanent": true
+    },
+    {
       "source": "/why-africa-latency",
       "destination": "/why-africa-latency.html",
       "permanent": false
@@ -295,6 +300,58 @@
     {
       "source": "/kenya",
       "destination": "/kenya.html"
+    },
+    {
+      "source": "/locations/egypt",
+      "destination": "/locations/egypt.html"
+    },
+    {
+      "source": "/locations/morocco",
+      "destination": "/locations/morocco.html"
+    },
+    {
+      "source": "/locations/nigeria",
+      "destination": "/locations/nigeria.html"
+    },
+    {
+      "source": "/locations/ghana",
+      "destination": "/locations/ghana.html"
+    },
+    {
+      "source": "/locations/senegal",
+      "destination": "/locations/senegal.html"
+    },
+    {
+      "source": "/locations/kenya",
+      "destination": "/locations/kenya.html"
+    },
+    {
+      "source": "/locations/tanzania",
+      "destination": "/locations/tanzania.html"
+    },
+    {
+      "source": "/locations/uganda",
+      "destination": "/locations/uganda.html"
+    },
+    {
+      "source": "/locations/south-africa",
+      "destination": "/locations/south-africa.html"
+    },
+    {
+      "source": "/teams",
+      "destination": "/teams.html"
+    },
+    {
+      "source": "/api",
+      "destination": "/api.html"
+    },
+    {
+      "source": "/real-user-metrics",
+      "destination": "/real-user-metrics.html"
+    },
+    {
+      "source": "/use-cases/fintech",
+      "destination": "/use-cases/fintech.html"
     }
   ]
 }

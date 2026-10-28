@@ -153,3 +153,47 @@ html body aside#al-cookie-banner p a {
   text-underline-offset: 0.15em;
   text-decoration-thickness: 1px;
 }
+
+/* Prevent the optional-services grid from extending beyond narrow 320px viewports. */
+@media (max-width: 360px) {
+  main .principles-grid {
+    width: 100%;
+    max-width: calc(100vw - 36px);
+    min-width: 0;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  main .principles-grid > .principle {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+  }
+  main .principles-grid > .principle h3,
+  main .principles-grid > .principle p,
+  main .principles-grid > .principle .status-label {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+}
+
+/* Keep optional-service cards inside their grid tracks at every viewport width. */
+main .principles-grid {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: hidden;
+}
+main .principles-grid > .principle {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+main .principles-grid > .principle h3,
+main .principles-grid > .principle p,
+main .principles-grid > .principle .status-label {
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}

@@ -88,7 +88,7 @@ No other application files are intended to change.
 
 ### Country-count audit and proposed wording
 
-The main homepage previously used both **9 African countries** (analysis label/card copy) and **up to 31 countries** (FAQ and Open Graph description). These describe different historical scopes and are inconsistent. Proposed single wording: **“We request measurements from up to 31 African countries; live results appear only where probes are available.”** Avoid implying that all 31 locations are currently live. This update normalizes the homepage analysis label to that wording; other pages still need a repository-wide audit before a site-wide claim of consistency can be certified.
+The current product requests measurements from nine African probe countries: Kenya, Nigeria, South Africa, Egypt, Ghana, Morocco, Tanzania, Uganda and Senegal. Globalping probes are community-operated, not AfricaLatency-owned; live results depend on eligible probes being online and able to reach the target. This is the approved current wording for customer-facing copy.
 
 ### `js/main.js` homepage behavior review
 

@@ -33,3 +33,7 @@
 
 /* Payload labels and code remain readable on narrow screens. */
 .telemetry-payload-toolbar, .telemetry-payload { font-size: max(12px, 0.8rem) !important; }
+
+/* Keep the API example readable at narrow viewport widths. */
+.tools-page pre.developer-code-block,
+.tools-page .developer-code-block code { font-size: max(12px, .78rem) !important; }

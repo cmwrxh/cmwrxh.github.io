@@ -68,3 +68,53 @@ body:not(.home-page) .al-mobile-menu.is-open:not([hidden]){display:flex!importan
 .al-site-header .al-try,.al-site-header a.al-try,.al-site-header .al-mobile-menu .al-try{background:#075985!important;color:#fff!important;border:1px solid #075985!important}
 .al-site-header .al-login{color:#fff!important}
 .al-site-header .al-try:focus-visible,.al-site-header .al-login:focus-visible{outline:3px solid #93c5fd;outline-offset:3px}
+
+/* Keep shared shell controls reachable on every page, including pages without brand.css. */
+[data-site-header] a,
+[data-site-footer] a,
+[data-site-header] button,
+[data-site-footer] button,
+[data-site-header] summary,
+[data-site-footer] summary,
+.al-mobile-menu a,
+.al-mobile-menu summary {
+  box-sizing: border-box;
+  min-height: 44px;
+  padding-block: 10px;
+  display: inline-flex;
+  align-items: center;
+}
+.al-mobile-menu a {
+  align-self: stretch;
+}
+.al-mobile-menu summary {
+  cursor: pointer;
+}
+
+/* Apply accessible 44px targets to the shared shell on country and planned pages too. */
+.al-site-header a,
+.al-site-footer a,
+.al-site-header button,
+.al-site-footer button,
+.al-site-header summary,
+.al-site-footer summary,
+[data-site-header] a,
+[data-site-footer] a {
+  box-sizing: border-box;
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+}
+.al-site-header a,
+.al-site-footer a {
+  padding-block: 10px;
+}
+.al-site-header .al-brand,
+.al-site-header .al-brand img {
+  flex-shrink: 0;
+}
+.al-site-header .al-mobile-menu a,
+.al-site-header .al-mobile-menu summary {
+  align-self: stretch;
+}

@@ -1,12 +1,12 @@
 (()=>{'use strict';
-const status=document.getElementById('rd-status'),app=document.getElementById('rd-app');
+const status=document.getElementById('rd-status'),app=document.getElementById('rd-app'),retry=document.getElementById('rd-retry');
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const finite=v=>v!==null&&v!==undefined&&v!==''&&Number.isFinite(Number(v));
 const ms=v=>finite(v)?(Number(v)>=1000?(Number(v)/1000).toFixed(2)+' s':Math.round(Number(v))+' ms'):'Unavailable';
 const score=v=>finite(v)?Math.round(Number(v))+'%':'Unavailable';
 const bytes=v=>finite(v)?(Number(v)===0?'0 B':Number(v)>=1048576?(Number(v)/1048576).toFixed(2)+' MB':Number(v)>=1024?(Number(v)/1024).toFixed(1)+' KB':Math.round(Number(v))+' B'):'Unavailable';
 const fmtDate=v=>v?new Date(v).toLocaleString():'Timestamp unavailable';
-const setStatus=t=>{status.hidden=false;status.textContent=t};
+const setStatus=t=>{status.hidden=false;status.textContent=t;if(retry)retry.hidden=false};
 const table=(headers,rows)=>'<div class="rd-table-wrap"><table class="rd-table"><thead><tr>'+headers.map(h=>'<th>'+esc(h)+'</th>').join('')+'</tr></thead><tbody>'+(rows.length?rows.map(row=>'<tr>'+row.map(c=>'<td>'+c+'</td>').join('')+'</tr>').join(''):'<tr><td colspan="'+headers.length+'">No data returned by this scan.</td></tr>')+'</tbody></table></div>';
 const params=new URLSearchParams(location.search);
 const pathMatch=location.pathname.match(/^\/reports\/([a-f0-9-]{36})\/?$/i);
@@ -26,8 +26,14 @@ document.querySelectorAll('[data-tab]').forEach(button=>button.addEventListener(
 (async()=>{try{
 let token='',user=null;if(client){const {data}=await client.auth.getSession();token=data?.session?.access_token||'';user=data?.session?.user||null;}
 const response=await fetch('/api/scan/'+encodeURIComponent(id),{headers:token?{Authorization:'Bearer '+token}:{}});const data=await response.json().catch(()=>({}));
+if(response.status===503)throw new Error('The report service is temporarily unavailable (HTTP 503). No result is being claimed. Retry shortly.');
+if(response.status===429)throw new Error('Report request rate limit reached. Wait before refreshing.');
 if(!response.ok)throw new Error(data.error||'Unable to load this report.');
-if(data.status!=='completed'){setStatus(data.status==='failed'?(data.error||'The scan failed; no scores are shown.'):'This scan is still running. Refresh this page shortly. Current stage: '+(data.stage||'queued')+'.');return;}
+if(data.status==='failed'){setStatus('Scan failed: '+(data.error||'the scan could not be completed')+'. No final scores are shown. Use Retry scan to start a new scan.');return;}
+if(data.status==='partial'||data.partial===true){setStatus('Partial report: some measurements are unavailable. Missing values are not inferred. Use Retry scan if you need a fresh run.');return;}
+if(data.status==='queued'){setStatus('Scan queued'+(finite(data.queuePosition)?' (position '+Math.round(Number(data.queuePosition))+')':'')+'. Current status only; this page does not poll indefinitely. Refresh later or retry.');return;}
+if(data.status==='running'){setStatus('Scan running. Current stage: '+(data.stage||'in progress')+(finite(data.progress)?' ('+Math.round(Number(data.progress))+'% complete)':'')+'. Refresh later for an update.');return;}
+if(data.status!=='completed'){setStatus('Scan status is unavailable. No final scores are shown. Refresh later or retry the scan.');return;}
 status.hidden=true;app.hidden=false;
 const summary=data.summary||{},m=summary.metrics||{},full=data.fullReport||{},fm=full.metrics||m;
 document.title='Scan Results: '+(data.url||'Website')+' | AfricaLatency';
@@ -39,6 +45,8 @@ document.getElementById('rd-profile').textContent=data.device==='mobile'?'Lighth
 document.getElementById('rd-browser').textContent='Chrome '+(data.chromeVersion||'version unavailable')+' · Lighthouse '+(data.lighthouseVersion||'version unavailable');
 const grade=summary.grade||'Unavailable';
 document.getElementById('rd-scores').innerHTML=[['AfricaLatency grade',grade,'rd-grade rd-grade-'+String(grade).toLowerCase()],['Performance score',score(summary.performance),''],['Structure score',score(summary.structure),'']].map(x=>'<div class="rd-score"><div class="rd-score-label">'+esc(x[0])+'</div><div class="rd-score-value '+x[2]+'">'+esc(x[1])+'</div><div class="rd-score-label">'+(x[0]==='AfricaLatency grade'?'Reported scan grade':x[0]==='Performance score'?'Lighthouse score':'AfricaLatency structure score')+'</div></div>').join('');
+const performanceCard=[...document.querySelectorAll('#rd-scores .rd-score')].find(el=>el.textContent.includes('Performance score'));
+if(performanceCard&&finite(summary.performance)){const n=Math.max(0,Math.min(100,Number(summary.performance)));const ring=document.createElement('div');ring.className='rd-score-ring';ring.style.setProperty('--rd-score-progress',n+'%');ring.setAttribute('role','img');ring.setAttribute('aria-label','Lighthouse performance score '+Math.round(n)+' percent');ring.textContent=String(Math.round(n));performanceCard.prepend(ring);}
 const METRIC_THRESHOLDS={
  LCP:{label:'Largest Contentful Paint',key:'lcpMs',unit:'time',good:2500,poor:4000,display:'s'},
  CLS:{label:'Cumulative Layout Shift',key:'cls',unit:'cls',good:0.10,poor:0.25},
@@ -65,7 +73,7 @@ scoreBreakdown.innerHTML='<div class="rd-breakdown-grid"><article><h3>Overall gr
 const audits=Array.isArray(full.auditList)?full.auditList:(Array.isArray(summary.auditList)?summary.auditList:[]);
 const opportunities=Array.isArray(full.opportunities)?full.opportunities:(Array.isArray(summary.opportunities)?summary.opportunities:[]);
 const issueTag=o=>{const id=String(o.id||'').toLowerCase(),title=String(o.title||'').toLowerCase(),desc=String(o.description||'').toLowerCase(),s=id+' '+title+' '+desc;if(/layout-shift|cumulative-layout-shift|\bcls\b/.test(s))return 'CLS';if(/long-task|total-blocking-time|mainthread|bootup-time|javascript execution|blocking time/.test(s))return 'TBT';if(/largest-contentful-paint|\blcp\b|image-delivery|preload-lcp|largest contentful/.test(s))return 'LCP';if(/first-contentful-paint|render-blocking|font-display|\bfcp\b|first contentful/.test(s))return 'FCP';return 'Other'};
-const renderIssues=filter=>{const source=opportunities.length?opportunities:audits.filter(a=>finite(a.score)&&Number(a.score)<100&&a.scoreDisplayMode!=='notApplicable').map(a=>({...a,savingsMs:null}));const items=source.filter(o=>filter==='All'||issueTag(o)===filter);document.getElementById('rd-issues').innerHTML='<div class="rd-filters">'+['All','FCP','LCP','TBT','CLS'].map(tag=>'<button type="button" class="rd-filter" data-issue-filter="'+tag+'" aria-pressed="'+String(tag===filter)+'">'+tag+'</button>').join('')+'</div>'+(items.length?items.map(o=>'<details class="rd-accordion"><summary>'+esc(o.title||'Optimization opportunity')+' <span class="rd-issue-tag">'+esc(issueTag(o))+'</span></summary><p>'+esc(o.description||'No additional details returned.')+'</p><p class="rd-muted">'+(finite(o.savingsMs)?'Potential lab savings: '+esc(ms(o.savingsMs)):'No savings estimate returned')+' · '+(opportunities.length?'Lighthouse opportunity':'Lighthouse audit finding; no time-savings estimate returned')+'</p></details>').join(''):'<div class="rd-empty">'+(filter==='All'?'No audit findings were returned for this report.':'No returned audit findings match this metric. Try All to see the available findings.')+'</div>');document.querySelectorAll('[data-issue-filter]').forEach(b=>b.addEventListener('click',()=>renderIssues(b.dataset.issueFilter)))};
+const renderIssues=filter=>{const source=(opportunities.length?opportunities:audits.filter(a=>finite(a.score)&&Number(a.score)<100&&a.scoreDisplayMode!=='notApplicable').map(a=>({...a,savingsMs:null}))).slice().sort((a,b)=>(finite(b.savingsMs)?Number(b.savingsMs):-1)-(finite(a.savingsMs)?Number(a.savingsMs):-1));const items=source.filter(o=>filter==='All'||issueTag(o)===filter);document.getElementById('rd-issues').innerHTML='<p class="rd-muted">Ranked by estimated lab savings when Lighthouse returns them; no savings are invented.</p><div class="rd-filters">'+['All','FCP','LCP','TBT','CLS'].map(tag=>'<button type="button" class="rd-filter" data-issue-filter="'+tag+'" aria-pressed="'+String(tag===filter)+'">'+tag+'</button>').join('')+'</div>'+(items.length?items.map((o,index)=>'<details class="rd-accordion"><summary><span class="rd-issue-rank">#'+(index+1)+'</span> '+esc(o.title||'Optimization opportunity')+' <span class="rd-issue-tag">'+esc(issueTag(o))+'</span></summary><p>'+esc(o.description||'No additional details returned.')+'</p><p class="rd-muted">'+(finite(o.savingsMs)?'Potential lab savings: '+esc(ms(o.savingsMs)):'No savings estimate returned')+' · '+(opportunities.length?'Lighthouse opportunity':'Lighthouse audit finding; no time-savings estimate returned')+'</p></details>').join(''):'<div class="rd-empty">'+(filter==='All'?'No audit findings were returned for this report.':'No returned audit findings match this metric. Try All to see the available findings.')+'</div>');document.querySelectorAll('[data-issue-filter]').forEach(b=>b.addEventListener('click',()=>renderIssues(b.dataset.issueFilter)))};
 renderIssues('All');
 function resourcesForPayload(d){return Array.isArray(d?.fullReport?.resourceDetails)?d.fullReport.resourceDetails:[];}
 const probeRows=Array.isArray(data.africaLatency)?data.africaLatency:[];
@@ -73,6 +81,10 @@ const measured=probeRows.filter(r=>r&&r.status==='measured'&&finite(r.rttMs)&&Nu
 const hubCards=probeRows.map(r=>'<div class="rd-hub"><strong>'+esc(r.country||r.countryCode||'Probe')+'</strong><span>'+(r.status==='measured'&&finite(r.rttMs)?esc(ms(r.rttMs))+' · measured': 'Unavailable / incomplete')+'</span></div>').join('');
 document.getElementById('rd-hubs').innerHTML=hubCards||'<div class="rd-empty">No African probe measurements were returned.</div>';
 document.getElementById('rd-grid').innerHTML=hubCards||'<div class="rd-empty">No probe data available.</div>';
+const requestedCountries=[['KE','Kenya'],['NG','Nigeria'],['ZA','South Africa'],['EG','Egypt'],['GH','Ghana'],['MA','Morocco'],['TZ','Tanzania'],['UG','Uganda'],['SN','Senegal']];
+const normCountry=value=>String(value||'').trim().toLowerCase().replace(/[^a-z]/g,'');
+const countryRows=requestedCountries.map(([code,name])=>{const found=probeRows.find(r=>normCountry(r.countryCode)===normCountry(code)||normCountry(r.country)===normCountry(name));const available=Boolean(found&&found.status==='measured'&&finite(found.rttMs)&&Number(found.rttMs)>=0);return [esc(name),available?esc(ms(found.rttMs)):'Unavailable',available?'Measured':'Unavailable'];});
+document.getElementById('rd-country-table').innerHTML=table(['Requested country','Probe timing','Status'],countryRows);
 const payloadBytes=finite(full.pageWeightBytes)?Number(full.pageWeightBytes):(finite(summary.pageWeightBytes)?Number(summary.pageWeightBytes):(resourcesForPayload(data).length?resourcesForPayload(data).reduce((sum,r)=>sum+(finite(r.transferSize)?Number(r.transferSize):0),0):null));
 document.getElementById('rd-data-cost').innerHTML=finite(payloadBytes)&&payloadBytes>0?'<p>Measured page payload: <strong>'+esc(bytes(payloadBytes))+'</strong>.</p><p>Estimated airtime cost is withheld until verified country/operator tariffs and a documented calculation model are configured.</p>':'This scan did not return a verified page payload size. No airtime cost is estimated.';
 const performanceMetrics=[
