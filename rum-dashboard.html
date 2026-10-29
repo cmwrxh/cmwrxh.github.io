@@ -27,11 +27,12 @@ main{max-width:1180px;margin:auto;padding:32px 22px 64px}.top{display:flex;justi
 </section>
 </main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/api/rum-config"></script>
 <script>
 (function(){
- const SUPABASE_URL='https://uzihwtxffklisczqvurf.supabase.co';
- const SUPABASE_PUBLISHABLE_KEY='sb_publishable_dGaR1jgofny7tGVWh0TK2w_haSVNyWv';
- const client=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
+ const config=window.AFRICALATENCY_SUPABASE_CONFIG;
+ if(!config||!config.url||!config.anonKey||!window.supabase){document.getElementById('site-status').textContent='RUM authentication is not configured for this preview.';return;}
+ const client=window.supabase.createClient(config.url,config.anonKey);
  const $=id=>document.getElementById(id);
  let session=null, sites=[], selectedSite=null;
  function status(id,msg,error){$(id).textContent=msg||'';$(id).classList.toggle('error',!!error);}
