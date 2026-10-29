@@ -1,4 +1,3 @@
-import { createClient } from '@supabase/supabase-js';
 import { getRumAdminClient, normalizedHostname, setNoStore } from '../lib/rum-beta-client.js';
 
 const UUID = /^[a-f0-9-]{36}$/i;
@@ -14,8 +13,9 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const reportId = String(req.query?.report_id || '').trim();
-  if (!UUID.test(reportId)) return res.status(400).json({ error: 'A valid report ID is required.' });
+  const rawReportId = String(req.query?.report_id || '').trim();
+  if (!UUID.test(rawReportId)) return res.status(400).json({ error: 'A valid report ID is required.' });
+  const reportId = rawReportId.toLowerCase();
 
   const base = workerUrl();
   const token = process.env.SCAN_INTERNAL_TOKEN;
