@@ -1,29 +1,27 @@
 # Technical and security notes
-Evidence date: 2026-10-29. This is a source review, not a penetration test, audit or certification.
+Evidence date: 2026-10-29. This is a source review and CI summary, not a penetration test, audit or certification.
 
-## Stack
-JavaScript/Node.js. [Root manifest](https://github.com/cmwrxh/cmwrxh.github.io/blob/main/package.json): Express, Supabase JS, Vercel Functions, Puppeteer Core and Chromium. [Worker manifest](https://github.com/cmwrxh/cmwrxh.github.io/blob/main/worker/package.json): Express, Supabase JS, Lighthouse, Chrome Launcher and Sharp. Exact lockfile-resolved versions, SPDX license inventory and vulnerability scan are UNVERIFIED.
+## Stack and evidence limits
+JavaScript/Node.js. Root and worker manifests identify Express, Supabase JS, Vercel Functions, Puppeteer/Chromium, Lighthouse, Chrome Launcher and Sharp. Exact lockfile-resolved versions, SPDX license inventory and vulnerability scan are UNVERIFIED.
 
-## Data model
-Worker references `scan_jobs`, `scan_api_keys` and Storage bucket `scan-screenshots`. Proposed RUM tables/functions are in [PR #13](https://github.com/cmwrxh/cmwrxh.github.io/pull/13); proposed monitoring schema is in [PR #147](https://github.com/cmwrxh/cmwrxh.github.io/pull/147). Proposed SQL is not proof of applied schema or running service.
+PR #150 transplanted the RUM beta onto main and merged as [261abdf](https://github.com/cmwrxh/cmwrxh.github.io/commit/261abdf8f4f3b4119dd0eaa5e8d7b2dfc950f23e). Its final head `678b839bc26d47564b64f1866238b95c1a5523aa` passed five checks: Auth return-path tests, RUM beta transplant checks, Scan V2 worker tests, Legacy CSS regeneration and Lighthouse comparison, and Site shell and responsive QA. This does not establish production deployment, production runtime behavior or an independent security audit.
 
 ## Controls visible in source; end-to-end proof still required
-- **SSRF:** [api/scan.js](https://github.com/cmwrxh/cmwrxh.github.io/blob/main/api/scan.js) accepts HTTP(S), rejects embedded credentials and nonstandard ports, limits URL length, and uses Turnstile for anonymous requests. Worker imports `validatePublicUrl` from `worker/url-safety.js`. Tests for IPv4/IPv6 private ranges, DNS rebinding, redirects and alternate encodings are UNVERIFIED.
-- **Worker auth:** API forwards an internal bearer token; worker compares configured token with constant-time comparison. Network isolation is UNVERIFIED.
-- **Rate limits:** code includes queue/retention configuration; effective production limits and distributed abuse tests are UNVERIFIED.
-- **API keys:** worker recognizes `al_live_` prefix and looks up SHA-256 digest in `scan_api_keys`. Issuance, rotation, revocation, scope and quota tests are UNVERIFIED. Never expose raw keys.
-- **Payments:** Paystack signature verification, amount/currency/reference matching, idempotent replay and settlement are UNVERIFIED. No revenue is claimed.
-- **Tenant isolation:** report code checks account/API-key ownership; cross-account tests and signed URL access tests are UNVERIFIED.
-- **Privacy:** proposed RUM schema avoids raw IP, full URL/query, cookies, user ID and user agent, but end-to-end logs/proxy headers must be reviewed before claiming no raw IP is stored anywhere.
-- **Retention/RLS:** RUM retention and monitoring migrations are not verified as applied. A prior read-only project preflight found no RUM/monitoring tables and 144 rows in `ip_geo_cache` (not expected 131). Do not describe proposed RLS as deployed.
-
-## CI and deployment
-Latest inspected source SHA: [8aed5d0](https://github.com/cmwrxh/cmwrxh.github.io/commit/8aed5d0451d85965289ef23f57b6a9fba27302cd), 2026-10-28. Latest CI for that SHA and production deployed SHA are UNVERIFIED in this pack. Backup/restore evidence, security advisor output and penetration test are also UNVERIFIED.
+- **SSRF:** `api/scan.js` validates HTTP(S), rejects embedded credentials and nonstandard ports, limits URL length and applies Turnstile to anonymous requests. Worker imports `validatePublicUrl`. IPv4/IPv6 private-range, DNS-rebinding, redirect and alternate-encoding coverage must be verified.
+- **Worker authentication:** Main API uses an internal bearer token; worker uses constant-time comparison. Network isolation is UNVERIFIED.
+- **Rate limits:** Code includes queue/retention configuration; effective production limits and distributed abuse tests are UNVERIFIED.
+- **API keys:** Worker recognizes the `al_live_` prefix and looks up a SHA-256 digest. Issuance, rotation, revocation, scope and quota tests are UNVERIFIED. Never expose raw keys.
+- **Payments:** Paystack signature verification, amount/currency/reference matching, replay handling, idempotency and settlement are UNVERIFIED. No revenue is claimed.
+- **Tenant isolation:** Ownership checks are present in source; cross-account tests and signed URL access tests are UNVERIFIED.
+- **RUM and privacy:** Beta code is on main. Production capture, preview-only routing, end-to-end logs/proxy headers, retention and deletion still require verification. Do not claim that no raw IP is stored anywhere until the full path and logs have been checked.
+- **RLS/schema:** Repository SQL or a proposed schema is not proof of deployed policy. Verify actual schema and policy status before any investor-facing security statement.
+- **Operational resilience:** Backup/restore evidence, production deployment SHA, security advisor output and penetration test are UNVERIFIED.
 
 ## Hardening priorities
-1. Attach deployed SHA and latest CI.
-2. Add SSRF negative tests and two-account isolation tests for scans/reports/API/RUM/monitoring.
-3. Test payment signature, amount/currency/reference checks and webhook replay.
-4. Verify backup and restore in isolation.
-5. Generate SPDX/license and dependency vulnerability reports.
-6. Review privacy notice, consent, retention and deletion paths.
+1. Attach production deployed SHA and latest relevant CI.
+2. Test SSRF negatives and two-account isolation for scans, reports, API, RUM and monitoring.
+3. Test payment signature, amount/currency/reference checks, idempotency and settlement.
+4. Verify preview RUM asset routing before any live preview test.
+5. Perform and document an isolated backup/restore drill.
+6. Generate SPDX/license and dependency-vulnerability reports.
+7. Review privacy notice, consent, retention and deletion paths.
