@@ -1,0 +1,35 @@
+name: RUM beta transplant checks
+on:
+  push:
+    branches: ['feature/rum-beta-main-transplant']
+  pull_request:
+    branches: [main]
+    paths:
+      - 'api/rum*.js'
+      - 'lib/rum-beta-client.js'
+      - 'login.html'
+      - 'rum.js'
+      - 'rum-dashboard.html'
+      - 'sql/rum-beta-mvp.sql'
+      - 'tests/rum-beta.test.js'
+      - 'package.json'
+      - '.github/workflows/rum-beta-checks.yml'
+  workflow_dispatch:
+jobs:
+  rum-beta:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm install --ignore-scripts
+      - name: Syntax-check RUM endpoints
+        run: |
+          node --check api/rum.js
+          node --check api/rum-config.js
+          node --check api/rum-sites.js
+          node --check api/rum-dashboard.js
+          node --check api/rum-library.js
+      - run: npm run test:rum-beta
