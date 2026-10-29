@@ -1,0 +1,44 @@
+name: Customer monitoring MVP checks
+on:
+  pull_request:
+    paths:
+      - 'api/monitors.js'
+      - 'api/monitor-alerts.js'
+      - 'api/monitor-status.js'
+      - 'api/monitor-config.js'
+      - 'login.html'
+      - 'signup.html'
+      - 'worker/monitoring.js'
+      - 'worker/index.js'
+      - 'worker/url-safety.js'
+      - 'sql/monitoring-mvp.sql'
+      - 'monitoring-dashboard.html'
+      - 'status.html'
+      - 'tests/monitoring-mvp.test.cjs'
+      - '.github/workflows/monitoring-mvp.yml'
+  push:
+    branches: ['feature/customer-monitoring-mvp']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: 22
+      - name: Syntax checks
+        run: |
+          node --check api/monitors.js
+          node --check api/monitor-alerts.js
+          node --check api/monitor-status.js
+          node --check api/monitor-config.js
+          node --check worker/monitoring.js
+          node --check worker/index.js
+          node --check server.js
+      - name: Monitoring and SSRF tests
+        run: node --test tests/monitoring-mvp.test.cjs

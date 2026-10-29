@@ -146,19 +146,19 @@
 <script src="/js/main.js?v=7"></script>
 <script src="/js/auth-next.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/api/monitor-config"></script>
 <script>
-  // Supabase settings — unchanged from your existing login page
-  const SUPABASE_URL = 'https://uzihwtxffklisczqvurf.supabase.co';
-  const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_dGaR1jgofny7tGVWh0TK2w_haSVNyWv';
-
+  // Use the public configuration for this deployment (preview or production).
+  const config = window.AFRICALATENCY_SUPABASE_CONFIG;
   let supabaseClient = null;
-  try { supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, storage: window.localStorage } }); } catch (err) { console.error('Supabase failed to load', err); }
+  try { if (config && config.url && config.anonKey) supabaseClient = window.supabase.createClient(config.url, config.anonKey, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, storage: window.localStorage } }); } catch (err) { console.error('Supabase failed to load', err); }
 
   const form = document.getElementById('login-form');
   const params = new URLSearchParams(window.location.search);
   const safeNext = window.AfricaLatencyAuthNext.getSafeNext(params.get('next'));
   document.getElementById('signup-link').href = window.AfricaLatencyAuthNext.buildAuthTabHref('/signup',safeNext);document.getElementById('login-tab-login').href=window.AfricaLatencyAuthNext.buildAuthTabHref('/login',safeNext);document.getElementById('login-tab-signup').href=window.AfricaLatencyAuthNext.buildAuthTabHref('/signup',safeNext);
   const status = document.getElementById('login-status');
+  if (!supabaseClient) { status.textContent = 'Sign-in is not configured for this deployment.'; document.getElementById('login-submit').disabled = true; }
   const submit = document.getElementById('login-submit');
   const password = document.getElementById('password');
   const toggle = document.getElementById('password-toggle');

@@ -90,7 +90,7 @@ app.get('/reports/:scanId', (req, res, next) => {
 app.get('/performance-index', (_req, res) => res.sendFile(path.join(__dirname, 'internet-performance-index.html')));
 app.get('/index', (_req, res) => res.redirect(301, '/performance-index'));
 
-// 3. Static site, with extension fallback (/contact -> contact.html)
+// Public customer status page uses a slug path, but exposes only the deliberately limited status payload.\napp.get('/status/:slug', (req, res) => { if (!/^[a-zA-Z0-9_-]{12,80}$/.test(String(req.params.slug || ''))) return res.status(404).sendFile(path.join(__dirname, '404.html')); return res.sendFile(path.join(__dirname, 'status.html')); });\napp.get('/monitoring-dashboard', (_req, res) => res.sendFile(path.join(__dirname, 'monitoring-dashboard.html')));\n\n// 3. Static site, with extension fallback (/contact -> contact.html)
 app.use(express.static(__dirname, { extensions: ['html'] }));
 
 // 4. Anything else -> your 404 page

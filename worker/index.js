@@ -5,6 +5,7 @@ import { createClient } from '@supabase/supabase-js';
 import { runLighthouse } from './provider.js';
 import { buildRequestAnalysis } from './scoring.js';
 import { validatePublicUrl } from './url-safety.js';
+import { monitoringTick } from './monitoring.js';
 
 const app = express();
 app.disable('x-powered-by');
@@ -474,6 +475,8 @@ async function retentionSweep() {
   }
 }
 setInterval(() => { processQueue(); }, 2000).unref();
+// Monitoring runs in the existing worker with a strict independent concurrency cap.
+setInterval(() => { monitoringTick(supabase).catch(() => {}); }, Math.max(15000, Number(process.env.MONITOR_TICK_MS) || 30000)).unref();
 setInterval(async () => {
   if (!supabase) return;
   const cutoff = new Date(Date.now() - 10 * 60 * 1000).toISOString();
