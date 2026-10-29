@@ -111,7 +111,7 @@ export function summarizeRun(lhr) {
   const categories = lhr?.categories || {};
   const performance = categories.performance?.score == null ? null : clampScore(categories.performance.score * 100);
   const structure = structureScore(categories, audits);
-  const ms = id => Number.isFinite(Number(audits[id]?.numericValue)) ? Number(audits[id].numericValue) : null;
+  const ms = id => audits[id]?.numericValue !== null && audits[id]?.numericValue !== undefined && Number.isFinite(Number(audits[id].numericValue)) ? Number(audits[id].numericValue) : null;
   const score = id => categories[id]?.score == null ? null : clampScore(categories[id].score * 100);
   const opportunities = Object.values(audits)
     .filter(a => a && (a.details?.type === 'opportunity' || a.details?.type === 'table') && a.score != null && a.score < 1)
