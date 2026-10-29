@@ -12,10 +12,13 @@ Source code proves code is present, not production deployment. Passing tests pro
 - [Measurement methodology](measurement-methodology.md)
 - [Traction tracker](traction-tracker.md)
 - [Metrics baseline](metrics-baseline.md)
-- [Financial model CSV](financial-model.csv)
+- [Pricing/cost inputs](financial-model.csv)
+- [18-month low/base/high forecast template](financial-forecast-18m.csv)
 - [Company/IP checklist](company-ip-checklist.md)
 - [Investor narrative](investor-narrative.md)
-- [Evidence gaps](evidence-gap-list.md)
+- [Ranked evidence gaps](evidence-gap-list.md)
+
+The financial files are editable CSV templates for spreadsheet software. They contain no forecasted sales or cost claims; blank inputs require founder confirmation. Forecast formulas depend on the FX rate and scenario inputs being entered and reviewed.
 
 ## Baseline
 Repository main SHA inspected: [8aed5d0](https://github.com/cmwrxh/cmwrxh.github.io/commit/8aed5d0451d85965289ef23f57b6a9fba27302cd), dated 2026-10-28. It fixes a filmstrip regex; this does not prove production runs that SHA. Scanner source: [API](https://github.com/cmwrxh/cmwrxh.github.io/blob/main/api/scan.js), [worker](https://github.com/cmwrxh/cmwrxh.github.io/blob/main/worker/index.js). RUM and monitoring remain draft/integration-unverified ([PR #13](https://github.com/cmwrxh/cmwrxh.github.io/pull/13), [PR #147](https://github.com/cmwrxh/cmwrxh.github.io/pull/147)). No revenue or customer metrics are claimed. A prior read-only DB preflight found 144 ip_geo_cache rows, not the expected 131; do not use this as traction evidence.
