@@ -1,5 +1,8 @@
 name: RUM Beta checks
 on:
+  push:
+    branches: ['feature/rum-beta-mvp']
+  workflow_dispatch:
   pull_request:
     branches: [main]
     paths:
