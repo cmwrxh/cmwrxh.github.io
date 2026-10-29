@@ -6,8 +6,8 @@
 | F1 normalized report schema/statuses | ci-green | #142 | 04f07f5768db9862dc4334cee6ff213bc972a111 |
 | F2 Lighthouse audits/opportunities/resource summary | ci-green | #143 | 2100404b28b6efb525ace309875890eaa52227b9 |
 | F3 screenshot/filmstrip capture and playback states | done (merged) | #144 | 325cdd235f9ff73d0d123acd83a5e9fc1aa87ab8 |
-| F4 scan profiles and optional repeat runs | todo | — | — |
-| F5 truthful network waterfall | todo | — | — |
+| F4 scan profiles and optional repeat runs | ci-green (PR open) | #145 | 124f34f8192da027199c0b21b5b7dac57015d7ea |
+| F5 truthful network waterfall | ci-green (PR open) | #146 | 6b45af41b6cf86bddb2c551470ee503ef1d4513b |
 | F6 regional Globalping probes | todo | — | — |
 | F7 CrUX and RUM | todo | — | — |
 | F8 report history persistence/UI | todo | — | — |
@@ -22,6 +22,8 @@
 - F2 latest head 2100404: Report repair CI run #40714742948 green, all four jobs green. Worker tests 12/12; added coverage for real audit score, returned opportunity savings, stripped query parameters, transferred bytes, and request timing.
 - F3 PR #144 merged into integration/report-repair at merge commit 325cdd235f9ff73d0d123acd83a5e9fc1aa87ab8 (head 77235738798f5561a77d6e4656b25eaf9b9631f9). Report repair CI run #40724632703 and companion worker/auth runs passed on the exact PR head. Includes independent Puppeteer visual capture, high-quality signed frames, responsive player/lightbox, URL refresh, empty/partial/overlay/filename tests, and cache headers. The filename regex was not double-escaped; derivative filenames were the actual validation defect and are now rejected.
 - Preview deployment lookup returned no Vercel preview for task/f3-visual-capture-redo; no live preview scan or full-resolution screenshot was possible. See REVIEW_PACKET.md for the explicit limitation. No production scan/deployment was performed.
-- Workstream status: done F0–F3; next F4. Do not begin F4 until separately instructed.
+- F4 PR #145 is open as a draft, targeting integration/report-repair. Report repair CI passed on head 28abadeda04eb4992873c88bd9b291f1abaa32c2 (run #40840230490). No merge or deployment.
+- F5 draft work normalizes only returned Lighthouse request start/end offsets, preserves null versus zero, and labels available, empty, unavailable, and error states. No DNS/TCP/TLS phases are inferred. A saved Lighthouse network-requests fixture is included. Report repair CI run #40840599513 passed on SHA 6b45af41b6cf86bddb2c551470ee503ef1d4513b.
+- Workstream status: F0–F3 done; F4 PR #145 CI-green/open; F5 in progress.
 - Historical PRs #134 and #135 were previously merged to main, outside this integration branch. No new merge to main was made in this run.
 - No merge to main, deployment, SQL application, production config, or secret changes.

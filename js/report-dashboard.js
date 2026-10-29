@@ -170,8 +170,43 @@ if(detailEl){
  if(note)note.textContent=completeAggregate?'Breakdown uses aggregate totals from all '+esc(requestAnalysis.requestCount??resources.length)+' returned resource request(s).':hasAggregate?'Category breakdown is incomplete for this saved report; total size and request count still use the complete Lighthouse totals.':'This report does not include resource aggregates; displayed categories use only resource rows available to this report.';
 }
 
-const timedResources=resources.filter(r=>finite(r.startTime)&&finite(r.endTime)&&Number(r.endTime)>=Number(r.startTime));
-if(timedResources.length){const maxEnd=Math.max(1,...timedResources.map(r=>Number(r.endTime)));document.getElementById('rd-waterfall').innerHTML='<p class="rd-muted">Request start/end timing from Lighthouse. Phase-level DNS/TCP/TLS/TTFB timings are not included in this payload.</p>'+timedResources.map(r=>{const left=Math.max(0,Number(r.startTime)/maxEnd*100),width=Math.max(.6,(Number(r.endTime)-Number(r.startTime))/maxEnd*100);return '<div class="rd-waterfall-row"><div class="rd-waterfall-label" title="'+esc(r.url||'')+'">'+esc(r.url||'Resource')+'</div><div class="rd-waterfall-track"><span class="rd-waterfall-bar" style="margin-left:'+left+'%;width:'+width+'%"></span></div><div class="rd-waterfall-ms">'+esc(ms(Number(r.endTime)-Number(r.startTime)))+'</div></div>'}).join('')+table(['Resource URL','Type','HTTP status','Transferred'],resources.map(r=>['<span>'+esc(r.url||'—')+'</span>',esc(r.resourceType||'—'),esc(r.statusCode??'—'),esc(bytes(r.transferSize))]))}else{document.getElementById('rd-waterfall').innerHTML=resources.length?table(['Resource URL','Type','HTTP status','Transferred'],resources.map(r=>['<span>'+esc(r.url||'—')+'</span>',esc(r.resourceType||'—'),esc(r.statusCode??'—'),esc(bytes(r.transferSize))])):'<div class="rd-empty">No resource-level waterfall details were returned for this scan.</div>'};
+const waterfallData=full.waterfall||null;
+const waterfallRoot=document.getElementById('rd-waterfall');
+const waterfallState=waterfallData?.status||summary.waterfallStatus||'unavailable';
+const waterfallReason=waterfallData?.reason||summary.waterfallReason||'This saved report does not include normalized request timing status.';
+const waterfallRows=Array.isArray(waterfallData?.rows)?waterfallData.rows:[];
+const timedResources=waterfallRows.filter(r=>r&&r.timingStatus==='measured'&&finite(r.startMs)&&finite(r.endMs)&&finite(r.durationMs)&&Number(r.endMs)>=Number(r.startMs));
+const renderWaterfallTable=rows=>table(['Resource URL','Type','HTTP status','Start offset','End offset','Duration','Timing status','Transferred'],rows.map(r=>[
+  '<span>'+esc(r.url||'—')+'</span>',
+  esc(r.resourceType||'—'),
+  esc(r.statusCode??'—'),
+  esc(finite(r.startMs)?ms(r.startMs):'Unavailable'),
+  esc(finite(r.endMs)?ms(r.endMs):'Unavailable'),
+  esc(finite(r.durationMs)?ms(r.durationMs):'Unavailable'),
+  esc(r.timingStatus==='measured'?'Measured':(r.timingReason||'Unavailable')),
+  esc(bytes(r.transferSizeBytes))
+]));
+if(!waterfallData){
+  const reason=summary.waterfallStatus==='available'
+    ? 'Request timing data exists, but resource-level rows are available only in the full report.'
+    : waterfallReason;
+  waterfallRoot.innerHTML='<div class="rd-empty">'+esc(reason)+'</div>';
+}else if(waterfallState==='empty'){
+  waterfallRoot.innerHTML='<div class="rd-empty">'+esc(waterfallReason||'No network requests were returned for this scan.')+'</div>';
+}else if(waterfallState==='error'||waterfallState==='unavailable'){
+  waterfallRoot.innerHTML='<div class="rd-empty">'+esc(waterfallReason)+'</div>'+(waterfallRows.length?renderWaterfallTable(waterfallRows):'');
+}else{
+  const maxEnd=Math.max(1,...timedResources.map(r=>Number(r.endMs)));
+  const chart=timedResources.length
+    ? '<p class="rd-muted">Bars show measured request start/end offsets from Lighthouse. No DNS, TCP, TLS, or other protocol phases are inferred.</p>'+timedResources.map(r=>{
+        const left=Math.max(0,Number(r.startMs)/maxEnd*100);
+        const width=Math.max(.6,Number(r.durationMs)/maxEnd*100);
+        return '<div class="rd-waterfall-row"><div class="rd-waterfall-label" title="'+esc(r.url||'')+'">'+esc(r.url||'Resource')+'</div><div class="rd-waterfall-track"><span class="rd-waterfall-bar" role="img" aria-label="Measured request duration '+esc(ms(r.durationMs))+'" style="margin-left:'+left+'%;width:'+width+'%"></span></div><div class="rd-waterfall-ms">'+esc(ms(r.durationMs))+'</div></div>';
+      }).join('')
+    : '<div class="rd-empty">Resource rows were returned, but no valid start/end timing pair was available for the chart.</div>';
+  waterfallRoot.innerHTML=chart+renderWaterfallTable(waterfallRows);
+}
+
 const reportPath='/reports/'+id;
 const safeNext=window.AfricaLatencyAuthNext?.getSafeNext(reportPath)||'/dashboard';
 const signInHref='/login?next='+encodeURIComponent(safeNext);

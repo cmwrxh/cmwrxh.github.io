@@ -27,12 +27,15 @@ jobs:
           node --check worker/index.js
           node --check worker/scoring.js
           node --check worker/provider.js
+          node --check worker/waterfall.js
+          node --check worker/waterfall.test.js
           node --check worker/url-safety.js
       - name: Check scan and report scripts syntax
         run: |
           node --check js/report-dashboard.js
           node --check scripts/scan-failure-states-test.mjs
           node --check tests/report-filmstrip.test.cjs
+          node --check tests/report-waterfall.test.cjs
           node --check tests/auth-next.test.cjs
 
   unit-tests:
@@ -49,6 +52,8 @@ jobs:
         run: npm run test:auth-next
       - name: Run report filmstrip tests
         run: npm run test:report-filmstrip
+      - name: Run report waterfall tests
+        run: npm run test:report-waterfall
 
   build:
     name: Static build validation

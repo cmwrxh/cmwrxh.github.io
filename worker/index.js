@@ -280,6 +280,8 @@ async function executeJob(job) {
     requestCount: lighthouseResult.requestCount,
     pageWeightBytes: lighthouseResult.pageWeightBytes,
     requestAnalysis: lighthouseResult.requestAnalysis || null,
+    waterfallStatus: lighthouseResult.waterfall?.status || 'unavailable',
+    waterfallReason: lighthouseResult.waterfall?.reason || null,
     runCount: lighthouseResult.runCount || 1,
     aggregation: lighthouseResult.aggregation || 'single Lighthouse run',
     filmstripStatus
@@ -300,6 +302,7 @@ async function executeJob(job) {
       requestCount: lighthouseResult.requestCount,
       pageWeightBytes: lighthouseResult.pageWeightBytes,
       requestAnalysis: lighthouseResult.requestAnalysis || null,
+      waterfall: lighthouseResult.waterfall || null,
       opportunities: lighthouseResult.opportunities,
       auditList: lighthouseResult.auditList || [],
       resourceDetails: lighthouseResult.resourceDetails || [],

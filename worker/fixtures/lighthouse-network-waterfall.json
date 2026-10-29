@@ -1,0 +1,36 @@
+{
+  "source": "Lighthouse 13.5.0 test asset lhr-10.4.0.json; extracted network-requests rows only",
+  "sourceUrl": "https://fossies.org/linux/www/lighthouse-13.5.0.tar.gz/lighthouse-13.5.0/report/test-assets/lhr-10.4.0.json",
+  "audits": {
+    "network-requests": {
+      "details": {
+        "items": [
+          {
+            "url": "https://www.coursehero.com/",
+            "rendererStartTime": 0,
+            "networkRequestTime": 0.748999999999,
+            "networkEndTime": 624.4779999982566,
+            "finished": true,
+            "transferSize": 94368,
+            "resourceSize": 804524,
+            "statusCode": 200,
+            "mimeType": "text/html",
+            "resourceType": "Document"
+          },
+          {
+            "url": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
+            "rendererStartTime": 628.0629999991506,
+            "networkRequestTime": 628.948999999091,
+            "networkEndTime": 804.0599999986589,
+            "finished": true,
+            "transferSize": 1103,
+            "resourceSize": 10028,
+            "statusCode": 200,
+            "mimeType": "text/css",
+            "resourceType": "Stylesheet"
+          }
+        ]
+      }
+    }
+  }
+}

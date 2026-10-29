@@ -1,3 +1,5 @@
+import { buildWaterfall } from './waterfall.js';
+
 export function clampScore(value) {
   return Math.max(0, Math.min(100, Math.round(Number(value) || 0)));
 }
@@ -136,14 +138,19 @@ export function summarizeRun(lhr) {
       resourceType: String(r.resourceType || '').slice(0, 40),
       mimeType: String(r.mimeType || '').slice(0, 100),
       statusCode: numericValue(r.statusCode),
-      transferSize: Math.max(0, numericValue(r.transferSize) ?? 0),
-      resourceSize: Math.max(0, numericValue(r.resourceSize) ?? 0),
+      transferSize: numericValue(r.transferSize),
+      resourceSize: numericValue(r.resourceSize),
       startTime: startTime !== null ? startTime : networkStartMs,
       endTime: endTime !== null ? endTime : networkEndMs
     };
   });
   const observedEndTimes = normalizedResources.map(r => r.endTime).filter(v => Number.isFinite(v) && v >= 0);
   const fullyLoadedTimeMs = observedEndTimes.length ? Math.max(...observedEndTimes) : numericValue(audits['fully-loaded']?.numericValue);
+  const waterfallAudit = audits['network-requests'];
+  const waterfall = buildWaterfall(requests, {
+    auditAvailable: hasRequestItems,
+    error: !hasRequestItems && typeof waterfallAudit?.errorMessage === 'string' ? waterfallAudit.errorMessage : null
+  });
   const requestAnalysis = buildRequestAnalysis(normalizedResources, {
     requestCount: hasRequestItems ? requests.length : null,
     pageWeightBytes: hasRequestItems ? normalizedResources.reduce((sum, r) => sum + r.transferSize, 0) : null,
@@ -179,6 +186,7 @@ export function summarizeRun(lhr) {
     requestCount: requestAnalysis.resourceDataAvailable ? requestAnalysis.requestCount : null,
     pageWeightBytes: requestAnalysis.resourceDataAvailable ? requestAnalysis.pageWeightBytes : null,
     requestAnalysis,
+    waterfall,
     opportunities,
     auditList,
     resourceDetails,
