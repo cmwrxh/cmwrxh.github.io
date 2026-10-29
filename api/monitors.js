@@ -72,6 +72,7 @@ export default async function handler(req,res){
       let targetUrl;
       try{targetUrl=await validatePublicUrl(String(req.body?.url||''));}catch(e){return response(res,400,{error:safeError(e)});}
       const plan=await planFor(user.id), limits=plan==='paid'?paidLimits:freeLimits;
+      if(type==='lighthouse'&&plan==='free'){const existing=await admin.from('customer_monitors').select('id',{count:'exact',head:true}).eq('owner_id',user.id).eq('check_type','lighthouse');if(existing.error)return response(res,503,{error:'Lighthouse allowance could not be verified.'});if((existing.count||0)>=1)return response(res,429,{error:'The free plan includes one weekly Lighthouse monitor.'});}
       const {count,error:countError}=await admin.from('customer_monitors').select('id',{count:'exact',head:true}).eq('owner_id',user.id);
       if(countError)return response(res,503,{error:'Monitor usage could not be verified.'});
       if((count||0)>=limits.monitors)return response(res,429,{error:'You have reached the monitor limit for your plan.'});
