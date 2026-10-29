@@ -84,10 +84,34 @@ async function runOne(supabase,job){
   await supabase.from('customer_monitors').update({last_check_at:checkedAt}).eq('id',monitor.id);
   await supabase.from('monitor_check_jobs').update({state:outputs.some(o=>o.result_class==='system_failure')?'failed':'completed',last_error:outputs.find(o=>o.error_reason)?.error_reason||null,updated_at:checkedAt,locked_at:null}).eq('id',job.id).eq('lock_token',job.lock_token);
 }
+async function alertOwner(supabase,monitor,incident,type){
+  const dedupeKey=type+':'+incident.id;
+  const {data:channels,error}=await supabase.from('monitor_alert_channels').select('id,destination,muted_until,enabled').eq('owner_id',monitor.owner_id).eq('enabled',true).not('verified_at','is',null);
+  if(error||!channels?.length)return;
+  for(const channel of channels){
+    if(channel.muted_until&&new Date(channel.muted_until).getTime()>Date.now())continue;
+    const {data:existing}=await supabase.from('monitor_alert_log').select('id').eq('channel_id',channel.id).eq('dedupe_key',dedupeKey).maybeSingle();
+    if(existing)continue;
+    const now=new Date().toISOString();
+    const {data:log,error:logError}=await supabase.from('monitor_alert_log').insert({monitor_id:monitor.id,channel_id:channel.id,incident_id:incident.id,alert_type:type,dedupe_key:dedupeKey,delivery_status:'queued',attempted_at:now}).select('id').single();
+    if(logError||!log)continue;
+    let status='failed', deliveredAt=null, errorReason='Email provider is not configured on this preview.';
+    if(process.env.RESEND_API_KEY&&process.env.MONITOR_FROM_EMAIL){
+      try{
+        const subject='AfricaLatency: '+(type==='down'?'monitor incident':'monitor recovered')+' — '+monitor.name;
+        const body='<p>Monitor: '+String(monitor.name).replace(/[&<>"]/g,'')+'</p><p>State: '+(type==='down'?'Incident detected after repeated failed checks.':'A successful check confirmed recovery.')+'</p><p>Measured by AfricaLatency checks and community probes. Probe availability varies and measurements do not guarantee availability.</p>';
+        const response=await fetch('https://api.resend.com/emails',{method:'POST',headers:{Authorization:'Bearer '+process.env.RESEND_API_KEY,'Content-Type':'application/json'},body:JSON.stringify({from:process.env.MONITOR_FROM_EMAIL,to:[channel.destination],subject,html:body}),signal:AbortSignal.timeout(8000)});
+        if(response.ok){status='sent';deliveredAt=new Date().toISOString();errorReason=null;}else errorReason='Email provider rejected the message.';
+      }catch{errorReason='Email provider request failed.';}
+    }
+    await supabase.from('monitor_alert_log').update({delivery_status:status,delivered_at:deliveredAt,error_reason:errorReason}).eq('id',log.id);
+  }
+}
 async function updateIncident(supabase,monitor,outputs,checkedAt){
   const {data:open}=await supabase.from('monitor_incidents').select('id,affected_countries,started_at').eq('monitor_id',monitor.id).eq('state','open').maybeSingle();
   if(outputs.some(o=>o.result_class==='success')&&open){
     await supabase.from('monitor_incidents').update({state:'recovered',ended_at:checkedAt}).eq('id',open.id);
+    await alertOwner(supabase,monitor,open,'recovered');
     return;
   }
   const targetFailures=outputs.filter(o=>o.result_class==='target_failure');
@@ -97,7 +121,7 @@ async function updateIncident(supabase,monitor,outputs,checkedAt){
   if((recent||[]).length<2)return;
   const affected=[...new Set([...(open?.affected_countries||[]),...targetFailures.map(o=>o.country_code).filter(Boolean)])];
   if(open){await supabase.from('monitor_incidents').update({affected_countries:affected}).eq('id',open.id);}
-  else await supabase.from('monitor_incidents').insert({monitor_id:monitor.id,started_at:recent[1].checked_at||checkedAt,affected_countries:affected,state:'open'});
+  else { const {data:incident}=await supabase.from('monitor_incidents').insert({monitor_id:monitor.id,started_at:recent[1].checked_at||checkedAt,affected_countries:affected,state:'open'}).select('id').single(); if(incident)await alertOwner(supabase,monitor,incident,'down'); }
 }
 export async function monitoringTick(supabase){
   if(ticking||!supabase)return;
