@@ -51,6 +51,7 @@ test('preview auth reads deployment config and never exposes a service-role key'
   const login = fs.readFileSync(new URL('../login.html', import.meta.url), 'utf8');
   const dashboard = fs.readFileSync(new URL('../rum-dashboard.html', import.meta.url), 'utf8');
   assert.match(config, /SUPABASE_PUBLISHABLE_KEY \|\| process\.env\.SUPABASE_ANON_KEY/);
+  assert.match(config, /SUPABASE_PUBLIC_URL \|\| process\.env\.SUPABASE_URL/);
   assert.doesNotMatch(config, /SUPABASE_SERVICE_ROLE_KEY|SUPABASE_SECRET_KEY/);
   assert.match(login, /AFRICALATENCY_SUPABASE_CONFIG/);
   assert.match(dashboard, /AFRICALATENCY_SUPABASE_CONFIG/);
