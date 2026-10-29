@@ -85,12 +85,16 @@ async function runOne(supabase,job){
   await supabase.from('monitor_check_jobs').update({state:outputs.some(o=>o.result_class==='system_failure')?'failed':'completed',last_error:outputs.find(o=>o.error_reason)?.error_reason||null,updated_at:checkedAt,locked_at:null}).eq('id',job.id).eq('lock_token',job.lock_token);
 }
 async function updateIncident(supabase,monitor,outputs,checkedAt){
+  const {data:open}=await supabase.from('monitor_incidents').select('id,affected_countries,started_at').eq('monitor_id',monitor.id).eq('state','open').maybeSingle();
+  if(outputs.some(o=>o.result_class==='success')&&open){
+    await supabase.from('monitor_incidents').update({state:'recovered',ended_at:checkedAt}).eq('id',open.id);
+    return;
+  }
   const targetFailures=outputs.filter(o=>o.result_class==='target_failure');
   if(!targetFailures.length)return;
   const {data:recent}=await supabase.from('monitor_check_results').select('result_class,country_code,checked_at').eq('monitor_id',monitor.id).eq('result_class','target_failure').order('checked_at',{ascending:false}).limit(2);
-  // Require at least two separate failed observations, not one failed community probe.
+  // Require at least two failed observations; probe/system failures never count as target downtime.
   if((recent||[]).length<2)return;
-  const {data:open}=await supabase.from('monitor_incidents').select('id,affected_countries').eq('monitor_id',monitor.id).eq('state','open').maybeSingle();
   const affected=[...new Set([...(open?.affected_countries||[]),...targetFailures.map(o=>o.country_code).filter(Boolean)])];
   if(open){await supabase.from('monitor_incidents').update({affected_countries:affected}).eq('id',open.id);}
   else await supabase.from('monitor_incidents').insert({monitor_id:monitor.id,started_at:recent[1].checked_at||checkedAt,affected_countries:affected,state:'open'});
