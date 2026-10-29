@@ -27,7 +27,7 @@ test('monitoring worker retries checks, distinguishes probe failures and uses co
   assert.match(worker,/validatePublicUrl/);
   assert.match(worker,/redirect:'manual'/);
   assert.match(worker,/monitor_purge_old_results/);
-  assert.match(worker,/alertOwner\(supabase,monitor,incident,'recovered'\)/);
+  assert.match(worker,/alertOwner\(supabase,monitor,open,'recovered'\)/);
   assert.match(worker,/Math\.floor\(Date\.now\(\)\/1800000\)/);
 });
 
