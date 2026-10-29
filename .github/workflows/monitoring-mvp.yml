@@ -5,6 +5,9 @@ on:
       - 'api/monitors.js'
       - 'api/monitor-alerts.js'
       - 'api/monitor-status.js'
+      - 'api/monitor-config.js'
+      - 'login.html'
+      - 'signup.html'
       - 'worker/monitoring.js'
       - 'worker/index.js'
       - 'worker/url-safety.js'
@@ -33,6 +36,7 @@ jobs:
           node --check api/monitors.js
           node --check api/monitor-alerts.js
           node --check api/monitor-status.js
+          node --check api/monitor-config.js
           node --check worker/monitoring.js
           node --check worker/index.js
           node --check server.js
