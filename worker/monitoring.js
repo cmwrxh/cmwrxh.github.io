@@ -6,8 +6,7 @@ const concurrency = Math.max(1, Math.min(2, Number(process.env.MONITOR_CONCURREN
 let ticking = false;
 let lastMaintenanceAt = 0;
 
-function reason(value) { return String(value || 'Check failed').replace(/[\r
-\t]+/g,' ').slice(0,220); }
+function reason(value) { return String(value || 'Check failed').replace(/[\r\n\t]+/g,' ').slice(0,220); }
 async function readTextLimited(response, limit=1024*1024) {
   if (!response.body) return '';
   const reader=response.body.getReader(); const chunks=[]; let size=0;
