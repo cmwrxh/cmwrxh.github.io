@@ -35,9 +35,9 @@ create or replace function public.enqueue_scan_job(
   p_device text,
   p_user_id uuid,
   p_ip_hash text,
-  p_max_queue integer default 12,
-  p_connection_profile text default 'mobile',
-  p_requested_runs integer default 1
+  p_max_queue integer,
+  p_connection_profile text,
+  p_requested_runs integer
 ) returns setof public.scan_jobs
 language plpgsql
 security definer
