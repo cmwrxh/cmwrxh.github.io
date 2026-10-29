@@ -13,6 +13,12 @@
 .report-dashboard-body a.rd-button{background:#075985!important;color:#fff!important;border:1px solid #075985!important}
 .report-dashboard-body a.rd-button.secondary,.report-dashboard-body button.rd-button.secondary{background:#eaf2ff!important;color:#12356f!important;border-color:#b8c9df!important}
 .rd-button:focus-visible{outline:3px solid #075985;outline-offset:3px}
+.rd-rum-section{margin:24px 0;padding:20px;border:1px solid var(--rd-border,#293342);border-radius:14px;background:var(--rd-panel,#111923)}
+.rd-rum-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:14px 0}
+.rd-rum-card{min-width:0;padding:14px;border:1px solid var(--rd-border,#293342);border-radius:10px;background:var(--rd-card,#0e131a)}
+.rd-rum-card strong{display:block;font-size:13px}.rd-rum-value{display:block;margin:8px 0;font-size:23px;font-weight:750;overflow-wrap:anywhere}
+.rd-rum-card small{color:var(--rd-muted,#9ba7b7)}.rd-rum-good{border-color:#237a56}.rd-rum-needs-improvement{border-color:#9a751b}.rd-rum-poor{border-color:#9f3b3b}
+@media(max-width:700px){.rd-rum-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.rd-rum-section{padding:14px}}
 #rd-url{overflow-wrap:anywhere;word-break:normal}
 .report-dashboard-body a.rd-button{min-height:44px;}
 </style></head>
@@ -32,7 +38,14 @@
 </nav>
 <section class="rd-panel" data-panel="summary">
 <div class="rd-section-head"><div><p class="rd-eyebrow">LAB MEASUREMENTS</p><h2>Core Web Vitals</h2></div><p>Controlled Lighthouse results. Lab measurements are not the same as field data from real visitors.</p></div>
-<div id="rd-vitals" class="rd-vitals"></div><section class="rd-page-details"><div class="rd-section-head"><div><p class="rd-eyebrow">REQUEST ANALYSIS</p><h2>Page Details</h2></div><p>Page size and request counts are calculated only from resource data returned by this scan.</p></div><div id="rd-page-details" class="rd-page-detail-grid"></div><p id="rd-page-details-note" class="rd-muted"></p></section>
+<div id="rd-vitals" class="rd-vitals"></div>
+<section class="rd-rum-section" aria-labelledby="rd-rum-heading">
+  <div class="rd-section-head"><div><p class="rd-eyebrow">REAL USER MEASUREMENTS</p><h2 id="rd-rum-heading">Field performance (RUM)</h2></div><p>Aggregated visitor measurements from the last 28 days. Only metric groups with at least 30 samples are shown.</p></div>
+  <p id="rd-rum-status" class="rd-muted" role="status" aria-live="polite">Checking whether real-user data is available…</p>
+  <div id="rd-rum-metrics" class="rd-rum-metrics"></div>
+  <div id="rd-rum-country-wrap" hidden><h3>Field metrics by country</h3><div id="rd-rum-countries" class="rd-table-wrap"></div></div>
+</section>
+<section class="rd-page-details"><div class="rd-section-head"><div><p class="rd-eyebrow">REQUEST ANALYSIS</p><h2>Page Details</h2></div><p>Page size and request counts are calculated only from resource data returned by this scan.</p></div><div id="rd-page-details" class="rd-page-detail-grid"></div><p id="rd-page-details-note" class="rd-muted"></p></section>
 <div class="rd-two-col"><section><h2>Page load filmstrip</h2><div id="rd-filmstrip" class="rd-empty">No filmstrip frames were returned for this scan.</div></section><section><h2>Top issues</h2><div id="rd-issues" class="rd-empty">Prioritized issue details are not available in this report payload.</div></section></div>
 <section class="rd-regional"><p class="rd-eyebrow">AFRICALATENCY REGIONAL INTELLIGENCE</p><h2>African network health</h2><div id="rd-hubs" class="rd-hub-grid"></div><div id="rd-country-table" aria-label="Requested African probe country measurements"><p class="rd-empty">Country measurements will appear here.</p></div><div class="rd-two-col"><div><h3>ISP carrier routing & peering matrix</h3><div class="rd-empty">Carrier-by-carrier comparison requires separate measurements from identified carrier probes. This scan does not include those measurements.</div></div><div><h3>Regional route & submarine cable path</h3><div class="rd-empty">AS-path and traceroute telemetry was not returned by the current scanner.</div></div></div><div class="rd-two-col"><div><h3>Mobile throttling & data-cost emulator</h3><div id="rd-data-cost" class="rd-empty">Data payload is unavailable or no verified country-specific airtime tariff is configured. No cost estimate is shown.</div></div><div><h3>Multi-hub regional health grid</h3><p class="rd-muted">Only returned probe results are shown. Unavailable hubs are never assigned synthetic timings.</p><div id="rd-grid" class="rd-hub-grid"></div></div></div></section>
 </section>
