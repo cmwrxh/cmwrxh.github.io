@@ -39,6 +39,21 @@ const summary=data.summary||{},m=summary.metrics||{},full=data.fullReport||{},fm
 document.title='Scan Results: '+(data.url||'Website')+' | AfricaLatency';
 document.getElementById('rd-url').textContent=data.url||'Website';
 document.getElementById('rd-meta').textContent='Report generated '+fmtDate(data.completedAt)+' · '+(summary.aggregation||'Single Lighthouse run')+(summary.runVariability?.label?' · '+summary.runVariability.label:'');
+const variability=summary.runVariability;
+let variabilityEl=document.getElementById('rd-variability');
+if(!variabilityEl){variabilityEl=document.createElement('p');variabilityEl.id='rd-variability';variabilityEl.className='rd-muted';document.getElementById('rd-meta')?.insertAdjacentElement('afterend',variabilityEl);}
+if(variability&&variability.label){
+  const rangeText=(range,format=value=>String(Math.round(Number(value))))=>range&&finite(range.min)&&finite(range.max)?format(range.min)+'–'+format(range.max):'Unavailable';
+  const metricRanges=variability.metricRanges||{};
+  const parts=[];
+  if(variability.performanceRange)parts.push('Performance '+rangeText(variability.performanceRange));
+  if(variability.structureRange)parts.push('Structure '+rangeText(variability.structureRange));
+  if(metricRanges.lcpMs)parts.push('LCP '+rangeText(metricRanges.lcpMs,value=>ms(value)));
+  if(metricRanges.fcpMs)parts.push('FCP '+rangeText(metricRanges.fcpMs,value=>ms(value)));
+  if(metricRanges.cls)parts.push('CLS '+rangeText(metricRanges.cls,value=>Number(value).toFixed(3)));
+  variabilityEl.textContent=variability.label+(parts.length?' · '+parts.join(' · '):'');
+  variabilityEl.hidden=false;
+}else{variabilityEl.hidden=true;variabilityEl.textContent='';}
 document.getElementById('rd-location').textContent=data.testedFrom||'Cloud worker (region not specified)';
 document.getElementById('rd-device').textContent=data.device==='desktop'?'Desktop Chrome':data.device==='mobile'?'Mobile Chrome':'Not reported';
 document.getElementById('rd-profile').textContent=summary.profileLabel||summary.testConditions||(data.device==='mobile'?'Lighthouse simulated mobile profile':'Unthrottled / not reported');
