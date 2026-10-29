@@ -8,7 +8,7 @@ export default function handler(req, res) {
     res.setHeader('Allow', 'GET, HEAD');
     return res.status(405).send('window.AFRICALATENCY_SUPABASE_CONFIG = null;');
   }
-  const url = process.env.SUPABASE_URL;
+  const url = process.env.SUPABASE_PUBLIC_URL || process.env.SUPABASE_URL;
   const anonKey = process.env.SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_ANON_KEY;
   if (!url || !anonKey) {
     res.status(503);
