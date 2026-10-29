@@ -169,4 +169,4 @@ $$;
 revoke all on function public.rum_beta_purge_expired_events() from public, anon, authenticated;
 grant execute on function public.rum_beta_purge_expired_events() to service_role;
 
--- Deliberately no CREATE EXTENSION, cron.schedule, cron.unschedule, or other scheduler calls.
+-- No extension or scheduler operations are included.
