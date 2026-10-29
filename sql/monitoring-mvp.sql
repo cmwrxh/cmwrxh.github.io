@@ -2,7 +2,7 @@
 -- Community probe measurements are observational and are not availability guarantees.
 -- gen_random_uuid() is available in supported PostgreSQL versions; no extension is created here.
 
-create table if not exists public.monitor_account_entitlements (
+create table public.monitor_account_entitlements (
   owner_id uuid primary key references auth.users(id) on delete cascade,
   plan text not null default 'free' check (plan in ('free','paid')),
   updated_at timestamptz not null default now()
@@ -10,10 +10,9 @@ create table if not exists public.monitor_account_entitlements (
 alter table public.monitor_account_entitlements enable row level security;
 revoke all on public.monitor_account_entitlements from anon, authenticated;
 grant select on public.monitor_account_entitlements to authenticated;
-drop policy if exists "users view own monitor entitlement" on public.monitor_account_entitlements;
 create policy "users view own monitor entitlement" on public.monitor_account_entitlements for select to authenticated using ((select auth.uid())=owner_id);
 
-create table if not exists public.customer_monitors (
+create table public.customer_monitors (
   id uuid primary key default gen_random_uuid(),
   owner_id uuid not null references auth.users(id) on delete cascade,
   name text not null check (char_length(name) between 1 and 80),
@@ -32,10 +31,10 @@ create table if not exists public.customer_monitors (
   updated_at timestamptz not null default now(),
   constraint customer_monitors_public_status_slug_check check (public_status_slug is null or public_status_slug ~ '^[a-zA-Z0-9_-]{12,80}$')
 );
-create index if not exists customer_monitors_due_idx on public.customer_monitors(next_check_at) where enabled;
-create index if not exists customer_monitors_owner_idx on public.customer_monitors(owner_id, created_at desc);
+create index customer_monitors_due_idx on public.customer_monitors(next_check_at) where enabled;
+create index customer_monitors_owner_idx on public.customer_monitors(owner_id, created_at desc);
 
-create table if not exists public.monitor_check_jobs (
+create table public.monitor_check_jobs (
   id uuid primary key default gen_random_uuid(),
   monitor_id uuid not null references public.customer_monitors(id) on delete cascade,
   scheduled_for timestamptz not null,
@@ -48,9 +47,9 @@ create table if not exists public.monitor_check_jobs (
   updated_at timestamptz not null default now(),
   unique(monitor_id, scheduled_for)
 );
-create index if not exists monitor_check_jobs_queue_idx on public.monitor_check_jobs(state, scheduled_for);
+create index monitor_check_jobs_queue_idx on public.monitor_check_jobs(state, scheduled_for);
 
-create table if not exists public.monitor_check_results (
+create table public.monitor_check_results (
   id uuid primary key default gen_random_uuid(),
   monitor_id uuid not null references public.customer_monitors(id) on delete cascade,
   job_id uuid references public.monitor_check_jobs(id) on delete set null,
@@ -63,10 +62,10 @@ create table if not exists public.monitor_check_results (
   details jsonb not null default '{}'::jsonb,
   created_at timestamptz not null default now()
 );
-create index if not exists monitor_results_history_idx on public.monitor_check_results(monitor_id, checked_at desc);
-create index if not exists monitor_results_retention_idx on public.monitor_check_results(checked_at);
+create index monitor_results_history_idx on public.monitor_check_results(monitor_id, checked_at desc);
+create index monitor_results_retention_idx on public.monitor_check_results(checked_at);
 
-create table if not exists public.monitor_daily_aggregates (
+create table public.monitor_daily_aggregates (
   monitor_id uuid not null references public.customer_monitors(id) on delete cascade,
   day date not null,
   country_code text not null default 'ALL',
@@ -78,7 +77,7 @@ create table if not exists public.monitor_daily_aggregates (
   primary key(monitor_id, day, country_code)
 );
 
-create table if not exists public.monitor_incidents (
+create table public.monitor_incidents (
   id uuid primary key default gen_random_uuid(),
   monitor_id uuid not null references public.customer_monitors(id) on delete cascade,
   started_at timestamptz not null default now(),
@@ -87,9 +86,9 @@ create table if not exists public.monitor_incidents (
   state text not null default 'open' check (state in ('open','recovered')),
   created_at timestamptz not null default now()
 );
-create unique index if not exists monitor_one_open_incident_idx on public.monitor_incidents(monitor_id) where state = 'open';
+create unique index monitor_one_open_incident_idx on public.monitor_incidents(monitor_id) where state = 'open';
 
-create table if not exists public.monitor_alert_channels (
+create table public.monitor_alert_channels (
   id uuid primary key default gen_random_uuid(),
   owner_id uuid not null references auth.users(id) on delete cascade,
   channel_type text not null default 'email' check (channel_type in ('email')),
@@ -99,10 +98,10 @@ create table if not exists public.monitor_alert_channels (
   enabled boolean not null default true,
   created_at timestamptz not null default now()
 );
-create index if not exists monitor_alert_channels_owner_idx on public.monitor_alert_channels(owner_id);
-create unique index if not exists monitor_alert_channels_email_unique on public.monitor_alert_channels(owner_id,channel_type,lower(destination));
+create index monitor_alert_channels_owner_idx on public.monitor_alert_channels(owner_id);
+create unique index monitor_alert_channels_email_unique on public.monitor_alert_channels(owner_id,channel_type,lower(destination));
 
-create table if not exists public.monitor_alert_log (
+create table public.monitor_alert_log (
   id uuid primary key default gen_random_uuid(),
   monitor_id uuid not null references public.customer_monitors(id) on delete cascade,
   channel_id uuid references public.monitor_alert_channels(id) on delete set null,
@@ -116,7 +115,7 @@ create table if not exists public.monitor_alert_log (
   created_at timestamptz not null default now(),
   unique(channel_id, dedupe_key)
 );
-create index if not exists monitor_alert_log_recent_idx on public.monitor_alert_log(monitor_id, created_at desc);
+create index monitor_alert_log_recent_idx on public.monitor_alert_log(monitor_id, created_at desc);
 
 alter table public.customer_monitors enable row level security;
 alter table public.monitor_check_jobs enable row level security;
@@ -126,25 +125,18 @@ alter table public.monitor_incidents enable row level security;
 alter table public.monitor_alert_channels enable row level security;
 alter table public.monitor_alert_log enable row level security;
 
-drop policy if exists "owners manage monitors" on public.customer_monitors;
 create policy "owners manage monitors" on public.customer_monitors for all to authenticated
 using ((select auth.uid()) = owner_id) with check ((select auth.uid()) = owner_id);
-drop policy if exists "owners view monitor jobs" on public.monitor_check_jobs;
 create policy "owners view monitor jobs" on public.monitor_check_jobs for select to authenticated
 using (exists (select 1 from public.customer_monitors m where m.id=monitor_id and m.owner_id=(select auth.uid())));
-drop policy if exists "owners view monitor results" on public.monitor_check_results;
 create policy "owners view monitor results" on public.monitor_check_results for select to authenticated
 using (exists (select 1 from public.customer_monitors m where m.id=monitor_id and m.owner_id=(select auth.uid())));
-drop policy if exists "owners view monitor aggregates" on public.monitor_daily_aggregates;
 create policy "owners view monitor aggregates" on public.monitor_daily_aggregates for select to authenticated
 using (exists (select 1 from public.customer_monitors m where m.id=monitor_id and m.owner_id=(select auth.uid())));
-drop policy if exists "owners view monitor incidents" on public.monitor_incidents;
 create policy "owners view monitor incidents" on public.monitor_incidents for select to authenticated
 using (exists (select 1 from public.customer_monitors m where m.id=monitor_id and m.owner_id=(select auth.uid())));
-drop policy if exists "owners manage alert channels" on public.monitor_alert_channels;
 create policy "owners manage alert channels" on public.monitor_alert_channels for all to authenticated
 using ((select auth.uid()) = owner_id) with check ((select auth.uid()) = owner_id);
-drop policy if exists "owners view alert logs" on public.monitor_alert_log;
 create policy "owners view alert logs" on public.monitor_alert_log for select to authenticated
 using (exists (select 1 from public.customer_monitors m where m.id=monitor_id and m.owner_id=(select auth.uid())));
 
