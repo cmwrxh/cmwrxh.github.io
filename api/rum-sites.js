@@ -3,8 +3,8 @@ import { getRumAdminClient, normalizedHostname, requireUser, setNoStore } from '
 
 export default async function handler(req, res) {
   setNoStore(res);
-  if (!['GET', 'POST'].includes(req.method)) {
-    res.setHeader('Allow', 'GET, POST');
+  if (!['GET', 'POST', 'DELETE'].includes(req.method)) {
+    res.setHeader('Allow', 'GET, POST, DELETE');
     return res.status(405).json({ error: 'Method not allowed' });
   }
   let admin;
@@ -13,6 +13,24 @@ export default async function handler(req, res) {
   }
   const auth = await requireUser(req, admin);
   if (auth.error) return res.status(auth.status).json({ error: auth.error });
+
+  if (req.method === 'DELETE') {
+    const siteId = String(req.query?.site_id || req.body?.site_id || '');
+    if (!/^[0-9a-f-]{36}$/i.test(siteId)) {
+      return res.status(400).json({ error: 'A valid site_id is required.' });
+    }
+    const { data: site, error: lookupError } = await admin.from('rum_beta_sites')
+      .select('id').eq('id', siteId).eq('owner_id', auth.user.id).maybeSingle();
+    if (lookupError) return res.status(503).json({ error: 'Could not verify site ownership.' });
+    if (!site) return res.status(404).json({ error: 'RUM site not found.' });
+    const { error: deleteError } = await admin.from('rum_beta_sites')
+      .delete().eq('id', siteId).eq('owner_id', auth.user.id);
+    if (deleteError) {
+      console.error('RUM site deletion failed:', deleteError.code || 'database error');
+      return res.status(503).json({ error: 'Could not delete the site and its associated events.' });
+    }
+    return res.status(200).json({ deleted: true, site_id: siteId, events_deleted_by_cascade: true });
+  }
 
   if (req.method === 'GET') {
     const { data, error } = await admin.from('rum_beta_sites')
