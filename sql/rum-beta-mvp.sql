@@ -25,7 +25,7 @@ create table public.rum_beta_events (
   connection_type text,
   metric text not null check (metric in ('LCP','INP','CLS','TTFB')),
   value double precision not null check (value >= 0 and value < 86400000),
-  path text not null check (char_length(path) <= 512 and left(path, 1) = '/' and path !~ '[?\\#]'),
+  path text not null check (char_length(path) <= 512 and left(path, 1) = '/' and position('?' in path) = 0 and position('#' in path) = 0),
   browser_family text not null check (browser_family in ('Chrome','Edge','Firefox','Safari','Opera','Other','Unknown'))
 );
 
