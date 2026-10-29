@@ -67,7 +67,8 @@ export default async function handler(req,res){
     }
     if(req.method==='POST'){
       const name=typeof req.body?.name==='string'?req.body.name.trim():'';
-      const type=['http','latency','lighthouse'].includes(req.body?.check_type)?req.body.check_type:'http';
+      if(req.body?.check_type!==undefined&&!['http','latency','lighthouse'].includes(req.body.check_type))return response(res,400,{error:'Unsupported monitor check type.'});
+      const type=req.body?.check_type||'http';
       if(name.length<1||name.length>80)return response(res,400,{error:'Monitor name must be 1–80 characters.'});
       let targetUrl;
       try{targetUrl=await validatePublicUrl(String(req.body?.url||''));}catch(e){return response(res,400,{error:safeError(e)});}
