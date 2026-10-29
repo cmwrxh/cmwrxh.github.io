@@ -60,6 +60,7 @@ create table if not exists public.monitor_check_results (
   response_ms integer check (response_ms is null or response_ms between 0 and 600000),
   country_code text check (country_code is null or country_code ~ '^[A-Z]{2}$'),
   error_reason text check (error_reason is null or char_length(error_reason) <= 240),
+  details jsonb not null default '{}'::jsonb,
   created_at timestamptz not null default now()
 );
 create index if not exists monitor_results_history_idx on public.monitor_check_results(monitor_id, checked_at desc);
