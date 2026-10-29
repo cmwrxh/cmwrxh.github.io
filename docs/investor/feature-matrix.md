@@ -1,0 +1,17 @@
+# Feature evidence matrix
+Evidence reviewed: 2026-10-29. Status reflects the evidence available, not assumptions. “On main” means repository code, not confirmed production deployment.
+
+| Feature | Current evidence status | Evidence / limits | Next proof |
+|---|---|---|---|
+| Scanner and Lighthouse | Source present; production verification pending | [API source](https://github.com/cmwrxh/cmwrxh.github.io/blob/main/api/scan.js), [worker source](https://github.com/cmwrxh/cmwrxh.github.io/blob/main/worker/index.js). Results vary by target, device, browser and run. | Dated production scan, deployed SHA, redacted report, repeat count and completion/error rates. |
+| African latency probes | Source integration present; live repeatability unverified | Uses Globalping community-operated probes, not AfricaLatency-owned servers. Intended countries: Kenya, Nigeria, South Africa, Egypt, Ghana, Morocco, Tanzania, Uganda and Senegal. Availability varies. | Preserve probe/location label, UTC timestamp, method, sample count, outcome and missing/error state across repeated runs. |
+| Reports, screenshots and filmstrip | Source present; production behavior unverified | Report/media code exists. Signed URLs and media expiry require live tests. | Dated scan-to-report recording and expiry/access tests. |
+| API and API keys | Source present; end-to-end issuance and controls unverified | Issuance, revocation, quotas and production availability not established. Never expose raw keys. | Disposable-key issue/revoke, quota and unauthorized-access tests. |
+| Payments / Paystack | Code path present; settlement unverified | No verified paid invoices, settlement exports or webhook replay evidence. | Verify signature, amount, currency, reference, idempotency and settlement with redacted evidence. |
+| RUM beta | Merged to main through PR #150; production integration unverified | PR #150 merged as [261abdf](https://github.com/cmwrxh/cmwrxh.github.io/commit/261abdf8f4f3b4119dd0eaa5e8d7b2dfc950f23e). Five CI checks passed on head 678b839bc26d47564b64f1866238b95c1a5523aa. No production deployment was performed. Preview snippet currently references the production `africalatency.dev/rum.js` asset; do not use preview for live-event verification until routing is corrected. | Verify deployed SHA, preview-only asset routing, real test events, two-account isolation, deletion/retention and no raw-IP persistence. |
+| Monitoring | Beta/in progress; live integration unverified | Do not claim operational monitoring. Scheduler and real alerts must remain off during demo unless separately approved. | Preview-only lifecycle tests, isolated test sites, alert delivery proof and deletion checks. |
+| Alerts and public status pages | Planned/unverified | No reliable end-to-end delivery or public-route isolation evidence attached. | Implement and test before presenting as shipped. |
+| AI/MCP | Planned/unverified | No production implementation evidence attached. | Do not present as shipped. |
+
+## Definition of production-verified
+Attach the live route, UTC date, deployed SHA, latest relevant CI/test evidence, redacted screenshot or recording, test scope and known limitations. Source code and CI alone do not establish production availability.
