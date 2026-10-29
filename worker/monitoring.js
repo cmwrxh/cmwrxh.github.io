@@ -122,9 +122,9 @@ async function updateIncident(supabase,monitor,outputs,checkedAt){
   }
   const targetFailures=outputs.filter(o=>o.result_class==='target_failure');
   if(!targetFailures.length)return;
-  const {data:recent}=await supabase.from('monitor_check_results').select('result_class,country_code,checked_at').eq('monitor_id',monitor.id).eq('result_class','target_failure').order('checked_at',{ascending:false}).limit(2);
-  // Require at least two failed observations; probe/system failures never count as target downtime.
-  if((recent||[]).length<2)return;
+  const {data:recent}=await supabase.from('monitor_check_results').select('result_class,country_code,checked_at').eq('monitor_id',monitor.id).order('checked_at',{ascending:false}).limit(2);
+  // Require two consecutive failed observations; probe/system failures never count as target downtime.
+  if((recent||[]).length<2||recent.some(r=>r.result_class!=='target_failure'))return;
   const affected=[...new Set([...(open?.affected_countries||[]),...targetFailures.map(o=>o.country_code).filter(Boolean)])];
   if(open){await supabase.from('monitor_incidents').update({affected_countries:affected}).eq('id',open.id);}
   else { const {data:incident}=await supabase.from('monitor_incidents').insert({monitor_id:monitor.id,started_at:recent[1].checked_at||checkedAt,affected_countries:affected,state:'open'}).select('id').single(); if(incident)await alertOwner(supabase,monitor,incident,'down'); }
