@@ -181,13 +181,12 @@
 <script defer src="/africalatency.js" data-al-key="test-site-001"></script>
 <script src="/js/main.js?v=5"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/api/rum-config"></script>
 <script>
-  // Supabase settings — unchanged from your existing login page
-  const SUPABASE_URL = 'https://uzihwtxffklisczqvurf.supabase.co';
-  const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_dGaR1jgofny7tGVWh0TK2w_haSVNyWv';
-
+  // Use public auth configuration for this deployment (preview or production).
+  const config = window.AFRICALATENCY_SUPABASE_CONFIG;
   let supabaseClient = null;
-  try { supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY); } catch (err) { console.error('Supabase failed to load', err); }
+  try { if (config && config.url && config.anonKey) supabaseClient = window.supabase.createClient(config.url, config.anonKey); } catch (err) { console.error('Supabase failed to load', err); }
 
   const form = document.getElementById('login-form');
   const status = document.getElementById('login-status');
