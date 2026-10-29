@@ -71,9 +71,15 @@ async function runOne(supabase,job){
   if(outputs.some(o=>o.result_class==='target_failure'||o.result_class==='system_failure')&&job.attempt<2){
     await new Promise(r=>setTimeout(r,1000));
     try{
-      const retry=monitor.check_type==='http'?[await httpCheck(monitor)]:monitor.check_type==='lighthouse'?[{result_class:'system_failure',error_reason:'Lighthouse retry requires the next scheduled run'}]:outputs;
-      if(retry.some(o=>o.result_class==='success'))outputs=retry;
-      else outputs=retry;
+      if(monitor.check_type==='http')outputs=[await httpCheck(monitor)];
+      else if(monitor.check_type==='lighthouse'){
+        const safeUrl=await validateRedirectChain(monitor.target_url);
+        const lh=await runLighthouse(safeUrl,'mobile',1);
+        outputs=[{result_class:'success',response_ms:lh.metrics?.ttfbMs??null,details:{kind:'lighthouse',performance:lh.performance,structure:lh.structure,scores:lh.scores,metrics:lh.metrics,provider:lh.provider,grade:lh.grade}}];
+      }else{
+        const regions=(monitor.regions||['KE']).filter(x=>REGIONS.has(x)).slice(0,3);
+        outputs=await regions.reduce(async(prev,country)=>{const acc=await prev;acc.push(await globalpingCheck(monitor,country));return acc;},Promise.resolve([]));
+      }
     }catch(e){outputs=[{result_class:'system_failure',error_reason:reason(e.message)}];}
   }
   const checkedAt=new Date().toISOString();
