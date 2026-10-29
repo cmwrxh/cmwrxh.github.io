@@ -46,7 +46,7 @@ export default async function handler(req,res){
         if(error)return response(res,503,{error:'Could not load monitor.'});
         if(!monitor)return response(res,404,{error:'Monitor not found.'});
         const [results,incidents,aggregates,alerts]=await Promise.all([
-          admin.from('monitor_check_results').select('checked_at,result_class,http_status,response_ms,country_code,error_reason,details').eq('monitor_id',monitorId).order('checked_at',{ascending:false}).limit(500),
+          admin.from('monitor_check_results').select('checked_at,result_class,http_status,response_ms,country_code,error_reason,details').eq('monitor_id',monitorId).order('checked_at',{ascending:false}).limit(1000),
           admin.from('monitor_incidents').select('id,started_at,ended_at,affected_countries,state').eq('monitor_id',monitorId).order('started_at',{ascending:false}).limit(100),
           admin.from('monitor_daily_aggregates').select('day,country_code,success_count,target_failure_count,inconclusive_count,avg_response_ms,p95_response_ms').eq('monitor_id',monitorId).order('day',{ascending:false}).limit(90),
           admin.from('monitor_alert_log').select('alert_type,delivery_status,attempted_at,delivered_at,error_reason,created_at').eq('monitor_id',monitorId).order('created_at',{ascending:false}).limit(50)
