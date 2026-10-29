@@ -99,7 +99,7 @@ create table if not exists public.monitor_alert_channels (
   enabled boolean not null default true,
   created_at timestamptz not null default now()
 );
-create index if not exists monitor_alert_channels_owner_idx on public.monitor_alert_channels(owner_id);
+create index if not exists monitor_alert_channels_owner_idx on public.monitor_alert_channels(owner_id);\ncreate unique index if not exists monitor_alert_channels_email_unique on public.monitor_alert_channels(owner_id,channel_type,lower(destination));
 
 create table if not exists public.monitor_alert_log (
   id uuid primary key default gen_random_uuid(),
