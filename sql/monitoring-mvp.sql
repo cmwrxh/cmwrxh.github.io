@@ -149,7 +149,7 @@ using (exists (select 1 from public.customer_monitors m where m.id=monitor_id an
 
 -- Queue scheduler. Service role only; row locks prevent multiple scheduler instances enqueueing same due tick.
 create or replace function public.monitor_enqueue_due_jobs(p_limit integer default 100)
-returns integer language plpgsql security definer set search_path=public,pg_temp as $
+returns integer language plpgsql security definer set search_path=public,pg_temp as $$
 declare
   rec record;
   added integer := 0;
@@ -180,7 +180,7 @@ revoke all on function public.monitor_enqueue_due_jobs(integer) from public, ano
 grant execute on function public.monitor_enqueue_due_jobs(integer) to service_role;
 
 create or replace function public.monitor_claim_jobs(p_limit integer default 2)
-returns setof public.monitor_check_jobs language plpgsql security definer set search_path=public,pg_temp as $
+returns setof public.monitor_check_jobs language plpgsql security definer set search_path=public,pg_temp as $$
 begin
   update public.monitor_check_jobs
      set state='failed',last_error='Worker lease expired after maximum attempts',locked_at=null,updated_at=now()
