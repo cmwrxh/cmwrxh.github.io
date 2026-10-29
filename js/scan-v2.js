@@ -50,7 +50,7 @@
     'A missing African probe is reported as unavailable, never as a slow or healthy result.',
     'Lighthouse is a controlled lab test. Real visitors can experience different results.'
   ];
-  let tipIndex = 0, tipTimer = null, selectedDevice = 'mobile', turnstileWidget = null, turnstileToken = '';
+  let tipIndex = 0, tipTimer = null, selectedDevice = 'mobile', selectedProfile = 'mobile', selectedRuns = 1, turnstileWidget = null, turnstileToken = '';
   let supabaseClient = null;
   try {
     if (window.supabase) supabaseClient = window.supabase.createClient(
@@ -158,10 +158,14 @@
       'error-callback': () => { turnstileToken = ''; }
     });
   }
-  document.querySelectorAll('[data-device]').forEach(control => control.addEventListener('click', () => {
+  document.querySelectorAll('[data-profile]').forEach(control => control.addEventListener('click', () => {
     selectedDevice = control.dataset.device;
-    document.querySelectorAll('[data-device]').forEach(item => item.setAttribute('aria-pressed', String(item === control)));
+    selectedProfile = control.dataset.profile;
+    document.querySelectorAll('[data-profile]').forEach(item => item.setAttribute('aria-pressed', String(item === control)));
   }));
+  document.getElementById('scan-runs')?.addEventListener('change', event => {
+    selectedRuns = event.target.value === '3' ? 3 : 1;
+  });
   document.getElementById('scan-tip').textContent = tips[0];
   tipTimer = setInterval(() => {
     tipIndex = (tipIndex + 1) % tips.length;
@@ -185,7 +189,7 @@
     setStage('queued');
     try {
       const token = await getToken();
-      const payload = { url, device: selectedDevice };
+      const payload = { url, device: selectedDevice, profile: selectedProfile, runs: selectedRuns };
       if (!token) {
         if (!turnstileToken) throw new Error('Complete the bot verification before running an anonymous scan.');
         payload.turnstileToken = turnstileToken;

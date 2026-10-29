@@ -37,12 +37,17 @@
     <div class="scan-device-row">
       <span>Test profile</span>
       <div class="scan-device-toggle" role="group" aria-label="Device profile">
-        <button type="button" data-device="mobile" aria-pressed="true">Mobile · slow 4G</button>
-        <button type="button" data-device="desktop" aria-pressed="false">Desktop</button>
+        <button type="button" data-device="mobile" data-profile="mobile" aria-pressed="true">Mobile · slow 4G</button>
+        <button type="button" data-device="mobile" data-profile="3g-class" aria-pressed="false">Mobile · 3G-class</button>
+        <button type="button" data-device="desktop" data-profile="desktop" aria-pressed="false">Desktop</button>
       </div>
     </div>
+    <div class="scan-device-row scan-run-count-row">
+      <label for="scan-runs">Repeat runs</label>
+      <select id="scan-runs" name="runs"><option value="1" selected>1 run · faster</option><option value="3">3 runs · median + observed range</option></select>
+    </div>
     <div id="scan-turnstile" class="scan-turnstile" hidden></div>
-    <p id="scan-note" class="scan-note">Only scan public websites you have permission to test. Mobile is the default and uses Lighthouse's simulated mobile throttling.</p>
+    <p id="scan-note" class="scan-note">Only scan public websites you have permission to test. Mobile slow 4G is the default. The 3G-class profile is a custom simulated connection. Three runs are optional and report the median plus the observed range.</p>
     <div id="scan-error" class="scan-error" role="alert"></div>
   </form>
   <section id="scan-work" class="scan-work" aria-live="polite">

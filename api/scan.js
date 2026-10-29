@@ -63,6 +63,11 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Use a public HTTP or HTTPS URL with no credentials or custom port.' });
   }
   const device = body.device === 'desktop' ? 'desktop' : 'mobile';
+  const profile = typeof body.profile === 'string' ? body.profile : device;
+  const runs = body.runs === undefined || body.runs === null || body.runs === '' ? 1 : Number(body.runs);
+  const validProfile = (device === 'desktop' && profile === 'desktop') || (device === 'mobile' && ['mobile', '3g-class'].includes(profile));
+  if (!validProfile) return res.status(400).json({ error: 'Choose a supported test profile for this device.' });
+  if (![1, 3].includes(runs)) return res.status(400).json({ error: 'Runs must be 1 or 3.' });
   const userToken = String(req.headers.authorization || '').replace(/^Bearer\s+/i, '').trim();
   const ip = String(req.headers['cf-connecting-ip'] || req.headers['x-forwarded-for'] || req.socket?.remoteAddress || 'unknown').split(',')[0].trim();
   let verified = false;
@@ -70,6 +75,6 @@ export default async function handler(req, res) {
     verified = await turnstileOk(body.turnstileToken, ip);
     if (!verified) return res.status(403).json({ error: process.env.TURNSTILE_SITE_KEY ? 'Please complete the bot verification and try again.' : 'Anonymous scanning is not configured yet. Please sign in or try again later.' });
   }
-  const result = await sendToWorker('/internal/jobs', req, { url: parsed.toString(), device, turnstileVerified: verified });
+  const result = await sendToWorker('/internal/jobs', req, { url: parsed.toString(), device, profile, runs, turnstileVerified: verified });
   return res.status(result.status).json(result.payload);
 }

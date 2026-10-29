@@ -27,12 +27,17 @@ jobs:
           node --check worker/index.js
           node --check worker/scoring.js
           node --check worker/provider.js
+          node --check worker/scan-profiles.js
+          node --check worker/scan-profiles.test.js
+          node --check api/scan.js
+          node --check js/scan-v2.js
           node --check worker/url-safety.js
       - name: Check scan and report scripts syntax
         run: |
           node --check js/report-dashboard.js
           node --check scripts/scan-failure-states-test.mjs
           node --check tests/report-filmstrip.test.cjs
+          node --check tests/scan-profiles-ui.test.cjs
           node --check tests/auth-next.test.cjs
 
   unit-tests:
@@ -49,6 +54,8 @@ jobs:
         run: npm run test:auth-next
       - name: Run report filmstrip tests
         run: npm run test:report-filmstrip
+      - name: Run scan profile UI tests
+        run: npm run test:scan-profiles
 
   build:
     name: Static build validation

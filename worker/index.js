@@ -7,6 +7,7 @@ import { buildRequestAnalysis } from './scoring.js';
 import { signFilmstripFiles } from './filmstrip-storage.js';
 import { captureVisualFilmstrip } from './visual-capture.js';
 import { validatePublicUrl } from './url-safety.js';
+import { normalizeRunCount, normalizeScanProfile, profileMetadata } from './scan-profiles.js';
 
 const app = express();
 app.disable('x-powered-by');
@@ -254,12 +255,13 @@ async function signedFilmstrip(jobId, forceRefresh = false) {
 }
 async function executeJob(job) {
   const update = async (fields) => supabase.from('scan_jobs').update({ ...fields, updated_at: new Date().toISOString() }).eq('id', job.id);
-  const user = job.user_id ? { id: job.user_id } : null;
-  const runCount = user ? 3 : 1;
+  const runCount = normalizeRunCount(job.requested_runs) ?? 1;
+  const profileId = normalizeScanProfile(job.connection_profile, job.device) || (job.device === 'desktop' ? 'desktop' : 'mobile');
+  const profileInfo = profileMetadata(profileId, runCount);
   await update({ status: 'processing', stage: 'fetching', progress: 12, error_message: null });
   const safeUrl = await validatePublicUrl(job.url);
   await update({ stage: 'lighthouse', progress: 30 });
-  const lighthouseResult = await runLighthouse(safeUrl, job.device, runCount);
+  const lighthouseResult = await runLighthouse(safeUrl, job.device, runCount, profileId);
   const screenshot = await saveScreenshot(job.id, lighthouseResult.screenshotDataUrl).catch(() => null);
   const visualCapture = await captureVisualFilmstrip(safeUrl).catch(error => ({ frames: [], errors: [{ reason: String(error?.message || error).slice(0, 180) }], partial: true }));
   const visualSave = await saveFilmstrip(job.id, visualCapture.frames).catch(error => ({ saved: 0, failed: visualCapture.frames.length }));
@@ -282,6 +284,11 @@ async function executeJob(job) {
     requestAnalysis: lighthouseResult.requestAnalysis || null,
     runCount: lighthouseResult.runCount || 1,
     aggregation: lighthouseResult.aggregation || 'single Lighthouse run',
+    profile: profileInfo.profile,
+    profileLabel: profileInfo.profileLabel,
+    requestedRuns: profileInfo.requestedRuns,
+    testConditions: profileInfo.testConditions,
+    runVariability: lighthouseResult.runVariability || null,
     filmstripStatus
   };
   await update({ stage: 'africa', progress: 72, screenshot });
@@ -307,6 +314,10 @@ async function executeJob(job) {
       provider: lighthouseResult.provider || 'local Lighthouse',
       aggregation: lighthouseResult.aggregation || 'single Lighthouse run',
       runVariability: lighthouseResult.runVariability || null,
+      profile: profileInfo.profile,
+      profileLabel: profileInfo.profileLabel,
+      requestedRuns: profileInfo.requestedRuns,
+      testConditions: profileInfo.testConditions,
       testedFrom: process.env.TEST_LOCATION_LABEL || 'Cloud worker',
       filmstripStatus
     }
@@ -380,8 +391,12 @@ app.use('/internal', (req, res, next) => authorized(req) ? next() : res.status(4
 
 app.post('/internal/jobs', async (req, res) => {
   if (!supabase || !IP_HASH_SECRET) return res.status(503).json({ error: 'Scan worker is not configured.' });
-  const { url, device = 'mobile', turnstileVerified = false } = req.body || {};
+  const { url, device = 'mobile', profile, runs = 1, turnstileVerified = false } = req.body || {};
   if (!['mobile', 'desktop'].includes(device)) return res.status(400).json({ error: 'Invalid device.' });
+  const connectionProfile = normalizeScanProfile(profile, device);
+  const requestedRuns = normalizeRunCount(runs);
+  if (!connectionProfile) return res.status(400).json({ error: 'Choose a supported test profile for this device.' });
+  if (requestedRuns === null) return res.status(400).json({ error: 'Runs must be 1 or 3.' });
   let normalized;
   try { normalized = await validatePublicUrl(url); } catch (e) { return res.status(400).json({ error: e.message }); }
   const user = await userFromRequest(req);
@@ -416,11 +431,11 @@ app.post('/internal/jobs', async (req, res) => {
   }
   const cacheSince = new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString();
   let cacheQuery = supabase.from('scan_jobs').select('id,public_id,status,stage,progress,created_at')
-    .eq('url', normalized).eq('device', device).eq('status', 'completed').eq('result->summary->>runCount', String(user || keyRecord ? 3 : 1)).gte('created_at', cacheSince);
+    .eq('url', normalized).eq('device', device).eq('connection_profile', connectionProfile).eq('requested_runs', requestedRuns).eq('status', 'completed').eq('result->summary->>runCount', String(requestedRuns)).gte('created_at', cacheSince);
   cacheQuery = user || keyRecord ? cacheQuery.eq('user_id', user?.id || keyRecord.user_id) : cacheQuery.is('user_id', null);
   const { data: cached } = await cacheQuery.order('completed_at', { ascending: false }).limit(1).maybeSingle();
   if (cached) return res.status(200).json({ jobId: cached.id, reportId: cached.public_id, queuePosition: 0, cacheHit: true });
-  let activeQuery = supabase.from('scan_jobs').select('id,public_id,created_at').eq('url', normalized).eq('device', device).in('status', ['queued','processing']);
+  let activeQuery = supabase.from('scan_jobs').select('id,public_id,created_at').eq('url', normalized).eq('device', device).eq('connection_profile', connectionProfile).eq('requested_runs', requestedRuns).in('status', ['queued','processing']);
   activeQuery = user || keyRecord ? activeQuery.eq('user_id', user?.id || keyRecord.user_id) : activeQuery.is('user_id', null);
   const { data: activeJob } = await activeQuery.order('created_at', { ascending: true }).limit(1).maybeSingle();
   if (activeJob) {
@@ -429,7 +444,7 @@ app.post('/internal/jobs', async (req, res) => {
   }
   const { data: jobRows, error } = await supabase.rpc('enqueue_scan_job', {
     p_url: normalized, p_device: device, p_user_id: user?.id || keyRecord?.user_id || null,
-    p_ip_hash: ipHash, p_max_queue: MAX_QUEUE
+    p_ip_hash: ipHash, p_max_queue: MAX_QUEUE, p_connection_profile: connectionProfile, p_requested_runs: requestedRuns
   });
   if (error) {
     if (String(error.message || '').includes('SCAN_QUEUE_FULL')) return res.status(429).json({ error: 'The scan queue is full right now. Please try again shortly.' });
