@@ -1,6 +1,6 @@
 -- Customer monitoring MVP: review and apply to PREVIEW only.
 -- Community probe measurements are observational and are not availability guarantees.
-create extension if not exists pgcrypto;
+-- gen_random_uuid() is available in supported PostgreSQL versions; no extension is created here.
 
 create table if not exists public.monitor_account_entitlements (
   owner_id uuid primary key references auth.users(id) on delete cascade,
@@ -149,8 +149,8 @@ create policy "owners view alert logs" on public.monitor_alert_log for select to
 using (exists (select 1 from public.customer_monitors m where m.id=monitor_id and m.owner_id=(select auth.uid())));
 
 -- Queue scheduler. Service role only; row locks prevent multiple scheduler instances enqueueing same due tick.
-create or replace function public.monitor_enqueue_due_jobs(p_limit integer default 100)
-returns integer language plpgsql security definer set search_path=public,pg_temp as $$
+create function public.monitor_enqueue_due_jobs(p_limit integer default 100)
+returns integer language plpgsql security definer set search_path=pg_catalog,public,pg_temp as $$
 declare
   rec record;
   added integer := 0;
@@ -184,8 +184,8 @@ end; $$;
 revoke all on function public.monitor_enqueue_due_jobs(integer) from public, anon, authenticated;
 grant execute on function public.monitor_enqueue_due_jobs(integer) to service_role;
 
-create or replace function public.monitor_claim_jobs(p_limit integer default 2)
-returns setof public.monitor_check_jobs language plpgsql security definer set search_path=public,pg_temp as $$
+create function public.monitor_claim_jobs(p_limit integer default 2)
+returns setof public.monitor_check_jobs language plpgsql security definer set search_path=pg_catalog,public,pg_temp as $$
 begin
   update public.monitor_check_jobs
      set state='failed',last_error='Worker lease expired after maximum attempts',locked_at=null,updated_at=now()
@@ -206,8 +206,8 @@ end; $$;
 revoke all on function public.monitor_claim_jobs(integer) from public, anon, authenticated;
 grant execute on function public.monitor_claim_jobs(integer) to service_role;
 
-create or replace function public.monitor_purge_old_results()
-returns bigint language plpgsql security definer set search_path=public,pg_temp as $$
+create function public.monitor_purge_old_results()
+returns bigint language plpgsql security definer set search_path=pg_catalog,public,pg_temp as $$
 declare removed bigint;
 begin
   delete from public.monitor_check_results where checked_at < now()-interval '30 days';
@@ -217,8 +217,8 @@ end; $$;
 revoke all on function public.monitor_purge_old_results() from public, anon, authenticated;
 grant execute on function public.monitor_purge_old_results() to service_role;
 
-create or replace function public.monitor_rollup_daily(p_day date default (now() at time zone 'utc')::date - 1)
-returns integer language plpgsql security definer set search_path=public,pg_temp as $$
+create function public.monitor_rollup_daily(p_day date default (now() at time zone 'utc')::date - 1)
+returns integer language plpgsql security definer set search_path=pg_catalog,public,pg_temp as $$
 declare changed integer;
 begin
   insert into public.monitor_daily_aggregates(monitor_id,day,country_code,success_count,target_failure_count,inconclusive_count,avg_response_ms,p95_response_ms)
@@ -242,8 +242,8 @@ revoke all on function public.monitor_rollup_daily(date) from public, anon, auth
 grant execute on function public.monitor_rollup_daily(date) to service_role;
 
 -- A public page exposes only coarse status, never probe internals or customer URLs beyond the chosen label.
-create or replace function public.monitor_public_status(p_slug text)
-returns jsonb language sql stable security definer set search_path=public,pg_temp as $$
+create function public.monitor_public_status(p_slug text)
+returns jsonb language sql stable security definer set search_path=pg_catalog,public,pg_temp as $$
   select jsonb_build_object(
     'name',m.name,
     'state',case when m.last_check_at is null then 'not_enough_data' when exists(select 1 from public.monitor_incidents i where i.monitor_id=m.id and i.state='open') then 'investigating' else 'no_open_incidents' end,
@@ -252,7 +252,7 @@ returns jsonb language sql stable security definer set search_path=public,pg_tem
     'incidents',coalesce((select jsonb_agg(jsonb_build_object('startedAt',i.started_at,'endedAt',i.ended_at,'state',i.state) order by i.started_at desc) from public.monitor_incidents i where i.monitor_id=m.id and i.started_at >= now()-interval '30 days'),'[]'::jsonb)
   ) from public.customer_monitors m where m.public_status_slug=p_slug and m.public_status_enabled and m.enabled;
 $$;
-revoke all on function public.monitor_public_status(text) from public, authenticated;
-grant execute on function public.monitor_public_status(text) to anon;
+revoke all on function public.monitor_public_status(text) from public, anon, authenticated;
+grant execute on function public.monitor_public_status(text) to service_role;
 
 -- Retention, aggregates and incidents require a scheduler; invoke from worker maintenance loop.
