@@ -243,6 +243,7 @@ returns jsonb language sql stable security definer set search_path=public,pg_tem
     'name',m.name,
     'state',case when m.last_check_at is null then 'not_enough_data' when exists(select 1 from public.monitor_incidents i where i.monitor_id=m.id and i.state='open') then 'investigating' else 'no_open_incidents' end,
     'updatedAt',m.last_check_at,
+    'history',coalesce((select jsonb_agg(jsonb_build_object('day',a.day,'successCount',a.success_count,'targetFailureCount',a.target_failure_count,'inconclusiveCount',a.inconclusive_count) order by a.day desc) from public.monitor_daily_aggregates a where a.monitor_id=m.id and a.country_code='ALL' and a.day >= current_date-30),'[]'::jsonb),
     'incidents',coalesce((select jsonb_agg(jsonb_build_object('startedAt',i.started_at,'endedAt',i.ended_at,'state',i.state) order by i.started_at desc) from public.monitor_incidents i where i.monitor_id=m.id and i.started_at >= now()-interval '30 days'),'[]'::jsonb)
   ) from public.customer_monitors m where m.public_status_slug=p_slug and m.public_status_enabled and m.enabled;
 $$;
