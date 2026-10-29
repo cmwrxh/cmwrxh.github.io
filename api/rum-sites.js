@@ -20,9 +20,12 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'A valid site_id is required.' });
     }
     const { data: site, error: lookupError } = await admin.from('rum_beta_sites')
-      .select('id').eq('id', siteId).eq('owner_id', auth.user.id).maybeSingle();
+      .select('id,public_key').eq('id', siteId).eq('owner_id', auth.user.id).maybeSingle();
     if (lookupError) return res.status(503).json({ error: 'Could not verify site ownership.' });
     if (!site) return res.status(404).json({ error: 'RUM site not found.' });
+    const { error: rateLimitDeleteError } = await admin.from('rum_beta_rate_limits')
+      .delete().eq('key_id', site.public_key);
+    if (rateLimitDeleteError) return res.status(503).json({ error: 'Could not clear the site rate-limit record.' });
     const { error: deleteError } = await admin.from('rum_beta_sites')
       .delete().eq('id', siteId).eq('owner_id', auth.user.id);
     if (deleteError) {
