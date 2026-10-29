@@ -153,7 +153,10 @@ returns integer language plpgsql security definer set search_path=public,pg_temp
 declare
   rec record;
   added integer := 0;
+  slots integer := 0;
 begin
+  select greatest(0,200-count(*)) into slots from public.monitor_check_jobs where state in ('queued','running');
+  if slots <= 0 then return 0; end if;
   for rec in
     select m.id,m.next_check_at,m.interval_minutes
       from public.customer_monitors m
@@ -163,7 +166,7 @@ begin
            < case when exists(select 1 from public.monitor_account_entitlements e where e.owner_id=m.owner_id and e.plan='paid') then 10000 else 100 end
      order by next_check_at
      for update skip locked
-     limit greatest(1,least(coalesce(p_limit,100),200))
+     limit greatest(1,least(coalesce(p_limit,100),200,slots))
   loop
     insert into public.monitor_check_jobs(monitor_id,scheduled_for)
     values(rec.id,rec.next_check_at)
