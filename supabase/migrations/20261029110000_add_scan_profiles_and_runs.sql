@@ -66,3 +66,23 @@ end;
 $$;
 revoke all on function public.enqueue_scan_job(text,text,uuid,text,integer,text,integer) from public, anon, authenticated;
 grant execute on function public.enqueue_scan_job(text,text,uuid,text,integer,text,integer) to service_role;
+
+-- Preserve compatibility for older workers calling the original five-argument RPC.
+create or replace function public.enqueue_scan_job(
+  p_url text,
+  p_device text,
+  p_user_id uuid,
+  p_ip_hash text,
+  p_max_queue integer default 12
+) returns setof public.scan_jobs
+language sql
+security definer
+set search_path = public
+as $$
+  select * from public.enqueue_scan_job(
+    p_url, p_device, p_user_id, p_ip_hash, p_max_queue,
+    case when p_device = 'desktop' then 'desktop' else 'mobile' end, 1
+  );
+$$;
+revoke all on function public.enqueue_scan_job(text,text,uuid,text,integer) from public, anon, authenticated;
+grant execute on function public.enqueue_scan_job(text,text,uuid,text,integer) to service_role;
