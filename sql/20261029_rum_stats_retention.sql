@@ -63,3 +63,27 @@ end;
 $$;
 revoke all on function public.rum_beta_purge_expired_events() from public, anon, authenticated;
 grant execute on function public.rum_beta_purge_expired_events() to service_role;
+
+
+-- Schedule daily deletion where pg_cron is installed (including supported self-hosted
+-- Supabase deployments). If unavailable, migration remains safe and emits a notice.
+do $rum_retention_schedule$
+declare
+  existing_job_id bigint;
+begin
+  if exists (select 1 from pg_extension where extname = 'pg_cron') then
+    execute 'select jobid from cron.job where jobname = $1 limit 1'
+      into existing_job_id using 'rum-beta-retention-daily';
+    if existing_job_id is not null then
+      execute 'select cron.unschedule($1)' using existing_job_id;
+    end if;
+    perform cron.schedule(
+      'rum-beta-retention-daily',
+      '17 2 * * *',
+      'select public.rum_beta_purge_expired_events();'
+    );
+  else
+    raise notice 'pg_cron is not installed; configure an external daily scheduler for public.rum_beta_purge_expired_events().';
+  end if;
+end;
+$rum_retention_schedule$;
