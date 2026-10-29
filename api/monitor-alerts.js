@@ -1,3 +1,4 @@
+import crypto from 'node:crypto';
 import { createClient } from '@supabase/supabase-js';
 const key=process.env.SUPABASE_SERVICE_KEY||process.env.SUPABASE_SECRET_KEY||process.env.SUPABASE_SERVICE_ROLE_KEY;
 const db=process.env.SUPABASE_URL&&key?createClient(process.env.SUPABASE_URL,key,{auth:{autoRefreshToken:false,persistSession:false}}):null;
