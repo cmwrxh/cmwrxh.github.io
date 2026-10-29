@@ -4,6 +4,7 @@ on:
     branches: [main]
     paths:
       - 'api/rum*.js'
+      - 'login.html'
       - 'api/run-diagnostic.js'
       - 'api/scan-history.js'
       - 'api/submit-lead.js'
@@ -47,6 +48,7 @@ jobs:
       - name: Syntax-check RUM endpoints
         run: |
           node --check api/rum.js
+          node --check api/rum-config.js
           node --check api/rum-sites.js
           node --check api/rum-dashboard.js
           node --check api/rum-library.js
