@@ -1,7 +1,7 @@
 # AfricaLatency RUM Beta MVP
 
 ## Current status
-This branch is not a live product. The public marketing page and navigation links remain unpublished until a real site sends metrics and the authenticated dashboard displays verified aggregates end to end. The RUM dashboard and login must read the deployment-specific public Supabase URL/key from `/api/rum-config`; never hardcode the hosted production project into a preview.
+This branch is not a live product. The public marketing page and navigation links remain unpublished until a real site sends metrics and the authenticated dashboard displays verified aggregates end to end. The RUM dashboard and login must read the deployment-specific public Supabase URL/key from `/api/rum-config`; never hardcode the hosted production project into a preview. `SUPABASE_PUBLIC_URL` overrides `SUPABASE_URL` for the browser if the server uses an internal service URL; the public key comes from `SUPABASE_PUBLISHABLE_KEY` or `SUPABASE_ANON_KEY`. The service-role key is never returned to the browser.
 
 ## Data flow
 - Customer embeds `<script async src="https://africalatency.dev/rum.js" data-key="PUBLIC_KEY"></script>`.
