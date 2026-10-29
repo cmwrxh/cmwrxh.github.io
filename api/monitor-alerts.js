@@ -10,7 +10,7 @@ async function sendEmail(to,subject,html){
   return {ok:true};
 }
 export default async function handler(req,res){
-  if(!['GET','POST','DELETE'].includes(req.method)){res.setHeader('Allow','GET, POST, DELETE');return out(res,405,{error:'Method not allowed'});}
+  if(!['GET','POST','PATCH','DELETE'].includes(req.method)){res.setHeader('Allow','GET, POST, PATCH, DELETE');return out(res,405,{error:'Method not allowed'});}
   if(!db)return out(res,503,{error:'Monitoring is not configured.'});
   const token=String(req.headers.authorization||'').replace(/^Bearer\\s+/i,'').trim();
   const {data:auth,error:authError}=token?await db.auth.getUser(token):{data:null,error:true};
@@ -44,6 +44,16 @@ export default async function handler(req,res){
     return out(res,201,{channel:data,message:'Confirmed account email added. Delivery requires email provider configuration.'});
   }
   const id=String(req.query?.id||req.body?.id||'');
+  if(req.method==='PATCH'){
+    if(!/^[0-9a-f-]{36}$/i.test(id))return out(res,400,{error:'A valid alert channel id is required.'});
+    const updates={};
+    if(typeof req.body?.enabled==='boolean')updates.enabled=req.body.enabled;
+    if(req.body?.muted===true)updates.muted_until=new Date(Date.now()+Math.min(24,Math.max(1,Number(req.body?.hours)||1))*3600000).toISOString();
+    if(req.body?.muted===false)updates.muted_until=null;
+    const {data,error}=await db.from('monitor_alert_channels').update(updates).eq('id',id).eq('owner_id',user.id).select('id,enabled,muted_until').maybeSingle();
+    if(error||!data)return out(res,503,{error:'Could not update alert channel.'});
+    return out(res,200,{channel:data});
+  }
   if(!/^[0-9a-f-]{36}$/i.test(id))return out(res,400,{error:'A valid alert channel id is required.'});
   const {error}=await db.from('monitor_alert_channels').delete().eq('id',id).eq('owner_id',user.id);
   if(error)return out(res,503,{error:'Could not delete alert channel.'});
