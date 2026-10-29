@@ -175,7 +175,7 @@ begin
      where id=rec.id;
   end loop;
   return added;
-end; $;
+end; $$;
 revoke all on function public.monitor_enqueue_due_jobs(integer) from public, anon, authenticated;
 grant execute on function public.monitor_enqueue_due_jobs(integer) to service_role;
 
@@ -197,7 +197,7 @@ begin
     set state='running',attempt=j.attempt+1,locked_at=now(),lock_token=gen_random_uuid(),updated_at=now()
     from picked where j.id=picked.id
     returning j.*;
-end; $;
+end; $$;
 revoke all on function public.monitor_claim_jobs(integer) from public, anon, authenticated;
 grant execute on function public.monitor_claim_jobs(integer) to service_role;
 
