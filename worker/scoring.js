@@ -146,7 +146,11 @@ export function summarizeRun(lhr) {
   });
   const observedEndTimes = normalizedResources.map(r => r.endTime).filter(v => Number.isFinite(v) && v >= 0);
   const fullyLoadedTimeMs = observedEndTimes.length ? Math.max(...observedEndTimes) : numericValue(audits['fully-loaded']?.numericValue);
-  const waterfall = buildWaterfall(requests, { auditAvailable: hasRequestItems });
+  const waterfallAudit = audits['network-requests'];
+  const waterfall = buildWaterfall(requests, {
+    auditAvailable: hasRequestItems,
+    error: !hasRequestItems && typeof waterfallAudit?.errorMessage === 'string' ? waterfallAudit.errorMessage : null
+  });
   const requestAnalysis = buildRequestAnalysis(normalizedResources, {
     requestCount: hasRequestItems ? requests.length : null,
     pageWeightBytes: hasRequestItems ? normalizedResources.reduce((sum, r) => sum + r.transferSize, 0) : null,
