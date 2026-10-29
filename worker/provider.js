@@ -73,12 +73,8 @@ async function runOne(url, device, profileId) {
   }
 }
 
-export async function runLighthouse(url, device, runCount = 1, requestedProfile = null) {
-  const profileId = normalizeScanProfile(requestedProfile, device);
-  const count = normalizeRunCount(runCount);
-  if (!profileId || count === null) throw new Error('Invalid scan profile or run count.');
-  const runs = [];
-  for (let i = 0; i < count; i += 1) runs.push(await runOne(url, device, profileId));
+export function aggregateRuns(runs) {
+  if (!Array.isArray(runs) || runs.length === 0) throw new TypeError('At least one Lighthouse run is required.');
   if (runs.length === 1) return runs[0];
   const medianMetric = key => {
     const values = runs.map(r => r.metrics?.[key]).filter(Number.isFinite).sort((a,b) => a-b);
@@ -115,6 +111,16 @@ export async function runLighthouse(url, device, runCount = 1, requestedProfile 
   };
   return merged;
 }
+
+export async function runLighthouse(url, device, runCount = 1, requestedProfile = null) {
+  const profileId = normalizeScanProfile(requestedProfile, device);
+  const count = normalizeRunCount(runCount);
+  if (!profileId || count === null) throw new Error('Invalid scan profile or run count.');
+  const runs = [];
+  for (let i = 0; i < count; i += 1) runs.push(await runOne(url, device, profileId));
+  return aggregateRuns(runs);
+}
+
 function medianScoreFrom(runs, path) {
   const values = runs.map(r => path.split('.').reduce((v,k) => v?.[k], r)).filter(Number.isFinite).sort((a,b) => a-b);
   if (!values.length) return null;
