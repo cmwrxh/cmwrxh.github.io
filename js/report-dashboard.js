@@ -38,7 +38,7 @@ status.hidden=true;app.hidden=false;
 const summary=data.summary||{},m=summary.metrics||{},full=data.fullReport||{},fm=full.metrics||m;
 document.title='Scan Results: '+(data.url||'Website')+' | AfricaLatency';
 document.getElementById('rd-url').textContent=data.url||'Website';
-document.getElementById('rd-meta').textContent='Report generated '+fmtDate(data.completedAt)+' · '+(summary.aggregation||'Single Lighthouse run')+(summary.runVariability?.label?' · '+summary.runVariability.label:'');
+document.getElementById('rd-meta').textContent='Report generated '+fmtDate(data.completedAt)+' · '+(summary.aggregation||'Single Lighthouse run');
 const variability=summary.runVariability;
 let variabilityEl=document.getElementById('rd-variability');
 if(!variabilityEl){variabilityEl=document.createElement('p');variabilityEl.id='rd-variability';variabilityEl.className='rd-muted';document.getElementById('rd-meta')?.insertAdjacentElement('afterend',variabilityEl);}
