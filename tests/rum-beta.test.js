@@ -42,3 +42,16 @@ test('RUM site deletion is owner-scoped and retention SQL preserves the 90-day p
   assert.match(migration, /rum_beta_purge_expired_events/);
   assert.match(migration, /p_dimension not in \('overall','country','operator','connection_type'\)/);
 });
+
+
+test('preview auth reads deployment config and never exposes a service-role key', () => {
+  const config = fs.readFileSync(new URL('../api/rum-config.js', import.meta.url), 'utf8');
+  const login = fs.readFileSync(new URL('../login.html', import.meta.url), 'utf8');
+  const dashboard = fs.readFileSync(new URL('../rum-dashboard.html', import.meta.url), 'utf8');
+  assert.match(config, /SUPABASE_PUBLISHABLE_KEY \|\| process\.env\.SUPABASE_ANON_KEY/);
+  assert.doesNotMatch(config, /SUPABASE_SERVICE_ROLE_KEY|SUPABASE_SECRET_KEY/);
+  assert.match(login, /AFRICALATENCY_SUPABASE_CONFIG/);
+  assert.match(dashboard, /AFRICALATENCY_SUPABASE_CONFIG/);
+  assert.doesNotMatch(login, /uzihwtxffklisczqvurf\.supabase\.co/);
+  assert.doesNotMatch(dashboard, /uzihwtxffklisczqvurf\.supabase\.co/);
+});
