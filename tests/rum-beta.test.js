@@ -23,3 +23,22 @@ test('RUM snippet stays under 3 KB gzipped and does not use cookies or local sto
   assert.match(source, /rateAttribute === null/);
   assert.match(source, /function cleanPath/);
 });
+
+
+test('RUM dashboard shows observed p75 values rather than counts of grouped rows', () => {
+  const dashboard = fs.readFileSync(new URL('../rum-dashboard.html', import.meta.url), 'utf8');
+  assert.match(dashboard, /renderMetricCards\(data\.breakdowns\.overall\s*\|\|\[\]\)/);
+  assert.match(dashboard, /fmt\(metric,item\.p75\)/);
+  assert.match(dashboard, /item\.sample_count/);
+});
+
+test('RUM site deletion is owner-scoped and retention SQL preserves the 90-day policy', () => {
+  const endpoint = fs.readFileSync(new URL('../api/rum-sites.js', import.meta.url), 'utf8');
+  const migration = fs.readFileSync(new URL('../sql/20261029_rum_stats_retention.sql', import.meta.url), 'utf8');
+  assert.match(endpoint, /eq\('id', siteId\)\.eq\('owner_id', auth\.user\.id\)/);
+  assert.match(endpoint, /method === 'DELETE'/);
+  assert.match(migration, /interval '90 days'/);
+  assert.match(migration, /rum-beta-retention-daily/);
+  assert.match(migration, /rum_beta_purge_expired_events/);
+  assert.match(migration, /p_dimension not in \('overall','country','operator','connection_type'\)/);
+});
