@@ -9,7 +9,7 @@ test('waterfall chart consumes normalized request offsets and preserves unavaila
   assert.match(report, /const waterfallData=full\.waterfall\|\|null/);
   assert.match(report, /r\.timingStatus==='measured'/);
   assert.match(report, /finite\(r\.durationMs\)\?ms\(r\.durationMs\):'Unavailable'/);
-  assert.match(report, /A valid request start and end timing pair/);
+  assert.match(report, /r\.timingReason\|\|'Unavailable'/);
 });
 
 test('waterfall UI explicitly excludes invented protocol phases', () => {
