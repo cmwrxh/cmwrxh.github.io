@@ -65,3 +65,15 @@ test('scanner URL safety rejects private IPs and credential URLs',async()=>{
   await assert.rejects(()=>validatePublicUrl('http://user:pass@example.com/'),/credentials/);
   await assert.rejects(()=>validatePublicUrl('http://localhost/'),/Private, local/);
 });
+
+test('login, signup and monitoring dashboard use deployment-specific public auth config',()=>{
+  const config=read('api/monitor-config.js');
+  assert.match(config,/SUPABASE_PUBLIC_URL\|\|process\.env\.SUPABASE_URL/);
+  assert.match(config,/SUPABASE_PUBLISHABLE_KEY\|\|process\.env\.SUPABASE_ANON_KEY/);
+  assert.doesNotMatch(config,/SERVICE_ROLE|SECRET_KEY/);
+  for(const file of ['login.html','signup.html','monitoring-dashboard.html']){
+    const page=read(file);
+    assert.match(page,/AFRICALATENCY_SUPABASE_CONFIG/);
+    assert.doesNotMatch(page,/uzihwtxffklisczqvurf\.supabase\.co/);
+  }
+});
