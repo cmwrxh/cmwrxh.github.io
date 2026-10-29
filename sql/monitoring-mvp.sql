@@ -155,6 +155,7 @@ declare
   added integer := 0;
   slots integer := 0;
 begin
+  perform pg_advisory_xact_lock(hashtext('monitor_enqueue_due_jobs'));
   select greatest(0,200-count(*)) into slots from public.monitor_check_jobs where state in ('queued','running');
   if slots <= 0 then return 0; end if;
   for rec in
