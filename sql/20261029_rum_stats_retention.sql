@@ -58,6 +58,7 @@ begin
   delete from public.rum_beta_events
    where ts < now() - interval '90 days';
   get diagnostics removed_count = row_count;
+  delete from public.rum_beta_rate_limits where updated_at < now() - interval '2 days';
   return removed_count;
 end;
 $$;
