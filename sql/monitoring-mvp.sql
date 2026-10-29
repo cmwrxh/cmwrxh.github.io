@@ -2,6 +2,17 @@
 -- Community probe measurements are observational and are not availability guarantees.
 create extension if not exists pgcrypto;
 
+create table if not exists public.monitor_account_entitlements (
+  owner_id uuid primary key references auth.users(id) on delete cascade,
+  plan text not null default 'free' check (plan in ('free','paid')),
+  updated_at timestamptz not null default now()
+);
+alter table public.monitor_account_entitlements enable row level security;
+revoke all on public.monitor_account_entitlements from anon, authenticated;
+grant select on public.monitor_account_entitlements to authenticated;
+drop policy if exists "users view own monitor entitlement" on public.monitor_account_entitlements;
+create policy "users view own monitor entitlement" on public.monitor_account_entitlements for select to authenticated using ((select auth.uid())=owner_id);
+
 create table if not exists public.customer_monitors (
   id uuid primary key default gen_random_uuid(),
   owner_id uuid not null references auth.users(id) on delete cascade,
@@ -137,29 +148,30 @@ using (exists (select 1 from public.customer_monitors m where m.id=monitor_id an
 
 -- Queue scheduler. Service role only; row locks prevent multiple scheduler instances enqueueing same due tick.
 create or replace function public.monitor_enqueue_due_jobs(p_limit integer default 100)
-returns integer language plpgsql security definer set search_path=public,pg_temp as $$
-declare added integer;
+returns integer language plpgsql security definer set search_path=public,pg_temp as $
+declare
+  rec record;
+  added integer := 0;
 begin
-  with due as (
-    select id, next_check_at, interval_minutes
-    from public.customer_monitors
-    where enabled and next_check_at <= now()
-    order by next_check_at
-    for update skip locked
-    limit greatest(1,least(coalesce(p_limit,100),200))
-  ), inserted as (
+  for rec in
+    select id,next_check_at,interval_minutes
+      from public.customer_monitors
+     where enabled and next_check_at <= now()
+     order by next_check_at
+     for update skip locked
+     limit greatest(1,least(coalesce(p_limit,100),200))
+  loop
     insert into public.monitor_check_jobs(monitor_id,scheduled_for)
-    select id,next_check_at from due
-    on conflict(monitor_id,scheduled_for) do nothing
-    returning monitor_id
-  )
-  select count(*) into added from inserted;
-  update public.customer_monitors m
-     set next_check_at = greatest(m.next_check_at + make_interval(mins=>m.interval_minutes), now() + interval '1 minute'),
-         updated_at=now()
-   where m.id in (select id from due);
+    values(rec.id,rec.next_check_at)
+    on conflict(monitor_id,scheduled_for) do nothing;
+    if found then added := added + 1; end if;
+    update public.customer_monitors
+       set next_check_at=greatest(rec.next_check_at+make_interval(mins=>rec.interval_minutes),now()+interval '1 minute'),
+           updated_at=now()
+     where id=rec.id;
+  end loop;
   return added;
-end; $$;
+end; $;
 revoke all on function public.monitor_enqueue_due_jobs(integer) from public, anon, authenticated;
 grant execute on function public.monitor_enqueue_due_jobs(integer) to service_role;
 
