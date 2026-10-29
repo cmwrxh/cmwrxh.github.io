@@ -89,11 +89,14 @@ async function runOne(supabase,job){
   const {error:saveError}=await supabase.from('monitor_check_results').insert(rows);
   if(saveError){await supabase.from('monitor_check_jobs').update({state:'failed',last_error:'Could not persist result',updated_at:checkedAt}).eq('id',job.id).eq('lock_token',job.lock_token);return;}
   await updateIncident(supabase,monitor,outputs,checkedAt);
+  if(monitor.latency_threshold_ms&&outputs.some(o=>o.result_class==='success'&&Number.isFinite(o.response_ms)&&o.response_ms>monitor.latency_threshold_ms)){
+    await alertOwner(supabase,monitor,null,'latency');
+  }
   await supabase.from('customer_monitors').update({last_check_at:checkedAt}).eq('id',monitor.id);
   await supabase.from('monitor_check_jobs').update({state:outputs.some(o=>o.result_class==='system_failure')?'failed':'completed',last_error:outputs.find(o=>o.error_reason)?.error_reason||null,updated_at:checkedAt,locked_at:null}).eq('id',job.id).eq('lock_token',job.lock_token);
 }
 async function alertOwner(supabase,monitor,incident,type){
-  const dedupeKey=type+':'+incident.id;
+  const dedupeKey=type+':'+(incident?.id||monitor.id+':'+Math.floor(Date.now()/1800000));
   const {data:channels,error}=await supabase.from('monitor_alert_channels').select('id,destination,muted_until,enabled').eq('owner_id',monitor.owner_id).eq('enabled',true).not('verified_at','is',null);
   if(error||!channels?.length)return;
   for(const channel of channels){
@@ -101,13 +104,13 @@ async function alertOwner(supabase,monitor,incident,type){
     const {data:existing}=await supabase.from('monitor_alert_log').select('id').eq('channel_id',channel.id).eq('dedupe_key',dedupeKey).maybeSingle();
     if(existing)continue;
     const now=new Date().toISOString();
-    const {data:log,error:logError}=await supabase.from('monitor_alert_log').insert({monitor_id:monitor.id,channel_id:channel.id,incident_id:incident.id,alert_type:type,dedupe_key:dedupeKey,delivery_status:'queued',attempted_at:now}).select('id').single();
+    const {data:log,error:logError}=await supabase.from('monitor_alert_log').insert({monitor_id:monitor.id,channel_id:channel.id,incident_id:incident?.id||null,alert_type:type,dedupe_key:dedupeKey,delivery_status:'queued',attempted_at:now}).select('id').single();
     if(logError||!log)continue;
     let status='failed', deliveredAt=null, errorReason='Email provider is not configured on this preview.';
     if(process.env.RESEND_API_KEY&&process.env.MONITOR_FROM_EMAIL){
       try{
         const subject='AfricaLatency: '+(type==='down'?'monitor incident':'monitor recovered')+' — '+monitor.name;
-        const body='<p>Monitor: '+String(monitor.name).replace(/[&<>"]/g,'')+'</p><p>State: '+(type==='down'?'Incident detected after repeated failed checks.':'A successful check confirmed recovery.')+'</p><p>Measured by AfricaLatency checks and community probes. Probe availability varies and measurements do not guarantee availability.</p>';
+        const body='<p>Monitor: '+String(monitor.name).replace(/[&<>"]/g,'')+'</p><p>State: '+(type==='down'?'Incident detected after repeated failed checks.':type==='latency'?'Configured latency threshold exceeded.':'A successful check confirmed recovery.')+'</p><p>Measured by AfricaLatency checks and community probes. Probe availability varies and measurements do not guarantee availability.</p>';
         const response=await fetch('https://api.resend.com/emails',{method:'POST',headers:{Authorization:'Bearer '+process.env.RESEND_API_KEY,'Content-Type':'application/json'},body:JSON.stringify({from:process.env.MONITOR_FROM_EMAIL,to:[channel.destination],subject,html:body}),signal:AbortSignal.timeout(8000)});
         if(response.ok){status='sent';deliveredAt=new Date().toISOString();errorReason=null;}else errorReason='Email provider rejected the message.';
       }catch{errorReason='Email provider request failed.';}
