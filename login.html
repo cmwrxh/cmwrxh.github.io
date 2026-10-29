@@ -146,13 +146,16 @@
 <script src="/js/main.js?v=7"></script>
 <script src="/js/auth-next.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/api/rum-config"></script>
 <script>
-  // Supabase settings — unchanged from your existing login page
-  const SUPABASE_URL = 'https://uzihwtxffklisczqvurf.supabase.co';
-  const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_dGaR1jgofny7tGVWh0TK2w_haSVNyWv';
-
+  // Use this deployment's public auth configuration (preview or production).
+  const config = window.AFRICALATENCY_SUPABASE_CONFIG;
   let supabaseClient = null;
-  try { supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, storage: window.localStorage } }); } catch (err) { console.error('Supabase failed to load', err); }
+  try {
+    if (config && config.url && config.anonKey) {
+      supabaseClient = window.supabase.createClient(config.url, config.anonKey, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, storage: window.localStorage } });
+    }
+  } catch (err) { console.error('Supabase failed to load', err); }
 
   const form = document.getElementById('login-form');
   const params = new URLSearchParams(window.location.search);

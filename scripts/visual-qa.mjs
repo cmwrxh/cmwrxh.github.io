@@ -29,6 +29,15 @@ for (const route of pages) {
     page.on('console', msg => { if (msg.type() === 'error') { const value='console: '+msg.text(); if ((route==='/login'||route==='/signup') && (/GSI_LOGGER|status of 403/.test(value))) environmentWarnings.push(value); else if(route===reportFixtureRoute&&(/fixture\.invalid|Failed to load resource|net::ERR_FAILED/.test(value))) environmentWarnings.push(value); else errors.push(value); } });
     let status = 0;
     try {
+      // The local static preview has no serverless API runtime. Stub the deployment-specific
+      // public auth config so login-page QA checks layout without a predictable /api/rum-config 404.
+      if (route === '/login' || route === '/signup') {
+        await page.route('**/api/rum-config', request => request.fulfill({
+          status: 200,
+          contentType: 'application/javascript; charset=utf-8',
+          body: 'window.AFRICALATENCY_SUPABASE_CONFIG = null;'
+        }));
+      }
       if(route===reportFixtureRoute){await page.route('**/api/scan/**',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(reportFixture)}));await page.route('https://fixture.invalid/**',route=>route.abort('failed'));await page.route('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2',route=>route.fulfill({status:200,contentType:'application/javascript',body:'window.supabase={createClient:()=>({auth:{getSession:async()=>({data:{session:null}})}})};'}));}
       const response = await page.goto(base+route, { waitUntil: 'networkidle', timeout: 45000 });
       if(route===reportFixtureRoute){await page.waitForSelector('#rd-app:not([hidden])',{timeout:10000});const countryRows=await page.locator('#rd-country-table tbody tr').count();if(countryRows!==9)throw new Error('Report fixture must show all nine requested countries; got '+countryRows);const unavailableRows=await page.locator('#rd-country-table tbody tr').filter({hasText:'Unavailable'}).count();if(unavailableRows!==9)throw new Error('Report fixture without probe results must mark all nine countries Unavailable');if(await page.locator('.rd-score-ring').count()!==1)throw new Error('Report fixture should show the performance score ring');await page.evaluate(()=>{const banner=document.createElement('div');banner.textContent='VISUAL QA FIXTURE · MOCKED SCAN DATA';banner.dataset.qaFixture='true';banner.style.cssText='background:#273244;color:#ffffff;border-bottom:1px solid #52627a;padding:8px 14px;font:700 12px/1.4 sans-serif;letter-spacing:.06em;text-align:center';document.body.prepend(banner);});await page.locator('#rd-filmstrip img').evaluateAll(imgs=>imgs.forEach(img=>{img.loading='eager';}));await page.waitForFunction(()=>[...document.querySelectorAll('[data-filmstrip-empty]')].some(el=>el.textContent.includes('No filmstrip frames were returned for this scan.')),null,{timeout:8000}).catch(()=>{});}
