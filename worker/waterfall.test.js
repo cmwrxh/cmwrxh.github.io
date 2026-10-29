@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { buildWaterfall } from './waterfall.js';
+import { summarizeRun } from './scoring.js';
 
 test('normalizes real Lighthouse request offsets without deriving protocol phases', () => {
   const fixture = JSON.parse(readFileSync(new URL('./fixtures/lighthouse-network-waterfall.json', import.meta.url), 'utf8'));
@@ -56,4 +57,21 @@ test('does not show a waterfall chart when rows have no valid offsets', () => {
   assert.equal(result.timedRequestCount, 0);
   assert.equal(result.rows[0].durationMs, null);
   assert.match(result.reason, /none included a valid/);
+});
+
+test('summarizeRun carries actual network request rows into the normalized waterfall', () => {
+  const fixture = JSON.parse(readFileSync(new URL('./fixtures/lighthouse-network-waterfall.json', import.meta.url), 'utf8'));
+  const result = summarizeRun({ categories: {}, audits: fixture.audits });
+  assert.equal(result.waterfall.status, 'available');
+  assert.equal(result.waterfall.requestCount, 2);
+  assert.equal(result.waterfall.rows[0].startMs, fixture.audits['network-requests'].details.items[0].networkRequestTime);
+});
+
+test('summarizeRun preserves Lighthouse audit error and empty-list states', () => {
+  const error = summarizeRun({ categories: {}, audits: { 'network-requests': { errorMessage: 'Trace data unavailable' } } });
+  assert.equal(error.waterfall.status, 'error');
+  assert.equal(error.waterfall.reason, 'Trace data unavailable');
+  const empty = summarizeRun({ categories: {}, audits: { 'network-requests': { details: { items: [] } } } });
+  assert.equal(empty.waterfall.status, 'empty');
+  assert.equal(empty.waterfall.requestCount, 0);
 });
