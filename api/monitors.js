@@ -23,9 +23,12 @@ async function planFor(userId) {
 async function usageFor(userId) {
   const monthStart = new Date();
   monthStart.setUTCDate(1); monthStart.setUTCHours(0,0,0,0);
+  const monitors = await admin.from('customer_monitors').select('id').eq('owner_id',userId);
+  if(monitors.error) throw new Error('Monitoring usage could not be verified.');
+  const ids=(monitors.data||[]).map(x=>x.id);
+  if(!ids.length)return 0;
   const {count,error}=await admin.from('monitor_check_jobs').select('id',{count:'exact',head:true})
-    .gte('scheduled_for',monthStart.toISOString()).in('state',['queued','running','completed','failed'])
-    .in('monitor_id',(await admin.from('customer_monitors').select('id').eq('owner_id',userId)).data?.map(x=>x.id)||[]);
+    .gte('scheduled_for',monthStart.toISOString()).in('monitor_id',ids);
   if(error) throw new Error('Monitoring usage could not be verified.');
   return count||0;
 }
@@ -43,7 +46,7 @@ export default async function handler(req,res){
         if(error)return response(res,503,{error:'Could not load monitor.'});
         if(!monitor)return response(res,404,{error:'Monitor not found.'});
         const [results,incidents,aggregates,alerts]=await Promise.all([
-          admin.from('monitor_check_results').select('checked_at,result_class,http_status,response_ms,country_code,error_reason').eq('monitor_id',monitorId).order('checked_at',{ascending:false}).limit(500),
+          admin.from('monitor_check_results').select('checked_at,result_class,http_status,response_ms,country_code,error_reason,details').eq('monitor_id',monitorId).order('checked_at',{ascending:false}).limit(500),
           admin.from('monitor_incidents').select('id,started_at,ended_at,affected_countries,state').eq('monitor_id',monitorId).order('started_at',{ascending:false}).limit(100),
           admin.from('monitor_daily_aggregates').select('day,country_code,success_count,target_failure_count,inconclusive_count,avg_response_ms,p95_response_ms').eq('monitor_id',monitorId).order('day',{ascending:false}).limit(90),
           admin.from('monitor_alert_log').select('alert_type,delivery_status,attempted_at,delivered_at,error_reason,created_at').eq('monitor_id',monitorId).order('created_at',{ascending:false}).limit(50)
@@ -54,7 +57,13 @@ export default async function handler(req,res){
       }
       const {data,error}=await admin.from('customer_monitors').select('id,name,target_url,check_type,interval_minutes,regions,enabled,public_status_enabled,next_check_at,last_check_at,created_at').eq('owner_id',user.id).order('created_at',{ascending:false});
       if(error)return response(res,503,{error:'Could not load monitors.'});
-      return response(res,200,{monitors:data||[],plan:await planFor(user.id),limits:(await planFor(user.id))==='paid'?paidLimits:freeLimits});
+      const plan=await planFor(user.id);
+      const latest={};
+      for(const monitor of data||[]){
+        const {data:rows}=await admin.from('monitor_check_results').select('result_class,checked_at,response_ms,country_code').eq('monitor_id',monitor.id).order('checked_at',{ascending:false}).limit(1);
+        latest[monitor.id]=rows?.[0]||null;
+      }
+      return response(res,200,{monitors:(data||[]).map(m=>({...m,latest_result:latest[m.id]})),plan,limits:plan==='paid'?paidLimits:freeLimits});
     }
     if(req.method==='POST'){
       const name=typeof req.body?.name==='string'?req.body.name.trim():'';
