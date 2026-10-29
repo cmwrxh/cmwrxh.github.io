@@ -55,7 +55,7 @@ export default async function handler(req,res){
         const {data:channels}=await admin.from('monitor_alert_channels').select('id,channel_type,destination,verified_at,muted_until,enabled').eq('owner_id',user.id);
         return response(res,200,{monitor,results:results.data||[],incidents:incidents.data||[],aggregates:aggregates.data||[],alerts:alerts.data||[],channels:channels||[]});
       }
-      const {data,error}=await admin.from('customer_monitors').select('id,name,target_url,check_type,interval_minutes,regions,enabled,public_status_enabled,next_check_at,last_check_at,created_at').eq('owner_id',user.id).order('created_at',{ascending:false});
+      const {data,error}=await admin.from('customer_monitors').select('id,name,target_url,check_type,interval_minutes,regions,enabled,public_status_enabled,public_status_slug,next_check_at,last_check_at,created_at').eq('owner_id',user.id).order('created_at',{ascending:false});
       if(error)return response(res,503,{error:'Could not load monitors.'});
       const plan=await planFor(user.id);
       const latest={};
