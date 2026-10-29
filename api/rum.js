@@ -73,10 +73,8 @@ async function geoFor(ip) {
         : (j.org || null),
     };
 
-    await db
-      .from('ip_geo_cache')
-      .upsert({ ip, data });
-
+    // Do not persist visitor IPs or geolocation responses in ip_geo_cache.
+    // Keep this lookup transient; existing cache rows are left untouched.
     return data;
   } catch {
     return null;
