@@ -25,7 +25,7 @@ export default async function handler(req, res) {
   if (siteError || !site) return res.status(404).json({ error: 'RUM site not found.' });
 
   const since = new Date(Date.now() - RANGES[range] * 60 * 60 * 1000).toISOString();
-  const dimensions = ['country', 'operator', 'connection_type'];
+  const dimensions = ['overall', 'country', 'operator', 'connection_type'];
   const results = await Promise.all(dimensions.map(async (dimension) => {
     const { data, error } = await admin.rpc('rum_beta_dashboard_stats', {
       p_site_id: siteId, p_since: since, p_dimension: dimension,
