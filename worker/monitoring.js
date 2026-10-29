@@ -3,9 +3,11 @@ import { runLighthouse } from './provider.js';
 
 const REGIONS = new Set(['KE','NG','ZA','EG','GH','MA','TZ','UG','SN']);
 const concurrency = Math.max(1, Math.min(2, Number(process.env.MONITOR_CONCURRENCY) || 1));
-let ticking = false;\nlet lastMaintenanceAt = 0;
+let ticking = false;
+let lastMaintenanceAt = 0;
 
-function reason(value) { return String(value || 'Check failed').replace(/[\r\n\t]+/g,' ').slice(0,220); }
+function reason(value) { return String(value || 'Check failed').replace(/[\r
+\t]+/g,' ').slice(0,220); }
 async function readTextLimited(response, limit=1024*1024) {
   if (!response.body) return '';
   const reader=response.body.getReader(); const chunks=[]; let size=0;
@@ -134,7 +136,11 @@ export async function monitoringTick(supabase){
   ticking=true;
   try{
     await supabase.rpc('monitor_enqueue_due_jobs',{p_limit:50});
-    if(Date.now()-lastMaintenanceAt>=86400000){\n      await supabase.rpc('monitor_purge_old_results');\n      await supabase.rpc('monitor_rollup_daily',{p_day:new Date(Date.now()-86400000).toISOString().slice(0,10)});\n      lastMaintenanceAt=Date.now();\n    }
+    if(Date.now()-lastMaintenanceAt>=86400000){
+      await supabase.rpc('monitor_purge_old_results');
+      await supabase.rpc('monitor_rollup_daily',{p_day:new Date(Date.now()-86400000).toISOString().slice(0,10)});
+      lastMaintenanceAt=Date.now();
+    }
     const {data:jobs,error}=await supabase.rpc('monitor_claim_jobs',{p_limit:concurrency});
     if(error)throw error;
     for(const job of jobs||[])await runOne(supabase,job);
