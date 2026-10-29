@@ -3,6 +3,8 @@
   'use strict';
   var script = document.currentScript;
   if (!script) return;
+  // Respect browser privacy signals before collecting or sending any measurements.
+  if (navigator.doNotTrack === '1' || window.doNotTrack === '1' || navigator.globalPrivacyControl === true) return;
   var key = script.getAttribute('data-key') || '';
   if (!/^rum_pub_[a-f0-9]{48}$/.test(key)) return;
   var rateAttribute = script.getAttribute('data-sample-rate');
