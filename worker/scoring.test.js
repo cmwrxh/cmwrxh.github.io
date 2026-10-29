@@ -58,3 +58,13 @@ test('recorded Lighthouse JSON fixture exposes only its real screenshot thumbnai
   assert.deepEqual(result.filmstripFrames.map(frame => frame.timingMs), [0, 500]);
   assert.ok(result.filmstripFrames.every(frame => frame.dataUrl.startsWith('data:image/jpeg;base64,')));
 });
+
+test('does not turn absent Lighthouse metric values into zero', () => {
+  const summary = summarizeRun({ categories: { performance: { score: 0.8 } }, audits: {} });
+  assert.equal(summary.metrics.lcpMs, null);
+  assert.equal(summary.metrics.fcpMs, null);
+  assert.equal(summary.metrics.tbtMs, null);
+  assert.equal(summary.metrics.cls, null);
+  assert.equal(summary.metrics.speedIndexMs, null);
+  assert.equal(summary.metrics.ttfbMs, null);
+});

@@ -236,7 +236,7 @@ async function signedFilmstrip(jobId) {
     if (error || !Array.isArray(files)) return [];
     const output = [];
     for (const file of files) {
-      const match = file.name.match(/^(\\d{2})-(\\d+)\\.jpg$/); if (!match) continue;
+      const match = file.name.match(/^(\d{2})-(\d+)\.jpg$/); if (!match) continue;
       const { data, error: signError } = await supabase.storage.from('scan-screenshots').createSignedUrl(jobId + '/filmstrip/' + file.name, 3600);
       if (!signError && data?.signedUrl) output.push({ timing_ms: Number(match[2]), url: data.signedUrl });
     }

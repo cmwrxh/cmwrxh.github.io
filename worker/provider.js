@@ -5,6 +5,25 @@ import { validateRedirectChain } from './url-safety.js';
 
 const timeoutMs = Math.max(60000, Math.min(90000, Number(process.env.LIGHTHOUSE_TIMEOUT_MS) || 75000));
 
+/**
+ * Do not publish a completed report if Lighthouse returned an incomplete payload.
+ */
+export function validateLighthouseResult(lhr) {
+  if (!lhr || !Number.isFinite(lhr.categories?.performance?.score)) {
+    throw new Error('Lighthouse returned no valid performance score.');
+  }
+  const audits = lhr.audits || {};
+  const metricIds = ['largest-contentful-paint', 'first-contentful-paint', 'total-blocking-time', 'cumulative-layout-shift', 'speed-index'];
+  if (!metricIds.some(id => Number.isFinite(audits[id]?.numericValue))) {
+    throw new Error('Lighthouse returned no usable core performance metrics.');
+  }
+  const requests = audits['network-requests']?.details?.items;
+  if (!Array.isArray(requests) || requests.length === 0) {
+    throw new Error('Lighthouse returned no network request details.');
+  }
+  return lhr;
+}
+
 async function runLighthouseOnce(url, device) {
   const safeUrl = await validateRedirectChain(url);
   const chrome = await chromeLauncher.launch({
@@ -28,6 +47,7 @@ async function runLighthouseOnce(url, device) {
       timer = setTimeout(() => reject(new Error('Timed out')), timeoutMs);
     });
     const result = await Promise.race([run, timeout]);
+    validateLighthouseResult(result?.lhr);
     return summarizeRun(result.lhr);
   } finally {
     clearTimeout(timer);
@@ -47,6 +67,7 @@ async function runPageSpeed(url, device) {
   const response = await fetch('https://www.googleapis.com/pagespeedonline/v5/runPagespeed?' + params.toString(), { signal: AbortSignal.timeout(Math.min(timeoutMs, 20000)) });
   const payload = await response.json().catch(() => ({}));
   if (!response.ok || !payload.lighthouseResult) throw new Error('PageSpeed Insights provider failed.');
+  validateLighthouseResult(payload.lighthouseResult);
   const result = summarizeRun(payload.lighthouseResult);
   result.provider = 'PageSpeed Insights';
   return result;
