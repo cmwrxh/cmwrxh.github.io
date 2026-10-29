@@ -155,9 +155,12 @@ declare
   added integer := 0;
 begin
   for rec in
-    select id,next_check_at,interval_minutes
-      from public.customer_monitors
-     where enabled and next_check_at <= now()
+    select m.id,m.next_check_at,m.interval_minutes
+      from public.customer_monitors m
+     where m.enabled and m.next_check_at <= now()
+       and (select count(*) from public.monitor_check_jobs j join public.customer_monitors cm on cm.id=j.monitor_id
+             where cm.owner_id=m.owner_id and j.scheduled_for >= date_trunc('month',now()))
+           < case when exists(select 1 from public.monitor_account_entitlements e where e.owner_id=m.owner_id and e.plan='paid') then 10000 else 100 end
      order by next_check_at
      for update skip locked
      limit greatest(1,least(coalesce(p_limit,100),200))
@@ -177,10 +180,15 @@ revoke all on function public.monitor_enqueue_due_jobs(integer) from public, ano
 grant execute on function public.monitor_enqueue_due_jobs(integer) to service_role;
 
 create or replace function public.monitor_claim_jobs(p_limit integer default 2)
-returns setof public.monitor_check_jobs language sql security definer set search_path=public,pg_temp as $$
+returns setof public.monitor_check_jobs language plpgsql security definer set search_path=public,pg_temp as $
+begin
+  update public.monitor_check_jobs
+     set state='failed',last_error='Worker lease expired after maximum attempts',locked_at=null,updated_at=now()
+   where state='running' and locked_at < now()-interval '3 minutes' and attempt >= 2;
+  return query
   with picked as (
     select id from public.monitor_check_jobs
-    where state='queued' or (state='running' and locked_at < now()-interval '3 minutes')
+    where state='queued' or (state='running' and locked_at < now()-interval '3 minutes' and attempt < 2)
     order by scheduled_for
     for update skip locked
     limit greatest(1,least(coalesce(p_limit,2),2))
@@ -189,7 +197,7 @@ returns setof public.monitor_check_jobs language sql security definer set search
     set state='running',attempt=j.attempt+1,locked_at=now(),lock_token=gen_random_uuid(),updated_at=now()
     from picked where j.id=picked.id
     returning j.*;
-$$;
+end; $;
 revoke all on function public.monitor_claim_jobs(integer) from public, anon, authenticated;
 grant execute on function public.monitor_claim_jobs(integer) to service_role;
 
