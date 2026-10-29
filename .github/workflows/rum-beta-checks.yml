@@ -21,6 +21,7 @@ on:
       - 'rum.js'
       - 'rum-dashboard.html'
       - 'sql/rum-beta-mvp.sql'
+      - 'sql/20261029_rum_stats_retention.sql'
       - 'tests/rum-beta.test.js'
       - 'package.json'
       - '.github/workflows/rum-beta-checks.yml'
@@ -43,4 +44,10 @@ jobs:
           node --check lib/privacy/client-ip.js
           node --check lib/probe-providers/globalping.js
           node --check lib/probe-providers/index.js
+      - name: Syntax-check RUM endpoints
+        run: |
+          node --check api/rum.js
+          node --check api/rum-sites.js
+          node --check api/rum-dashboard.js
+          node --check api/rum-library.js
       - run: npm test
