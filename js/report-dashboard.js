@@ -7,6 +7,48 @@ const score=v=>finite(v)?Math.round(Number(v))+'%':'Unavailable';
 const bytes=v=>finite(v)?(Number(v)===0?'0 B':Number(v)>=1048576?(Number(v)/1048576).toFixed(2)+' MB':Number(v)>=1024?(Number(v)/1024).toFixed(1)+' KB':Math.round(Number(v))+' B'):'Unavailable';
 const fmtDate=v=>v?new Date(v).toLocaleString():'Timestamp unavailable';
 const setStatus=t=>{status.hidden=false;status.textContent=t;if(retry)retry.hidden=false};
+async function loadRUMReport(reportId){
+ const rumStatus=document.getElementById('rd-rum-status'),cards=document.getElementById('rd-rum-metrics'),countryWrap=document.getElementById('rd-rum-country-wrap'),countryTable=document.getElementById('rd-rum-countries');
+ if(!rumStatus||!cards)return;
+ try{
+  const response=await fetch('/api/report-rum?report_id='+encodeURIComponent(reportId),{headers:{Accept:'application/json'}});
+  const payload=await response.json().catch(()=>({}));
+  if(!response.ok)throw new Error(response.status===503?'The RUM service is temporarily unavailable. Lab results above are unaffected.':(payload.error||'Could not load real-user measurements.'));
+  if(!payload.available){
+   rumStatus.textContent=payload.reason==='not_configured'
+    ?'RUM is not connected to this domain yet. Register the site in the RUM dashboard and install its snippet to begin collecting field data.'
+    :'RUM is connected, but there are not yet 30 samples per metric in the last 28 days. Field values stay hidden until the privacy threshold is met.';
+   cards.innerHTML='';countryWrap.hidden=true;return;
+  }
+  const metricNames={LCP:'Largest Contentful Paint',INP:'Interaction to Next Paint',CLS:'Cumulative Layout Shift',TTFB:'Time to First Byte'};
+  const keys=['LCP','INP','CLS','TTFB'];
+  const metrics=payload.metrics||{};
+  const formatValue=(key,value)=>key==='CLS'?Number(value).toFixed(3):ms(value);
+  const verdict=(key,value)=>{
+   const n=Number(value),limits={LCP:[2500,4000],INP:[200,500],CLS:[0.1,0.25],TTFB:[800,1800]}[key];
+   return n<=limits[0]?'Good':n<=limits[1]?'Needs improvement':'Poor';
+  };
+  cards.innerHTML=keys.map(key=>{
+   const item=metrics[key];
+   if(!item||!finite(item.p75))return '<div class="rd-rum-card"><strong>'+esc(metricNames[key])+'</strong><span class="rd-rum-value">Not enough data</span><small>At least 30 samples required</small></div>';
+   const state=verdict(key,item.p75),cls=state.toLowerCase().replace(/\s+/g,'-');
+   return '<div class="rd-rum-card rd-rum-'+cls+'"><strong>'+esc(metricNames[key])+'</strong><span class="rd-rum-value">'+esc(formatValue(key,item.p75))+'</span><small>p75 · '+esc(String(item.samples))+' samples · '+esc(state)+'</small></div>';
+  }).join('');
+  rumStatus.textContent='Real-user field data · trailing '+String(payload.windowDays||28)+' days · p75 values. These measurements are separate from the controlled Lighthouse lab test.';
+  const countryRows=(Array.isArray(payload.countries)?payload.countries:[]).slice(0,60).map(row=>[
+   esc(row.country),esc(metricNames[row.metric]||row.metric),
+   esc(formatValue(row.metric,row.p75)),esc(String(row.samples))
+  ]);
+  if(countryRows.length){
+   countryTable.innerHTML=table(['Country','Metric','p75','Samples'],countryRows);
+   countryWrap.hidden=false;
+  }else countryWrap.hidden=true;
+ }catch(error){
+  rumStatus.textContent=error.message||'Real-user measurements could not be loaded.';
+  cards.innerHTML='';countryWrap.hidden=true;
+ }
+}
+
 const table=(headers,rows)=>'<div class="rd-table-wrap"><table class="rd-table"><thead><tr>'+headers.map(h=>'<th>'+esc(h)+'</th>').join('')+'</tr></thead><tbody>'+(rows.length?rows.map(row=>'<tr>'+row.map(c=>'<td>'+c+'</td>').join('')+'</tr>').join(''):'<tr><td colspan="'+headers.length+'">No data returned by this scan.</td></tr>')+'</tbody></table></div>';
 const params=new URLSearchParams(location.search);
 const pathMatch=location.pathname.match(/^\/reports\/([a-f0-9-]{36})\/?$/i);
@@ -37,6 +79,7 @@ if(data.status!=='completed'){setStatus('Scan status is unavailable. No final sc
 status.hidden=true;app.hidden=false;
 const summary=data.summary||{},m=summary.metrics||{},full=data.fullReport||{},fm=full.metrics||m;
 document.title='Scan Results: '+(data.url||'Website')+' | AfricaLatency';
+void loadRUMReport(id);
 document.getElementById('rd-url').textContent=data.url||'Website';
 document.getElementById('rd-meta').textContent='Report generated '+fmtDate(data.completedAt)+' · '+(data.device==='desktop'?'Desktop Chrome':'Mobile Chrome · Lighthouse simulated mobile profile');
 document.getElementById('rd-location').textContent=data.testedFrom||'Cloud worker (region not specified)';
