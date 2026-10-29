@@ -6,6 +6,10 @@ on:
     branches: [main]
     paths:
       - 'api/rum*.js'
+      - 'api/report-rum.js'
+      - 'reports.html'
+      - 'js/report-dashboard.js'
+      - 'tests/report-rum.test.js'
       - 'lib/rum-beta-client.js'
       - 'login.html'
       - 'rum.js'
@@ -27,8 +31,10 @@ jobs:
       - name: Syntax-check RUM endpoints
         run: |
           node --check api/rum.js
+          node --check api/report-rum.js
           node --check api/rum-config.js
           node --check api/rum-sites.js
           node --check api/rum-dashboard.js
           node --check api/rum-library.js
       - run: npm run test:rum-beta
+      - run: npm run test:report-rum
