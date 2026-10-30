@@ -59,3 +59,35 @@ test('preview auth reads deployment config and never exposes a service-role key'
   assert.doesNotMatch(login, /uzihwtxffklisczqvurf\.supabase\.co/);
   assert.doesNotMatch(dashboard, /uzihwtxffklisczqvurf\.supabase\.co/);
 });
+
+
+function inlineScriptBodies(html) {
+  const lines = html.split(/\r?\n/);
+  const bodies = [];
+  let current = null;
+  for (const line of lines) {
+    if (current === null && /^\s*<script(?:\s[^>]*)?>\s*$/.test(line) && !/\bsrc\s*=/.test(line)) {
+      current = [];
+      continue;
+    }
+    if (current !== null && /^\s*<\/script>\s*$/.test(line)) {
+      bodies.push(current.join('\n'));
+      current = null;
+      continue;
+    }
+    if (current !== null) current.push(line);
+  }
+  return bodies;
+}
+
+test('RUM and auth page inline scripts cannot terminate early or contain HTML comments', () => {
+  for (const path of ['rum-dashboard.html', 'login.html', 'dashboard.html']) {
+    const html = fs.readFileSync(new URL('../' + path, import.meta.url), 'utf8');
+    const scripts = inlineScriptBodies(html);
+    assert.ok(scripts.length > 0, path + ' should contain an inline script to inspect');
+    for (const script of scripts) {
+      assert.doesNotMatch(script, /<\/script\s*>/i, path + ' inline script contains a literal closing script tag');
+      assert.doesNotMatch(script, /<!--/, path + ' inline script contains an HTML comment opener');
+    }
+  }
+});
