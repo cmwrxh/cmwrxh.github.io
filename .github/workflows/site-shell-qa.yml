@@ -3,7 +3,8 @@ on:
   pull_request:
     branches: [main, feat/scan-filmstrip-v2, integration/finish-all]
   push:
-    branches: [fix/sitewide-header-and-pages, integration/finish-all]
+    branches: [fix/sitewide-header-and-pages, integration/finish-all, feature/customer-monitoring-mvp]
+  workflow_dispatch:
 permissions:
   contents: read
 jobs:
