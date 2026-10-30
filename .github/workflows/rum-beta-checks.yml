@@ -6,6 +6,9 @@ on:
     branches: [main]
     paths:
       - 'api/rum*.js'
+      - 'dashboard.html'
+      - 'docs/rum-beta-mvp.md'
+      - 'js/rum-beta-dashboard.js'
       - 'lib/rum-beta-client.js'
       - 'login.html'
       - 'rum.js'

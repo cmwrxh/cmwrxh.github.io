@@ -320,7 +320,35 @@
                 font-size: 26px;
             }
         }
-    </style>
+    
+        .rum-beta-intro,.rum-beta-muted{color:var(--muted);font-size:14px;line-height:1.65}
+        .rum-beta-setup,.rum-beta-results{margin:16px 0}
+        .rum-beta-setup form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 14px;max-width:760px}
+        .rum-beta-setup label{font-size:13px;color:var(--muted)}
+        .rum-beta-setup input{width:100%;min-height:42px;padding:10px 12px;border:1px solid var(--border);border-radius:8px;background:#0e131a;color:var(--text);font:inherit}
+        .rum-beta-setup button,.rum-beta-layout button{min-height:40px;padding:9px 13px;border:1px solid #365b87;border-radius:8px;background:#17385d;color:#fff;font:inherit;font-weight:600;cursor:pointer}
+        .rum-beta-setup button{grid-column:1/-1;justify-self:start}
+        .rum-beta-setup button:disabled,.rum-beta-layout button:disabled{opacity:.55;cursor:not-allowed}
+        #rum-beta-form-message,#rum-beta-action-message{grid-column:1/-1;min-height:1.4em;font-size:13px;color:var(--muted)}
+        #rum-beta-form-message[data-state="error"],#rum-beta-action-message[data-state="error"],#rum-beta-data-status[data-state="error"]{color:#fda29b}
+        .rum-beta-layout{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+        .rum-beta-layout .card{min-width:0}
+        .rum-beta-site-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)}
+        .rum-beta-site-row:last-child{border-bottom:0}
+        .rum-beta-site-row strong,.rum-beta-site-row small{display:block;overflow-wrap:anywhere}
+        .rum-beta-site-row small{margin-top:4px;color:var(--muted);font-size:12px}
+        .rum-beta-snippet{overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;padding:12px;border:1px solid var(--border);border-radius:8px;background:#0a0e14;color:#d6e8ff;font-size:12px;line-height:1.6}
+        #rum-beta-copy,#rum-beta-delete{margin:8px 8px 0 0}
+        #rum-beta-delete{background:#351c22;border-color:#75414a}
+        .rum-beta-results .section-header{gap:14px;flex-wrap:wrap}
+        .rum-beta-results h3{margin:0}
+        .rum-beta-breakdown{margin-top:18px;min-width:0}
+        .rum-beta-breakdown h4{margin:0 0 8px}
+        .rum-beta-table{min-width:480px}
+        .rum-beta-table-wrap{overflow-x:auto}
+        .rum-beta-breakdown{overflow-x:auto}
+        @media(max-width:720px){.rum-beta-layout,.rum-beta-setup form{grid-template-columns:1fr}.rum-beta-setup button{grid-column:auto}.rum-beta-site-row{align-items:flex-start}.rum-beta-site-row button{flex-shrink:0}}
+</style>
 <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
 <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
@@ -550,6 +578,53 @@
 
         </div>
 
+        <section class="section" id="rum-beta-workflow" aria-labelledby="rum-beta-heading">
+            <div class="section-header">
+                <h2 id="rum-beta-heading">Real-user monitoring</h2>
+                <span class="status" id="rum-beta-status">RUM beta</span>
+            </div>
+            <p class="rum-beta-intro">Connect a website to collect first-party Core Web Vitals and network context. Visitor IP addresses are used only for local Country/ASN lookup and are not stored.</p>
+            <div class="card rum-beta-setup">
+                <h3>Add a website</h3>
+                <form id="rum-beta-site-form">
+                    <label for="rum-beta-site-name">Website name</label>
+                    <input id="rum-beta-site-name" name="site_name" maxlength="120" required placeholder="My website">
+                    <label for="rum-beta-domain">Domain</label>
+                    <input id="rum-beta-domain" name="domain" maxlength="253" required placeholder="example.com" inputmode="url">
+                    <button type="submit" id="rum-beta-create">Create RUM site</button>
+                    <p id="rum-beta-form-message" role="status" aria-live="polite"></p>
+                </form>
+            </div>
+            <div class="rum-beta-layout">
+                <div class="card">
+                    <h3>Your RUM sites</h3>
+                    <div id="rum-beta-sites" aria-live="polite">Loading your RUM sites…</div>
+                </div>
+                <div class="card">
+                    <h3>Installation snippet</h3>
+                    <p id="rum-beta-install-help">Select a site or create one to get its installation snippet.</p>
+                    <pre id="rum-beta-snippet" class="rum-beta-snippet" hidden><code></code></pre>
+                    <button type="button" id="rum-beta-copy" disabled>Copy snippet</button>
+                    <button type="button" id="rum-beta-delete" disabled>Delete selected site and its data</button>
+                    <p id="rum-beta-action-message" role="status" aria-live="polite"></p>
+                </div>
+            </div>
+            <div class="card rum-beta-results">
+                <div class="section-header">
+                    <h3 id="rum-beta-results-title">RUM performance data</h3>
+                    <label for="rum-beta-range">Period
+                        <select id="rum-beta-range">
+                            <option value="24h">24 hours</option>
+                            <option value="7d" selected>7 days</option>
+                            <option value="30d">30 days</option>
+                        </select>
+                    </label>
+                </div>
+                <p id="rum-beta-data-status">Select a site to view received data. Aggregates with fewer than 30 samples are suppressed.</p>
+                <div id="rum-beta-breakdowns"></div>
+            </div>
+        </section>
+
         <section class="section" id="reports-history" aria-labelledby="reports-heading">
             <div class="section-header">
                 <h2 id="reports-heading">Reports History</h2>
@@ -587,23 +662,20 @@
 
 <script src="/js/scan-v2.js?v=3"></script>
 
+<script src="/api/rum-config"></script>
+
 <script>
-    const SUPABASE_URL = 'https://uzihwtxffklisczqvurf.supabase.co';
-    const SUPABASE_ANON_KEY = 'sb_publishable_dGaR1jgofny7tGVWh0TK2w_haSVNyWv';
-
+    const config = window.AFRICALATENCY_SUPABASE_CONFIG;
     const { createClient } = supabase;
-
-    const client = createClient(
-        SUPABASE_URL,
-        SUPABASE_ANON_KEY,
-        {
+    const client = config && config.url && config.anonKey
+        ? createClient(config.url, config.anonKey, {
             auth: {
                 persistSession: true,
                 autoRefreshToken: true,
                 detectSessionInUrl: true
             }
-        }
-    );
+        })
+        : null;
 
     const loading = document.getElementById('loading');
     const errorBox = document.getElementById('error');
@@ -971,6 +1043,10 @@
     }
 
     async function initialiseDashboard() {
+        if (!client) {
+            showError('Account services are not configured for this deployment. Please contact support.');
+            return;
+        }
         try {
             const {
                 data: { session },
@@ -1081,6 +1157,7 @@
     initialiseDashboard();
 </script>
 
+  <script src="/js/rum-beta-dashboard.js?v=1" defer></script>
   <script src="/js/sitewide-africa-dot-matrix.js?v=1" defer></script>
   <script src="/js/site-header.js" defer></script>
 </body>

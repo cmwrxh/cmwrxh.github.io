@@ -61,6 +61,21 @@ test('preview auth reads deployment config and never exposes a service-role key'
 });
 
 
+test('customer dashboard RUM workflow uses deployment auth and the current deployment origin', () => {
+  const dashboard = fs.readFileSync(new URL('../dashboard.html', import.meta.url), 'utf8');
+  const workflow = fs.readFileSync(new URL('../js/rum-beta-dashboard.js', import.meta.url), 'utf8');
+  assert.match(dashboard, /src="\/api\/rum-config"/);
+  assert.match(dashboard, /window\.AFRICALATENCY_SUPABASE_CONFIG/);
+  assert.doesNotMatch(dashboard, /uzihwtxffklisczqvurf\.supabase\.co|sb_publishable_/);
+  assert.match(dashboard, /id="rum-beta-workflow"/);
+  assert.match(dashboard, /src="\/js\/rum-beta-dashboard\.js/);
+  assert.match(workflow, /Authorization:\s*'Bearer '\s*\+\s*session\.access_token/);
+  assert.match(workflow, /window\.location\.origin\s*\+\s*'\/rum\.js"/);
+  assert.match(workflow, /\/api\/rum-sites/);
+  assert.match(workflow, /\/api\/rum-dashboard/);
+  assert.match(workflow, /method:\s*'DELETE'/);
+});
+
 function inlineScriptBodies(html) {
   const lines = html.split(/\r?\n/);
   const bodies = [];
