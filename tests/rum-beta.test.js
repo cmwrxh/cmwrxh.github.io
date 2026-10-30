@@ -134,7 +134,7 @@ test('production auth config falls back only for the three production hostnames'
     for (const hostname of ['africalatency.dev', 'www.africalatency.dev', 'app.africalatency.dev']) {
       const response = invoke(hostname);
       assert.equal(response.statusCode, 200, hostname + ' should receive production public config');
-      assert.match(response.body, /uzihwtxffklisczqvurf\\.supabase\\.co/);
+      assert.match(response.body, /uzihwtxffklisczqvurf\.supabase\.co/);
       assert.match(response.body, /sb_publishable_/);
       assert.doesNotMatch(response.body, /service_role|SUPABASE_SECRET_KEY/i);
     }
