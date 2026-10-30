@@ -96,7 +96,7 @@ for (const route of pages) {
       const linkResults = await Promise.all([...new Set(metrics.links)].map(url => {
         if (!linkStatusCache.has(url)) {
           linkStatusCache.set(url, (async () => {
-            if (url.startsWith('mailto:')) { const result={url,status:'mailto',ok:/^mailto:[^\s@]+@[^\s@]+\.[^\s@]+$/i.test(url)};allLinkResults.set(url,result);return result; }
+            if (url.startsWith('mailto:')) { let address=''; try { address=decodeURIComponent(new URL(url).pathname); } catch {} const result={url,status:'mailto',ok:/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/i.test(address)};allLinkResults.set(url,result);return result; }
             if (!url.startsWith('http://') && !url.startsWith('https://')) { const result={url,status:'invalid-scheme',ok:false};allLinkResults.set(url,result);return result; }
             let checkUrl=url;
             try { const parsed=new URL(url); if (['africalatency.dev','www.africalatency.dev'].includes(parsed.hostname)) checkUrl=base+parsed.pathname+parsed.search; } catch {}
