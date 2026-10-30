@@ -5,6 +5,8 @@ The RUM beta uses the existing AfricaLatency Supabase project, `uzihwtxffklisczq
 
 Preview application verification must use the same Supabase project, with the deployment's public URL/key supplied through `/api/rum-config`. Keep the browser configuration deployment-driven: `SUPABASE_PUBLIC_URL` overrides `SUPABASE_URL` when the server uses an internal service URL, and the public key comes from `SUPABASE_PUBLISHABLE_KEY` or `SUPABASE_ANON_KEY`. The service-role/secret key must never be returned to the browser.
 
+The beta dashboard reads only `rum_beta_sites` and `rum_beta_events`. Existing rows in the legacy `rum_sites` / `rum_events` tables are not automatically backfilled or displayed by this workflow.
+
 Because preview and production share the database, do not use real customer accounts or customer sites for tests. Use an explicitly designated test account and clearly named `test-*` RUM site/domain. Do not run destructive cleanup, delete existing RUM data, or modify schema/credentials during verification. If a safe test account and hostname are not available, limit verification to CI and mocked/local checks until they are provided.
 
 ## Data flow
