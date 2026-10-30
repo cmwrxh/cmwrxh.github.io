@@ -550,6 +550,53 @@
 
         </div>
 
+        <section class="section" id="rum-beta-workflow" aria-labelledby="rum-beta-heading">
+            <div class="section-header">
+                <h2 id="rum-beta-heading">Real-user monitoring</h2>
+                <span class="status" id="rum-beta-status">RUM beta</span>
+            </div>
+            <p class="rum-beta-intro">Connect a website to collect first-party Core Web Vitals and network context. Visitor IP addresses are used only for local Country/ASN lookup and are not stored.</p>
+            <div class="card rum-beta-setup">
+                <h3>Add a website</h3>
+                <form id="rum-beta-site-form">
+                    <label for="rum-beta-site-name">Website name</label>
+                    <input id="rum-beta-site-name" name="site_name" maxlength="120" required placeholder="My website">
+                    <label for="rum-beta-domain">Domain</label>
+                    <input id="rum-beta-domain" name="domain" maxlength="253" required placeholder="example.com" inputmode="url">
+                    <button type="submit" id="rum-beta-create">Create RUM site</button>
+                    <p id="rum-beta-form-message" role="status" aria-live="polite"></p>
+                </form>
+            </div>
+            <div class="rum-beta-layout">
+                <div class="card">
+                    <h3>Your RUM sites</h3>
+                    <div id="rum-beta-sites" aria-live="polite">Loading your RUM sites…</div>
+                </div>
+                <div class="card">
+                    <h3>Installation snippet</h3>
+                    <p id="rum-beta-install-help">Select a site or create one to get its installation snippet.</p>
+                    <pre id="rum-beta-snippet" class="rum-beta-snippet" hidden><code></code></pre>
+                    <button type="button" id="rum-beta-copy" disabled>Copy snippet</button>
+                    <button type="button" id="rum-beta-delete" disabled>Delete selected site and its data</button>
+                    <p id="rum-beta-action-message" role="status" aria-live="polite"></p>
+                </div>
+            </div>
+            <div class="card rum-beta-results">
+                <div class="section-header">
+                    <h3 id="rum-beta-results-title">RUM performance data</h3>
+                    <label for="rum-beta-range">Period
+                        <select id="rum-beta-range">
+                            <option value="24h">24 hours</option>
+                            <option value="7d" selected>7 days</option>
+                            <option value="30d">30 days</option>
+                        </select>
+                    </label>
+                </div>
+                <p id="rum-beta-data-status">Select a site to view received data. Aggregates with fewer than 30 samples are suppressed.</p>
+                <div id="rum-beta-breakdowns"></div>
+            </div>
+        </section>
+
         <section class="section" id="reports-history" aria-labelledby="reports-heading">
             <div class="section-header">
                 <h2 id="reports-heading">Reports History</h2>
@@ -1081,6 +1128,7 @@
     initialiseDashboard();
 </script>
 
+  <script src="/js/rum-beta-dashboard.js?v=1" defer></script>
   <script src="/js/sitewide-africa-dot-matrix.js?v=1" defer></script>
   <script src="/js/site-header.js" defer></script>
 </body>
