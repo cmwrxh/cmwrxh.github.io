@@ -7,7 +7,7 @@ const read = p => fs.readFileSync(path.join(root,p),'utf8');
 
 test('monitoring schema has owner isolation, queue dedupe, bounded worker claims and retention',()=>{
   const sql=read('sql/monitoring-mvp.sql');
-  for(const table of ['customer_monitors','monitor_check_jobs','monitor_check_results','monitor_daily_aggregates','monitor_incidents','monitor_alert_channels','monitor_alert_log']) assert.match(sql,new RegExp('create table if not exists public\\.'+table));
+  for(const table of ['customer_monitors','monitor_check_jobs','monitor_check_results','monitor_daily_aggregates','monitor_incidents','monitor_alert_channels','monitor_alert_log']) assert.match(sql,new RegExp('create table public\\.'+table));
   assert.match(sql,/enable row level security/g);
   assert.match(sql,/unique\(monitor_id, scheduled_for\)/);
   assert.match(sql,/for update skip locked/i);
