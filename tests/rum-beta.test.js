@@ -70,7 +70,7 @@ test('customer dashboard RUM workflow uses deployment auth and the current deplo
   assert.match(dashboard, /id="rum-beta-workflow"/);
   assert.match(dashboard, /src="\/js\/rum-beta-dashboard\.js/);
   assert.match(workflow, /Authorization:\s*'Bearer '\s*\+\s*session\.access_token/);
-  assert.match(workflow, /window\.location\.origin\s*\+\s*'\/rum\.js'/);
+  assert.match(workflow, /window\.location\.origin\s*\+\s*'\/rum\.js"/);
   assert.match(workflow, /\/api\/rum-sites/);
   assert.match(workflow, /\/api\/rum-dashboard/);
   assert.match(workflow, /method:\s*'DELETE'/);
