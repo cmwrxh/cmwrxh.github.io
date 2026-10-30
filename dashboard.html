@@ -320,7 +320,35 @@
                 font-size: 26px;
             }
         }
-    </style>
+    
+        .rum-beta-intro,.rum-beta-muted{color:var(--muted);font-size:14px;line-height:1.65}
+        .rum-beta-setup,.rum-beta-results{margin:16px 0}
+        .rum-beta-setup form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 14px;max-width:760px}
+        .rum-beta-setup label{font-size:13px;color:var(--muted)}
+        .rum-beta-setup input{width:100%;min-height:42px;padding:10px 12px;border:1px solid var(--border);border-radius:8px;background:#0e131a;color:var(--text);font:inherit}
+        .rum-beta-setup button,.rum-beta-layout button{min-height:40px;padding:9px 13px;border:1px solid #365b87;border-radius:8px;background:#17385d;color:#fff;font:inherit;font-weight:600;cursor:pointer}
+        .rum-beta-setup button{grid-column:1/-1;justify-self:start}
+        .rum-beta-setup button:disabled,.rum-beta-layout button:disabled{opacity:.55;cursor:not-allowed}
+        #rum-beta-form-message,#rum-beta-action-message{grid-column:1/-1;min-height:1.4em;font-size:13px;color:var(--muted)}
+        #rum-beta-form-message[data-state="error"],#rum-beta-action-message[data-state="error"],#rum-beta-data-status[data-state="error"]{color:#fda29b}
+        .rum-beta-layout{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+        .rum-beta-layout .card{min-width:0}
+        .rum-beta-site-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)}
+        .rum-beta-site-row:last-child{border-bottom:0}
+        .rum-beta-site-row strong,.rum-beta-site-row small{display:block;overflow-wrap:anywhere}
+        .rum-beta-site-row small{margin-top:4px;color:var(--muted);font-size:12px}
+        .rum-beta-snippet{overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;padding:12px;border:1px solid var(--border);border-radius:8px;background:#0a0e14;color:#d6e8ff;font-size:12px;line-height:1.6}
+        #rum-beta-copy,#rum-beta-delete{margin:8px 8px 0 0}
+        #rum-beta-delete{background:#351c22;border-color:#75414a}
+        .rum-beta-results .section-header{gap:14px;flex-wrap:wrap}
+        .rum-beta-results h3{margin:0}
+        .rum-beta-breakdown{margin-top:18px;min-width:0}
+        .rum-beta-breakdown h4{margin:0 0 8px}
+        .rum-beta-table{min-width:480px}
+        .rum-beta-table-wrap{overflow-x:auto}
+        .rum-beta-breakdown{overflow-x:auto}
+        @media(max-width:720px){.rum-beta-layout,.rum-beta-setup form{grid-template-columns:1fr}.rum-beta-setup button{grid-column:auto}.rum-beta-site-row{align-items:flex-start}.rum-beta-site-row button{flex-shrink:0}}
+</style>
 <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
 <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
