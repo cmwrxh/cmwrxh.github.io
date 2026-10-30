@@ -662,23 +662,20 @@
 
 <script src="/js/scan-v2.js?v=3"></script>
 
+<script src="/api/rum-config"></script>
+
 <script>
-    const SUPABASE_URL = 'https://uzihwtxffklisczqvurf.supabase.co';
-    const SUPABASE_ANON_KEY = 'sb_publishable_dGaR1jgofny7tGVWh0TK2w_haSVNyWv';
-
+    const config = window.AFRICALATENCY_SUPABASE_CONFIG;
     const { createClient } = supabase;
-
-    const client = createClient(
-        SUPABASE_URL,
-        SUPABASE_ANON_KEY,
-        {
+    const client = config && config.url && config.anonKey
+        ? createClient(config.url, config.anonKey, {
             auth: {
                 persistSession: true,
                 autoRefreshToken: true,
                 detectSessionInUrl: true
             }
-        }
-    );
+        })
+        : null;
 
     const loading = document.getElementById('loading');
     const errorBox = document.getElementById('error');
