@@ -106,3 +106,46 @@ test('RUM and auth page inline scripts cannot terminate early or contain HTML co
     }
   }
 });
+
+
+test('production auth config falls back only for the three production hostnames', async () => {
+  const rumConfigHandler = (await import('../api/rum-config.js')).default;
+  const names = [
+    'SUPABASE_PUBLIC_URL',
+    'SUPABASE_URL',
+    'SUPABASE_PUBLISHABLE_KEY',
+    'SUPABASE_ANON_KEY'
+  ];
+  const previous = Object.fromEntries(names.map((name) => [name, process.env[name]]));
+  for (const name of names) delete process.env[name];
+
+  function invoke(hostname) {
+    const response = {
+      headers: {},
+      setHeader(name, value) { this.headers[name] = value; return this; },
+      status(code) { this.statusCode = code; return this; },
+      send(body) { this.body = body; return this; }
+    };
+    rumConfigHandler({ method: 'GET', hostname, headers: { host: hostname } }, response);
+    return response;
+  }
+
+  try {
+    for (const hostname of ['africalatency.dev', 'www.africalatency.dev', 'app.africalatency.dev']) {
+      const response = invoke(hostname);
+      assert.equal(response.statusCode, 200, hostname + ' should receive production public config');
+      assert.match(response.body, /uzihwtxffklisczqvurf\.supabase\.co/);
+      assert.match(response.body, /sb_publishable_/);
+      assert.doesNotMatch(response.body, /service_role|SUPABASE_SECRET_KEY/i);
+    }
+
+    const preview = invoke('preview.africalatency.dev');
+    assert.equal(preview.statusCode, 503);
+    assert.equal(preview.body, 'window.AFRICALATENCY_SUPABASE_CONFIG = null;');
+  } finally {
+    for (const name of names) {
+      if (previous[name] === undefined) delete process.env[name];
+      else process.env[name] = previous[name];
+    }
+  }
+});
