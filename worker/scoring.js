@@ -22,6 +22,20 @@ export function median(values) {
 export function structureScore(categories, audits = {}) {
   const best = categories?.['best-practices']?.score;
   const seo = categories?.seo?.score;
+  // A Structure score is only meaningful when Lighthouse returned at least
+  // one scored audit that contributes to this score. Category scores alone
+  // must not manufacture a Structure score when the audit payload is absent.
+  const structureAuditIds = [
+    'color-contrast', 'image-alt', 'label', 'link-name', 'button-name',
+    'document-title', 'html-has-lang', 'meta-viewport', 'is-on-https',
+    'uses-http2', 'uses-long-cache-ttl', 'meta-description', 'robots-txt',
+    'canonical', 'hreflang', 'structured-data'
+  ];
+  const hasStructureAudit = structureAuditIds.some(id => {
+    const audit = audits?.[id];
+    return audit && audit.scoreDisplayMode !== 'notApplicable' && audit.score != null && Number.isFinite(Number(audit.score));
+  });
+  if (!hasStructureAudit) return null;
   const weights = { 'best-practices': 0.40, seo: 0.35, accessibility: 0.25 };
   const accessIds = [
     'color-contrast', 'image-alt', 'label', 'link-name',
@@ -178,6 +192,17 @@ export function summarizeRun(lhr) {
     },
     requestCount: requestAnalysis.resourceDataAvailable ? requestAnalysis.requestCount : null,
     pageWeightBytes: requestAnalysis.resourceDataAvailable ? requestAnalysis.pageWeightBytes : null,
+    metricStatus: {
+      requestCount: requestAnalysis.resourceDataAvailable
+        ? { status: 'ok', reason: 'Request count returned by Lighthouse network-requests audit.' }
+        : { status: 'unavailable', reason: 'Lighthouse did not return network-requests items.' },
+      pageWeightBytes: requestAnalysis.resourceDataAvailable
+        ? { status: 'ok', reason: 'Transferred bytes summed from Lighthouse network-requests items.' }
+        : { status: 'unavailable', reason: 'Lighthouse did not return network-requests items.' },
+      structure: structure === null
+        ? { status: 'not_implemented', reason: 'Structure score was not computed because no scored structure audit was returned.' }
+        : { status: 'ok', reason: 'Computed from returned Lighthouse structure audits and category scores.' }
+    },
     requestAnalysis,
     opportunities,
     auditList,

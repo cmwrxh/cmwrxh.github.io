@@ -58,3 +58,34 @@ test('recorded Lighthouse JSON fixture exposes only its real screenshot thumbnai
   assert.deepEqual(result.filmstripFrames.map(frame => frame.timingMs), [0, 500]);
   assert.ok(result.filmstripFrames.every(frame => frame.dataUrl.startsWith('data:image/jpeg;base64,')));
 });
+
+test('structure score is not computed when Lighthouse returns no scored structure audits', () => {
+  const result = summarizeRun({
+    categories: {
+      performance: { score: 1 },
+      'best-practices': { score: 1 },
+      seo: { score: 1 },
+      accessibility: { score: 1 }
+    },
+    audits: {
+      'largest-contentful-paint': { numericValue: 461 },
+      'network-requests': { details: { items: [] } }
+    }
+  });
+  assert.equal(result.structure, null);
+  assert.equal(result.grade, null);
+  assert.equal(result.metricStatus.structure.status, 'not_implemented');
+  assert.equal(result.metricStatus.requestCount.status, 'ok');
+  assert.equal(result.requestCount, 0);
+  assert.equal(result.pageWeightBytes, 0);
+});
+
+test('missing network request audit is unavailable, not zero', () => {
+  const result = summarizeRun({ categories: {}, audits: {} });
+  assert.equal(result.requestCount, null);
+  assert.equal(result.pageWeightBytes, null);
+  assert.equal(result.metricStatus.requestCount.status, 'unavailable');
+  assert.equal(result.metricStatus.pageWeightBytes.status, 'unavailable');
+  assert.equal(result.structure, null);
+  assert.equal(result.grade, null);
+});
