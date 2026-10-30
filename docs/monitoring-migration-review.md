@@ -2,7 +2,7 @@
 
 Status: draft only. No SQL has been applied. Do not apply this migration until the RUM beta has passed its integration, isolation, deletion and retention tests and the founder explicitly approves it.
 
-Preview application checks use the existing AfricaLatency Supabase project (`uzihwtxffklisczqvurf`) with clearly designated `test-*` accounts/sites. Do not create a second Supabase project. Because preview and production share this database, keep monitoring schema changes unapplied until the founder explicitly approves the migration.
+Preview application checks use the already provisioned self-hosted Supabase stack on Oracle/Hermes, managed by Coolify (stack suffix `dhxxkbjcstmiaqxpzvlyctdc`). Do not create a second Supabase project or use the hosted production Supabase project for preview. Keep the hosted production project untouched. The preview app reaches the existing self-hosted stack over the private Tailscale network; monitoring schema changes remain unapplied until the founder explicitly approves the migration.
 
 ## Changed files
 - `sql/monitoring-mvp.sql`: review-only monitoring schema. All five functions now use CREATE (not OR REPLACE), no extension is created, and every function revokes EXECUTE from PUBLIC, anon and authenticated before granting EXECUTE only to service_role.
