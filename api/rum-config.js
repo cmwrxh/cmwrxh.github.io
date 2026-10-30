@@ -16,7 +16,7 @@ const PRODUCTION_PUBLIC_CONFIG = Object.freeze({
 function resolvePublicConfig(req) {
   const host = String(req.hostname || req.headers?.host || '')
     .toLowerCase()
-    .replace(/:\\d+$/, '');
+    .replace(/:\d+$/, '');
   const isProductionHost = PRODUCTION_HOSTS.has(host);
   const url = process.env.SUPABASE_PUBLIC_URL || process.env.SUPABASE_URL;
   const anonKey = process.env.SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_ANON_KEY;
