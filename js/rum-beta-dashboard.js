@@ -73,7 +73,7 @@
   }
 
   function renderSnippet(site) {
-    snippet = '<script async src="https://africalatency.dev/rum.js" data-key="' + site.public_key + '"><' + '/script>';
+    snippet = '<script async src="' + window.location.origin + '/rum.js" data-key="' + site.public_key + '"><' + '/script>';
     snippetCode.textContent = snippet;
     snippetNode.hidden = false;
     copyButton.disabled = false;
