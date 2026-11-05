@@ -69,6 +69,6 @@ jobs:
           mapfile -t modules < <(find . -name go.mod -not -path './node_modules/*' -not -path './.git/*' -printf '%h\n' | sort)
           for dir in "${modules[@]}"; do
             echo "::group::Go module $dir"
-            (cd "$dir" && go vet ./... && go test ./...)
+            (cd "$dir" && go mod tidy && go vet ./... && go test ./...)
             echo "::endgroup::"
           done
