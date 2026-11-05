@@ -30,10 +30,10 @@ test('crawler dashboard panel and audit action remain present', () => {
   assert.match(dashboard, /\/api\/crawler-audit/);
 });
 
-test('RUM GeoLite fail-open is opt-in and maps missing metadata to unknown', () => {
+test('RUM GeoLite fail-open defaults on and maps missing metadata to unknown', () => {
   const source = fs.readFileSync(new URL('../api/rum.js', import.meta.url), 'utf8');
-  assert.match(source, /RUM_GEOIP_FAIL_OPEN === 'true'/);
-  assert.match(source, /const unknownGeo = \{ country: null, asn: null, operator: null \}/);
+  assert.match(source, /RUM_GEOIP_FAIL_OPEN !== 'false'/);
+  assert.match(source, /const unknownGeo = \{ country: 'unknown', asn: null, operator: 'unknown' \}/);
   assert.match(source, /maxmind\.open\(path\.join\(root, 'GeoLite2-Country\.mmdb'\)\)\.catch\(\(\) => null\)/);
   assert.match(source, /maxmind\.open\(path\.join\(root, 'GeoLite2-ASN\.mmdb'\)\)\.catch\(\(\) => null\)/);
   assert.doesNotMatch(source, /ip_geo_cache/);
