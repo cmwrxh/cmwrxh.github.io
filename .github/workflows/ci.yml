@@ -41,6 +41,7 @@ jobs:
             npm run "$script"
           done
           if [ -d tests ]; then node --test tests; fi
+          if [ -d worker ]; then node --test worker; fi
       - name: Atomic guest scan concurrency test\n        run: |\n          sudo apt-get update\n          sudo apt-get install -y postgresql-client\n          if [ -f tests/guest-scan-concurrency.sh ]; then bash tests/guest-scan-concurrency.sh; else echo 'Guest scan concurrency test not present on this branch'; fi\n      - name: JavaScript syntax checks
         run: |
           set -e
