@@ -14,7 +14,7 @@ async function forwardRumToGo(payload, mode) {
     method: 'POST',
     headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
     body: JSON.stringify({ ...payload, mode }),
-    signal: AbortSignal.timeout(2500)
+    signal: AbortSignal.timeout(6000)
   });
   if (!response.ok) throw new Error('Go RUM service rejected request');
   const result = await response.json();
@@ -113,6 +113,12 @@ export default async function handler(req, res) {
   let admin;
   try { admin = getRumAdminClient(); } catch (error) {
     recordRumRejected(); return res.status(503).json({ error: error.message });
+  }
+  const { count: existingCount, error: existingError } = await admin.from('rum_beta_events')
+    .select('id', { count: 'exact', head: true }).eq('ingest_request_id', ingestRequestId);
+  if (!existingError && existingCount >= cleanEvents.length) {
+    recordRumAccepted(cleanEvents.length);
+    return res.status(202).json({ accepted: cleanEvents.length });
   }
   const { data: site, error: siteError } = await admin.from('rum_beta_sites')
     .select('id,public_key,allowed_domains,is_active').eq('public_key', key).eq('is_active', true).maybeSingle();
