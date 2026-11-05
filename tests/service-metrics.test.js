@@ -24,3 +24,14 @@ test('internal application metrics endpoint requires a bearer token', () => {
   if (previous === undefined) delete process.env.SCAN_INTERNAL_TOKEN;
   else process.env.SCAN_INTERNAL_TOKEN = previous;
 });
+
+test('internal application metrics are uncached when authorized', () => {
+  const previous = process.env.SCAN_INTERNAL_TOKEN;
+  process.env.SCAN_INTERNAL_TOKEN = 'unit-test-only-token';
+  const res = response();
+  handler({ method: 'GET', headers: { authorization: 'Bearer unit-test-only-token' } }, res);
+  assert.equal(res.statusCode, 200);
+  assert.equal(res.headers['Cache-Control'], 'no-store');
+  if (previous === undefined) delete process.env.SCAN_INTERNAL_TOKEN;
+  else process.env.SCAN_INTERNAL_TOKEN = previous;
+});
