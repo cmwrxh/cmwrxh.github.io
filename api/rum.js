@@ -90,8 +90,8 @@ export default async function handler(req, res) {
 
   // req.ip is used only transiently for offline lookup. It is never logged or stored.
   const ip = typeof req.ip === 'string' ? req.ip.replace(/^::ffff:/, '') : null;
-  const failOpen = process.env.RUM_GEOIP_FAIL_OPEN === 'true';
-  const unknownGeo = { country: null, asn: null, operator: null };
+  const failOpen = process.env.RUM_GEOIP_FAIL_OPEN !== 'false';
+  const unknownGeo = { country: 'unknown', asn: null, operator: 'unknown' };
   let geo = unknownGeo;
   try {
     const readers = await getGeoReaders();
@@ -101,9 +101,9 @@ export default async function handler(req, res) {
       const country = readers.country.get(ip);
       const asn = readers.asn.get(ip);
       geo = {
-        country: country?.country?.iso_code || country?.registered_country?.iso_code || null,
+        country: country?.country?.iso_code || country?.registered_country?.iso_code || 'unknown',
         asn: Number.isInteger(asn?.autonomous_system_number) ? asn.autonomous_system_number : null,
-        operator: typeof asn?.autonomous_system_organization === 'string' ? asn.autonomous_system_organization.slice(0, 160) : null,
+        operator: typeof asn?.autonomous_system_organization === 'string' ? asn.autonomous_system_organization.slice(0, 160) : 'unknown',
       };
     }
   } catch {
