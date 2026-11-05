@@ -5,6 +5,7 @@ import { createClient } from '@supabase/supabase-js';
 import { runLighthouse } from './provider.js';
 import { buildRequestAnalysis } from './scoring.js';
 import { validatePublicUrl } from './url-safety.js';
+import { metricsSnapshot, recordDbQuery, recordProbe, recordScanCompleted, recordScanFailed, recordScanStarted, recordRetryScheduled, recordStage } from './metrics.js';
 
 const app = express();
 app.disable('x-powered-by');
@@ -172,6 +173,7 @@ async function getAfricaLatency(url) {
     const batch = countries.slice(i, i + 2);
     out.push(...await Promise.all(batch.map(country => globalpingCountry(url, country))));
   }
+  for (const item of out) recordProbe(item.countryCode, item.status);
   const values = out.filter(x => x.status === 'measured').map(x => x.rttMs).sort((a,b) => a-b);
   const median = values.length ? (values.length % 2 ? values[(values.length - 1) / 2] : Math.round((values[values.length / 2 - 1] + values[values.length / 2]) / 2)) : null;
   return { countries: out, medianRttMs: median, measuredCountries: values.length, requestedCountries: countries.length };
@@ -252,7 +254,9 @@ async function executeJob(job) {
   await update({ status: 'processing', stage: 'fetching', progress: 12, error_message: null });
   const safeUrl = await validatePublicUrl(job.url);
   await update({ stage: 'lighthouse', progress: 30 });
+  const lighthouseStarted = performance.now();
   const lighthouseResult = await runLighthouse(safeUrl, job.device, runCount);
+  recordStage('lighthouse', performance.now() - lighthouseStarted);
   const screenshot = await saveScreenshot(job.id, lighthouseResult.screenshotDataUrl).catch(() => null);
   await saveFilmstrip(job.id, lighthouseResult.filmstripFrames).catch(error => console.warn('[scan-worker] filmstrip save failed:', String(error?.message || error).slice(0, 160)));
   const summary = {
@@ -269,7 +273,9 @@ async function executeJob(job) {
     aggregation: lighthouseResult.aggregation || 'single Lighthouse run'
   };
   await update({ stage: 'africa', progress: 72, screenshot });
+  const probeStarted = performance.now();
   const africaLatency = await getAfricaLatency(safeUrl);
+  recordStage('globalping', performance.now() - probeStarted);
   await update({ stage: 'report', progress: 92 });
   const result = {
     testedFrom: process.env.TEST_LOCATION_LABEL || 'Cloud worker',
@@ -296,6 +302,7 @@ async function executeJob(job) {
   };
   const { error } = await update({ status: 'completed', stage: 'completed', progress: 100, result, completed_at: new Date().toISOString(), error_message: null });
   if (error) throw error;
+  recordScanCompleted();
   // Materialize the completed worker result for authenticated report history.
   // The scan_jobs record remains the execution source of truth.
   const metrics = lighthouseResult.metrics || {};
@@ -341,10 +348,12 @@ async function processQueue() {
     const job = Array.isArray(jobs) ? jobs[0] : jobs;
     if (!job) return;
     lastJobAt = Date.now();
+    recordScanStarted(Date.now() - new Date(job.created_at || Date.now()).getTime());
     try {
       await executeJob(job);
     } catch (error) {
       const message = /timed out/i.test(String(error?.message)) ? 'Timed out while testing the website.' : /unreachable|ENOTFOUND|hostname could not be resolved/i.test(String(error?.message)) ? 'Site unreachable. Check that the public URL is correct.' : 'The scan could not be completed. Please try again later.';
+      recordScanFailed();
       await supabase.from('scan_jobs').update({
         status: 'failed', stage: 'failed', progress: 100, error_message: message,
         completed_at: new Date().toISOString(), updated_at: new Date().toISOString()
@@ -360,6 +369,26 @@ async function processQueue() {
 
 app.get('/healthz', (_req, res) => res.json({ ok: true, busy, lastJobAt, queueCap: MAX_QUEUE }));
 app.use('/internal', (req, res, next) => authorized(req) ? next() : res.status(401).json({ error: 'Unauthorized' }));
+
+app.get('/internal/metrics', async (_req, res) => {
+  const started = performance.now();
+  try {
+    const [queued, processing] = await Promise.all([
+      supabase.from('scan_jobs').select('id', { count: 'exact', head: true }).eq('status', 'queued'),
+      supabase.from('scan_jobs').select('id', { count: 'exact', head: true }).eq('status', 'processing')
+    ]);
+    recordDbQuery(performance.now() - started);
+    if (queued.error || processing.error) return res.status(503).json({ error: 'Metrics query unavailable.' });
+    return res.json({
+      ...metricsSnapshot(),
+      queue: { queued: queued.count || 0, processing: processing.count || 0 },
+      dbQueryLatencyMs: Math.round(performance.now() - started)
+    });
+  } catch {
+    recordDbQuery(performance.now() - started);
+    return res.status(503).json({ error: 'Metrics query unavailable.' });
+  }
+});
 
 app.post('/internal/jobs', async (req, res) => {
   if (!supabase || !IP_HASH_SECRET) return res.status(503).json({ error: 'Scan worker is not configured.' });
