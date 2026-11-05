@@ -1,0 +1,25 @@
+Section,Metric,Unit,Low,Base,High,Source or assumption,Founder input required
+Pricing,Audit price,KES,3500,3500,3500,"Proposed price; not proof of sales",Confirm offer and tax treatment
+Pricing,Speed Check price,USD,19,19,19,"Proposed price; not proof of sales",Confirm offer and tax treatment
+Pricing,Custom Deep Dive starting price,KES,25000,25000,25000,"Proposed starting price; not proof of sales",Confirm scope and tax treatment
+Pricing,Monitoring monthly price,USD,,,,"Assumption; unverified",Enter proposed price
+Pricing,RUM monthly price,USD,,,,"Assumption; unverified",Enter proposed price
+Volume,Audits sold per month,count,,,,"Assumption only; no revenue reported",Set low/base/high volumes
+Volume,Speed Checks sold per month,count,,,,"Assumption only; no revenue reported",Set low/base/high volumes
+Volume,Custom Deep Dives sold per month,count,,,,"Assumption only; no revenue reported",Set low/base/high volumes
+Volume,Paying monitoring sites,count,,,,"Assumption only; integration unverified",Set launch and conversion assumptions
+Volume,Paying RUM sites,count,,,,"Assumption only; beta/integration unverified",Set launch and conversion assumptions
+Costs,Hosting per month,USD,,,,"Invoice required; do not assume zero",Enter actual monthly bills
+Costs,Database per month,USD,,,,"Invoice required",Enter actual monthly bills
+Costs,Probe/API cost per month,USD,,,,"Provider usage/invoice required",Enter actual costs
+Costs,Other API costs per month,USD,,,,"Invoice required",Enter actual costs
+Costs,Variable cost per scan,USD,,,,"Assumption until measured",Calculate from attributable costs and eligible scans
+Costs,Payment processing fee,percent,,,,"Verify Paystack terms and settlement currency",Enter actual fee
+Funding,Fundraising target,USD,,,,"Not supplied by founder",Founder decision
+Funding,Use of funds,USD,,,,"Not supplied by founder",Allocate by milestone
+Forecast,Revenue by month 1-18,USD,,,,"Build after volume and FX inputs confirmed",Add formulas/assumptions
+Forecast,Costs by month 1-18,USD,,,,"Build after invoices and assumptions",Include fixed, variable, fees and taxes
+Forecast,Runway,months,,,,"Cannot calculate without cash/burn",Founder input
+Milestones,Milestone 1,description,,,,"Assumption only",Set date and acceptance criteria
+Milestones,Milestone 2,description,,,,"Assumption only",Set date and acceptance criteria
+Milestones,Milestone 3,description,,,,"Assumption only",Set date and acceptance criteria
