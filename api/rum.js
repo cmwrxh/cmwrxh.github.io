@@ -1,9 +1,27 @@
 import maxmind from 'maxmind';
+import crypto from 'node:crypto';
 import path from 'node:path';
 import { getRumAdminClient, setNoStore } from '../lib/rum-beta-client.js';
 import { recordRumAccepted, recordRumRejected } from '../lib/service-metrics.js';
 
 let geoReadersPromise;
+const RUM_INGEST_ENGINE = ['node', 'go', 'shadow'].includes(process.env.RUM_INGEST_ENGINE) ? process.env.RUM_INGEST_ENGINE : 'node';
+const RUM_INGEST_SERVICE_URL = String(process.env.RUM_INGEST_SERVICE_URL || '').replace(/\/$/, '');
+async function forwardRumToGo(payload, mode) {
+  const token = String(process.env.SCAN_INTERNAL_TOKEN || '');
+  if (!RUM_INGEST_SERVICE_URL || !token) throw new Error('Go RUM service is not configured');
+  const response = await fetch(RUM_INGEST_SERVICE_URL + '/v1/ingest', {
+    method: 'POST',
+    headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ ...payload, mode }),
+    signal: AbortSignal.timeout(2500)
+  });
+  if (!response.ok) throw new Error('Go RUM service rejected request');
+  const result = await response.json();
+  if (result.accepted !== payload.events.length) throw new Error('Go RUM service returned an invalid count');
+  return result;
+}
+
 async function getGeoReaders() {
   if (!geoReadersPromise) {
     const root = '/app/data';
@@ -75,6 +93,22 @@ export default async function handler(req, res) {
     event && ['LCP','INP','CLS','TTFB'].includes(event.metric) &&
     Number.isFinite(event.value) && event.value >= 0 && event.value < 86400000
   );
+  const ingestRequestId = crypto.randomUUID();
+  const goPayload = {
+    key, origin: req.headers.origin, userAgent: String(req.headers['user-agent'] || ''),
+    ip: typeof req.ip === 'string' ? req.ip.replace(/^::ffff:/, '') : '',
+    requestId: ingestRequestId, events: cleanEvents
+  };
+  if (RUM_INGEST_ENGINE === 'go') {
+    try {
+      const result = await forwardRumToGo(goPayload, 'production');
+      recordRumAccepted(result.accepted);
+      return res.status(202).json({ accepted: result.accepted });
+    } catch {
+      console.warn('Go RUM ingestion unavailable; falling back to Node.');
+    }
+  }
+
   if (!cleanEvents.length) { recordRumRejected(); return res.status(400).json({ error: 'No valid metrics supplied.' }); }
   let admin;
   try { admin = getRumAdminClient(); } catch (error) {
@@ -120,11 +154,16 @@ export default async function handler(req, res) {
     site_id: site.id, key_id: key, country: geo.country, asn: geo.asn,
     operator: geo.operator, connection_type: connection, metric: event.metric,
     value: event.value, path: pathValue, browser_family: browser,
+    ingest_request_id: ingestRequestId, event_index: cleanEvents.indexOf(event),
   }));
-  const { error: insertError } = await admin.from('rum_beta_events').insert(rows);
+  const { error: insertError } = await admin.from('rum_beta_events').upsert(rows, { onConflict: 'ingest_request_id,event_index', ignoreDuplicates: true });
   if (insertError) {
     console.error('RUM event insert failed:', insertError.code || 'database error');
     recordRumRejected(); return res.status(503).json({ error: 'Could not store RUM metrics.' });
   }
-  recordRumAccepted(rows.length); return res.status(202).json({ accepted: rows.length });
+  recordRumAccepted(rows.length);
+  if (RUM_INGEST_ENGINE === 'shadow') {
+    void forwardRumToGo(goPayload, 'shadow').catch(() => console.warn('Go RUM shadow ingestion unavailable.'));
+  }
+  return res.status(202).json({ accepted: rows.length });
 }
