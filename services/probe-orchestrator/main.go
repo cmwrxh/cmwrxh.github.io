@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"errors"
 	"log"
 	"math"
 	"net"
@@ -13,6 +12,7 @@ import (
 	"os"
 	"sort"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -80,7 +80,7 @@ func (s *service) handle(w http.ResponseWriter,r *http.Request) {
 	var in Request
 	if json.NewDecoder(r.Body).Decode(&in)!=nil||!validTarget(in.Target)||len(in.Countries)==0||len(in.Countries)>9 { http.Error(w,"invalid request",http.StatusBadRequest); return }
 	for _,c:=range in.Countries { if len(c.Code)!=2||c.Name=="" { http.Error(w,"invalid country",http.StatusBadRequest); return } }
-	sem:=make(chan struct{},s.concurrency); results:=make([]Probe,len(in.Countries)); var wg syncWaitGroup
+	sem:=make(chan struct{},s.concurrency); results:=make([]Probe,len(in.Countries)); var wg sync.WaitGroup
 	for i,c:=range in.Countries { wg.Add(1); go func(i int,c Country){ defer wg.Done(); sem<-struct{}{}; results[i]=s.probe(r.Context(),in.Target,c); <-sem }(i,c) }
 	wg.Wait()
 	values:=make([]int,0,len(results)); measured:=0
@@ -90,10 +90,6 @@ func (s *service) handle(w http.ResponseWriter,r *http.Request) {
 	w.Header().Set("Content-Type","application/json"); w.Header().Set("Cache-Control","no-store")
 	_ = json.NewEncoder(w).Encode(Response{Countries:results,MedianRTTMs:median,MeasuredCountries:measured,RequestedCountries:len(results)})
 }
-type syncWaitGroup struct { ch chan struct{}; n int }
-func (w *syncWaitGroup) Add(n int){ if w.ch==nil {w.ch=make(chan struct{},1)}; w.n+=n }
-func (w *syncWaitGroup) Done(){ w.n--; if w.n==0 { close(w.ch) } }
-func (w *syncWaitGroup) Wait(){ if w.n>0 { <-w.ch } }
 func main() {
 	concurrency:=2; if os.Getenv("PROBE_CONCURRENCY")=="true" { concurrency=4 }
 	s:=&service{client:&http.Client{Timeout:22*time.Second},globalpingToken:os.Getenv("GP_API_TOKEN"),concurrency:concurrency}
