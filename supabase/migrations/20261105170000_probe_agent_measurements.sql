@@ -16,5 +16,5 @@ create index if not exists probe_agent_measurements_received_idx
 create index if not exists probe_agent_measurements_country_time_idx
   on public.probe_agent_measurements (country_code, measured_at desc);
 alter table public.probe_agent_measurements enable row level security;
-revoke all on public.probe_agent_measurements from anon, authenticated;
+revoke all on public.probe_agent_measurements from public, anon, authenticated;
 grant all on public.probe_agent_measurements to service_role;

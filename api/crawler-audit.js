@@ -4,6 +4,7 @@ import https from 'node:https';
 import { isIP } from 'node:net';
 import { createClient } from '@supabase/supabase-js';
 import { getBearerToken, setNoStore } from '../lib/rum-beta-client.js';
+import { recordCrawlerAudit } from '../lib/service-metrics.js';
 
 const MAX_BODY_BYTES = 1024 * 1024;
 const REQUEST_TIMEOUT_MS = 6500;
@@ -232,6 +233,7 @@ export default async function handler(req, res) {
     findings.push({ id: 'noindex', status: htmlSignals.noindex ? 'warning' : 'pass', title: 'Homepage noindex signals', detail: htmlSignals.noindex ? 'A meta robots or X-Robots-Tag noindex directive was detected.' : 'No homepage noindex directive was detected.' });
     findings.push({ id: 'sitemap', status: sitemapAvailable ? 'pass' : 'warning', title: 'Sitemap', detail: sitemapAvailable ? 'Found; ' + sitemapCount + ' URL entries detected.' : 'No readable same-origin sitemap was found.' });
 
+    recordCrawlerAudit(true);
     return res.status(200).json({
       target: origin,
       checkedAt: new Date().toISOString(),
@@ -258,6 +260,7 @@ export default async function handler(req, res) {
     const message = /public IP|resolve|ENOTFOUND|EAI_AGAIN|private/i.test(error.message)
       ? 'The target could not be verified as a public website.'
       : 'The target could not be checked. It may be unavailable or slow to respond.';
+    recordCrawlerAudit(false);
     return res.status(422).json({ error: message });
   }
 }

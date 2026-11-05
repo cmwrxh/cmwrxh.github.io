@@ -1,0 +1,87 @@
+name: CI
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  node:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: ci_test
+          POSTGRES_PASSWORD: ci_test
+          POSTGRES_DB: ci_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U ci_test -d ci_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgresql://ci_test:ci_test@localhost:5432/ci_test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install dependencies
+        run: npm install
+      - name: Install scan worker dependencies
+        run: npm install --prefix worker
+      - name: Lint
+        run: npm run lint --if-present
+      - name: Existing Node test suite
+        run: |
+          set -e
+          for script in $(node -e "const p=require('./package.json'); console.log(Object.keys(p.scripts||{}).filter(k=>k.startsWith('test:')).join(' '))"); do
+            npm run "$script"
+          done
+          node --test tests/*.test.js tests/*.test.cjs
+          if compgen -G 'worker/*.test.js' > /dev/null; then node --test worker/*.test.js; fi
+      - name: Atomic guest scan concurrency test
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+          if [ -f tests/guest-scan-concurrency.sh ]; then bash tests/guest-scan-concurrency.sh; else echo 'Guest scan concurrency test not present on this branch'; fi
+          if [ -f tests/scanner-migration-test.sh ]; then bash tests/scanner-migration-test.sh; else echo 'Scanner migration test not present on this branch'; fi
+          if [ -f tests/probe-agent-migration-test.sh ]; then bash tests/probe-agent-migration-test.sh; else echo 'Probe agent migration test not present on this branch'; fi
+          if [ -f tests/rum-ingest-migration-test.sh ]; then bash tests/rum-ingest-migration-test.sh; else echo 'RUM migration test not present on this branch'; fi
+          if [ -f tests/db-rollup-migration-test.sh ]; then bash tests/db-rollup-migration-test.sh; else echo 'DB rollup migration test not present on this branch'; fi
+          if [ -f tests/rollup-migration-test.sh ]; then bash tests/rollup-migration-test.sh; else echo 'Rollup migration test not present on this branch'; fi
+          if [ -f tests/fresh-postgres-migrations.sh ]; then bash tests/fresh-postgres-migrations.sh; else echo 'Fresh Postgres migration test not present on this branch'; fi
+      - name: JavaScript syntax checks
+        run: |
+          set -e
+          find api -type f -name '*.js' -print0 2>/dev/null | xargs -0 -r -n1 node --check
+          node --check server.js
+  go:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.24.x'
+      - name: Vet and test every Go module
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -t modules < <(find . -name go.mod -not -path './node_modules/*' -not -path './.git/*' -printf '%h\n' | sort)
+          for dir in "${modules[@]}"; do
+            echo "::group::Go module $dir"
+            (cd "$dir" && go mod tidy && go vet ./... && go test ./...)
+            echo "::endgroup::"
+          done
+      - name: Build Go service containers
+        run: |
+          set -euo pipefail
+          for dir in services/probe-orchestrator services/probe-agent services/rum-ingest; do
+            if [ -f "$dir/Dockerfile" ]; then
+              docker build --pull -f "$dir/Dockerfile" -t "ci/${dir##*/}:test" "$dir"
+            fi
+          done

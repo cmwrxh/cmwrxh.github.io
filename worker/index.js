@@ -5,6 +5,8 @@ import { createClient } from '@supabase/supabase-js';
 import { runLighthouse } from './provider.js';
 import { buildRequestAnalysis } from './scoring.js';
 import { validatePublicUrl } from './url-safety.js';
+import { runProbeEngine } from '../lib/engine-fallback.js';
+import { metricsSnapshot, recordDbQuery, recordProbe, recordScanCompleted, recordScanFailed, recordScanStarted, recordRetryScheduled, recordStage } from './metrics.js';
 
 const app = express();
 app.disable('x-powered-by');
@@ -17,6 +19,10 @@ const supabase = SUPABASE_URL && SERVICE_KEY ? createClient(SUPABASE_URL, SERVIC
 const GP_API_TOKEN = process.env.GP_API_TOKEN;
 const MAX_QUEUE = Math.max(1, Math.min(50, Number(process.env.SCAN_MAX_QUEUE) || 12));
 const RETENTION_DAYS = Math.max(1, Math.min(90, Number(process.env.SCAN_ANON_RETENTION_DAYS) || 7));
+const SCAN_RETRY_RECOVERY = process.env.SCAN_RETRY_RECOVERY === 'true';
+const PROBE_CONCURRENCY = process.env.PROBE_CONCURRENCY === 'true';
+const PROBE_ENGINE = ['node', 'go', 'shadow'].includes(process.env.PROBE_ENGINE) ? process.env.PROBE_ENGINE : 'node';
+const PROBE_ORCHESTRATOR_URL = String(process.env.PROBE_ORCHESTRATOR_URL || '').replace(/\/$/, '');
 const IP_HASH_SECRET = process.env.IP_HASH_SECRET;
 const API_KEY_PREFIX = 'al_live_';
 const signedUrlCache = new Map();
@@ -131,22 +137,23 @@ async function validateApiKey(raw) {
   return data || null;
 }
 
-async function globalpingCountry(url, country) {
+async function globalpingCountry(url, country, batchSignal) {
   if (!GP_API_TOKEN) return { country: country.name, countryCode: country.code, status: 'unavailable', rttMs: null, reason: 'Provider not configured' };
   const host = new URL(url).hostname;
   const headers = { Authorization: `Bearer ${GP_API_TOKEN}`, 'Content-Type': 'application/json', Accept: 'application/json' };
+  const signal = batchSignal ? AbortSignal.any([batchSignal, AbortSignal.timeout(20000)]) : AbortSignal.timeout(20000);
   try {
     const created = await fetch('https://api.globalping.io/v1/measurements', {
       method: 'POST', headers,
       body: JSON.stringify({ type: 'ping', target: host, locations: [{ country: country.code, limit: 1 }] }),
-      signal: AbortSignal.timeout(8000)
+      signal
     });
     const payload = await created.json().catch(() => ({}));
     if (!created.ok || !payload.id) return { country: country.name, countryCode: country.code, status: 'unavailable', rttMs: null, reason: created.status === 422 ? 'No matching probe' : 'Measurement unavailable' };
     const start = Date.now();
     while (Date.now() - start < 12000) {
       await new Promise(resolve => setTimeout(resolve, 1000));
-      const polled = await fetch(`https://api.globalping.io/v1/measurements/${encodeURIComponent(payload.id)}`, { headers, signal: AbortSignal.timeout(5000) });
+      const polled = await fetch(`https://api.globalping.io/v1/measurements/${encodeURIComponent(payload.id)}`, { headers, signal });
       if (!polled.ok) continue;
       const data = await polled.json().catch(() => ({}));
       if (!data.status || data.status === 'in-progress') continue;
@@ -165,16 +172,53 @@ async function globalpingCountry(url, country) {
     return { country: country.name, countryCode: country.code, status: 'unavailable', rttMs: null, reason: 'Probe request failed' };
   }
 }
-async function getAfricaLatency(url) {
-  // Keep provider load bounded; one ping per country, at most two concurrent.
-  const out = [];
-  for (let i = 0; i < countries.length; i += 2) {
-    const batch = countries.slice(i, i + 2);
-    out.push(...await Promise.all(batch.map(country => globalpingCountry(url, country))));
+async function getGoAfricaLatency(url) {
+  if (!PROBE_ORCHESTRATOR_URL || !INTERNAL_TOKEN) throw new Error('Go probe orchestrator is not configured');
+  const response = await fetch(PROBE_ORCHESTRATOR_URL + '/v1/probe', {
+    method: 'POST',
+    headers: { Authorization: 'Bearer ' + INTERNAL_TOKEN, 'Content-Type': 'application/json', Accept: 'application/json' },
+    body: JSON.stringify({ target: new URL(url).hostname, countries }),
+    signal: AbortSignal.timeout(25000)
+  });
+  if (!response.ok) throw new Error('Go probe orchestrator unavailable');
+  const payload = await response.json();
+  if (!Array.isArray(payload.countries) || payload.countries.length !== countries.length ||
+      !Number.isInteger(payload.requestedCountries) || payload.requestedCountries !== countries.length) {
+    throw new Error('Go probe orchestrator returned an invalid result');
   }
+  return payload;
+}
+async function runNodeAfricaLatency(url) {
+  // Preserve existing bounded Node/Globalping polling as the safe fallback.
+  const out = [];
+  const concurrency = PROBE_CONCURRENCY ? 4 : 2;
+  for (let i = 0; i < countries.length; i += concurrency) {
+    const controller = new AbortController();
+    const deadline = setTimeout(() => controller.abort(), 20000);
+    try {
+      const batch = countries.slice(i, i + concurrency);
+      out.push(...await Promise.all(batch.map(country => globalpingCountry(url, country, controller.signal))));
+    } finally {
+      clearTimeout(deadline);
+      controller.abort();
+    }
+  }
+  for (const item of out) recordProbe(item.countryCode, item.status);
   const values = out.filter(x => x.status === 'measured').map(x => x.rttMs).sort((a,b) => a-b);
   const median = values.length ? (values.length % 2 ? values[(values.length - 1) / 2] : Math.round((values[values.length / 2 - 1] + values[values.length / 2]) / 2)) : null;
   return { countries: out, medianRttMs: median, measuredCountries: values.length, requestedCountries: countries.length };
+}
+async function getAfricaLatency(url) {
+  return runProbeEngine(PROBE_ENGINE, () => getGoAfricaLatency(url), () => runNodeAfricaLatency(url), async (node) => {
+    const go = await getGoAfricaLatency(url);
+    const sameShape = Array.isArray(go.countries) && go.countries.length === node.countries.length &&
+      go.countries.every((item, index) => item.countryCode === node.countries[index].countryCode && ['measured', 'unavailable'].includes(item.status));
+    if (!sameShape) console.warn('[scan-worker] Go probe shadow structure mismatch');
+    else {
+      const goMedian = Number.isFinite(go.medianRttMs) ? go.medianRttMs : null;
+      console.info('[scan-worker] Go probe shadow comparison', { structureMatch: true, nodeMeasured: node.measuredCountries, goMeasured: go.measuredCountries, nodeMedianRttMs: node.medianRttMs, goMedianRttMs: goMedian });
+    }
+  });
 }
 
 async function saveScreenshot(jobId, dataUrl) {
@@ -252,7 +296,9 @@ async function executeJob(job) {
   await update({ status: 'processing', stage: 'fetching', progress: 12, error_message: null });
   const safeUrl = await validatePublicUrl(job.url);
   await update({ stage: 'lighthouse', progress: 30 });
+  const lighthouseStarted = performance.now();
   const lighthouseResult = await runLighthouse(safeUrl, job.device, runCount);
+  recordStage('lighthouse', performance.now() - lighthouseStarted);
   const screenshot = await saveScreenshot(job.id, lighthouseResult.screenshotDataUrl).catch(() => null);
   await saveFilmstrip(job.id, lighthouseResult.filmstripFrames).catch(error => console.warn('[scan-worker] filmstrip save failed:', String(error?.message || error).slice(0, 160)));
   const summary = {
@@ -269,7 +315,9 @@ async function executeJob(job) {
     aggregation: lighthouseResult.aggregation || 'single Lighthouse run'
   };
   await update({ stage: 'africa', progress: 72, screenshot });
+  const probeStarted = performance.now();
   const africaLatency = await getAfricaLatency(safeUrl);
+  recordStage('globalping', performance.now() - probeStarted);
   await update({ stage: 'report', progress: 92 });
   const result = {
     testedFrom: process.env.TEST_LOCATION_LABEL || 'Cloud worker',
@@ -296,6 +344,7 @@ async function executeJob(job) {
   };
   const { error } = await update({ status: 'completed', stage: 'completed', progress: 100, result, completed_at: new Date().toISOString(), error_message: null });
   if (error) throw error;
+  recordScanCompleted();
   // Materialize the completed worker result for authenticated report history.
   // The scan_jobs record remains the execution source of truth.
   const metrics = lighthouseResult.metrics || {};
@@ -332,24 +381,48 @@ async function executeJob(job) {
   if (reportError) console.warn('[scan-worker] report materialization failed:', reportError.message);
 }
 
+function isTransientScanError(error) {
+  const message = String(error?.message || error || '');
+  const code = String(error?.code || error?.cause?.code || '');
+  return /ECONNRESET|ETIMEDOUT|EAI_AGAIN|ECONNREFUSED|socket hang up|temporarily unavailable|timeout|upstream.*5\d\d|HTTP 5\d\d|HTTP 429/i.test(message) ||
+    /ECONNRESET|ETIMEDOUT|EAI_AGAIN|ECONNREFUSED/.test(code);
+}
+
 async function processQueue() {
   if (busy || !supabase) return;
   busy = true;
   try {
-    const { data: jobs, error } = await supabase.rpc('claim_next_scan_job');
+    if (SCAN_RETRY_RECOVERY) {
+      const { error: recoveryError } = await supabase.rpc('recover_stuck_scan_jobs');
+      if (recoveryError) throw recoveryError;
+    }
+    const claimFunction = SCAN_RETRY_RECOVERY ? 'claim_next_scan_job_with_retries' : 'claim_next_scan_job';
+    const { data: jobs, error } = await supabase.rpc(claimFunction);
     if (error) throw error;
     const job = Array.isArray(jobs) ? jobs[0] : jobs;
     if (!job) return;
     lastJobAt = Date.now();
+    recordScanStarted(Date.now() - new Date(job.created_at || Date.now()).getTime());
     try {
       await executeJob(job);
     } catch (error) {
-      const message = /timed out/i.test(String(error?.message)) ? 'Timed out while testing the website.' : /unreachable|ENOTFOUND|hostname could not be resolved/i.test(String(error?.message)) ? 'Site unreachable. Check that the public URL is correct.' : 'The scan could not be completed. Please try again later.';
-      await supabase.from('scan_jobs').update({
-        status: 'failed', stage: 'failed', progress: 100, error_message: message,
-        completed_at: new Date().toISOString(), updated_at: new Date().toISOString()
-      }).eq('id', job.id);
-      console.warn('[scan-worker] job failed:', job.id, String(error?.message || error).slice(0, 300));
+      const rawMessage = String(error?.message || error || '');
+      const message = /timed out/i.test(rawMessage) ? 'Timed out while testing the website.' : /unreachable|ENOTFOUND|hostname could not be resolved/i.test(rawMessage) ? 'Site unreachable. Check that the public URL is correct.' : 'The scan could not be completed. Please try again later.';
+      const retryable = SCAN_RETRY_RECOVERY && isTransientScanError(error) && Number(job.attempt_count || 0) < 3;
+      const retryDelayMs = Math.min(60000, 5000 * (2 ** Math.max(0, Number(job.attempt_count || 1) - 1)));
+      const update = retryable
+        ? {
+            status: 'queued', stage: 'queued', progress: 0, error_message: message,
+            next_attempt_at: new Date(Date.now() + retryDelayMs).toISOString(),
+            completed_at: null, updated_at: new Date().toISOString()
+          }
+        : {
+            status: 'failed', stage: 'failed', progress: 100, error_message: message,
+            completed_at: new Date().toISOString(), updated_at: new Date().toISOString()
+          };
+      await supabase.from('scan_jobs').update(update).eq('id', job.id);
+      if (retryable) recordRetryScheduled(); else recordScanFailed();
+      console.warn('[scan-worker] job ' + (retryable ? 'scheduled for retry:' : 'failed:'), job.id, rawMessage.slice(0, 300));
     }
   } catch (error) {
     console.error('[scan-worker] queue poll failed:', String(error?.message || error).slice(0, 300));
@@ -361,9 +434,30 @@ async function processQueue() {
 app.get('/healthz', (_req, res) => res.json({ ok: true, busy, lastJobAt, queueCap: MAX_QUEUE }));
 app.use('/internal', (req, res, next) => authorized(req) ? next() : res.status(401).json({ error: 'Unauthorized' }));
 
+app.get('/internal/metrics', async (_req, res) => {
+  res.setHeader('Cache-Control', 'no-store');
+  const started = performance.now();
+  try {
+    const [queued, processing] = await Promise.all([
+      supabase.from('scan_jobs').select('id', { count: 'exact', head: true }).eq('status', 'queued'),
+      supabase.from('scan_jobs').select('id', { count: 'exact', head: true }).eq('status', 'processing')
+    ]);
+    recordDbQuery(performance.now() - started);
+    if (queued.error || processing.error) return res.status(503).json({ error: 'Metrics query unavailable.' });
+    return res.json({
+      ...metricsSnapshot(),
+      queue: { queued: queued.count || 0, processing: processing.count || 0 },
+      dbQueryLatencyMs: Math.round(performance.now() - started)
+    });
+  } catch {
+    recordDbQuery(performance.now() - started);
+    return res.status(503).json({ error: 'Metrics query unavailable.' });
+  }
+});
+
 app.post('/internal/jobs', async (req, res) => {
   if (!supabase || !IP_HASH_SECRET) return res.status(503).json({ error: 'Scan worker is not configured.' });
-  const { url, device = 'mobile', turnstileVerified = false } = req.body || {};
+  const { url, device = 'mobile', turnstileVerified = false, guestProofHash, firstGuestScan = false, deviceId } = req.body || {};
   if (!['mobile', 'desktop'].includes(device)) return res.status(400).json({ error: 'Invalid device.' });
   let normalized;
   try { normalized = await validatePublicUrl(url); } catch (e) { return res.status(400).json({ error: e.message }); }
@@ -384,11 +478,23 @@ app.post('/internal/jobs', async (req, res) => {
     await supabase.from('scan_api_keys').update({ last_used_at: new Date().toISOString() }).eq('id', keyRecord.id);
   }
   if (!user && !keyRecord) {
-    const { data: allowed, error } = await supabase.rpc('check_scan_rate_limit', {
-      p_ip_hash: ipHash, p_endpoint: endpoint, p_max_requests: 3, p_window_minutes: 60
+    if (!firstGuestScan || typeof guestProofHash !== 'string' || !/^[a-f0-9]{64}$/.test(guestProofHash)) {
+      return res.status(400).json({ error: 'Guest scan proof is required to start a free scan.' });
+    }
+    if (typeof deviceId !== 'string' || !/^[a-zA-Z0-9_-]{24,128}$/.test(deviceId)) {
+      return res.status(400).json({ error: 'A valid browser device identifier is required.' });
+    }
+    const { data: ipAllowed, error: ipError } = await supabase.rpc('check_scan_rate_limit', {
+      p_ip_hash: ipHash, p_endpoint: 'scan-ip', p_max_requests: 10, p_window_minutes: 60
     });
-    if (error) return res.status(503).json({ error: 'Rate-limit service is temporarily unavailable.' });
-    if (allowed !== true) return res.status(429).json({ error: 'Free scan limit reached. Please try again in an hour or sign in.' });
+    if (ipError) return res.status(503).json({ error: 'Rate-limit service is temporarily unavailable.' });
+    if (ipAllowed !== true) return res.status(429).json({ error: 'Anonymous scan protection limit reached for this network. Please sign in to continue.' });
+    const deviceHash = hashIp('device:' + deviceId);
+    const { data: deviceAllowed, error: deviceError } = await supabase.rpc('check_scan_rate_limit', {
+      p_ip_hash: deviceHash, p_endpoint: 'scan-device', p_max_requests: 1, p_window_minutes: 43200
+    });
+    if (deviceError) return res.status(503).json({ error: 'Rate-limit service is temporarily unavailable.' });
+    if (deviceAllowed !== true) return res.status(429).json({ error: 'Your free scan has already been used in this browser. Please sign in to continue.' });
   }
   if (user) {
     const { data: allowed, error } = await supabase.rpc('check_scan_rate_limit', {
@@ -401,11 +507,11 @@ app.post('/internal/jobs', async (req, res) => {
   let cacheQuery = supabase.from('scan_jobs').select('id,public_id,status,stage,progress,created_at')
     .eq('url', normalized).eq('device', device).eq('status', 'completed').eq('result->summary->>runCount', String(user || keyRecord ? 3 : 1)).gte('created_at', cacheSince);
   cacheQuery = user || keyRecord ? cacheQuery.eq('user_id', user?.id || keyRecord.user_id) : cacheQuery.is('user_id', null);
-  const { data: cached } = await cacheQuery.order('completed_at', { ascending: false }).limit(1).maybeSingle();
+  const { data: cached } = firstGuestScan ? { data: null } : await cacheQuery.order('completed_at', { ascending: false }).limit(1).maybeSingle();
   if (cached) return res.status(200).json({ jobId: cached.id, reportId: cached.public_id, queuePosition: 0, cacheHit: true });
   let activeQuery = supabase.from('scan_jobs').select('id,public_id,created_at').eq('url', normalized).eq('device', device).in('status', ['queued','processing']);
   activeQuery = user || keyRecord ? activeQuery.eq('user_id', user?.id || keyRecord.user_id) : activeQuery.is('user_id', null);
-  const { data: activeJob } = await activeQuery.order('created_at', { ascending: true }).limit(1).maybeSingle();
+  const { data: activeJob } = firstGuestScan ? { data: null } : await activeQuery.order('created_at', { ascending: true }).limit(1).maybeSingle();
   if (activeJob) {
     const { count: ahead } = await supabase.from('scan_jobs').select('id', { count: 'exact', head: true }).in('status',['queued','processing']).lt('created_at',activeJob.created_at);
     return res.status(202).json({ jobId: activeJob.id, reportId: activeJob.public_id, queuePosition: (ahead || 0) + 1, cacheHit: false, reusedActiveJob: true });
@@ -421,10 +527,53 @@ app.post('/internal/jobs', async (req, res) => {
   }
   const job = Array.isArray(jobRows) ? jobRows[0] : jobRows;
   if (!job) return res.status(503).json({ error: 'Unable to queue the scan.' });
+  let guestProofStored = false;
+  if (!user && !keyRecord) {
+    const proofExpiry = new Date(Date.now() + 30 * 86400000).toISOString();
+    const { error: proofError } = await supabase.from('scan_jobs').update({
+      guest_proof_hash: guestProofHash,
+      guest_proof_expires_at: proofExpiry
+    }).eq('id', job.id).is('guest_proof_hash', null);
+    if (proofError) {
+      console.error('[scan-worker] guest proof persistence failed:', String(proofError.message || proofError).slice(0, 160));
+      return res.status(503).json({ error: 'Unable to secure this guest scan. Please sign in and try again.' });
+    }
+    guestProofStored = true;
+  }
   const { count: ahead } = await supabase.from('scan_jobs').select('id', { count: 'exact', head: true }).in('status',['queued','processing']).lt('created_at',job.created_at);
-  return res.status(202).json({ jobId: job.id, reportId: job.public_id, queuePosition: (ahead || 0) + 1, cacheHit: false });
+  return res.status(202).json({ jobId: job.id, reportId: job.public_id, queuePosition: (ahead || 0) + 1, cacheHit: false, ...(guestProofStored ? { guestProofStored: true } : {}) });
 });
 
+app.post('/internal/jobs/:id/claim', async (req, res) => {
+  if (!supabase) return res.status(503).json({ error: 'Worker is not configured.' });
+  const job = await findJob(String(req.params.id).slice(0, 80));
+  if (!job) return res.status(404).json({ error: 'Scan not found.' });
+  const user = await userFromRequest(req);
+  if (!user) return res.status(401).json({ error: 'Sign in to claim this report.' });
+  if (job.user_id === user.id) {
+    const { error: syncError } = await supabase.from('scans').update({ user_id: user.id }).eq('scan_job_id', job.id).is('user_id', null);
+    if (syncError) return res.status(503).json({ error: 'Could not finish report claim.' });
+    return res.json({ claimed: true, alreadyClaimed: true });
+  }
+  if (job.user_id || job.status !== 'completed') return res.status(409).json({ error: 'Report is not eligible for this claim.' });
+  const proofNonce = String(req.headers['x-guest-proof-nonce'] || '');
+  const proofReportId = String(req.headers['x-guest-proof-report-id'] || '');
+  const proofHash = proofNonce ? crypto.createHash('sha256').update(proofNonce).digest('hex') : '';
+  if (!proofHash || proofReportId !== job.public_id || !job.guest_proof_hash ||
+      !job.guest_proof_expires_at || new Date(job.guest_proof_expires_at).getTime() <= Date.now() ||
+      proofHash !== job.guest_proof_hash) {
+    return res.status(403).json({ error: 'Guest report proof is invalid or expired.' });
+  }
+  const { data, error } = await supabase.from('scan_jobs').update({
+    user_id: user.id, guest_proof_hash: null, guest_proof_expires_at: null
+  }).eq('id', job.id).is('user_id', null).eq('guest_proof_hash', proofHash)
+    .gt('guest_proof_expires_at', new Date().toISOString()).select('*').maybeSingle();
+  if (error) return res.status(503).json({ error: 'Could not claim report.' });
+  if (!data) return res.status(409).json({ error: 'Report was already claimed or proof expired.' });
+  const { error: syncError } = await supabase.from('scans').update({ user_id: user.id }).eq('scan_job_id', job.id).is('user_id', null);
+  if (syncError) return res.status(503).json({ error: 'Could not finish report claim.' });
+  return res.json({ claimed: true });
+});
 app.get('/internal/jobs/:id', async (req, res) => {
   if (!supabase) return res.status(503).json({ error: 'Worker is not configured.' });
   const job = await findJob(String(req.params.id).slice(0, 80));
@@ -434,14 +583,7 @@ app.get('/internal/jobs/:id', async (req, res) => {
   const apiKeyRecord = rawApiKey ? await validateApiKey(rawApiKey) : null;
   if (rawApiKey && !apiKeyRecord) return res.status(401).json({ error: 'Invalid API key.' });
   let unlocked = Boolean(apiKeyRecord && apiKeyRecord.user_id === job.user_id);
-  if (user && job.status === 'completed') {
-    if (!job.user_id) {
-      const { data } = await supabase.from('scan_jobs').update({ user_id: user.id }).eq('id', job.id).is('user_id', null).select('*').maybeSingle();
-      if (data) Object.assign(job, data);
-      await supabase.from('scans').update({ user_id: user.id }).eq('scan_job_id', job.id).is('user_id', null);
-    }
-    unlocked = job.user_id === user.id;
-  }
+  unlocked = unlocked || Boolean(user && job.user_id === user.id);
   const screenshotUrl = await signedScreenshot(job).catch(() => null);
   const payload = publicSummary(job, screenshotUrl, job.status === 'completed' ? await signedFilmstrip(job.id) : []);
   payload.locked = !unlocked;
@@ -462,7 +604,11 @@ app.get('/internal/health/queue', async (_req, res) => {
 async function retentionSweep() {
   if (!supabase) return;
   const rateCutoff = new Date(Date.now() - 2 * 86400000).toISOString();
-  await supabase.from('scan_rate_limits').delete().lt('window_started_at', rateCutoff);
+  const deviceRateCutoff = new Date(Date.now() - 30 * 86400000).toISOString();
+  await supabase.from('scan_rate_limits').delete().lt('window_started_at', rateCutoff).neq('endpoint', 'scan-device');
+  await supabase.from('scan_rate_limits').delete().lt('window_started_at', deviceRateCutoff).eq('endpoint', 'scan-device');
+  await supabase.from('scan_jobs').update({ guest_proof_hash: null, guest_proof_expires_at: null })
+    .lt('guest_proof_expires_at', new Date().toISOString()).not('guest_proof_hash', 'is', null);
   const cutoff = new Date(Date.now() - RETENTION_DAYS * 86400000).toISOString();
   const { data: expired } = await supabase.from('scan_jobs').select('id,screenshot').is('user_id', null).lt('created_at', cutoff).limit(100);
   for (const job of expired || []) {
