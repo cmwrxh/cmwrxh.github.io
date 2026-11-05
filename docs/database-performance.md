@@ -2,7 +2,7 @@
 
 ## Additive migration
 
-Migration `20261105190000_db_rollups_indexes.sql` adds:
+Migrations `20261105190000_db_rollups_indexes.sql` and `20261105200000_bound_rollup_refresh.sql` add:
 - BRIN indexes for append-oriented scan, RUM and regional-probe timestamps.
 - A partial processing-job timestamp index.
 - Private 5-minute and hourly RUM rollup tables.
