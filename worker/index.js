@@ -21,7 +21,7 @@ const RETENTION_DAYS = Math.max(1, Math.min(90, Number(process.env.SCAN_ANON_RET
 const SCAN_RETRY_RECOVERY = process.env.SCAN_RETRY_RECOVERY === 'true';
 const PROBE_CONCURRENCY = process.env.PROBE_CONCURRENCY === 'true';
 const PROBE_ENGINE = ['node', 'go', 'shadow'].includes(process.env.PROBE_ENGINE) ? process.env.PROBE_ENGINE : 'node';
-const PROBE_ORCHESTRATOR_URL = String(process.env.PROBE_ORCHESTRATOR_URL || '').replace(/\\/$/, '');
+const PROBE_ORCHESTRATOR_URL = String(process.env.PROBE_ORCHESTRATOR_URL || '').replace(/\/$/, '');
 const IP_HASH_SECRET = process.env.IP_HASH_SECRET;
 const API_KEY_PREFIX = 'al_live_';
 const signedUrlCache = new Map();
