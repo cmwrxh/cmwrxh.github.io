@@ -518,7 +518,9 @@ app.get('/internal/health/queue', async (_req, res) => {
 async function retentionSweep() {
   if (!supabase) return;
   const rateCutoff = new Date(Date.now() - 2 * 86400000).toISOString();
-  await supabase.from('scan_rate_limits').delete().lt('window_started_at', rateCutoff);
+  const deviceRateCutoff = new Date(Date.now() - 30 * 86400000).toISOString();
+  await supabase.from('scan_rate_limits').delete().lt('window_started_at', rateCutoff).neq('endpoint', 'scan-device');
+  await supabase.from('scan_rate_limits').delete().lt('window_started_at', deviceRateCutoff).eq('endpoint', 'scan-device');
   const cutoff = new Date(Date.now() - RETENTION_DAYS * 86400000).toISOString();
   const { data: expired } = await supabase.from('scan_jobs').select('id,screenshot').is('user_id', null).lt('created_at', cutoff).limit(100);
   for (const job of expired || []) {
