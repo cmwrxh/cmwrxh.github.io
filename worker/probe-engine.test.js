@@ -9,5 +9,5 @@ test('Go probe engine is opt-in and production worker uses the tested fallback d
   assert.match(source, /runProbeEngine\(PROBE_ENGINE, \(\) => getGoAfricaLatency\(url\), \(\) => runNodeAfricaLatency\(url\)/);
   assert.match(source, /Go probe shadow comparison/);
   assert.match(helper, /if \(engine === 'go'\)[\s\S]*catch[\s\S]*return node\(\)/);
-  assert.match(helper, /if \(engine === 'shadow'\)[\s\S]*const nodeResult = await node\(\)[\s\S]*return nodeResult/);
+  assert.match(helper, /const nodeResult = await node\(\)[\s\S]*if \(engine === 'shadow'\)[\s\S]*return nodeResult/);
 });
