@@ -39,3 +39,9 @@ Engineering summary, not legal advice. Kenya's Data Protection Act 2019 and ODPC
 10. Do not create or enable scheduled jobs. Retention scheduling is explicitly deferred.
 11. Test dashboard at 390px and 1440px and retain genuine screenshots.
 12. Enable the AfricaLatency site's own RUM snippet only after a real site key is registered and the ingestion/privacy checks pass.
+
+## Scanner reliability rollout
+
+- `SCAN_RETRY_RECOVERY` defaults to `false`; enable only after applying `supabase/migrations/20261105150000_scan_retry_recovery.sql` in a reviewed environment.
+- When enabled, Postgres continues to claim jobs with `FOR UPDATE SKIP LOCKED`. Transient network failures retry up to three attempts with bounded backoff; processing jobs stale for 20 minutes are recovered. Exhausted jobs become failed.
+- The migration uses additive nullable/defaulted columns and new functions/indexes only. `CREATE INDEX CONCURRENTLY` statements must run outside a transaction.
