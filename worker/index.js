@@ -335,7 +335,9 @@ async function executeJob(job) {
 
 function isTransientScanError(error) {
   const message = String(error?.message || error || '');
-  return /ECONNRESET|ETIMEDOUT|EAI_AGAIN|ECONNREFUSED|socket hang up|temporarily unavailable|upstream.*5\d\d|HTTP 5\d\d|HTTP 429/i.test(message);
+  const code = String(error?.code || error?.cause?.code || '');
+  return /ECONNRESET|ETIMEDOUT|EAI_AGAIN|ECONNREFUSED|socket hang up|temporarily unavailable|timeout|upstream.*5\d\d|HTTP 5\d\d|HTTP 429/i.test(message) ||
+    /ECONNRESET|ETIMEDOUT|EAI_AGAIN|ECONNREFUSED/.test(code);
 }
 
 async function processQueue() {
