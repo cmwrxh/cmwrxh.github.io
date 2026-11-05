@@ -21,7 +21,7 @@ test('target normalization only accepts safe public-web URL shapes', () => {
   assert.equal(normalizeTarget('ftp://example.com'), null);
   assert.equal(normalizeTarget('http://user:pass@example.com'), null);
   assert.equal(normalizeTarget('https://example.com:8443'), null);
-  assert.equal(normalizeTarget('http://127.0.0.1'), 'http://127.0.0.1/');
+  assert.equal(normalizeTarget('http://127.0.0.1').toString(), 'http://127.0.0.1/');
 });
 
 test('robots parser identifies wildcard and named crawler blocks and sitemap', () => {
