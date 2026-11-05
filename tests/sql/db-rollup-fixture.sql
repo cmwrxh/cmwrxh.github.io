@@ -2,10 +2,6 @@ create table if not exists public.scans (
   id uuid primary key default gen_random_uuid(),
   created_at timestamptz not null default now()
 );
-create table if not exists public.probe_agent_measurements (
-  measurement_id text primary key,
-  received_at timestamptz not null default now()
-);
 
 insert into public.rum_beta_events(
   site_id,key_id,ts,metric,value,path,browser_family,country,operator,connection_type
