@@ -19,15 +19,24 @@ export default async function handler(req, res) {
     .select('id').eq('id', siteId).eq('owner_id', auth.user.id).maybeSingle();
   if (siteError || !site) return res.status(404).json({ error: 'RUM site not found.' });
   const bucket = req.query?.bucket === 'hourly' ? 'hourly' : '5m';
-  const table = bucket === 'hourly' ? 'rum_beta_rollups_hourly' : 'rum_beta_rollups_5m';
+  const bucketSeconds = bucket === 'hourly' ? 3600 : 300;
   const sinceRaw = String(req.query?.since || '');
   const parsedSince = sinceRaw ? Date.parse(sinceRaw) : Date.now() - 24 * 60 * 60 * 1000;
   if (!Number.isFinite(parsedSince)) return res.status(400).json({ error: 'Invalid start time.' });
   const since = new Date(Math.max(parsedSince, Date.now() - 90 * 24 * 60 * 60 * 1000)).toISOString();
-  const { data, error } = await admin.from(table)
-    .select('bucket_start,dimension,dimension_value,metric,p75,sample_count')
-    .eq('site_id', siteId).gte('bucket_start', since)
+  const { data, error } = await admin.from('rum_beta_rollups')
+    .select('bucket_start,country,browser_family,metric,p75_value,event_count')
+    .eq('site_id', siteId).eq('bucket_seconds', bucketSeconds).gte('bucket_start', since)
     .order('bucket_start', { ascending: true }).limit(5000);
   if (error) return res.status(503).json({ error: 'RUM rollups are unavailable.' });
-  return res.status(200).json({ siteId, bucket, rows: data || [] });
+  const rows = (data || []).map((row) => ({
+    bucket_start: row.bucket_start,
+    dimension: 'country',
+    dimension_value: row.country || 'unknown',
+    browser_family: row.browser_family || 'Unknown',
+    metric: row.metric,
+    p75: row.p75_value,
+    sample_count: row.event_count
+  }));
+  return res.status(200).json({ siteId, bucket, rows });
 }
