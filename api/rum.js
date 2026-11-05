@@ -3,6 +3,7 @@ import crypto from 'node:crypto';
 import path from 'node:path';
 import { getRumAdminClient, setNoStore } from '../lib/rum-beta-client.js';
 import { recordRumAccepted, recordRumRejected } from '../lib/service-metrics.js';
+import { attemptGoIngest } from '../lib/engine-fallback.js';
 
 let geoReadersPromise;
 const RUM_INGEST_ENGINE = ['node', 'go', 'shadow'].includes(process.env.RUM_INGEST_ENGINE) ? process.env.RUM_INGEST_ENGINE : 'node';
@@ -99,14 +100,14 @@ export default async function handler(req, res) {
     ip: typeof req.ip === 'string' ? req.ip.replace(/^::ffff:/, '') : '',
     requestId: ingestRequestId, events: cleanEvents
   };
-  if (RUM_INGEST_ENGINE === 'go') {
-    try {
-      const result = await forwardRumToGo(goPayload, 'production');
-      recordRumAccepted(result.accepted);
-      return res.status(202).json({ accepted: result.accepted });
-    } catch {
-      console.warn('Go RUM ingestion unavailable; falling back to Node.');
-    }
+  const goResult = await attemptGoIngest(
+    RUM_INGEST_ENGINE,
+    () => forwardRumToGo(goPayload, RUM_INGEST_ENGINE === 'shadow' ? 'shadow' : 'production'),
+    () => console.warn('Go RUM ingestion unavailable; continuing with Node.')
+  );
+  if (goResult && RUM_INGEST_ENGINE === 'go') {
+    recordRumAccepted(goResult.accepted);
+    return res.status(202).json({ accepted: goResult.accepted });
   }
 
   if (!cleanEvents.length) { recordRumRejected(); return res.status(400).json({ error: 'No valid metrics supplied.' }); }
@@ -168,8 +169,5 @@ export default async function handler(req, res) {
     recordRumRejected(); return res.status(503).json({ error: 'Could not store RUM metrics.' });
   }
   recordRumAccepted(rows.length);
-  if (RUM_INGEST_ENGINE === 'shadow') {
-    void forwardRumToGo(goPayload, 'shadow').catch(() => console.warn('Go RUM shadow ingestion unavailable.'));
-  }
   return res.status(202).json({ accepted: rows.length });
 }
