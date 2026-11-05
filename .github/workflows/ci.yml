@@ -54,6 +54,7 @@ jobs:
           if [ -f tests/rum-ingest-migration-test.sh ]; then bash tests/rum-ingest-migration-test.sh; else echo 'RUM migration test not present on this branch'; fi
           if [ -f tests/db-rollup-migration-test.sh ]; then bash tests/db-rollup-migration-test.sh; else echo 'DB rollup migration test not present on this branch'; fi
           if [ -f tests/rollup-migration-test.sh ]; then bash tests/rollup-migration-test.sh; else echo 'Rollup migration test not present on this branch'; fi
+          if [ -f tests/fresh-postgres-migrations.sh ]; then bash tests/fresh-postgres-migrations.sh; else echo 'Fresh Postgres migration test not present on this branch'; fi
       - name: JavaScript syntax checks
         run: |
           set -e
