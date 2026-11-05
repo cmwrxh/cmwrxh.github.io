@@ -1,9 +1,9 @@
 # AfricaLatency RUM Beta MVP
 
 ## Current status
-Use the existing self-hosted Supabase stack on Oracle/Hermes, managed through Coolify, as the RUM preview database. Its existing stack suffix is `dhxxkbjcstmiaqxpzvlyctdc`; it is already provisioned and has the RUM beta schema and a test user from the earlier setup. Do not create another Supabase project, duplicate the database, or use the hosted production Supabase project for preview. Keep the hosted production project and its customer data untouched.
+Use the existing Supabase project configuration selected for the deployment. The current project decision is to use the same Supabase project for preview and production; do not create a second project or duplicate schemas. Preview tests must use designated test accounts, test site keys and test hostnames. Never modify production records as part of preview verification.
 
-The preview app is hosted through the existing Coolify environment (`coolify.africalatency.dev`) and reaches the self-hosted Supabase stack over the existing private Tailscale network. Use the already configured Coolify environment variables for the self-hosted project. `SUPABASE_PUBLIC_URL` overrides `SUPABASE_URL` for the browser when the server-side URL is private; the browser URL must be reachable from the preview user's browser. The public key comes from `SUPABASE_PUBLISHABLE_KEY` or `SUPABASE_ANON_KEY`. The service-role/secret key must never be returned to the browser.
+The preview app is hosted through the existing Coolify environment. `SUPABASE_PUBLIC_URL` overrides `SUPABASE_URL` for the browser when the server-side URL is private; the browser URL must be reachable from the preview user's browser. The public key comes from `SUPABASE_PUBLISHABLE_KEY` or `SUPABASE_ANON_KEY`. The service-role/secret key must never be returned to the browser.
 
 The beta dashboard reads only `rum_beta_sites` and `rum_beta_events`. Existing rows in the legacy `rum_sites` / `rum_events` tables are not automatically backfilled or displayed by this workflow.
 
@@ -12,7 +12,7 @@ The beta dashboard reads only `rum_beta_sites` and `rum_beta_events`. Existing r
 - First-party snippet loads the self-hosted Google `web-vitals` IIFE bundle from `/api/rum-library`, records LCP, INP, CLS and TTFB, and sends sampled events with `navigator.sendBeacon`.
 - No cookies or local storage are used by the snippet. Event payload contains metric name/value, normalized pathname only, and connection type where available. It excludes the full URL, query string, raw user agent, user ID and IP address.
 - Ingest checks the public key, exact Origin hostname allowlist, active site and per-key hourly request limit.
-- Country and ASN/network organization are resolved using local MaxMind GeoLite2 Country and ASN MMDB files mounted at `/app/data/GeoLite2-Country.mmdb` and `/app/data/GeoLite2-ASN.mmdb`. The IP is used transiently for lookup, never inserted into RUM tables or logged by this endpoint.
+- Country and ASN/network organization are resolved using local MaxMind GeoLite2 Country and ASN MMDB files mounted read-only at `/app/data/GeoLite2-Country.mmdb` and `/app/data/GeoLite2-ASN.mmdb`. The IP is used transiently for lookup, never inserted into RUM tables or logged by this endpoint. With `RUM_GEOIP_FAIL_OPEN=true`, unavailable databases or network metadata produce unknown country/ASN/operator values and ingestion continues. The flag defaults to false to preserve current behavior until explicitly enabled.
 - Authenticated dashboard uses the preview deployment's Supabase public configuration, Supabase sessions and owner checks. SQL aggregation returns site-wide p75 and sample counts plus country/operator/connection breakdowns. Each group is suppressed below 30 samples.
 - Customers can delete a site only after an owner-scoped lookup; deleting the site cascades to its stored events. The UI requires confirmation and reports success only after the API confirms deletion.
 - The consolidated migration defines a retention function, but no retention or monitoring job is to be scheduled as part of this work. Monitoring and all scheduled jobs remain on hold.
@@ -27,9 +27,9 @@ Google web-vitals license: Apache-2.0, https://github.com/GoogleChrome/web-vital
 Engineering summary, not legal advice. Kenya's Data Protection Act 2019 and ODPC guidance require transparent, lawful, purpose-limited processing and safeguards. Even when raw IP is not retained, the server receives an IP and uses it transiently for GeoIP lookup; do not describe that as “no IP processing.” Site owners must provide an appropriate visitor notice and assess their lawful basis and cross-border processing. Update AfricaLatency's policy before production activation.
 
 ## Launch gates
-1. Verify the preview deployment's `/api/rum-config` resolves to the existing Oracle/Coolify Supabase instance and returns only its public key; never expose the service-role/secret key.
-2. Confirm the existing `rum_beta_*` tables, RLS and RPC grants are present on that self-hosted preview instance. Do not create a new project or reapply an already-applied migration.
-3. Confirm Coolify's existing preview environment variables point to that instance; keep the hosted production project untouched.
+1. Verify preview and production use the approved existing Supabase project and that preview tests use designated test accounts/sites; never expose the service-role/secret key.
+2. Confirm the existing `rum_beta_*` tables, RLS and RPC grants are present. Do not create a new project or reapply an already-applied migration.
+3. Confirm the existing Coolify environment variables point to the approved Supabase project; do not change them as part of this code-only work.
 4. Mount current GeoLite2 Country and ASN MMDBs at `/app/data`; verify account/license, attribution, update cadence and old-file deletion.
 5. Install `maxmind` and `web-vitals`; verify gzip size of `rum.js` is under 3 KB and the library is self-hosted.
 6. Test site creation using the previously created RUM preview test account and an approved preview hostname. Do not create test records under a customer account.
