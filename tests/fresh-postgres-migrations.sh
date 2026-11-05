@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 : "${DATABASE_URL:?DATABASE_URL must point to disposable CI Postgres}"
+# CI-only: reset the disposable service database after the independent migration fixtures.
+psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -c "drop schema public cascade; create schema public; grant all on schema public to public;"
 psql "$DATABASE_URL" -v ON_ERROR_STOP=1 <<'SQL'
 do $$
 begin
