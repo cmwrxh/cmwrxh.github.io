@@ -32,6 +32,8 @@ jobs:
           node-version: 22
       - name: Install dependencies
         run: npm install
+      - name: Install scan worker dependencies
+        run: npm install --prefix worker
       - name: Lint
         run: npm run lint --if-present
       - name: Existing Node test suite
