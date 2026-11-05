@@ -58,7 +58,7 @@ func measure(ctx context.Context, host, agent, country string) (Measurement,erro
 		TLSHandshakeDone:func(_ tls.ConnectionState,_ error){if !tlsStart.IsZero(){tlsMs=time.Since(tlsStart).Milliseconds()}},
 		GotFirstResponseByte:func(){ttfbMs=time.Since(started).Milliseconds()},
 	}
-	ips,err:=resolvePublic(ctx,host); if err!=nil{return out,err}
+	dnsStarted:=time.Now(); ips,err:=resolvePublic(ctx,host); dnsMs=time.Since(dnsStarted).Milliseconds(); if err!=nil{return out,err}
 	dialer:=&net.Dialer{Timeout:3*time.Second}
 	transport:=&http.Transport{ForceAttemptHTTP2:true,TLSHandshakeTimeout:3*time.Second,ResponseHeaderTimeout:4*time.Second,DisableKeepAlives:true}
 	transport.DialContext=func(ctx context.Context,network,address string)(net.Conn,error){
