@@ -41,7 +41,12 @@ jobs:
             npm run "$script"
           done
           if [ -d tests ]; then node --test tests; fi
-      - name: Atomic guest scan concurrency test\n        run: |\n          sudo apt-get update\n          sudo apt-get install -y postgresql-client\n          if [ -f tests/guest-scan-concurrency.sh ]; then bash tests/guest-scan-concurrency.sh; else echo 'Guest scan concurrency test not present on this branch'; fi\n      - name: JavaScript syntax checks
+          if [ -d worker ]; then node --test worker; fi
+      - name: Atomic guest scan concurrency test
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+          if [ -f tests/guest-scan-concurrency.sh ]; then bash tests/guest-scan-concurrency.sh; else echo 'Guest scan concurrency test not present on this branch'; fi\n      - name: JavaScript syntax checks
         run: |
           set -e
           find api -type f -name '*.js' -print0 2>/dev/null | xargs -0 -r -n1 node --check
@@ -57,7 +62,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          mapfile -t modules < <(find . -name go.mod -not -path './node_modules/*' -not -path './.git/*' -printf '%h\\n' | sort)
+          mapfile -t modules < <(find . -name go.mod -not -path './node_modules/*' -not -path './.git/*' -printf '%h\n' | sort)
           for dir in "${modules[@]}"; do
             echo "::group::Go module $dir"
             (cd "$dir" && go vet ./... && go test ./...)
