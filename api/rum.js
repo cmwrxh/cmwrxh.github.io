@@ -81,7 +81,7 @@ export default async function handler(req, res) {
   }
   const { data: site, error: siteError } = await admin.from('rum_beta_sites')
     .select('id,public_key,allowed_domains,is_active').eq('public_key', key).eq('is_active', true).maybeSingle();
-  if (siteError || !site || !site.allowed_domains.includes(origin.hostname)) {
+  if (siteError || !site || !Array.isArray(site.allowed_domains) || !site.allowed_domains.includes(origin.hostname)) {
     return res.status(403).json({ error: 'This key is not authorized for this domain.' });
   }
   const { data: allowed, error: rateError } = await admin.rpc('rum_beta_allow_request', { p_key_id: key, p_limit: 120 });
