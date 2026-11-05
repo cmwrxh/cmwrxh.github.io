@@ -20,6 +20,8 @@ const MAX_QUEUE = Math.max(1, Math.min(50, Number(process.env.SCAN_MAX_QUEUE) ||
 const RETENTION_DAYS = Math.max(1, Math.min(90, Number(process.env.SCAN_ANON_RETENTION_DAYS) || 7));
 const SCAN_RETRY_RECOVERY = process.env.SCAN_RETRY_RECOVERY === 'true';
 const PROBE_CONCURRENCY = process.env.PROBE_CONCURRENCY === 'true';
+const PROBE_ENGINE = ['node', 'go', 'shadow'].includes(process.env.PROBE_ENGINE) ? process.env.PROBE_ENGINE : 'node';
+const PROBE_ORCHESTRATOR_URL = String(process.env.PROBE_ORCHESTRATOR_URL || '').replace(/\\/$/, '');
 const IP_HASH_SECRET = process.env.IP_HASH_SECRET;
 const API_KEY_PREFIX = 'al_live_';
 const signedUrlCache = new Map();
@@ -169,7 +171,27 @@ async function globalpingCountry(url, country, batchSignal) {
     return { country: country.name, countryCode: country.code, status: 'unavailable', rttMs: null, reason: 'Probe request failed' };
   }
 }
+async function getGoAfricaLatency(url) {
+  if (!PROBE_ORCHESTRATOR_URL || !INTERNAL_TOKEN) throw new Error('Go probe orchestrator is not configured');
+  const response = await fetch(PROBE_ORCHESTRATOR_URL + '/v1/probe', {
+    method: 'POST',
+    headers: { Authorization: 'Bearer ' + INTERNAL_TOKEN, 'Content-Type': 'application/json', Accept: 'application/json' },
+    body: JSON.stringify({ target: new URL(url).hostname, countries }),
+    signal: AbortSignal.timeout(25000)
+  });
+  if (!response.ok) throw new Error('Go probe orchestrator unavailable');
+  const payload = await response.json();
+  if (!Array.isArray(payload.countries) || payload.countries.length !== countries.length ||
+      !Number.isInteger(payload.requestedCountries) || payload.requestedCountries !== countries.length) {
+    throw new Error('Go probe orchestrator returned an invalid result');
+  }
+  return payload;
+}
 async function getAfricaLatency(url) {
+  if (PROBE_ENGINE === 'go') {
+    try { return await getGoAfricaLatency(url); }
+    catch (error) { console.warn('[scan-worker] Go probe fallback to Node:', String(error?.message || error).slice(0, 120)); }
+  }
   // Preserve the existing two-at-a-time default. Opt in to four concurrent
   // country measurements; each batch has a hard 20-second cancellation bound.
   const out = [];
@@ -183,6 +205,22 @@ async function getAfricaLatency(url) {
     } finally {
       clearTimeout(deadline);
       controller.abort();
+    }
+  }
+  if (PROBE_ENGINE === 'shadow') {
+    try {
+      const go = await getGoAfricaLatency(url);
+      const sameShape = Array.isArray(go.countries) && go.countries.length === out.length &&
+        go.countries.every((item, index) => item.countryCode === out[index].countryCode && ['measured', 'unavailable'].includes(item.status));
+      if (!sameShape) console.warn('[scan-worker] Go probe shadow structure mismatch');
+      else {
+        const goMedian = Number.isFinite(go.medianRttMs) ? go.medianRttMs : null;
+        const nodeValues = out.filter(item => item.status === 'measured').map(item => item.rttMs).sort((a,b) => a-b);
+        const nodeMedian = nodeValues.length ? (nodeValues.length % 2 ? nodeValues[(nodeValues.length - 1) / 2] : Math.round((nodeValues[nodeValues.length / 2 - 1] + nodeValues[nodeValues.length / 2]) / 2)) : null;
+        console.info('[scan-worker] Go probe shadow comparison', { structureMatch: true, nodeMeasured: nodeValues.length, goMeasured: go.measuredCountries, nodeMedianRttMs: nodeMedian, goMedianRttMs: goMedian });
+      }
+    } catch (error) {
+      console.warn('[scan-worker] Go probe shadow unavailable:', String(error?.message || error).slice(0, 120));
     }
   }
   for (const item of out) recordProbe(item.countryCode, item.status);
