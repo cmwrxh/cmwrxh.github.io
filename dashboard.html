@@ -625,6 +625,24 @@
             </div>
         </section>
 
+
+        <section class="section" id="crawler-intelligence" aria-labelledby="crawler-intelligence-heading">
+            <div class="section-header">
+                <h2 id="crawler-intelligence-heading">Crawler Intelligence</h2>
+                <span class="status">Read-only audit</span>
+            </div>
+            <p class="rum-beta-intro">Check how search engines and selected AI crawlers are instructed to access your public website. This checks robots.txt, the homepage, sitemap availability and homepage noindex signals. It does not change your website.</p>
+            <div class="card crawler-audit-card">
+                <form id="crawler-audit-form" class="crawler-audit-form">
+                    <label for="crawler-audit-url" class="hidden">Website URL</label>
+                    <input id="crawler-audit-url" name="url" type="url" inputmode="url" autocomplete="url" maxlength="2048" placeholder="https://example.com" required>
+                    <button id="crawler-audit-submit" type="submit">Run crawler audit</button>
+                </form>
+                <p id="crawler-audit-message" role="status" aria-live="polite">Audits are limited to five requests per account per minute.</p>
+                <div id="crawler-audit-results" aria-live="polite"></div>
+            </div>
+        </section>
+
         <section class="section" id="reports-history" aria-labelledby="reports-heading">
             <div class="section-header">
                 <h2 id="reports-heading">Reports History</h2>
@@ -1135,6 +1153,63 @@
         await loadScanHistory(session);
     });
     groupSelect.addEventListener('change', loadStats);
+
+
+    const crawlerAuditForm = document.getElementById('crawler-audit-form');
+    const crawlerAuditMessage = document.getElementById('crawler-audit-message');
+    const crawlerAuditResults = document.getElementById('crawler-audit-results');
+    const crawlerAuditSubmit = document.getElementById('crawler-audit-submit');
+
+    crawlerAuditForm?.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        crawlerAuditSubmit.disabled = true;
+        crawlerAuditSubmit.textContent = 'Checking…';
+        crawlerAuditMessage.textContent = 'Checking the public homepage, robots.txt and sitemap…';
+        crawlerAuditResults.replaceChildren();
+        try {
+            const { data: { session }, error: sessionError } = await client.auth.getSession();
+            if (sessionError || !session) {
+                window.location.href = '/login.html';
+                return;
+            }
+            const response = await fetch('/api/crawler-audit', {
+                method: 'POST',
+                headers: {
+                    Authorization: 'Bearer ' + session.access_token,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ url: document.getElementById('crawler-audit-url').value })
+            });
+            const payload = await response.json().catch(() => ({}));
+            if (!response.ok) throw new Error(payload.error || 'Crawler audit failed.');
+            const summary = document.createElement('p');
+            summary.className = 'crawler-audit-summary';
+            summary.textContent = 'Target: ' + payload.target + ' · Checked: ' + new Date(payload.checkedAt).toLocaleString() + ' · Read-only';
+            crawlerAuditResults.appendChild(summary);
+            for (const finding of payload.findings || []) {
+                const row = document.createElement('article');
+                row.className = 'crawler-audit-finding';
+                const status = document.createElement('span');
+                status.className = 'crawler-audit-status';
+                status.dataset.state = finding.status;
+                status.textContent = finding.status;
+                const detail = document.createElement('div');
+                const title = document.createElement('strong');
+                title.textContent = finding.title;
+                const description = document.createElement('p');
+                description.textContent = finding.detail;
+                detail.append(title, description);
+                row.append(status, detail);
+                crawlerAuditResults.appendChild(row);
+            }
+            crawlerAuditMessage.textContent = 'Audit complete. Findings describe the public responses observed at check time.';
+        } catch (error) {
+            crawlerAuditMessage.textContent = error.message || 'Crawler audit failed.';
+        } finally {
+            crawlerAuditSubmit.disabled = false;
+            crawlerAuditSubmit.textContent = 'Run crawler audit';
+        }
+    });
 
     logoutButton.addEventListener('click', async function () {
         logoutButton.disabled = true;
