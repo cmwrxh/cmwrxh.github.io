@@ -52,3 +52,10 @@ test('guest scan enforcement uses an atomic one-per-device monthly rate limit', 
   assert.match(worker, /\.eq\('guest_proof_hash', proofHash\)\.select\('\*'\)\.maybeSingle\(\)/);
   assert.match(worker, /firstGuestScan \? \{ data: null \}/);
 });
+
+test('device rate-limit hashes are retained for the full one-month guest window', async () => {
+  const fs = await import('node:fs');
+  const worker = fs.readFileSync(new URL('../worker/index.js', import.meta.url), 'utf8');
+  assert.match(worker, /deviceRateCutoff = new Date\(Date\.now\(\) - 30 \* 86400000\)/);
+  assert.match(worker, /\.eq\('endpoint', 'scan-device'\)/);
+});
