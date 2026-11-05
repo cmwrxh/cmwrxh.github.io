@@ -59,3 +59,10 @@ test('device rate-limit hashes are retained for the full one-month guest window'
   assert.match(worker, /deviceRateCutoff = new Date\(Date\.now\(\) - 30 \* 86400000\)/);
   assert.match(worker, /\.eq\('endpoint', 'scan-device'\)/);
 });
+
+test('expired guest proof hashes are cleared without touching existing IP cache rows', async () => {
+  const fs = await import('node:fs');
+  const worker = fs.readFileSync(new URL('../worker/index.js', import.meta.url), 'utf8');
+  assert.match(worker, /update\(\{ guest_proof_hash: null, guest_proof_expires_at: null \}\)/);
+  assert.doesNotMatch(worker, /from\(['\"]ip_geo_cache['\"]\)/);
+});
