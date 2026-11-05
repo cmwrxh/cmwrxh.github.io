@@ -17,6 +17,7 @@ const supabase = SUPABASE_URL && SERVICE_KEY ? createClient(SUPABASE_URL, SERVIC
 const GP_API_TOKEN = process.env.GP_API_TOKEN;
 const MAX_QUEUE = Math.max(1, Math.min(50, Number(process.env.SCAN_MAX_QUEUE) || 12));
 const RETENTION_DAYS = Math.max(1, Math.min(90, Number(process.env.SCAN_ANON_RETENTION_DAYS) || 7));
+const SCAN_RETRY_RECOVERY = process.env.SCAN_RETRY_RECOVERY === 'true';
 const IP_HASH_SECRET = process.env.IP_HASH_SECRET;
 const API_KEY_PREFIX = 'al_live_';
 const signedUrlCache = new Map();
@@ -332,11 +333,21 @@ async function executeJob(job) {
   if (reportError) console.warn('[scan-worker] report materialization failed:', reportError.message);
 }
 
+function isTransientScanError(error) {
+  const message = String(error?.message || error || '');
+  return /ECONNRESET|ETIMEDOUT|EAI_AGAIN|ECONNREFUSED|socket hang up|temporarily unavailable|upstream.*5\d\d|HTTP 5\d\d|HTTP 429/i.test(message);
+}
+
 async function processQueue() {
   if (busy || !supabase) return;
   busy = true;
   try {
-    const { data: jobs, error } = await supabase.rpc('claim_next_scan_job');
+    if (SCAN_RETRY_RECOVERY) {
+      const { error: recoveryError } = await supabase.rpc('recover_stuck_scan_jobs');
+      if (recoveryError) throw recoveryError;
+    }
+    const claimFunction = SCAN_RETRY_RECOVERY ? 'claim_next_scan_job_with_retries' : 'claim_next_scan_job';
+    const { data: jobs, error } = await supabase.rpc(claimFunction);
     if (error) throw error;
     const job = Array.isArray(jobs) ? jobs[0] : jobs;
     if (!job) return;
@@ -344,12 +355,22 @@ async function processQueue() {
     try {
       await executeJob(job);
     } catch (error) {
-      const message = /timed out/i.test(String(error?.message)) ? 'Timed out while testing the website.' : /unreachable|ENOTFOUND|hostname could not be resolved/i.test(String(error?.message)) ? 'Site unreachable. Check that the public URL is correct.' : 'The scan could not be completed. Please try again later.';
-      await supabase.from('scan_jobs').update({
-        status: 'failed', stage: 'failed', progress: 100, error_message: message,
-        completed_at: new Date().toISOString(), updated_at: new Date().toISOString()
-      }).eq('id', job.id);
-      console.warn('[scan-worker] job failed:', job.id, String(error?.message || error).slice(0, 300));
+      const rawMessage = String(error?.message || error || '');
+      const message = /timed out/i.test(rawMessage) ? 'Timed out while testing the website.' : /unreachable|ENOTFOUND|hostname could not be resolved/i.test(rawMessage) ? 'Site unreachable. Check that the public URL is correct.' : 'The scan could not be completed. Please try again later.';
+      const retryable = SCAN_RETRY_RECOVERY && isTransientScanError(error) && Number(job.attempt_count || 0) < 3;
+      const retryDelayMs = Math.min(60000, 5000 * (2 ** Math.max(0, Number(job.attempt_count || 1) - 1)));
+      const update = retryable
+        ? {
+            status: 'queued', stage: 'queued', progress: 0, error_message: message,
+            next_attempt_at: new Date(Date.now() + retryDelayMs).toISOString(),
+            completed_at: null, updated_at: new Date().toISOString()
+          }
+        : {
+            status: 'failed', stage: 'failed', progress: 100, error_message: message,
+            completed_at: new Date().toISOString(), updated_at: new Date().toISOString()
+          };
+      await supabase.from('scan_jobs').update(update).eq('id', job.id);
+      console.warn('[scan-worker] job ' + (retryable ? 'scheduled for retry:' : 'failed:'), job.id, rawMessage.slice(0, 300));
     }
   } catch (error) {
     console.error('[scan-worker] queue poll failed:', String(error?.message || error).slice(0, 300));
