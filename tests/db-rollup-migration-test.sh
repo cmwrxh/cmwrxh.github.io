@@ -2,6 +2,7 @@
 set -euo pipefail
 : "${DATABASE_URL:?DATABASE_URL must point to disposable CI Postgres}"
 psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f tests/sql/db-rollup-fixture.sql
+psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f supabase/migrations/20261105170000_probe_agent_measurements.sql
 psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f supabase/migrations/20261105190000_db_rollups_indexes.sql
 psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f supabase/migrations/20261105200000_bound_rollup_refresh.sql
 psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -c "select public.refresh_rum_beta_rollups(now() - interval '1 hour');"
