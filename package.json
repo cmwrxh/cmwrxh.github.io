@@ -8,7 +8,8 @@
     "test:report-filmstrip": "node --test tests/report-filmstrip.test.cjs",
     "test:rum-beta": "node --test tests/rum-beta.test.js",
     "test:crawler-audit": "node --test tests/crawler-audit.test.js",
-    "test:crawler-health": "node --test tests/crawler-audit-health.test.js"
+    "test:crawler-health": "node --test tests/crawler-audit-health.test.js",
+    "test:guest-scan-proof": "node --test tests/guest-scan-proof.test.js"
   },
   "dependencies": {
     "@sparticuz/chromium": "^138.0.0",
