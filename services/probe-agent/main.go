@@ -39,7 +39,12 @@ type Measurement struct {
 }
 type queue struct { db *sql.DB }
 func newID() string { b:=make([]byte,16); _,_=rand.Read(b); return hex.EncodeToString(b) }
-func isPublicIP(ip net.IP) bool { return ip!=nil && ip.IsGlobalUnicast() && !ip.IsPrivate() && !ip.IsLoopback() && !ip.IsLinkLocalUnicast() && !ip.IsUnspecified() && !ip.IsMulticast() }
+func isPublicIP(ip net.IP) bool {
+	if ip==nil || !ip.IsGlobalUnicast() || ip.IsPrivate() || ip.IsLoopback() || ip.IsLinkLocalUnicast() || ip.IsUnspecified() || ip.IsMulticast() { return false }
+	reserved:=[]string{"100.64.0.0/10","192.0.0.0/24","192.0.2.0/24","198.18.0.0/15","198.51.100.0/24","203.0.113.0/24","240.0.0.0/4","2001:db8::/32","fc00::/7"}
+	for _,cidr:=range reserved { _,block,_:=net.ParseCIDR(cidr); if block.Contains(ip) { return false } }
+	return true
+}
 func resolvePublic(ctx context.Context, host string) ([]net.IP,error) {
 	ips,err:=net.DefaultResolver.LookupIPAddr(ctx,host); if err!=nil||len(ips)==0 { return nil,errors.New("DNS resolution failed") }
 	out:=make([]net.IP,0,len(ips)); for _,item:=range ips { if !isPublicIP(item.IP) { return nil,errors.New("target resolves to a non-public address") }; out=append(out,item.IP) }; return out,nil
