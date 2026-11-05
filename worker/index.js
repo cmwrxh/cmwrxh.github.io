@@ -552,6 +552,31 @@ app.post('/internal/jobs', async (req, res) => {
   return res.status(202).json({ jobId: job.id, reportId: job.public_id, queuePosition: (ahead || 0) + 1, cacheHit: false, ...(guestProofStored ? { guestProofStored: true } : {}) });
 });
 
+app.post('/internal/jobs/:id/claim', async (req, res) => {
+  if (!supabase) return res.status(503).json({ error: 'Worker is not configured.' });
+  const job = await findJob(String(req.params.id).slice(0, 80));
+  if (!job) return res.status(404).json({ error: 'Scan not found.' });
+  const user = await userFromRequest(req);
+  if (!user) return res.status(401).json({ error: 'Sign in to claim this report.' });
+  if (job.user_id === user.id) return res.json({ claimed: true, alreadyClaimed: true });
+  if (job.user_id || job.status !== 'completed') return res.status(409).json({ error: 'Report is not eligible for this claim.' });
+  const proofNonce = String(req.headers['x-guest-proof-nonce'] || '');
+  const proofReportId = String(req.headers['x-guest-proof-report-id'] || '');
+  const proofHash = proofNonce ? crypto.createHash('sha256').update(proofNonce).digest('hex') : '';
+  if (!proofHash || proofReportId !== job.public_id || !job.guest_proof_hash ||
+      !job.guest_proof_expires_at || new Date(job.guest_proof_expires_at).getTime() <= Date.now() ||
+      proofHash !== job.guest_proof_hash) {
+    return res.status(403).json({ error: 'Guest report proof is invalid or expired.' });
+  }
+  const { data, error } = await supabase.from('scan_jobs').update({
+    user_id: user.id, guest_proof_hash: null, guest_proof_expires_at: null
+  }).eq('id', job.id).is('user_id', null).eq('guest_proof_hash', proofHash)
+    .gt('guest_proof_expires_at', new Date().toISOString()).select('*').maybeSingle();
+  if (error) return res.status(503).json({ error: 'Could not claim report.' });
+  if (!data) return res.status(409).json({ error: 'Report was already claimed or proof expired.' });
+  await supabase.from('scans').update({ user_id: user.id }).eq('scan_job_id', job.id).is('user_id', null);
+  return res.json({ claimed: true });
+});
 app.get('/internal/jobs/:id', async (req, res) => {
   if (!supabase) return res.status(503).json({ error: 'Worker is not configured.' });
   const job = await findJob(String(req.params.id).slice(0, 80));
@@ -561,24 +586,7 @@ app.get('/internal/jobs/:id', async (req, res) => {
   const apiKeyRecord = rawApiKey ? await validateApiKey(rawApiKey) : null;
   if (rawApiKey && !apiKeyRecord) return res.status(401).json({ error: 'Invalid API key.' });
   let unlocked = Boolean(apiKeyRecord && apiKeyRecord.user_id === job.user_id);
-  if (user && job.status === 'completed') {
-    const proofNonce = String(req.headers['x-guest-proof-nonce'] || '');
-    const proofReportId = String(req.headers['x-guest-proof-report-id'] || '');
-    const proofHash = proofNonce ? crypto.createHash('sha256').update(proofNonce).digest('hex') : '';
-    const validGuestClaim = !job.user_id && job.guest_proof_hash && job.guest_proof_expires_at &&
-      new Date(job.guest_proof_expires_at).getTime() > Date.now() &&
-      proofReportId === job.public_id && proofHash === job.guest_proof_hash;
-    if (validGuestClaim) {
-      const { data, error: claimError } = await supabase.from('scan_jobs').update({
-        user_id: user.id, guest_proof_hash: null, guest_proof_expires_at: null
-      }).eq('id', job.id).is('user_id', null).eq('guest_proof_hash', proofHash).select('*').maybeSingle();
-      if (!claimError && data) {
-        Object.assign(job, data);
-        await supabase.from('scans').update({ user_id: user.id }).eq('scan_job_id', job.id).is('user_id', null);
-      }
-    }
-    unlocked = job.user_id === user.id;
-  }
+  unlocked = unlocked || Boolean(user && job.user_id === user.id);
   const screenshotUrl = await signedScreenshot(job).catch(() => null);
   const payload = publicSummary(job, screenshotUrl, job.status === 'completed' ? await signedFilmstrip(job.id) : []);
   payload.locked = !unlocked;
