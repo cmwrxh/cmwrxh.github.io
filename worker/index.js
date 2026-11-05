@@ -558,7 +558,11 @@ app.post('/internal/jobs/:id/claim', async (req, res) => {
   if (!job) return res.status(404).json({ error: 'Scan not found.' });
   const user = await userFromRequest(req);
   if (!user) return res.status(401).json({ error: 'Sign in to claim this report.' });
-  if (job.user_id === user.id) return res.json({ claimed: true, alreadyClaimed: true });
+  if (job.user_id === user.id) {
+    const { error: syncError } = await supabase.from('scans').update({ user_id: user.id }).eq('scan_job_id', job.id).is('user_id', null);
+    if (syncError) return res.status(503).json({ error: 'Could not finish report claim.' });
+    return res.json({ claimed: true, alreadyClaimed: true });
+  }
   if (job.user_id || job.status !== 'completed') return res.status(409).json({ error: 'Report is not eligible for this claim.' });
   const proofNonce = String(req.headers['x-guest-proof-nonce'] || '');
   const proofReportId = String(req.headers['x-guest-proof-report-id'] || '');
@@ -574,7 +578,8 @@ app.post('/internal/jobs/:id/claim', async (req, res) => {
     .gt('guest_proof_expires_at', new Date().toISOString()).select('*').maybeSingle();
   if (error) return res.status(503).json({ error: 'Could not claim report.' });
   if (!data) return res.status(409).json({ error: 'Report was already claimed or proof expired.' });
-  await supabase.from('scans').update({ user_id: user.id }).eq('scan_job_id', job.id).is('user_id', null);
+  const { error: syncError } = await supabase.from('scans').update({ user_id: user.id }).eq('scan_job_id', job.id).is('user_id', null);
+  if (syncError) return res.status(503).json({ error: 'Could not finish report claim.' });
   return res.json({ claimed: true });
 });
 app.get('/internal/jobs/:id', async (req, res) => {
