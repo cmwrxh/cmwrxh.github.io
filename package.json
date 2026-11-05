@@ -6,7 +6,8 @@
     "start": "node server.js",
     "test:auth-next": "node --test tests/auth-next.test.cjs",
     "test:report-filmstrip": "node --test tests/report-filmstrip.test.cjs",
-    "test:rum-beta": "node --test tests/rum-beta.test.js"
+    "test:rum-beta": "node --test tests/rum-beta.test.js",
+    "test:crawler-audit": "node --test tests/crawler-audit.test.js"
   },
   "dependencies": {
     "@sparticuz/chromium": "^138.0.0",
