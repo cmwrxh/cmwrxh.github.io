@@ -19,6 +19,7 @@ const GP_API_TOKEN = process.env.GP_API_TOKEN;
 const MAX_QUEUE = Math.max(1, Math.min(50, Number(process.env.SCAN_MAX_QUEUE) || 12));
 const RETENTION_DAYS = Math.max(1, Math.min(90, Number(process.env.SCAN_ANON_RETENTION_DAYS) || 7));
 const SCAN_RETRY_RECOVERY = process.env.SCAN_RETRY_RECOVERY === 'true';
+const PROBE_CONCURRENCY = process.env.PROBE_CONCURRENCY === 'true';
 const IP_HASH_SECRET = process.env.IP_HASH_SECRET;
 const API_KEY_PREFIX = 'al_live_';
 const signedUrlCache = new Map();
@@ -133,22 +134,23 @@ async function validateApiKey(raw) {
   return data || null;
 }
 
-async function globalpingCountry(url, country) {
+async function globalpingCountry(url, country, batchSignal) {
   if (!GP_API_TOKEN) return { country: country.name, countryCode: country.code, status: 'unavailable', rttMs: null, reason: 'Provider not configured' };
   const host = new URL(url).hostname;
   const headers = { Authorization: `Bearer ${GP_API_TOKEN}`, 'Content-Type': 'application/json', Accept: 'application/json' };
+  const signal = batchSignal ? AbortSignal.any([batchSignal, AbortSignal.timeout(20000)]) : AbortSignal.timeout(20000);
   try {
     const created = await fetch('https://api.globalping.io/v1/measurements', {
       method: 'POST', headers,
       body: JSON.stringify({ type: 'ping', target: host, locations: [{ country: country.code, limit: 1 }] }),
-      signal: AbortSignal.timeout(8000)
+      signal
     });
     const payload = await created.json().catch(() => ({}));
     if (!created.ok || !payload.id) return { country: country.name, countryCode: country.code, status: 'unavailable', rttMs: null, reason: created.status === 422 ? 'No matching probe' : 'Measurement unavailable' };
     const start = Date.now();
     while (Date.now() - start < 12000) {
       await new Promise(resolve => setTimeout(resolve, 1000));
-      const polled = await fetch(`https://api.globalping.io/v1/measurements/${encodeURIComponent(payload.id)}`, { headers, signal: AbortSignal.timeout(5000) });
+      const polled = await fetch(`https://api.globalping.io/v1/measurements/${encodeURIComponent(payload.id)}`, { headers, signal });
       if (!polled.ok) continue;
       const data = await polled.json().catch(() => ({}));
       if (!data.status || data.status === 'in-progress') continue;
@@ -168,11 +170,20 @@ async function globalpingCountry(url, country) {
   }
 }
 async function getAfricaLatency(url) {
-  // Keep provider load bounded; one ping per country, at most two concurrent.
+  // Preserve the existing two-at-a-time default. Opt in to four concurrent
+  // country measurements; each batch has a hard 20-second cancellation bound.
   const out = [];
-  for (let i = 0; i < countries.length; i += 2) {
-    const batch = countries.slice(i, i + 2);
-    out.push(...await Promise.all(batch.map(country => globalpingCountry(url, country))));
+  const concurrency = PROBE_CONCURRENCY ? 4 : 2;
+  for (let i = 0; i < countries.length; i += concurrency) {
+    const controller = new AbortController();
+    const deadline = setTimeout(() => controller.abort(), 20000);
+    try {
+      const batch = countries.slice(i, i + concurrency);
+      out.push(...await Promise.all(batch.map(country => globalpingCountry(url, country, controller.signal))));
+    } finally {
+      clearTimeout(deadline);
+      controller.abort();
+    }
   }
   for (const item of out) recordProbe(item.countryCode, item.status);
   const values = out.filter(x => x.status === 'measured').map(x => x.rttMs).sort((a,b) => a-b);
