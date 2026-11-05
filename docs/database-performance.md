@@ -2,35 +2,35 @@
 
 ## Additive migration
 
-Migration `20261105190000_rum_rollups_and_query_indexes.sql` adds:
-- A partial B-tree index for queued scan-job claims.
-- A BRIN index for append-oriented RUM timestamps and a site/timestamp B-tree index.
-- A private `rum_beta_rollups` table with 5-minute and hourly buckets.
-- A bounded service-role-only `refresh_rum_beta_rollups(p_from, p_to)` function.
+Migration `20261105190000_db_rollups_indexes.sql` adds:
+- BRIN indexes for append-oriented scan, RUM and regional-probe timestamps.
+- A partial processing-job timestamp index.
+- Private 5-minute and hourly RUM rollup tables.
+- A service-role-only refresh function that upserts derived p75 and sample-count aggregates.
 
-All indexes and the table use `IF NOT EXISTS`. The function upserts derived aggregates and rejects windows longer than 31 days. No existing scan or RUM event rows are deleted, truncated, or rewritten.
+The migration uses `IF NOT EXISTS` for indexes and tables. It does not delete, truncate, rewrite or backfill existing scan or RUM event rows. The refresh function is bounded to the most recent 31 days per invocation.
 
 ## Refresh operations
 
-No scheduler is installed by this change. After applying the migration to a disposable preview database and validating query plans, an operator may call:
+No scheduler is installed by this change. After applying the migration to a disposable preview database and validating the results, an operator may call:
 
 ```sql
-select public.refresh_rum_beta_rollups(now() - interval '24 hours', now());
+select public.refresh_rum_beta_rollups(now() - interval '24 hours');
 ```
 
-Run it on a bounded overlapping window to account for late events. Compare its output with direct aggregation queries before scheduling. Monitor DB load; the function computes both 5-minute and hourly buckets for the supplied window.
+The function refreshes both 5-minute and hourly buckets, grouped by site, metric and overall/country/operator/connection type. Re-running it upserts the same buckets. Use a bounded overlapping window to account for late events and monitor DB load before scheduling.
 
 ## Rollup reads
 
-`GET /api/rum-rollups?siteId=<uuid>&bucket=5m|hourly&since=<ISO timestamp>` is authenticated against site ownership and is unavailable unless `RUM_ROLLUP_READS=true`. Raw-event APIs remain unchanged. The rollup read flag must remain false until the migration and aggregation are validated.
+`GET /api/rum-rollups?siteId=<uuid>&bucket=5m|hourly&since=<ISO timestamp>` is authenticated against site ownership and is unavailable unless `RUM_ROLLUP_READS=true`. It reads `rum_beta_rollups_5m` or `rum_beta_rollups_hourly`. Raw-event APIs remain unchanged.
 
 ## Retention
 
-No retention deletion is included. Agree a retention period and separately review an additive cleanup job before deleting any derived rollup rows. Existing raw RUM events are preserved.
+No retention deletion is included. Agree a retention period and separately review any cleanup process before deleting derived rollup rows. Existing raw RUM events are preserved.
 
 ## Rollback
 
-Set `RUM_ROLLUP_READS=false` and redeploy. Stop invoking the refresh function. Leave the additive tables and indexes in place; do not drop them as part of rollback.
+Set `RUM_ROLLUP_READS=false` and redeploy. Stop invoking the refresh function. Leave additive tables and indexes in place; do not drop them as part of rollback.
 
 ## Verification
 
