@@ -49,6 +49,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y postgresql-client
           if [ -f tests/guest-scan-concurrency.sh ]; then bash tests/guest-scan-concurrency.sh; else echo 'Guest scan concurrency test not present on this branch'; fi
+          if [ -f tests/scanner-migration-test.sh ]; then bash tests/scanner-migration-test.sh; else echo 'Scanner migration test not present on this branch'; fi
       - name: JavaScript syntax checks
         run: |
           set -e
