@@ -72,3 +72,11 @@ jobs:
             (cd "$dir" && go mod tidy && go vet ./... && go test ./...)
             echo "::endgroup::"
           done
+      - name: Build Go service containers
+        run: |
+          set -euo pipefail
+          for dir in services/probe-orchestrator services/probe-agent services/rum-ingest; do
+            if [ -f "$dir/Dockerfile" ]; then
+              docker build --pull -f "$dir/Dockerfile" -t "ci/${dir##*/}:test" "$dir"
+            fi
+          done
