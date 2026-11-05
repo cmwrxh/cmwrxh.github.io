@@ -53,10 +53,6 @@ declare
   rows_5m integer := 0;
   rows_hourly integer := 0;
 begin
-  if p_from is null or p_from < now() - interval '31 days' then
-    raise exception 'rollup window must be within the last 31 days';
-  end if;
-
   with expanded as (
     select site_id,ts,metric,value,'overall'::text as dimension,'All visitors'::text as dimension_value from public.rum_beta_events where ts >= p_from
     union all
