@@ -15,3 +15,8 @@ func TestEventValidationHelpers(t *testing.T){
 	if browserFamily("Mozilla Chrome/120")!="Chrome"{t.Fatal("browser family mismatch")}
 	if connectionType("unsupported")!="unknown"{t.Fatal("connection should be unknown")}
 }
+
+func TestGeoIPFilesFailOpenTogether(t *testing.T) {
+	got:=lookupGeo("203.0.113.10","/missing/country.mmdb","/missing/asn.mmdb")
+	if got.Country!="unknown"||got.ASN!=nil||got.Operator!="unknown" { t.Fatalf("expected unknown GeoIP: %#v",got) }
+}
