@@ -1,6 +1,7 @@
 import maxmind from 'maxmind';
 import path from 'node:path';
 import { getRumAdminClient, setNoStore } from '../lib/rum-beta-client.js';
+import { recordRumAccepted, recordRumRejected } from '../lib/service-metrics.js';
 
 let geoReadersPromise;
 async function getGeoReaders() {
@@ -58,35 +59,35 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
   const origin = normalizeOrigin(req.headers.origin || '');
-  if (!origin) return res.status(403).json({ error: 'A valid browser origin is required.' });
+  if (!origin) { recordRumRejected(); return res.status(403).json({ error: 'A valid browser origin is required.' }); }
   res.setHeader('Access-Control-Allow-Origin', origin.origin);
   res.setHeader('Vary', 'Origin');
   const body = req.body || {};
   const key = typeof body.key === 'string' ? body.key : '';
   let events;
   try { events = typeof body.events === 'string' ? JSON.parse(body.events) : body.events; } catch {
-    return res.status(400).json({ error: 'Invalid event payload.' });
+    recordRumRejected(); return res.status(400).json({ error: 'Invalid event payload.' });
   }
   if (!/^rum_pub_[a-f0-9]{48}$/.test(key) || !Array.isArray(events) || events.length < 1 || events.length > 8) {
-    return res.status(400).json({ error: 'Invalid RUM payload.' });
+    recordRumRejected(); return res.status(400).json({ error: 'Invalid RUM payload.' });
   }
   const cleanEvents = events.filter((event) =>
     event && ['LCP','INP','CLS','TTFB'].includes(event.metric) &&
     Number.isFinite(event.value) && event.value >= 0 && event.value < 86400000
   );
-  if (!cleanEvents.length) return res.status(400).json({ error: 'No valid metrics supplied.' });
+  if (!cleanEvents.length) { recordRumRejected(); return res.status(400).json({ error: 'No valid metrics supplied.' }); }
   let admin;
   try { admin = getRumAdminClient(); } catch (error) {
-    return res.status(503).json({ error: error.message });
+    recordRumRejected(); return res.status(503).json({ error: error.message });
   }
   const { data: site, error: siteError } = await admin.from('rum_beta_sites')
     .select('id,public_key,allowed_domains,is_active').eq('public_key', key).eq('is_active', true).maybeSingle();
   if (siteError || !site || !Array.isArray(site.allowed_domains) || !site.allowed_domains.includes(origin.hostname)) {
-    return res.status(403).json({ error: 'This key is not authorized for this domain.' });
+    recordRumRejected(); return res.status(403).json({ error: 'This key is not authorized for this domain.' });
   }
   const { data: allowed, error: rateError } = await admin.rpc('rum_beta_allow_request', { p_key_id: key, p_limit: 120 });
-  if (rateError) return res.status(503).json({ error: 'RUM rate limiter unavailable.' });
-  if (allowed !== true) return res.status(429).json({ error: 'RUM rate limit reached.' });
+  if (rateError) { recordRumRejected(); return res.status(503).json({ error: 'RUM rate limiter unavailable.' }); }
+  if (allowed !== true) { recordRumRejected(); return res.status(429).json({ error: 'RUM rate limit reached.' }); }
 
   // req.ip is used only transiently for offline lookup. It is never logged or stored.
   const ip = typeof req.ip === 'string' ? req.ip.replace(/^::ffff:/, '') : null;
@@ -123,7 +124,7 @@ export default async function handler(req, res) {
   const { error: insertError } = await admin.from('rum_beta_events').insert(rows);
   if (insertError) {
     console.error('RUM event insert failed:', insertError.code || 'database error');
-    return res.status(503).json({ error: 'Could not store RUM metrics.' });
+    recordRumRejected(); return res.status(503).json({ error: 'Could not store RUM metrics.' });
   }
-  return res.status(202).json({ accepted: rows.length });
+  recordRumAccepted(rows.length); return res.status(202).json({ accepted: rows.length });
 }
