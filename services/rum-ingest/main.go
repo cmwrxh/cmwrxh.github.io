@@ -58,7 +58,7 @@ func lookupGeo(ipRaw,countryPath,asnPath string)geo{
 	out:=geo{Country:"unknown",Operator:"unknown"}
 	ip:=net.ParseIP(strings.TrimPrefix(ipRaw,"::ffff:"));if ip==nil{return out}
 	country,err:=maxminddb.Open(countryPath);if err==nil{var record countryRecord;if country.Lookup(ip,&record)==nil{out.Country=record.Country.ISOCode;if out.Country==""{out.Country=record.Registered.ISOCode}};_ = country.Close()}
-	asn,err:=maxminddb.Open(asnPath);if err==nil{var record asnRecord;if asn.Lookup(ip,&record)==nil{if record.ASN>0&&record.ASN<=math.MaxInt64{v:=int64(record.ASN);out.ASN=&v};if record.Organization!=""{out.Operator=record.Organization}};_ = asn.Close()}
+	asn,err:=maxminddb.Open(asnPath);if err==nil{var record asnRecord;if asn.Lookup(ip,&record)==nil{if record.ASN>0{v:=int64(record.ASN);out.ASN=&v};if record.Organization!=""{out.Operator=record.Organization}};_ = asn.Close()}
 	if out.Country==""{out.Country="unknown"};if out.Operator==""{out.Operator="unknown"};return out
 }
 func authorize(expected,supplied string)bool{
@@ -66,31 +66,37 @@ func authorize(expected,supplied string)bool{
 }
 func process(ctx context.Context,pool *pgxpool.Pool,in Request,countryDB,asnDB string)(int,error){
 	if !keyPattern.MatchString(in.Key)||len(in.Events)<1||len(in.Events)>8||!idPattern.MatchString(in.RequestID){return 0,errors.New("invalid payload")}
-	origin,host,err:=normalizedOrigin(in.Origin);if err!=nil{return 0,err}
+	_,host,err:=normalizedOrigin(in.Origin);if err!=nil{return 0,err}
 	if in.Mode!="production"&&in.Mode!="shadow"{return 0,errors.New("invalid mode")}
+	clean:=make([]Event,0,len(in.Events))
+	for _,event:=range in.Events{
+		if (event.Metric=="LCP"||event.Metric=="INP"||event.Metric=="CLS"||event.Metric=="TTFB")&&!math.IsNaN(event.Value)&&!math.IsInf(event.Value,0)&&event.Value>=0&&event.Value<86400000{clean=append(clean,event)}
+	}
+	if len(clean)==0{return 0,errors.New("no valid metrics")}
 	var site Site
 	err=pool.QueryRow(ctx,`select id::text, allowed_domains from public.rum_beta_sites where public_key=$1 and is_active=true`,in.Key).Scan(&site.ID,&site.Domains)
 	if err!=nil{return 0,errors.New("site unavailable")}
-	_ = origin
 	allowed:=false;for _,domain:=range site.Domains{if strings.EqualFold(domain,host){allowed=true;break}}
 	if !allowed{return 0,errors.New("origin not allowed")}
+	tx,err:=pool.BeginTx(ctx,pgx.TxOptions{});if err!=nil{return 0,err};defer tx.Rollback(ctx)
+	table:="public.rum_beta_events";if in.Mode=="shadow"{table="public.rum_beta_events_shadow"}
+	var existing int
+	if err=tx.QueryRow(ctx,"select count(*) from "+table+" where ingest_request_id=$1",in.RequestID).Scan(&existing);err!=nil{return 0,err}
+	if existing>0{if err=tx.Commit(ctx);err!=nil{return 0,err};return len(clean),nil}
 	if in.Mode=="production"{
 		var ok bool
-		if err=pool.QueryRow(ctx,`select public.rum_beta_allow_request($1,120)`,in.Key).Scan(&ok);err!=nil{return 0,err}
+		if err=tx.QueryRow(ctx,`select public.rum_beta_allow_request($1,120)`,in.Key).Scan(&ok);err!=nil{return 0,err}
 		if !ok{return 0,errors.New("rate limit reached")}
 	}
 	g:=lookupGeo(in.IP,countryDB,asnDB)
-	path:=safePath(in.Events[0].Path);browser:=browserFamily(in.UserAgent);connection:=connectionType(in.Events[0].ConnectionType)
-	tx,err:=pool.BeginTx(ctx,pgx.TxOptions{});if err!=nil{return 0,err};defer tx.Rollback(ctx)
-	table:="public.rum_beta_events";if in.Mode=="shadow"{table="public.rum_beta_events_shadow"}
-	for i,event:=range in.Events{
-		if (event.Metric!="LCP"&&event.Metric!="INP"&&event.Metric!="CLS"&&event.Metric!="TTFB")||math.IsNaN(event.Value)||math.IsInf(event.Value,0)||event.Value<0||event.Value>=86400000{continue}
+	path:=safePath(clean[0].Path);browser:=browserFamily(in.UserAgent);connection:=connectionType(clean[0].ConnectionType)
+	for i,event:=range clean{
 		query:=fmt.Sprintf(`insert into %s(site_id,key_id,country,asn,operator,connection_type,metric,value,path,browser_family,ingest_request_id,event_index)
 			values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12) on conflict (ingest_request_id,event_index) do nothing`,table)
 		if _,err=tx.Exec(ctx,query,site.ID,in.Key,g.Country,g.ASN,g.Operator,connection,event.Metric,event.Value,path,browser,in.RequestID,i);err!=nil{return 0,err}
 	}
 	if err=tx.Commit(ctx);err!=nil{return 0,err}
-	return len(in.Events),nil
+	return len(clean),nil
 }
 func main(){
 	dbURL:=os.Getenv("DATABASE_URL");if dbURL==""{log.Fatal("DATABASE_URL is required")}
