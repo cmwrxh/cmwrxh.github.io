@@ -5,6 +5,7 @@ import { createClient } from '@supabase/supabase-js';
 import { runLighthouse } from './provider.js';
 import { buildRequestAnalysis } from './scoring.js';
 import { validatePublicUrl } from './url-safety.js';
+import { runProbeEngine } from '../lib/engine-fallback.js';
 import { metricsSnapshot, recordDbQuery, recordProbe, recordScanCompleted, recordScanFailed, recordScanStarted, recordRetryScheduled, recordStage } from './metrics.js';
 
 const app = express();
@@ -187,13 +188,8 @@ async function getGoAfricaLatency(url) {
   }
   return payload;
 }
-async function getAfricaLatency(url) {
-  if (PROBE_ENGINE === 'go') {
-    try { return await getGoAfricaLatency(url); }
-    catch (error) { console.warn('[scan-worker] Go probe fallback to Node:', String(error?.message || error).slice(0, 120)); }
-  }
-  // Preserve the existing two-at-a-time default. Opt in to four concurrent
-  // country measurements; each batch has a hard 20-second cancellation bound.
+async function runNodeAfricaLatency(url) {
+  // Preserve existing bounded Node/Globalping polling as the safe fallback.
   const out = [];
   const concurrency = PROBE_CONCURRENCY ? 4 : 2;
   for (let i = 0; i < countries.length; i += concurrency) {
@@ -207,26 +203,22 @@ async function getAfricaLatency(url) {
       controller.abort();
     }
   }
-  if (PROBE_ENGINE === 'shadow') {
-    try {
-      const go = await getGoAfricaLatency(url);
-      const sameShape = Array.isArray(go.countries) && go.countries.length === out.length &&
-        go.countries.every((item, index) => item.countryCode === out[index].countryCode && ['measured', 'unavailable'].includes(item.status));
-      if (!sameShape) console.warn('[scan-worker] Go probe shadow structure mismatch');
-      else {
-        const goMedian = Number.isFinite(go.medianRttMs) ? go.medianRttMs : null;
-        const nodeValues = out.filter(item => item.status === 'measured').map(item => item.rttMs).sort((a,b) => a-b);
-        const nodeMedian = nodeValues.length ? (nodeValues.length % 2 ? nodeValues[(nodeValues.length - 1) / 2] : Math.round((nodeValues[nodeValues.length / 2 - 1] + nodeValues[nodeValues.length / 2]) / 2)) : null;
-        console.info('[scan-worker] Go probe shadow comparison', { structureMatch: true, nodeMeasured: nodeValues.length, goMeasured: go.measuredCountries, nodeMedianRttMs: nodeMedian, goMedianRttMs: goMedian });
-      }
-    } catch (error) {
-      console.warn('[scan-worker] Go probe shadow unavailable:', String(error?.message || error).slice(0, 120));
-    }
-  }
   for (const item of out) recordProbe(item.countryCode, item.status);
   const values = out.filter(x => x.status === 'measured').map(x => x.rttMs).sort((a,b) => a-b);
   const median = values.length ? (values.length % 2 ? values[(values.length - 1) / 2] : Math.round((values[values.length / 2 - 1] + values[values.length / 2]) / 2)) : null;
   return { countries: out, medianRttMs: median, measuredCountries: values.length, requestedCountries: countries.length };
+}
+async function getAfricaLatency(url) {
+  return runProbeEngine(PROBE_ENGINE, () => getGoAfricaLatency(url), () => runNodeAfricaLatency(url), async (node) => {
+    const go = await getGoAfricaLatency(url);
+    const sameShape = Array.isArray(go.countries) && go.countries.length === node.countries.length &&
+      go.countries.every((item, index) => item.countryCode === node.countries[index].countryCode && ['measured', 'unavailable'].includes(item.status));
+    if (!sameShape) console.warn('[scan-worker] Go probe shadow structure mismatch');
+    else {
+      const goMedian = Number.isFinite(go.medianRttMs) ? go.medianRttMs : null;
+      console.info('[scan-worker] Go probe shadow comparison', { structureMatch: true, nodeMeasured: node.measuredCountries, goMeasured: go.measuredCountries, nodeMedianRttMs: node.medianRttMs, goMedianRttMs: goMedian });
+    }
+  });
 }
 
 async function saveScreenshot(jobId, dataUrl) {
