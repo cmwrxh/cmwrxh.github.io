@@ -55,12 +55,18 @@ func connectionType(raw string)string{
 	if allowed[raw]{return raw};return "unknown"
 }
 func lookupGeo(ipRaw,countryPath,asnPath string)geo{
-	out:=geo{Country:"unknown",Operator:"unknown"}
-	ip:=net.ParseIP(strings.TrimPrefix(ipRaw,"::ffff:"));if ip==nil{return out}
-	country,err:=maxminddb.Open(countryPath);if err==nil{var record countryRecord;if country.Lookup(ip,&record)==nil{out.Country=record.Country.ISOCode;if out.Country==""{out.Country=record.Registered.ISOCode}};_ = country.Close()}
-	asn,err:=maxminddb.Open(asnPath);if err==nil{var record asnRecord;if asn.Lookup(ip,&record)==nil{if record.ASN>0{v:=int64(record.ASN);out.ASN=&v};if record.Organization!=""{out.Operator=record.Organization}};_ = asn.Close()}
-	if out.Country==""{out.Country="unknown"};if out.Operator==""{out.Operator="unknown"};return out
+ out:=geo{Country:"unknown",Operator:"unknown"}
+ ip:=net.ParseIP(strings.TrimPrefix(ipRaw,"::ffff:"));if ip==nil{return out}
+ country,err:=maxminddb.Open(countryPath);if err!=nil{return out}
+ asn,err:=maxminddb.Open(asnPath);if err!=nil{_ = country.Close();return out}
+ defer country.Close();defer asn.Close()
+ var cr countryRecord; if country.Lookup(ip,&cr)!=nil{return out}
+ var ar asnRecord; if asn.Lookup(ip,&ar)!=nil{return out}
+ out.Country=cr.Country.ISOCode;if out.Country==""{out.Country=cr.Registered.ISOCode};if out.Country==""{out.Country="unknown"}
+ if ar.ASN>0{v:=int64(ar.ASN);out.ASN=&v};if ar.Organization!=""{out.Operator=ar.Organization}
+ return out
 }
+
 func authorize(expected,supplied string)bool{
 	if expected==""||len(expected)!=len(supplied){return false};return subtle.ConstantTimeCompare([]byte(expected),[]byte(supplied))==1
 }
