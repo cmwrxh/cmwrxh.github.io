@@ -17,6 +17,7 @@ const supabase = SUPABASE_URL && SERVICE_KEY ? createClient(SUPABASE_URL, SERVIC
 const GP_API_TOKEN = process.env.GP_API_TOKEN;
 const MAX_QUEUE = Math.max(1, Math.min(50, Number(process.env.SCAN_MAX_QUEUE) || 12));
 const RETENTION_DAYS = Math.max(1, Math.min(90, Number(process.env.SCAN_ANON_RETENTION_DAYS) || 7));
+const SCAN_RETRY_RECOVERY = process.env.SCAN_RETRY_RECOVERY === 'true';
 const IP_HASH_SECRET = process.env.IP_HASH_SECRET;
 const API_KEY_PREFIX = 'al_live_';
 const signedUrlCache = new Map();
@@ -332,11 +333,23 @@ async function executeJob(job) {
   if (reportError) console.warn('[scan-worker] report materialization failed:', reportError.message);
 }
 
+function isTransientScanError(error) {
+  const message = String(error?.message || error || '');
+  const code = String(error?.code || error?.cause?.code || '');
+  return /ECONNRESET|ETIMEDOUT|EAI_AGAIN|ECONNREFUSED|socket hang up|temporarily unavailable|timeout|upstream.*5\d\d|HTTP 5\d\d|HTTP 429/i.test(message) ||
+    /ECONNRESET|ETIMEDOUT|EAI_AGAIN|ECONNREFUSED/.test(code);
+}
+
 async function processQueue() {
   if (busy || !supabase) return;
   busy = true;
   try {
-    const { data: jobs, error } = await supabase.rpc('claim_next_scan_job');
+    if (SCAN_RETRY_RECOVERY) {
+      const { error: recoveryError } = await supabase.rpc('recover_stuck_scan_jobs');
+      if (recoveryError) throw recoveryError;
+    }
+    const claimFunction = SCAN_RETRY_RECOVERY ? 'claim_next_scan_job_with_retries' : 'claim_next_scan_job';
+    const { data: jobs, error } = await supabase.rpc(claimFunction);
     if (error) throw error;
     const job = Array.isArray(jobs) ? jobs[0] : jobs;
     if (!job) return;
@@ -344,12 +357,22 @@ async function processQueue() {
     try {
       await executeJob(job);
     } catch (error) {
-      const message = /timed out/i.test(String(error?.message)) ? 'Timed out while testing the website.' : /unreachable|ENOTFOUND|hostname could not be resolved/i.test(String(error?.message)) ? 'Site unreachable. Check that the public URL is correct.' : 'The scan could not be completed. Please try again later.';
-      await supabase.from('scan_jobs').update({
-        status: 'failed', stage: 'failed', progress: 100, error_message: message,
-        completed_at: new Date().toISOString(), updated_at: new Date().toISOString()
-      }).eq('id', job.id);
-      console.warn('[scan-worker] job failed:', job.id, String(error?.message || error).slice(0, 300));
+      const rawMessage = String(error?.message || error || '');
+      const message = /timed out/i.test(rawMessage) ? 'Timed out while testing the website.' : /unreachable|ENOTFOUND|hostname could not be resolved/i.test(rawMessage) ? 'Site unreachable. Check that the public URL is correct.' : 'The scan could not be completed. Please try again later.';
+      const retryable = SCAN_RETRY_RECOVERY && isTransientScanError(error) && Number(job.attempt_count || 0) < 3;
+      const retryDelayMs = Math.min(60000, 5000 * (2 ** Math.max(0, Number(job.attempt_count || 1) - 1)));
+      const update = retryable
+        ? {
+            status: 'queued', stage: 'queued', progress: 0, error_message: message,
+            next_attempt_at: new Date(Date.now() + retryDelayMs).toISOString(),
+            completed_at: null, updated_at: new Date().toISOString()
+          }
+        : {
+            status: 'failed', stage: 'failed', progress: 100, error_message: message,
+            completed_at: new Date().toISOString(), updated_at: new Date().toISOString()
+          };
+      await supabase.from('scan_jobs').update(update).eq('id', job.id);
+      console.warn('[scan-worker] job ' + (retryable ? 'scheduled for retry:' : 'failed:'), job.id, rawMessage.slice(0, 300));
     }
   } catch (error) {
     console.error('[scan-worker] queue poll failed:', String(error?.message || error).slice(0, 300));
@@ -363,7 +386,7 @@ app.use('/internal', (req, res, next) => authorized(req) ? next() : res.status(4
 
 app.post('/internal/jobs', async (req, res) => {
   if (!supabase || !IP_HASH_SECRET) return res.status(503).json({ error: 'Scan worker is not configured.' });
-  const { url, device = 'mobile', turnstileVerified = false } = req.body || {};
+  const { url, device = 'mobile', turnstileVerified = false, guestProofHash, firstGuestScan = false, deviceId } = req.body || {};
   if (!['mobile', 'desktop'].includes(device)) return res.status(400).json({ error: 'Invalid device.' });
   let normalized;
   try { normalized = await validatePublicUrl(url); } catch (e) { return res.status(400).json({ error: e.message }); }
@@ -384,11 +407,23 @@ app.post('/internal/jobs', async (req, res) => {
     await supabase.from('scan_api_keys').update({ last_used_at: new Date().toISOString() }).eq('id', keyRecord.id);
   }
   if (!user && !keyRecord) {
-    const { data: allowed, error } = await supabase.rpc('check_scan_rate_limit', {
-      p_ip_hash: ipHash, p_endpoint: endpoint, p_max_requests: 3, p_window_minutes: 60
+    if (!firstGuestScan || typeof guestProofHash !== 'string' || !/^[a-f0-9]{64}$/.test(guestProofHash)) {
+      return res.status(400).json({ error: 'Guest scan proof is required to start a free scan.' });
+    }
+    if (typeof deviceId !== 'string' || !/^[a-zA-Z0-9_-]{24,128}$/.test(deviceId)) {
+      return res.status(400).json({ error: 'A valid browser device identifier is required.' });
+    }
+    const { data: ipAllowed, error: ipError } = await supabase.rpc('check_scan_rate_limit', {
+      p_ip_hash: ipHash, p_endpoint: 'scan-ip', p_max_requests: 10, p_window_minutes: 60
     });
-    if (error) return res.status(503).json({ error: 'Rate-limit service is temporarily unavailable.' });
-    if (allowed !== true) return res.status(429).json({ error: 'Free scan limit reached. Please try again in an hour or sign in.' });
+    if (ipError) return res.status(503).json({ error: 'Rate-limit service is temporarily unavailable.' });
+    if (ipAllowed !== true) return res.status(429).json({ error: 'Anonymous scan protection limit reached for this network. Please sign in to continue.' });
+    const deviceHash = hashIp('device:' + deviceId);
+    const { data: deviceAllowed, error: deviceError } = await supabase.rpc('check_scan_rate_limit', {
+      p_ip_hash: deviceHash, p_endpoint: 'scan-device', p_max_requests: 1, p_window_minutes: 43200
+    });
+    if (deviceError) return res.status(503).json({ error: 'Rate-limit service is temporarily unavailable.' });
+    if (deviceAllowed !== true) return res.status(429).json({ error: 'Your free scan has already been used in this browser. Please sign in to continue.' });
   }
   if (user) {
     const { data: allowed, error } = await supabase.rpc('check_scan_rate_limit', {
@@ -401,11 +436,11 @@ app.post('/internal/jobs', async (req, res) => {
   let cacheQuery = supabase.from('scan_jobs').select('id,public_id,status,stage,progress,created_at')
     .eq('url', normalized).eq('device', device).eq('status', 'completed').eq('result->summary->>runCount', String(user || keyRecord ? 3 : 1)).gte('created_at', cacheSince);
   cacheQuery = user || keyRecord ? cacheQuery.eq('user_id', user?.id || keyRecord.user_id) : cacheQuery.is('user_id', null);
-  const { data: cached } = await cacheQuery.order('completed_at', { ascending: false }).limit(1).maybeSingle();
+  const { data: cached } = firstGuestScan ? { data: null } : await cacheQuery.order('completed_at', { ascending: false }).limit(1).maybeSingle();
   if (cached) return res.status(200).json({ jobId: cached.id, reportId: cached.public_id, queuePosition: 0, cacheHit: true });
   let activeQuery = supabase.from('scan_jobs').select('id,public_id,created_at').eq('url', normalized).eq('device', device).in('status', ['queued','processing']);
   activeQuery = user || keyRecord ? activeQuery.eq('user_id', user?.id || keyRecord.user_id) : activeQuery.is('user_id', null);
-  const { data: activeJob } = await activeQuery.order('created_at', { ascending: true }).limit(1).maybeSingle();
+  const { data: activeJob } = firstGuestScan ? { data: null } : await activeQuery.order('created_at', { ascending: true }).limit(1).maybeSingle();
   if (activeJob) {
     const { count: ahead } = await supabase.from('scan_jobs').select('id', { count: 'exact', head: true }).in('status',['queued','processing']).lt('created_at',activeJob.created_at);
     return res.status(202).json({ jobId: activeJob.id, reportId: activeJob.public_id, queuePosition: (ahead || 0) + 1, cacheHit: false, reusedActiveJob: true });
@@ -421,8 +456,21 @@ app.post('/internal/jobs', async (req, res) => {
   }
   const job = Array.isArray(jobRows) ? jobRows[0] : jobRows;
   if (!job) return res.status(503).json({ error: 'Unable to queue the scan.' });
+  let guestProofStored = false;
+  if (!user && !keyRecord) {
+    const proofExpiry = new Date(Date.now() + 30 * 86400000).toISOString();
+    const { error: proofError } = await supabase.from('scan_jobs').update({
+      guest_proof_hash: guestProofHash,
+      guest_proof_expires_at: proofExpiry
+    }).eq('id', job.id).is('guest_proof_hash', null);
+    if (proofError) {
+      console.error('[scan-worker] guest proof persistence failed:', String(proofError.message || proofError).slice(0, 160));
+      return res.status(503).json({ error: 'Unable to secure this guest scan. Please sign in and try again.' });
+    }
+    guestProofStored = true;
+  }
   const { count: ahead } = await supabase.from('scan_jobs').select('id', { count: 'exact', head: true }).in('status',['queued','processing']).lt('created_at',job.created_at);
-  return res.status(202).json({ jobId: job.id, reportId: job.public_id, queuePosition: (ahead || 0) + 1, cacheHit: false });
+  return res.status(202).json({ jobId: job.id, reportId: job.public_id, queuePosition: (ahead || 0) + 1, cacheHit: false, ...(guestProofStored ? { guestProofStored: true } : {}) });
 });
 
 app.get('/internal/jobs/:id', async (req, res) => {
@@ -435,10 +483,20 @@ app.get('/internal/jobs/:id', async (req, res) => {
   if (rawApiKey && !apiKeyRecord) return res.status(401).json({ error: 'Invalid API key.' });
   let unlocked = Boolean(apiKeyRecord && apiKeyRecord.user_id === job.user_id);
   if (user && job.status === 'completed') {
-    if (!job.user_id) {
-      const { data } = await supabase.from('scan_jobs').update({ user_id: user.id }).eq('id', job.id).is('user_id', null).select('*').maybeSingle();
-      if (data) Object.assign(job, data);
-      await supabase.from('scans').update({ user_id: user.id }).eq('scan_job_id', job.id).is('user_id', null);
+    const proofNonce = String(req.headers['x-guest-proof-nonce'] || '');
+    const proofReportId = String(req.headers['x-guest-proof-report-id'] || '');
+    const proofHash = proofNonce ? crypto.createHash('sha256').update(proofNonce).digest('hex') : '';
+    const validGuestClaim = !job.user_id && job.guest_proof_hash && job.guest_proof_expires_at &&
+      new Date(job.guest_proof_expires_at).getTime() > Date.now() &&
+      proofReportId === job.public_id && proofHash === job.guest_proof_hash;
+    if (validGuestClaim) {
+      const { data, error: claimError } = await supabase.from('scan_jobs').update({
+        user_id: user.id, guest_proof_hash: null, guest_proof_expires_at: null
+      }).eq('id', job.id).is('user_id', null).eq('guest_proof_hash', proofHash).select('*').maybeSingle();
+      if (!claimError && data) {
+        Object.assign(job, data);
+        await supabase.from('scans').update({ user_id: user.id }).eq('scan_job_id', job.id).is('user_id', null);
+      }
     }
     unlocked = job.user_id === user.id;
   }
@@ -462,7 +520,11 @@ app.get('/internal/health/queue', async (_req, res) => {
 async function retentionSweep() {
   if (!supabase) return;
   const rateCutoff = new Date(Date.now() - 2 * 86400000).toISOString();
-  await supabase.from('scan_rate_limits').delete().lt('window_started_at', rateCutoff);
+  const deviceRateCutoff = new Date(Date.now() - 30 * 86400000).toISOString();
+  await supabase.from('scan_rate_limits').delete().lt('window_started_at', rateCutoff).neq('endpoint', 'scan-device');
+  await supabase.from('scan_rate_limits').delete().lt('window_started_at', deviceRateCutoff).eq('endpoint', 'scan-device');
+  await supabase.from('scan_jobs').update({ guest_proof_hash: null, guest_proof_expires_at: null })
+    .lt('guest_proof_expires_at', new Date().toISOString()).not('guest_proof_hash', 'is', null);
   const cutoff = new Date(Date.now() - RETENTION_DAYS * 86400000).toISOString();
   const { data: expired } = await supabase.from('scan_jobs').select('id,screenshot').is('user_id', null).lt('created_at', cutoff).limit(100);
   for (const job of expired || []) {

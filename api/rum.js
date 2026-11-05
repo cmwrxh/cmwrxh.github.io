@@ -6,13 +6,12 @@ let geoReadersPromise;
 async function getGeoReaders() {
   if (!geoReadersPromise) {
     const root = '/app/data';
+    // MaxMind opens the mounted MMDB files read-only. Missing files are
+    // represented as unavailable readers so the opt-in fallback can use unknown.
     geoReadersPromise = Promise.all([
-      maxmind.open(path.join(root, 'GeoLite2-Country.mmdb')),
-      maxmind.open(path.join(root, 'GeoLite2-ASN.mmdb')),
-    ]).then(([country, asn]) => ({ country, asn })).catch((error) => {
-      geoReadersPromise = null;
-      throw error;
-    });
+      maxmind.open(path.join(root, 'GeoLite2-Country.mmdb')).catch(() => null),
+      maxmind.open(path.join(root, 'GeoLite2-ASN.mmdb')).catch(() => null),
+    ]).then(([country, asn]) => ({ country, asn }));
   }
   return geoReadersPromise;
 }
@@ -82,7 +81,7 @@ export default async function handler(req, res) {
   }
   const { data: site, error: siteError } = await admin.from('rum_beta_sites')
     .select('id,public_key,allowed_domains,is_active').eq('public_key', key).eq('is_active', true).maybeSingle();
-  if (siteError || !site || !site.allowed_domains.includes(origin.hostname)) {
+  if (siteError || !site || !Array.isArray(site.allowed_domains) || !site.allowed_domains.includes(origin.hostname)) {
     return res.status(403).json({ error: 'This key is not authorized for this domain.' });
   }
   const { data: allowed, error: rateError } = await admin.rpc('rum_beta_allow_request', { p_key_id: key, p_limit: 120 });
@@ -91,20 +90,25 @@ export default async function handler(req, res) {
 
   // req.ip is used only transiently for offline lookup. It is never logged or stored.
   const ip = typeof req.ip === 'string' ? req.ip.replace(/^::ffff:/, '') : null;
-  if (!ip) return res.status(503).json({ error: 'Network metadata is unavailable.' });
-  let geo;
+  const failOpen = process.env.RUM_GEOIP_FAIL_OPEN !== 'false';
+  const unknownGeo = { country: 'unknown', asn: null, operator: 'unknown' };
+  let geo = unknownGeo;
   try {
     const readers = await getGeoReaders();
-    const country = readers.country.get(ip);
-    const asn = readers.asn.get(ip);
-    geo = {
-      country: country?.country?.iso_code || country?.registered_country?.iso_code || null,
-      asn: Number.isInteger(asn?.autonomous_system_number) ? asn.autonomous_system_number : null,
-      operator: typeof asn?.autonomous_system_organization === 'string' ? asn.autonomous_system_organization.slice(0, 160) : null,
-    };
+    if (!ip || !readers.country || !readers.asn) {
+      if (!failOpen) return res.status(503).json({ error: 'Offline network metadata database is unavailable.' });
+    } else {
+      const country = readers.country.get(ip);
+      const asn = readers.asn.get(ip);
+      geo = {
+        country: country?.country?.iso_code || country?.registered_country?.iso_code || 'unknown',
+        asn: Number.isInteger(asn?.autonomous_system_number) ? asn.autonomous_system_number : null,
+        operator: typeof asn?.autonomous_system_organization === 'string' ? asn.autonomous_system_organization.slice(0, 160) : 'unknown',
+      };
+    }
   } catch {
-    console.error('RUM offline GeoIP database unavailable.');
-    return res.status(503).json({ error: 'Offline network metadata database is unavailable.' });
+    if (!failOpen) return res.status(503).json({ error: 'Offline network metadata database is unavailable.' });
+    geo = unknownGeo;
   }
   const browser = browserFamily(req.headers['user-agent']);
   const pathValue = safePath(cleanEvents[0].path);
