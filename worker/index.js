@@ -394,6 +394,7 @@ app.get('/healthz', (_req, res) => res.json({ ok: true, busy, lastJobAt, queueCa
 app.use('/internal', (req, res, next) => authorized(req) ? next() : res.status(401).json({ error: 'Unauthorized' }));
 
 app.get('/internal/metrics', async (_req, res) => {
+  res.setHeader('Cache-Control', 'no-store');
   const started = performance.now();
   try {
     const [queued, processing] = await Promise.all([
