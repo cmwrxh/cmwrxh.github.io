@@ -44,7 +44,7 @@ function normalizeTarget(value) {
   try {
     url = new URL(value.trim());
     if (!['http:', 'https:'].includes(url.protocol) || url.username || url.password) return null;
-    if (url.port && !['80', '443'].includes(url.port)) return null;
+    if (url.port) return null;
     if (url.hash) url.hash = '';
     url.search = '';
     url.pathname = '/';
@@ -73,7 +73,9 @@ function requestText(url, resolved) {
     const request = transport.request(url, {
       method: 'GET',
       agent: false,
-      lookup: (_hostname, _options, callback) => callback(null, resolved.address, resolved.family),
+      lookup: (_hostname, options, callback) => options?.all
+        ? callback(null, [{ address: resolved.address, family: resolved.family }])
+        : callback(null, resolved.address, resolved.family),
       servername: isIP(host) ? undefined : host,
       headers: {
         'User-Agent': 'AfricaLatencyCrawlerAudit/1.0 (+https://africalatency.dev)',
@@ -107,7 +109,7 @@ function requestText(url, resolved) {
 async function fetchPublicText(value, expectedOrigin) {
   const url = new URL(value);
   if (!['http:', 'https:'].includes(url.protocol) || url.username || url.password ||
-      (url.port && !['80', '443'].includes(url.port))) {
+      url.port) {
     throw new Error('Unsupported URL.');
   }
   if (expectedOrigin && url.origin !== expectedOrigin) {
