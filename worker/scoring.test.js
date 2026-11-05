@@ -58,3 +58,26 @@ test('recorded Lighthouse JSON fixture exposes only its real screenshot thumbnai
   assert.deepEqual(result.filmstripFrames.map(frame => frame.timingMs), [0, 500]);
   assert.ok(result.filmstripFrames.every(frame => frame.dataUrl.startsWith('data:image/jpeg;base64,')));
 });
+
+test('summarizeRun preserves real Lighthouse audit findings, opportunity savings, and bounded resource rows', () => {
+  const result = summarizeRun({
+    lighthouseVersion: '12.8.2',
+    categories: { performance: { score: 0.8 }, 'best-practices': { score: 0.9 }, seo: { score: 0.9 }, accessibility: { score: 0.9 } },
+    audits: {
+      'document-title': { id: 'document-title', title: 'Document has a title', score: 1, scoreDisplayMode: 'binary', description: 'The document has a title.' },
+      'unused-javascript': { id: 'unused-javascript', title: 'Reduce unused JavaScript', score: 0, scoreDisplayMode: 'numeric', description: 'Reduce unused JavaScript.', details: { type: 'opportunity', overallSavingsMs: 725 } },
+      'network-requests': { details: { items: [
+        { url: 'https://example.com/app.js?secret=removed', resourceType: 'Script', mimeType: 'application/javascript', transferSize: 4096, statusCode: 200, startTime: 120, endTime: 520 }
+      ] } }
+    }
+  });
+  assert.ok(result.auditList.some(a => a.id === 'document-title' && a.score === 100));
+  assert.equal(result.opportunities.length, 1);
+  assert.equal(result.opportunities[0].id, 'unused-javascript');
+  assert.equal(result.opportunities[0].savingsMs, 725);
+  assert.equal(result.resourceDetails.length, 1);
+  assert.equal(result.resourceDetails[0].url, 'https://example.com/app.js');
+  assert.equal(result.resourceDetails[0].transferSize, 4096);
+  assert.equal(result.resourceDetails[0].startTime, 120);
+  assert.equal(result.resourceDetails[0].endTime, 520);
+});
