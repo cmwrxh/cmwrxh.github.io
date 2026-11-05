@@ -25,6 +25,8 @@ document.getElementById('rd-tags')?.addEventListener('click',()=>{let n=document
 document.querySelectorAll('[data-tab]').forEach(button=>button.addEventListener('click',()=>{document.querySelectorAll('[data-tab]').forEach(b=>b.setAttribute('aria-selected',String(b===button)));document.querySelectorAll('[data-panel]').forEach(p=>p.hidden=p.dataset.panel!==button.dataset.tab)}));
 (async()=>{try{
 let token='',user=null;if(client){const {data}=await client.auth.getSession();token=data?.session?.access_token||'';user=data?.session?.user||null;}
+if(token){try{await fetch('/api/scan-claim',{method:'POST',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify({reportId:id}),signal:AbortSignal.timeout(8000)});}catch{}}
+
 const response=await fetch('/api/scan/'+encodeURIComponent(id),{headers:token?{Authorization:'Bearer '+token}:{}});const data=await response.json().catch(()=>({}));
 if(response.status===503)throw new Error('The report service is temporarily unavailable (HTTP 503). No result is being claimed. Retry shortly.');
 if(response.status===429)throw new Error('Report request rate limit reached. Wait before refreshing.');

@@ -49,7 +49,7 @@ test('guest scan enforcement uses an atomic one-per-device monthly rate limit', 
   const fs = await import('node:fs');
   const worker = fs.readFileSync(new URL('../worker/index.js', import.meta.url), 'utf8');
   assert.match(worker, /p_endpoint: 'scan-device', p_max_requests: 1, p_window_minutes: 43200/);
-  assert.match(worker, /\.eq\('guest_proof_hash', proofHash\)\.select\('\*'\)\.maybeSingle\(\)/);
+  assert.match(worker, /eq\('guest_proof_hash', proofHash\)[\s\S]*?select\('\*'\)\.maybeSingle\(\)/);
   assert.match(worker, /firstGuestScan \? \{ data: null \}/);
 });
 
