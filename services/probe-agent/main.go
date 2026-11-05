@@ -91,6 +91,21 @@ func (q *queue) batch(limit int)([]Measurement,error) {
 	out:=[]Measurement{}; for rows.Next(){var raw string;if err:=rows.Scan(&raw);err!=nil{return nil,err};var m Measurement;if err:=json.Unmarshal([]byte(raw),&m);err!=nil{return nil,err};out=append(out,m)};return out,rows.Err()
 }
 func (q *queue) ack(items []Measurement) error { tx,err:=q.db.Begin();if err!=nil{return err};defer tx.Rollback();for _,m:=range items{if _,err=tx.Exec("delete from pending_measurements where id=?",m.ID);err!=nil{return err}};return tx.Commit() }
+func deliverBatch(q *queue, items []Measurement, client *http.Client, receiver, token string) error {
+	if len(items) == 0 { return nil }
+	body, err := json.Marshal(map[string]any{"agentId": items[0].AgentID, "measurements": items})
+	if err != nil { return err }
+	req, err := http.NewRequest(http.MethodPost, strings.TrimRight(receiver, "/")+"/api/probe-agent", bytes.NewReader(body))
+	if err != nil { return err }
+	req.Header.Set("Authorization", "Bearer "+token)
+	req.Header.Set("Content-Type", "application/json")
+	resp, err := client.Do(req)
+	if err != nil { return err }
+	defer resp.Body.Close()
+	if resp.StatusCode < 200 || resp.StatusCode >= 300 { return fmt.Errorf("Node receiver returned HTTP %d", resp.StatusCode) }
+	return q.ack(items)
+}
+
 func main() {
 	agentID:=os.Getenv("AGENT_ID"); country:=os.Getenv("AGENT_COUNTRY_CODE"); token:=os.Getenv("PROBE_AGENT_TOKEN")
 	if agentID==""||country==""||token=="" { log.Fatal("AGENT_ID, AGENT_COUNTRY_CODE and PROBE_AGENT_TOKEN are required") }
@@ -102,7 +117,7 @@ func main() {
 	var sendMu sync.Mutex
 	go func(){ticker:=time.NewTicker(5*time.Second);defer ticker.Stop();for range ticker.C{
 		if receiver==""{continue};sendMu.Lock()
-		items,e:=q.batch(50);if e==nil&&len(items)>0{body,_:=json.Marshal(map[string]any{"agentId":agentID,"measurements":items});req,e:=http.NewRequest(http.MethodPost,receiver+"/api/probe-agent",bytes.NewReader(body));if e==nil{req.Header.Set("Authorization","Bearer "+token);req.Header.Set("Content-Type","application/json");resp,e:=client.Do(req);if e==nil{if resp.StatusCode>=200&&resp.StatusCode<300{_ = q.ack(items)};resp.Body.Close()}}}
+		items,e:=q.batch(50);if e==nil&&len(items)>0{if e=deliverBatch(q,items,client,receiver,token);e!=nil{log.Printf("Node receiver delivery deferred: %v",e)}}
 		sendMu.Unlock()
 	}}()
 	mux:=http.NewServeMux()
