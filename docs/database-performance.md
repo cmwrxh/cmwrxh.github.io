@@ -1,30 +1,39 @@
 # Database performance and RUM rollups
 
-## Additive indexes
+## Additive migration
 
-Migration `20261105190000_db_rollups_indexes.sql` adds BRIN indexes to append-oriented timestamp columns on scans, RUM events and regional probe measurements. Existing B-tree indexes remain unchanged. It also adds an append-only BRIN index for scan-job creation time. No existing rows are rewritten or removed.
+Migration `20261105190000_rum_rollups_and_query_indexes.sql` adds:
+- A partial B-tree index for queued scan-job claims.
+- A BRIN index for append-oriented RUM timestamps and a site/timestamp B-tree index.
+- A private `rum_beta_rollups` table with 5-minute and hourly buckets.
+- A bounded service-role-only `refresh_rum_beta_rollups(p_from, p_to)` function.
 
-Existing operational indexes continue to support:
-- atomic queued-job claim by status and creation time;
-- stuck-job recovery by processing status and update time;
-- report history by owner and creation time;
-- scan cache lookup by URL, device, status and completion time;
-- RUM dashboard reads by site, metric and timestamp.
+All indexes and the table use `IF NOT EXISTS`. The function upserts derived aggregates and rejects windows longer than 31 days. No existing scan or RUM event rows are deleted, truncated, or rewritten.
 
-## Rollups
+## Refresh operations
 
-The migration creates isolated 5-minute and hourly aggregate tables and the service-role-only function `refresh_rum_beta_rollups(p_from)`. It groups p75 and sample count by site, metric, and overall/country/operator/connection type. Re-running the function upserts the same buckets.
+No scheduler is installed by this change. After applying the migration to a disposable preview database and validating query plans, an operator may call:
 
-No scheduler is installed. Suggested operations schedule (operator-owned, after preview validation):
-- run `select public.refresh_rum_beta_rollups(now() - interval '24 hours')` every five minutes for near-real-time buckets;
-- run the same function hourly with a longer `p_from` window to backfill hourly buckets.
+```sql
+select public.refresh_rum_beta_rollups(now() - interval '24 hours', now());
+```
 
-The function currently recomputes every selected bucket since `p_from`; choose a bounded window and monitor database load before scheduling. No retention deletes are included. Retention periods require an explicit owner decision and a separately reviewed additive cleanup process.
+Run it on a bounded overlapping window to account for late events. Compare its output with direct aggregation queries before scheduling. Monitor DB load; the function computes both 5-minute and hourly buckets for the supplied window.
 
 ## Rollup reads
 
-`GET /api/rum-rollups?siteId=<uuid>&bucket=5m|hourly&since=<ISO timestamp>` requires an authenticated site owner. It is unavailable unless `RUM_ROLLUP_READS=true`. The existing dashboard/RUM APIs are unchanged and remain the default.
+`GET /api/rum-rollups?siteId=<uuid>&bucket=5m|hourly&since=<ISO timestamp>` is authenticated against site ownership and is unavailable unless `RUM_ROLLUP_READS=true`. Raw-event APIs remain unchanged. The rollup read flag must remain false until the migration and aggregation are validated.
+
+## Retention
+
+No retention deletion is included. Agree a retention period and separately review an additive cleanup job before deleting any derived rollup rows. Existing raw RUM events are preserved.
 
 ## Rollback
 
-Set `RUM_ROLLUP_READS=false` and redeploy the app to return to existing raw-event reads. Stop calling the refresh function. Leave the additive tables and indexes in place; do not drop them during rollback. No existing RUM event or scan rows are modified by this migration.
+Set `RUM_ROLLUP_READS=false` and redeploy. Stop invoking the refresh function. Leave the additive tables and indexes in place; do not drop them as part of rollback.
+
+## Verification
+
+UNVERIFIED: PostgreSQL migration execution and query-plan comparison on disposable CI/preview database, owner to verify after deploy.
+UNVERIFIED: rollup refresh correctness against representative fixtures, owner to verify after deploy.
+UNVERIFIED: production scheduling and load profile, owner to verify after deploy.
