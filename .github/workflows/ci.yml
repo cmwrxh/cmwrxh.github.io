@@ -52,6 +52,7 @@ jobs:
           if [ -f tests/scanner-migration-test.sh ]; then bash tests/scanner-migration-test.sh; else echo 'Scanner migration test not present on this branch'; fi
           if [ -f tests/probe-agent-migration-test.sh ]; then bash tests/probe-agent-migration-test.sh; else echo 'Probe agent migration test not present on this branch'; fi
           if [ -f tests/rum-ingest-migration-test.sh ]; then bash tests/rum-ingest-migration-test.sh; else echo 'RUM migration test not present on this branch'; fi
+          if [ -f tests/db-rollup-migration-test.sh ]; then bash tests/db-rollup-migration-test.sh; else echo 'DB rollup migration test not present on this branch'; fi
           if [ -f tests/rollup-migration-test.sh ]; then bash tests/rollup-migration-test.sh; else echo 'Rollup migration test not present on this branch'; fi
       - name: JavaScript syntax checks
         run: |
