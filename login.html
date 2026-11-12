@@ -8,6 +8,11 @@
   <meta name="description" content="Sign in to your AfricaLatency account.">
   <meta name="robots" content="noindex, follow">
   <meta name="theme-color" content="#0A0E17">
+  <script>
+    if (['africalatency.dev', 'www.africalatency.dev'].includes(window.location.hostname)) {
+      window.location.replace('https://app.africalatency.dev' + window.location.pathname + window.location.search + window.location.hash);
+    }
+  </script>
 
 
   <link rel="stylesheet" href="/css/style.css">
@@ -121,7 +126,7 @@
         </div>
       </div>
 
-      <div class="google-signin-wrap" id="google-login" aria-label="Continue with Google"></div>
+      <button type="button" class="btn btn-secondary google-signin-wrap" id="google-login" aria-label="Continue with Google">Continue with Google</button>
       <div class="login-links">
         <a href="mailto:support@africalatency.dev?subject=Password%20reset" aria-label="Password reset help (email support; self-service reset is not available)">Forgot your password?</a><small class="auth-reset-note">Self-service password reset is not available yet. Email support for help.</small>
         <span>New to AfricaLatency? <a id="signup-link" href="/signup">Sign up</a></span>
@@ -153,13 +158,13 @@
   let supabaseClient = null;
   try {
     if (config && config.url && config.anonKey) {
-      supabaseClient = window.supabase.createClient(config.url, config.anonKey, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, storage: window.localStorage } });
+      supabaseClient = window.supabase.createClient(config.url, config.anonKey, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, flowType: 'implicit', storage: window.localStorage } });
     }
   } catch (err) { console.error('Supabase failed to load', err); }
 
   const form = document.getElementById('login-form');
   const params = new URLSearchParams(window.location.search);
-  const safeNext = window.AfricaLatencyAuthNext.getSafeNext(params.get('next'));
+  let safeNext = window.AfricaLatencyAuthNext.getSafeNext(params.get('next'));
   document.getElementById('signup-link').href = window.AfricaLatencyAuthNext.buildAuthTabHref('/signup',safeNext);document.getElementById('login-tab-login').href=window.AfricaLatencyAuthNext.buildAuthTabHref('/login',safeNext);document.getElementById('login-tab-signup').href=window.AfricaLatencyAuthNext.buildAuthTabHref('/signup',safeNext);
   const status = document.getElementById('login-status');
   const submit = document.getElementById('login-submit');
@@ -183,77 +188,56 @@
   });
 
 
-  const GOOGLE_CLIENT_ID = '949269030986-972e78l4lhk99h16h3t9i4aqm8cheebq.apps.googleusercontent.com';
+  const googleButton = document.getElementById('google-login');
 
-  async function handleGoogleCredential(response) {
-    if (!supabaseClient || !response || !response.credential) {
-      setStatus('Google sign-in is temporarily unavailable. Please try again.', true);
-      return;
-    }
-    setStatus('Google verified. Completing AfricaLatency sign-in…', false);
-    const googleButton = document.getElementById('google-login');
-    if (googleButton) googleButton.setAttribute('aria-busy', 'true');
-    try {
-      await exchangeGoogleCredential(response.credential);
-      setStatus('Signed in. Opening your dashboard…', false);
-      window.location.replace(new URL(safeNext, window.location.origin).href);
-    } catch (err) {
-      console.error('Google sign-in failed', err);
-      setStatus(err && err.message ? err.message : 'Could not complete Google sign-in. Please try again.', true);
-      if (googleButton) googleButton.removeAttribute('aria-busy');
-    }
+  function completeSignIn() {
+    window.location.replace(new URL(safeNext, window.location.origin).href);
   }
 
-  async function exchangeGoogleCredential(token) {
-    // Give users actionable feedback instead of leaving the button spinning forever.
-    const timeout = new Promise((_, reject) => {
-      window.setTimeout(() => reject(new Error('Google sign-in timed out while connecting to AfricaLatency. Check your connection and try again.')), 25000);
+  const storedNext = localStorage.getItem('al-auth-next');
+  if (storedNext) {
+    localStorage.removeItem('al-auth-next');
+    safeNext = window.AfricaLatencyAuthNext.getSafeNext(storedNext);
+  }
+
+  if (supabaseClient) {
+    // OAuth returns to this same app origin so the browser session is stored
+    // where the scan application reads it (app.africalatency.dev).
+    supabaseClient.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN' && session) completeSignIn();
     });
-    const exchange = (async () => {
-      const { data, error } = await supabaseClient.auth.signInWithIdToken({ provider: 'google', token });
+    supabaseClient.auth.getSession().then(({ data, error }) => {
       if (error) throw error;
-      let session = data && data.session;
-      if (!session) {
-        const result = await supabaseClient.auth.getSession();
-        if (result.error) throw result.error;
-        session = result.data && result.data.session;
-      }
-      if (!session) throw new Error('Google verified your account, but AfricaLatency could not save the session. Please try again.');
-      return session;
-    })();
-    return Promise.race([exchange, timeout]);
+      if (data && data.session) completeSignIn();
+    }).catch(err => {
+      console.error('Could not restore AfricaLatency session', err);
+    });
   }
 
-  function initializeGoogleSignIn() {
-    const container = document.getElementById('google-login');
-    if (!container || !window.google || !window.google.accounts || !window.google.accounts.id) {
-      setStatus('Google sign-in could not load. Check your connection and try again.', true);
+  googleButton.addEventListener('click', async () => {
+    if (!supabaseClient) {
+      setStatus('Sign-in is temporarily unavailable. Please try again or email support@africalatency.dev.', true);
       return;
     }
-    window.google.accounts.id.initialize({
-      client_id: GOOGLE_CLIENT_ID,
-      callback: handleGoogleCredential,
-      auto_select: false,
-      cancel_on_tap_outside: true
-    });
-    window.google.accounts.id.renderButton(container, {
-      type: 'standard',
-      theme: 'outline',
-      size: 'large',
-      text: 'continue_with',
-      shape: 'rectangular',
-      width: Math.min(400, Math.max(200, container.clientWidth || 400)),
-      logo_alignment: 'left'
-    });
-  }
-
-  const googleIdentityScript = document.createElement('script');
-  googleIdentityScript.src = 'https://accounts.google.com/gsi/client';
-  googleIdentityScript.async = true;
-  googleIdentityScript.defer = true;
-  googleIdentityScript.onload = initializeGoogleSignIn;
-  googleIdentityScript.onerror = () => setStatus('Google sign-in could not load. Check your connection and try again.', true);
-  document.head.appendChild(googleIdentityScript);
+    googleButton.disabled = true;
+    setStatus('Connecting to Google…', false);
+    try {
+      localStorage.setItem('al-auth-next', safeNext);
+      const { error } = await supabaseClient.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: window.location.origin + '/login',
+          queryParams: { prompt: 'select_account' }
+        }
+      });
+      if (error) throw error;
+      setStatus('Redirecting securely to Google…', false);
+    } catch (err) {
+      console.error('Google OAuth could not start', err);
+      setStatus(err && err.message ? err.message : 'Could not start Google sign-in. Please try again.', true);
+      googleButton.disabled = false;
+    }
+  });
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
