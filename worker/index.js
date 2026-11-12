@@ -253,11 +253,11 @@ async function saveFilmstrip(jobId, frames) {
         (async () => {
           const source = Buffer.from(match[2], 'base64');
           if (!source.length || source.length > 4 * 1024 * 1024) { dropped++; return; }
-          let output = await sharp(source, { limitInputPixels: 40000000 }).resize({ width: 900, withoutEnlargement: true }).jpeg({ quality: 78, mozjpeg: true }).toBuffer();
-          if (!output.length || output.length > 80 * 1024) {
-            output = await sharp(source, { limitInputPixels: 40000000 }).resize({ width: 640, withoutEnlargement: true }).jpeg({ quality: 60, mozjpeg: true }).toBuffer();
+          let output = await sharp(source, { limitInputPixels: 40000000 }).resize({ width: 1200, withoutEnlargement: true }).jpeg({ quality: 84, mozjpeg: true }).toBuffer();
+          if (!output.length || output.length > 250 * 1024) {
+            output = await sharp(source, { limitInputPixels: 40000000 }).resize({ width: 900, withoutEnlargement: true }).jpeg({ quality: 78, mozjpeg: true }).toBuffer();
           }
-          if (!output.length || output.length > 80 * 1024) { dropped++; return; }
+          if (!output.length || output.length > 250 * 1024) { dropped++; return; }
           const timing = Number.isFinite(Number(frame.timingMs)) ? Math.max(0, Math.round(Number(frame.timingMs))) : i;
           const path = jobId + '/filmstrip/' + String(i).padStart(2, '0') + '-' + timing + '.jpg';
           const { error } = await storage.upload(path, output, { contentType: 'image/jpeg', upsert: true });
@@ -291,8 +291,9 @@ async function signedFilmstrip(jobId) {
 }
 async function executeJob(job) {
   const update = async (fields) => supabase.from('scan_jobs').update({ ...fields, updated_at: new Date().toISOString() }).eq('id', job.id);
-  const user = job.user_id ? { id: job.user_id } : null;
-  const runCount = user ? 3 : 1;
+  // Keep standard scans to one Lighthouse pass. Serial three-pass audits multiplied
+  // browser runtime and caused otherwise healthy sites to time out under load.
+  const runCount = 1;
   await update({ status: 'processing', stage: 'fetching', progress: 12, error_message: null });
   const safeUrl = await validatePublicUrl(job.url);
   await update({ stage: 'lighthouse', progress: 30 });
@@ -465,7 +466,12 @@ app.post('/internal/jobs', async (req, res) => {
   const apiKey = String(req.headers['x-api-key'] || '');
   const keyRecord = apiKey ? await validateApiKey(apiKey) : null;
   if (apiKey && !keyRecord) return res.status(401).json({ error: 'Invalid API key.' });
-  if (!user && !keyRecord && turnstileVerified !== true) return res.status(403).json({ error: 'Bot verification is required.' });
+  const validGuestProof = firstGuestScan === true &&
+    typeof guestProofHash === 'string' && /^[a-f0-9]{64}$/.test(guestProofHash) &&
+    typeof deviceId === 'string' && /^[a-zA-Z0-9_-]{24,128}$/.test(deviceId);
+  if (!user && !keyRecord && turnstileVerified !== true && !validGuestProof) {
+    return res.status(403).json({ error: 'Guest scan verification is required.' });
+  }
   const ipHash = user || keyRecord ? null : hashIp(clientIp(req));
   const endpoint = keyRecord ? 'api-lighthouse' : 'scan';
   if (keyRecord) {
