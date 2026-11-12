@@ -33,6 +33,7 @@
   const count = document.getElementById('scan-queue-count');
   const elapsedLabel = document.getElementById('scan-elapsed');
   let scanStartedAt = 0, elapsedTimer = null;
+  let activeJob = null;
   function updateElapsed() {
     if (!elapsedLabel || !scanStartedAt) return;
     const seconds = Math.floor((Date.now() - scanStartedAt) / 1000);
@@ -119,19 +120,41 @@
     let lastStage = 'queued';
     const maxAttempts = scanTestMode ? 2 : 180;
     const pollDelay = scanTestMode ? 500 : 2000;
+    let transientFailures = 0;
     for (let attempt = 0; attempt < maxAttempts; attempt++) {
       const token = await getToken();
-      const response = await fetch('/api/scan/' + encodeURIComponent(jobId), { headers: token ? { Authorization: 'Bearer ' + token } : {} });
+      let response;
+      try {
+        response = await fetch('/api/scan/' + encodeURIComponent(jobId), { headers: token ? { Authorization: 'Bearer ' + token } : {} });
+      } catch {
+        if (transientFailures >= 3) {
+          throw Object.assign(new Error('Your scan was accepted, but its status is temporarily unreachable. Check this same scan again shortly.'), { code: 'SCAN_STATUS_UNAVAILABLE' });
+        }
+        stageTitle.textContent = 'Reconnecting to scan service…';
+        stageCopy.textContent = 'Your scan request is still being tracked. Checking its status again automatically.';
+        await new Promise(resolve => setTimeout(resolve, [1000, 2000, 4000][transientFailures++]));
+        continue;
+      }
+      if ([502, 503, 504].includes(response.status)) {
+        if (transientFailures >= 3) {
+          throw Object.assign(new Error('Your scan was accepted, but its status is temporarily unavailable. Check this same scan again shortly.'), { code: 'SCAN_STATUS_UNAVAILABLE' });
+        }
+        stageTitle.textContent = 'Reconnecting to scan service…';
+        stageCopy.textContent = 'Your scan request is still being tracked. Checking its status again automatically.';
+        await new Promise(resolve => setTimeout(resolve, [1000, 2000, 4000][transientFailures++]));
+        continue;
+      }
+      transientFailures = 0;
       const payload = await response.json().catch(() => ({}));
-      if (response.status === 503) throw new Error('The scan service is temporarily unavailable (HTTP 503). No result is being claimed. Please try again shortly.');
       if (response.status === 429) throw new Error(payload.error || 'Scan rate limit reached. Wait before trying again.');
       if (!response.ok) throw new Error(payload.error || 'Unable to retrieve scan status.');
       if (payload.screenshotUrl) showScreenshot(payload.screenshotUrl);
       if (payload.stage !== lastStage) { lastStage = payload.stage; setStage(payload.stage, payload.stage === 'queued' ? (payload.queuePosition || initialPosition) : null, payload.progress); }
       else if (payload.progress !== undefined) count.textContent = Number.isFinite(Number(payload.progress)) ? (Math.max(0,Math.min(100,Math.round(Number(payload.progress)))) + '% complete') : '';
       if (payload.status === 'partial' || payload.partial === true) { stageTitle.textContent = 'Partial results available'; stageCopy.textContent = 'Some checks returned evidence while others remain unavailable. Waiting for the scan to finish; missing values are not inferred.'; }
-      if (payload.status === 'failed') throw new Error('Scan failed: ' + (payload.error || 'The scan could not be completed.'));
+      if (payload.status === 'failed') { activeJob = null; throw new Error('Scan failed: ' + (payload.error || 'The scan could not be completed.')); }
       if (payload.status === 'completed') {
+        activeJob = null;
         stopElapsed();
         if (elapsedLabel) elapsedLabel.textContent = 'Completed in ' + elapsedLabel.textContent.replace(/^Elapsed /,'').replace(/ · typical duration.*$/,'');
         work.setAttribute('aria-busy','false');
@@ -179,10 +202,11 @@
   form.addEventListener('submit', async event => {
     event.preventDefault();
     setError('');
+    const resumeJob = activeJob;
     let url;
-    try { url = normalizeUrl(input.value); } catch (e) { setError(e.message); input.focus(); return; }
+    try { url = resumeJob ? resumeJob.url : normalizeUrl(input.value); } catch (e) { setError(e.message); input.focus(); return; }
     button.disabled = true;
-    button.textContent = 'Starting scan…';
+    button.textContent = resumeJob ? 'Checking scan…' : 'Starting scan…';
     scanStartedAt = Date.now();
     stopElapsed();
     updateElapsed();
@@ -192,6 +216,10 @@
     work.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
     setStage('queued');
     try {
+      if (resumeJob) {
+        await poll(resumeJob.jobId, resumeJob.reportId, resumeJob.queuePosition);
+        return;
+      }
       const token = await getToken();
       const payload = { url, device: selectedDevice, deviceId };
       if (!token) {
@@ -224,6 +252,7 @@
       if (response.status === 429) throw new Error(data.error || 'Scan rate limit reached. Wait before trying again.');
       if (!response.ok) throw new Error(data.error || 'Could not start the scan.');
       if (data.cacheHit) stageCopy.textContent = 'A recent scan of this URL and device is available. Reusing that result.';
+      activeJob = { jobId: data.jobId, reportId: data.reportId, queuePosition: data.queuePosition, url, device: selectedDevice };
       setStage('queued', data.queuePosition);
       await poll(data.jobId, data.reportId, data.queuePosition);
     } catch (e) {
@@ -233,12 +262,13 @@
       setError(message);
       if (/queue is full|queue full/i.test(message)) { stageTitle.textContent = 'Scan queue is full'; stageCopy.textContent = 'No scan job was accepted. Wait briefly and retry.'; }
       else if (/rate limit/i.test(message)) { stageTitle.textContent = 'Scan rate limit reached'; stageCopy.textContent = 'No additional scan was started. Wait for the limit window to reset before retrying.'; }
-      else if (/temporarily unavailable|HTTP 503|worker unavailable/i.test(message)) { stageTitle.textContent = 'Service temporarily unavailable'; stageCopy.textContent = 'The scan service did not return a usable result. No score is shown. You can retry shortly.'; }
+      else if (e.code === 'SCAN_STATUS_UNAVAILABLE' && activeJob) { stageTitle.textContent = 'Scan accepted; status temporarily unavailable'; stageCopy.textContent = 'Your original scan is still being tracked. Your website will not be scanned again when you check its status.'; }
+      else if (/temporarily unavailable|HTTP 503|worker unavailable/i.test(message)) { stageTitle.textContent = 'Scan service temporarily unavailable'; stageCopy.textContent = 'The scan could not be confirmed. No performance result is being reported. Please try again shortly.'; }
       else if (/taking longer than expected|reopen the report link/i.test(message)) { stageTitle.textContent = 'Scan timed out'; stageCopy.textContent = 'Polling has stopped. No final result is being claimed; you can retry the scan.'; }
       else if (/Scan failed:/i.test(message)) { stageTitle.textContent = 'Scan failed'; stageCopy.textContent = 'The reason is shown above. No missing measurements or scores are invented.'; }
       else { stageTitle.textContent = 'Scan paused'; stageCopy.textContent = 'Correct the issue above and try again.'; }
       button.disabled = false;
-      button.textContent = 'Run free scan';
+      button.textContent = activeJob ? 'Check scan status again' : 'Run free scan';
       if (window.turnstile && turnstileWidget !== null) { window.turnstile.reset(turnstileWidget); turnstileToken = ''; }
     }
   });
