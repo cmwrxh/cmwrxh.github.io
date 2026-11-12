@@ -72,6 +72,21 @@ test('device rate-limit hashes are retained for the full one-month guest window'
   assert.match(worker, /\.eq\('endpoint', 'scan-device'\)/);
 });
 
+
+test('guest first scan is allowed without Turnstile only when signed proof and device limits are present', async () => {
+  const fs = await import('node:fs');
+  const api = fs.readFileSync(new URL('../api/scan.js', import.meta.url), 'utf8');
+  const worker = fs.readFileSync(new URL('../worker/index.js', import.meta.url), 'utf8');
+  const ui = fs.readFileSync(new URL('../js/scan-v2.js', import.meta.url), 'utf8');
+  assert.match(api, /hasTurnstileSiteKey !== hasTurnstileSecret/);
+  assert.match(api, /if \(hasTurnstileSiteKey\)/);
+  assert.match(api, /firstGuestScan: true/);
+  assert.match(worker, /const validGuestProof = firstGuestScan === true/);
+  assert.match(worker, /p_endpoint: 'scan-device', p_max_requests: 1, p_window_minutes: 43200/);
+  assert.match(ui, /turnstileRequired = config\.turnstileRequired === true/);
+  assert.match(ui, /if \(!token && turnstileRequired\)/);
+});
+
 test('expired guest proof hashes are cleared without touching existing IP cache rows', async () => {
   const fs = await import('node:fs');
   const worker = fs.readFileSync(new URL('../worker/index.js', import.meta.url), 'utf8');
