@@ -168,7 +168,7 @@
     throw new Error('This scan is taking longer than expected. You can reopen the report link and check its status.');
   }
   async function setupTurnstile() {
-    const response = await fetch('/api/scan?config=1');
+    const response = await fetch('/api/scan?config=1', { signal: AbortSignal.timeout(5000) });
     const config = await response.json().catch(() => ({}));
     turnstileRequired = config.turnstileRequired === true && Boolean(config.turnstileSiteKey);
     if (!turnstileRequired) return;
@@ -199,7 +199,7 @@
     tipIndex = (tipIndex + 1) % tips.length;
     document.getElementById('scan-tip').textContent = tips[tipIndex];
   }, 6500);
-  setupTurnstile().catch(() => {});
+  const turnstileSetup = setupTurnstile().catch(() => {});
   form.addEventListener('submit', async event => {
     event.preventDefault();
     setError('');
@@ -221,6 +221,7 @@
         await poll(resumeJob.jobId, resumeJob.reportId, resumeJob.queuePosition);
         return;
       }
+      await turnstileSetup;
       const token = await getToken();
       const payload = { url, device: selectedDevice, deviceId };
       if (!token && turnstileRequired) {
