@@ -4,6 +4,7 @@ const base=process.env.SITE_BASE_URL||'http://127.0.0.1:4173';
 const browser=await chromium.launch({headless:true});
 const cases=[
  {name:'status-recovers-after-503',statuses:[503,200],body:{status:'completed',stage:'completed'},expect:null},
+ {name:'unavailable-start',postStatus:503,postBody:{error:'Scan worker is not configured.'},expect:'Scan service unavailable',error:'Scan worker is not configured'},
  {name:'queued',body:{status:'queued',stage:'queued',queuePosition:4},expect:'You are #4 in the queue'},
  {name:'running',body:{status:'running',stage:'lighthouse',progress:45},expect:'Analyzing with Lighthouse',progress:'45% complete'},
  {name:'partial',body:{status:'running',stage:'africa',progress:75,partial:true},expect:'Partial results available'},
@@ -23,7 +24,7 @@ try{
  if(item.name==='status-recovers-after-503'){await page.waitForURL('**/reports/**',{timeout:5000});}else{await page.waitForFunction(({expected,selector})=>document.querySelector(selector)?.textContent.includes(expected),{expected:item.expect,selector:item.name==='queued'?'#scan-queue-count':'#scan-stage'},{timeout:item.name==='unavailable'?12000:4000}).catch(async()=>{const text=await page.locator('#scan-stage').textContent();assert.ok(text?.includes(item.expect),item.name+' expected stage '+item.expect+', got '+text);});}
  if(item.progress)assert.ok((await page.locator('#scan-queue-count').textContent()).includes(item.progress),item.name+' progress visible');
  if(item.error)await page.waitForFunction(expected=>document.querySelector('#scan-error')?.textContent.includes(expected),item.error,{timeout:item.name==='unavailable'?12000:4000});
- if(['failed','lighthouse-timeout','unavailable','timeout','private-blocked','queue-full','rate-limited','turnstile-failure'].includes(item.name))assert.equal(await page.locator('#scan-run').isDisabled(),false,item.name+' leaves retry enabled');
+ if(['failed','lighthouse-timeout','unavailable','unavailable-start','timeout','private-blocked','queue-full','rate-limited','turnstile-failure'].includes(item.name))assert.equal(await page.locator('#scan-run').isDisabled(),false,item.name+' leaves retry enabled');
  if(item.name==='unavailable'){assert.equal(await page.locator('#scan-run').textContent(),'Check scan status again');await page.locator('#scan-run').click();await page.waitForTimeout(100);assert.equal(postCount,1,'checking an accepted scan must not submit a duplicate job');}
  console.log('PASS scan state: '+item.name+' ('+pollCount+' status request(s))');await page.close();}
  const page=await browser.newPage();await page.addInitScript(()=>{localStorage.setItem('africalatency_analytics_consent_v1','rejected')});await page.goto(base+'/scan?scan-test=1',{waitUntil:'domcontentloaded'});await page.locator('#scan-url').evaluate(el=>{el.type='text'});await page.locator('#scan-url').fill('not a url');await page.locator('#scan-run').click();await page.locator('#scan-error').waitFor({state:'visible'});assert.ok((await page.locator('#scan-error').textContent()).includes('Enter a public domain name, not a local hostname.'));console.log('PASS scan state: invalid URL');await page.close();
