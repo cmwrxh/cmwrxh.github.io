@@ -248,7 +248,7 @@
         button.textContent = 'Run free scan';
         return;
       }
-      if (response.status === 503) throw new Error('The scan service is temporarily unavailable (HTTP 503). No result is being claimed. Please try again shortly.');
+      if (response.status === 503) throw Object.assign(new Error(data.error || 'The scan service is temporarily unavailable (HTTP 503). No scan was confirmed.'), { code: 'SCAN_START_UNAVAILABLE' });
       if (response.status === 429) throw new Error(data.error || 'Scan rate limit reached. Wait before trying again.');
       if (!response.ok) throw new Error(data.error || 'Could not start the scan.');
       if (data.cacheHit) stageCopy.textContent = 'A recent scan of this URL and device is available. Reusing that result.';
@@ -263,6 +263,7 @@
       if (/queue is full|queue full/i.test(message)) { stageTitle.textContent = 'Scan queue is full'; stageCopy.textContent = 'No scan job was accepted. Wait briefly and retry.'; }
       else if (/rate limit/i.test(message)) { stageTitle.textContent = 'Scan rate limit reached'; stageCopy.textContent = 'No additional scan was started. Wait for the limit window to reset before retrying.'; }
       else if (e.code === 'SCAN_STATUS_UNAVAILABLE' && activeJob) { stageTitle.textContent = 'Scan accepted; status temporarily unavailable'; stageCopy.textContent = 'Your original scan is still being tracked. Your website will not be scanned again when you check its status.'; }
+      else if (e.code === 'SCAN_START_UNAVAILABLE') { stageTitle.textContent = 'Scan service unavailable'; stageCopy.textContent = 'No scan job was confirmed. The service reported: ' + message; }
       else if (/temporarily unavailable|HTTP 503|worker unavailable/i.test(message)) { stageTitle.textContent = 'Scan service temporarily unavailable'; stageCopy.textContent = 'The scan could not be confirmed. No performance result is being reported. Please try again shortly.'; }
       else if (/taking longer than expected|reopen the report link/i.test(message)) { stageTitle.textContent = 'Scan timed out'; stageCopy.textContent = 'Polling has stopped. No final result is being claimed; you can retry the scan.'; }
       else if (/Scan failed:/i.test(message)) { stageTitle.textContent = 'Scan failed'; stageCopy.textContent = 'The reason is shown above. No missing measurements or scores are invented.'; }
