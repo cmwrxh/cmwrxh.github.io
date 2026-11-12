@@ -57,10 +57,13 @@ test('missing dedicated and worker secrets do not accept a cookie', () => {
   assert.equal(readGuestProof({ headers: { cookie } }), null);
 });
 
-test('guest scan enforcement uses an atomic one-per-device monthly rate limit', async () => {
+test('guest scan enforcement commits the browser limit only for completed scans and releases it on failure', async () => {
   const fs = await import('node:fs');
   const worker = fs.readFileSync(new URL('../worker/index.js', import.meta.url), 'utf8');
   assert.match(worker, /p_endpoint: 'scan-device', p_max_requests: 1, p_window_minutes: 43200/);
+  assert.match(worker, /guest_device_hash: hashIp\('device:' \+ deviceId\)/);
+  assert.match(worker, /!retryable && job\.guest_device_hash[\s\S]*?\.eq\('endpoint', 'scan-device'\)/);
+  assert.match(worker, /resetGuestDeviceLimit === true/);
   assert.match(worker, /eq\('guest_proof_hash', proofHash\)[\s\S]*?select\('\*'\)\.maybeSingle\(\)/);
   assert.match(worker, /firstGuestScan \? \{ data: null \}/);
 });
@@ -81,6 +84,9 @@ test('guest first scan is allowed without Turnstile only when signed proof and d
   assert.match(api, /hasTurnstileSiteKey !== hasTurnstileSecret/);
   assert.match(api, /if \(hasTurnstileSiteKey\)/);
   assert.match(api, /firstGuestScan: true/);
+  assert.match(api, /internal\/guest-scan\//);
+  assert.match(api, /prior\.payload\?\.status === 'completed'/);
+  assert.match(api, /prior\.payload\?\.status === 'failed'/);
   assert.match(worker, /const validGuestProof = firstGuestScan === true/);
   assert.match(worker, /p_endpoint: 'scan-device', p_max_requests: 1, p_window_minutes: 43200/);
   assert.match(ui, /turnstileRequired = config\.turnstileRequired === true/);
