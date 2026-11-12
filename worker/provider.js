@@ -3,7 +3,7 @@ import * as chromeLauncher from 'chrome-launcher';
 import { summarizeRun, overallGrade } from './scoring.js';
 import { validateRedirectChain } from './url-safety.js';
 
-const timeoutMs = Math.max(60000, Math.min(90000, Number(process.env.LIGHTHOUSE_TIMEOUT_MS) || 75000));
+const timeoutMs = Math.max(90000, Math.min(120000, Number(process.env.LIGHTHOUSE_TIMEOUT_MS) || 90000));
 
 /**
  * Do not publish a completed report if Lighthouse returned an incomplete payload.
@@ -26,12 +26,24 @@ export function validateLighthouseResult(lhr) {
 
 async function runLighthouseOnce(url, device) {
   const safeUrl = await validateRedirectChain(url);
-  const chrome = await chromeLauncher.launch({
-    chromePath: process.env.CHROME_PATH || '/usr/bin/chromium',
-    chromeFlags: ['--headless', '--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--disable-gpu']
-  });
+  let chrome = null;
   let timer;
+  const deadline = Date.now() + timeoutMs;
+  const timeout = new Promise((_, reject) => {
+    timer = setTimeout(() => reject(new Error('Lighthouse timed out after ' + timeoutMs + 'ms.')), timeoutMs);
+  });
   try {
+    const launch = chromeLauncher.launch({
+      chromePath: process.env.CHROME_PATH || '/usr/bin/chromium',
+      chromeFlags: ['--headless', '--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--disable-gpu']
+    }).then(instance => {
+      if (Date.now() >= deadline) {
+        instance.kill().catch(() => {});
+        throw new Error('Lighthouse timed out after ' + timeoutMs + 'ms.');
+      }
+      return instance;
+    });
+    chrome = await Promise.race([launch, timeout]);
     const run = lighthouse(safeUrl, {
       port: chrome.port,
       output: 'json',
@@ -43,18 +55,17 @@ async function runLighthouseOnce(url, device) {
         ? { mobile: false, width: 1440, height: 1000, deviceScaleFactor: 1, disabled: true }
         : { mobile: true, width: 390, height: 844, deviceScaleFactor: 3, disabled: false }
     });
-    const timeout = new Promise((_, reject) => {
-      timer = setTimeout(() => reject(new Error('Timed out')), timeoutMs);
-    });
     const result = await Promise.race([run, timeout]);
     validateLighthouseResult(result?.lhr);
     return summarizeRun(result.lhr);
   } finally {
     clearTimeout(timer);
-    try {
-      await chrome.kill();
-    } catch {
-      // Ignore cleanup errors so they do not mask the Lighthouse result or original failure.
+    if (chrome) {
+      try {
+        await chrome.kill();
+      } catch {
+        // Ignore cleanup errors so they do not mask the Lighthouse result or original failure.
+      }
     }
   }
 }

@@ -51,7 +51,7 @@
     'A missing African probe is reported as unavailable, never as a slow or healthy result.',
     'Lighthouse is a controlled lab test. Real visitors can experience different results.'
   ];
-  let tipIndex = 0, tipTimer = null, selectedDevice = 'mobile', turnstileWidget = null, turnstileToken = '';
+  let tipIndex = 0, tipTimer = null, selectedDevice = 'mobile', turnstileWidget = null, turnstileToken = '', turnstileRequired = false;
   let deviceId = '';
   try {
     deviceId = localStorage.getItem('al-guest-device-id') || '';
@@ -168,9 +168,10 @@
     throw new Error('This scan is taking longer than expected. You can reopen the report link and check its status.');
   }
   async function setupTurnstile() {
-    const response = await fetch('/api/scan?config=1');
+    const response = await fetch('/api/scan?config=1', { signal: AbortSignal.timeout(5000) });
     const config = await response.json().catch(() => ({}));
-    if (!config.turnstileSiteKey) return;
+    turnstileRequired = config.turnstileRequired === true && Boolean(config.turnstileSiteKey);
+    if (!turnstileRequired) return;
     const host = document.getElementById('scan-turnstile');
     host.hidden = false;
     if (window.turnstile) return renderTurnstile(config.turnstileSiteKey);
@@ -198,7 +199,7 @@
     tipIndex = (tipIndex + 1) % tips.length;
     document.getElementById('scan-tip').textContent = tips[tipIndex];
   }, 6500);
-  setupTurnstile().catch(() => {});
+  const turnstileSetup = setupTurnstile().catch(() => {});
   form.addEventListener('submit', async event => {
     event.preventDefault();
     setError('');
@@ -220,9 +221,10 @@
         await poll(resumeJob.jobId, resumeJob.reportId, resumeJob.queuePosition);
         return;
       }
+      await turnstileSetup;
       const token = await getToken();
       const payload = { url, device: selectedDevice, deviceId };
-      if (!token) {
+      if (!token && turnstileRequired) {
         if (!turnstileToken) throw new Error('Complete the bot verification before running an anonymous scan.');
         payload.turnstileToken = turnstileToken;
       }

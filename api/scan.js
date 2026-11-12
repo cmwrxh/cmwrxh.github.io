@@ -48,7 +48,8 @@ async function sendToWorker(path, req, body, extraHeaders = {}) {
 
 export default async function handler(req, res) {
   if (req.method === 'GET' && req.query?.config === '1') {
-    return res.status(200).json({ turnstileSiteKey: process.env.TURNSTILE_SITE_KEY || null });
+    const turnstileConfigured = Boolean(process.env.TURNSTILE_SITE_KEY && process.env.TURNSTILE_SECRET_KEY);
+    return res.status(200).json({ turnstileSiteKey: turnstileConfigured ? process.env.TURNSTILE_SITE_KEY : null, turnstileRequired: turnstileConfigured });
   }
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'GET, POST');
@@ -81,8 +82,15 @@ export default async function handler(req, res) {
   const ip = String(req.headers['cf-connecting-ip'] || req.headers['x-forwarded-for'] || req.socket?.remoteAddress || 'unknown').split(',')[0].trim();
   let verified = false;
   if (!userToken) {
-    verified = await turnstileOk(body.turnstileToken, ip);
-    if (!verified) return res.status(403).json({ error: process.env.TURNSTILE_SITE_KEY ? 'Please complete the bot verification and try again.' : 'Anonymous scanning is not configured yet. Please sign in or try again later.' });
+    const hasTurnstileSiteKey = Boolean(process.env.TURNSTILE_SITE_KEY);
+    const hasTurnstileSecret = Boolean(process.env.TURNSTILE_SECRET_KEY);
+    if (hasTurnstileSiteKey !== hasTurnstileSecret) {
+      return res.status(503).json({ error: 'Guest scan protection is temporarily misconfigured. Please try again later.' });
+    }
+    if (hasTurnstileSiteKey) {
+      verified = await turnstileOk(body.turnstileToken, ip);
+      if (!verified) return res.status(403).json({ error: 'Please complete the bot verification and try again.' });
+    }
   }
   const guestNonce = !userToken ? newGuestProofNonce() : null;
   const result = await sendToWorker('/internal/jobs', req, {
