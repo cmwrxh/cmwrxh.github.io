@@ -3,7 +3,8 @@ import * as chromeLauncher from 'chrome-launcher';
 import { summarizeRun, overallGrade } from './scoring.js';
 import { validateRedirectChain } from './url-safety.js';
 
-const timeoutMs = Math.max(120000, Math.min(180000, Number(process.env.LIGHTHOUSE_TIMEOUT_MS) || 120000));
+const MAX_SCAN_TIMEOUT_MS = 110000;
+const configuredTimeoutMs = Math.max(1000, Math.min(MAX_SCAN_TIMEOUT_MS, Number(process.env.LIGHTHOUSE_TIMEOUT_MS) || MAX_SCAN_TIMEOUT_MS));
 
 /**
  * Do not publish a completed report if Lighthouse returned an incomplete payload.
@@ -24,7 +25,7 @@ export function validateLighthouseResult(lhr) {
   return lhr;
 }
 
-async function runLighthouseOnce(url, device) {
+async function runLighthouseOnce(url, device, timeoutMs) {
   const safeUrl = await validateRedirectChain(url);
   let chrome = null;
   let timer;
@@ -70,7 +71,7 @@ async function runLighthouseOnce(url, device) {
   }
 }
 
-async function runPageSpeed(url, device) {
+async function runPageSpeed(url, device, timeoutMs) {
   const key = process.env.PAGESPEED_API_KEY;
   if (!key) throw new Error('PageSpeed fallback is not configured.');
   const params = new URLSearchParams({ url, strategy: device === 'desktop' ? 'DESKTOP' : 'MOBILE', key });
@@ -83,16 +84,16 @@ async function runPageSpeed(url, device) {
   result.provider = 'PageSpeed Insights';
   return result;
 }
-async function runOne(url, device) {
+async function runOne(url, device, timeoutMs) {
   const provider = String(process.env.LIGHTHOUSE_PROVIDER || 'local').toLowerCase();
-  if (provider === 'pagespeed') return runPageSpeed(url, device);
+  if (provider === 'pagespeed') return runPageSpeed(url, device, timeoutMs);
   try {
-    const result = await runLighthouseOnce(url, device);
+    const result = await runLighthouseOnce(url, device, timeoutMs);
     result.provider = 'local Lighthouse';
     return result;
   } catch (error) {
     if (process.env.PAGESPEED_API_KEY) {
-      const fallback = await runPageSpeed(url, device);
+      const fallback = await runPageSpeed(url, device, timeoutMs);
       fallback.providerFallback = 'PageSpeed Insights';
       return fallback;
     }
@@ -100,9 +101,10 @@ async function runOne(url, device) {
   }
 }
 
-export async function runLighthouse(url, device, runCount = 1) {
+export async function runLighthouse(url, device, runCount = 1, options = {}) {
+  const timeoutMs = Math.max(1000, Math.min(configuredTimeoutMs, Number(options.timeoutMs) || configuredTimeoutMs));
   const runs = [];
-  for (let i = 0; i < runCount; i += 1) runs.push(await runOne(url, device));
+  for (let i = 0; i < runCount; i += 1) runs.push(await runOne(url, device, timeoutMs));
   if (runs.length === 1) return runs[0];
   const medianMetric = key => {
     const values = runs.map(r => r.metrics?.[key]).filter(Number.isFinite).sort((a,b) => a-b);
