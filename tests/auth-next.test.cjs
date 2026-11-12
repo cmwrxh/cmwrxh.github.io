@@ -12,6 +12,12 @@ test('login and signup use the app host as the canonical auth origin',()=>{
     assert.match(html,/africalatency\.dev.*www\.africalatency\.dev/s);
   }
 });
+test('login and signup show the Google brand mark on OAuth buttons',()=>{
+  for(const html of [loginHtml,signupHtml]){
+    assert.match(html,/<svg class="google-mark"/);
+    assert.match(html,/id="google-(?:login|signup)"[^>]*>[\s\S]*?<span>Continue with Google<\/span>/);
+  }
+});
 test('Google login uses Supabase OAuth redirect rather than a client-side ID-token exchange',()=>{
   for(const html of [loginHtml,signupHtml]){
     assert.match(html,/signInWithOAuth\(\{\s*provider:\s*'google'/);
