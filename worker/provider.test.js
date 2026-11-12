@@ -28,7 +28,8 @@ test('Lighthouse timeout includes Chrome startup and supports a bounded 120-seco
   const fs = await import('node:fs');
   const provider = fs.readFileSync(new URL('./provider.js', import.meta.url), 'utf8');
   assert.match(provider, /Math\.min\(120000/);
-  assert.match(provider, /Promise\.race\(\[chromeLauncher\.launch/);
+  assert.match(provider, /const launch = chromeLauncher\.launch/);
+  assert.match(provider, /chrome = await Promise\.race\(\[launch, timeout\]\)/);
 });
 test('accepts a complete Lighthouse payload', () => {
   const payload = {
