@@ -443,6 +443,9 @@ async function processQueue() {
             completed_at: new Date().toISOString(), updated_at: new Date().toISOString()
           };
       await supabase.from('scan_jobs').update(update).eq('id', job.id);
+      if (!retryable && job.guest_device_hash) {
+        await supabase.from('scan_rate_limits').delete().eq('ip_hash', job.guest_device_hash).eq('endpoint', 'scan-device');
+      }
       if (retryable) recordRetryScheduled(); else recordScanFailed();
       console.warn('[scan-worker] job ' + (retryable ? 'scheduled for retry:' : 'failed:'), job.id, rawMessage.slice(0, 300));
     }
@@ -479,7 +482,7 @@ app.get('/internal/metrics', async (_req, res) => {
 
 app.post('/internal/jobs', async (req, res) => {
   if (!supabase || !IP_HASH_SECRET) return res.status(503).json({ error: 'Scan worker is not configured.' });
-  const { url, device = 'mobile', turnstileVerified = false, guestProofHash, firstGuestScan = false, deviceId } = req.body || {};
+  const { url, device = 'mobile', turnstileVerified = false, guestProofHash, firstGuestScan = false, deviceId, resetGuestDeviceLimit = false } = req.body || {};
   if (!['mobile', 'desktop'].includes(device)) return res.status(400).json({ error: 'Invalid device.' });
   let normalized;
   try { normalized = await validatePublicUrl(url); } catch (e) { return res.status(400).json({ error: e.message }); }
@@ -517,6 +520,9 @@ app.post('/internal/jobs', async (req, res) => {
     if (ipError) return res.status(503).json({ error: 'Rate-limit service is temporarily unavailable.' });
     if (ipAllowed !== true) return res.status(429).json({ error: 'Anonymous scan protection limit reached for this network. Please sign in to continue.' });
     const deviceHash = hashIp('device:' + deviceId);
+    if (resetGuestDeviceLimit === true) {
+      await supabase.from('scan_rate_limits').delete().eq('ip_hash', deviceHash).eq('endpoint', 'scan-device');
+    }
     const { data: deviceAllowed, error: deviceError } = await supabase.rpc('check_scan_rate_limit', {
       p_ip_hash: deviceHash, p_endpoint: 'scan-device', p_max_requests: 1, p_window_minutes: 43200
     });
@@ -548,27 +554,48 @@ app.post('/internal/jobs', async (req, res) => {
     p_ip_hash: ipHash, p_max_queue: MAX_QUEUE
   });
   if (error) {
+    if (!user && !keyRecord && deviceId) await supabase.from('scan_rate_limits').delete().eq('ip_hash', hashIp('device:' + deviceId)).eq('endpoint', 'scan-device');
     if (String(error.message || '').includes('SCAN_QUEUE_FULL')) return res.status(429).json({ error: 'The scan queue is full right now. Please try again shortly.' });
     console.error('[scan-worker] enqueue failed:', String(error.message || error).slice(0,200));
     return res.status(503).json({ error: 'Unable to queue the scan.' });
   }
   const job = Array.isArray(jobRows) ? jobRows[0] : jobRows;
-  if (!job) return res.status(503).json({ error: 'Unable to queue the scan.' });
+  if (!job) {
+    if (!user && !keyRecord && deviceId) await supabase.from('scan_rate_limits').delete().eq('ip_hash', hashIp('device:' + deviceId)).eq('endpoint', 'scan-device');
+    return res.status(503).json({ error: 'Unable to queue the scan.' });
+  }
   let guestProofStored = false;
   if (!user && !keyRecord) {
     const proofExpiry = new Date(Date.now() + 30 * 86400000).toISOString();
     const { error: proofError } = await supabase.from('scan_jobs').update({
       guest_proof_hash: guestProofHash,
-      guest_proof_expires_at: proofExpiry
+      guest_proof_expires_at: proofExpiry,
+      guest_device_hash: hashIp('device:' + deviceId)
     }).eq('id', job.id).is('guest_proof_hash', null);
     if (proofError) {
       console.error('[scan-worker] guest proof persistence failed:', String(proofError.message || proofError).slice(0, 160));
+      await supabase.from('scan_rate_limits').delete().eq('ip_hash', hashIp('device:' + deviceId)).eq('endpoint', 'scan-device');
       return res.status(503).json({ error: 'Unable to secure this guest scan. Please sign in and try again.' });
     }
     guestProofStored = true;
   }
   const { count: ahead } = await supabase.from('scan_jobs').select('id', { count: 'exact', head: true }).in('status',['queued','processing']).lt('created_at',job.created_at);
   return res.status(202).json({ jobId: job.id, reportId: job.public_id, queuePosition: (ahead || 0) + 1, cacheHit: false, ...(guestProofStored ? { guestProofStored: true } : {}) });
+});
+
+app.get('/internal/guest-scan/:id', async (req, res) => {
+  if (!supabase) return res.status(503).json({ error: 'Worker is not configured.' });
+  const job = await findJob(String(req.params.id).slice(0, 80));
+  if (!job) return res.status(404).json({ error: 'Guest scan not found.' });
+  const nonce = String(req.headers['x-guest-proof-nonce'] || '');
+  const proofHash = nonce ? crypto.createHash('sha256').update(nonce).digest('hex') : '';
+  if (!proofHash || !job.guest_proof_hash || proofHash !== job.guest_proof_hash ||
+      !job.guest_proof_expires_at || new Date(job.guest_proof_expires_at).getTime() <= Date.now()) {
+    return res.status(403).json({ error: 'Guest scan proof is invalid or expired.' });
+  }
+  const { count: ahead } = await supabase.from('scan_jobs').select('id', { count: 'exact', head: true })
+    .in('status', ['queued', 'processing']).lt('created_at', job.created_at);
+  return res.json({ jobId: job.id, reportId: job.public_id, status: job.status, queuePosition: (ahead || 0) + 1 });
 });
 
 app.post('/internal/jobs/:id/claim', async (req, res) => {
