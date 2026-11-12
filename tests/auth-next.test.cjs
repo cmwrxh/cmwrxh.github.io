@@ -23,7 +23,7 @@ test('Google login uses Supabase OAuth redirect rather than a client-side ID-tok
 test('inline auth page scripts parse as JavaScript',()=>{
   const vm=require('node:vm');
   for(const [name,html] of [['login',loginHtml],['signup',signupHtml]]){
-    const scripts=[...html.matchAll(/<script(?:\\s[^>]*)?>([\\s\\S]*?)<\\/script>/gi)].map(match=>match[1]).filter(source=>source.trim());
+    const scripts=[...html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/gi)].map(match=>match[1]).filter(source=>source.trim());
     assert.ok(scripts.length>0,name+' should contain an inline auth script');
     for(const source of scripts)assert.doesNotThrow(()=>new vm.Script(source),name+' inline script should parse');
   }
