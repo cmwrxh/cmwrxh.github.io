@@ -51,7 +51,7 @@
     'A missing African probe is reported as unavailable, never as a slow or healthy result.',
     'Lighthouse is a controlled lab test. Real visitors can experience different results.'
   ];
-  let tipIndex = 0, tipTimer = null, selectedDevice = 'mobile', turnstileWidget = null, turnstileToken = '';
+  let tipIndex = 0, tipTimer = null, selectedDevice = 'mobile', turnstileWidget = null, turnstileToken = '', turnstileRequired = false;
   let deviceId = '';
   try {
     deviceId = localStorage.getItem('al-guest-device-id') || '';
@@ -170,7 +170,8 @@
   async function setupTurnstile() {
     const response = await fetch('/api/scan?config=1');
     const config = await response.json().catch(() => ({}));
-    if (!config.turnstileSiteKey) return;
+    turnstileRequired = config.turnstileRequired === true && Boolean(config.turnstileSiteKey);
+    if (!turnstileRequired) return;
     const host = document.getElementById('scan-turnstile');
     host.hidden = false;
     if (window.turnstile) return renderTurnstile(config.turnstileSiteKey);
@@ -222,7 +223,7 @@
       }
       const token = await getToken();
       const payload = { url, device: selectedDevice, deviceId };
-      if (!token) {
+      if (!token && turnstileRequired) {
         if (!turnstileToken) throw new Error('Complete the bot verification before running an anonymous scan.');
         payload.turnstileToken = turnstileToken;
       }
