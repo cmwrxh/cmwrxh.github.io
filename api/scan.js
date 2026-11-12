@@ -1,4 +1,5 @@
 import { readGuestProof, issueGuestProof, guestProofHash, newGuestProofNonce } from '../lib/guest-scan-proof.js';
+import { readBearerToken } from '../lib/bearer-token.mjs';
 
 const INTERNAL_TOKEN = process.env.SCAN_INTERNAL_TOKEN;
 
@@ -29,7 +30,7 @@ async function sendToWorker(path, req, body, extraHeaders = {}) {
   const base = workerUrl();
   if (!base || !INTERNAL_TOKEN) return { status: 503, payload: { error: 'Scan service is not configured yet.' } };
   const headers = { 'Content-Type': 'application/json', Authorization: 'Bearer ' + INTERNAL_TOKEN, ...extraHeaders };
-  const userToken = String(req.headers.authorization || '').replace(/^Bearer\s+/i, '').trim();
+  const userToken = readBearerToken(req.headers.authorization);
   if (userToken) headers['x-user-token'] = userToken;
   const ip = String(req.headers['cf-connecting-ip'] || req.ip || req.socket?.remoteAddress || 'unknown').split(',')[0].trim();
   if (ip !== 'unknown') headers['x-forwarded-for'] = ip;
@@ -54,7 +55,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
   const body = req.body || {};
-  const userToken = String(req.headers.authorization || '').replace(/^Bearer\\s+/i, '').trim();
+  const userToken = readBearerToken(req.headers.authorization);
   const guestProof = readGuestProof(req);
   if (!userToken && guestProof) {
     return res.status(429).json({
