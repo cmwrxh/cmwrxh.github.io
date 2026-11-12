@@ -18,6 +18,7 @@ const SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SEC
 const supabase = SUPABASE_URL && SERVICE_KEY ? createClient(SUPABASE_URL, SERVICE_KEY, { auth: { autoRefreshToken: false, persistSession: false } }) : null;
 const GP_API_TOKEN = process.env.GP_API_TOKEN;
 const MAX_QUEUE = Math.max(1, Math.min(50, Number(process.env.SCAN_MAX_QUEUE) || 12));
+const SCAN_TIMEOUT_MS = 110000;
 const RETENTION_DAYS = Math.max(1, Math.min(90, Number(process.env.SCAN_ANON_RETENTION_DAYS) || 7));
 const SCAN_RETRY_RECOVERY = process.env.SCAN_RETRY_RECOVERY === 'true';
 const PROBE_CONCURRENCY = process.env.PROBE_CONCURRENCY === 'true';
@@ -172,13 +173,13 @@ async function globalpingCountry(url, country, batchSignal) {
     return { country: country.name, countryCode: country.code, status: 'unavailable', rttMs: null, reason: 'Probe request failed' };
   }
 }
-async function getGoAfricaLatency(url) {
+async function getGoAfricaLatency(url, batchSignal) {
   if (!PROBE_ORCHESTRATOR_URL || !INTERNAL_TOKEN) throw new Error('Go probe orchestrator is not configured');
   const response = await fetch(PROBE_ORCHESTRATOR_URL + '/v1/probe', {
     method: 'POST',
     headers: { Authorization: 'Bearer ' + INTERNAL_TOKEN, 'Content-Type': 'application/json', Accept: 'application/json' },
     body: JSON.stringify({ target: new URL(url).hostname, countries }),
-    signal: AbortSignal.timeout(25000)
+    signal: batchSignal ? AbortSignal.any([batchSignal, AbortSignal.timeout(25000)]) : AbortSignal.timeout(25000)
   });
   if (!response.ok) throw new Error('Go probe orchestrator unavailable');
   const payload = await response.json();
@@ -188,18 +189,21 @@ async function getGoAfricaLatency(url) {
   }
   return payload;
 }
-async function runNodeAfricaLatency(url) {
+async function runNodeAfricaLatency(url, batchSignal) {
   // Preserve existing bounded Node/Globalping polling as the safe fallback.
   const out = [];
   const concurrency = PROBE_CONCURRENCY ? 4 : 2;
-  for (let i = 0; i < countries.length; i += concurrency) {
+  for (let i = 0; i < countries.length && !batchSignal?.aborted; i += concurrency) {
     const controller = new AbortController();
     const deadline = setTimeout(() => controller.abort(), 20000);
+    const abortBatch = () => controller.abort();
+    batchSignal?.addEventListener('abort', abortBatch, { once: true });
     try {
       const batch = countries.slice(i, i + concurrency);
       out.push(...await Promise.all(batch.map(country => globalpingCountry(url, country, controller.signal))));
     } finally {
       clearTimeout(deadline);
+      batchSignal?.removeEventListener('abort', abortBatch);
       controller.abort();
     }
   }
@@ -208,9 +212,10 @@ async function runNodeAfricaLatency(url) {
   const median = values.length ? (values.length % 2 ? values[(values.length - 1) / 2] : Math.round((values[values.length / 2 - 1] + values[values.length / 2]) / 2)) : null;
   return { countries: out, medianRttMs: median, measuredCountries: values.length, requestedCountries: countries.length };
 }
-async function getAfricaLatency(url) {
-  return runProbeEngine(PROBE_ENGINE, () => getGoAfricaLatency(url), () => runNodeAfricaLatency(url), async (node) => {
-    const go = await getGoAfricaLatency(url);
+async function getAfricaLatency(url, signal) {
+  return runProbeEngine(PROBE_ENGINE, () => getGoAfricaLatency(url, signal), () => runNodeAfricaLatency(url, signal), async (node) => {
+    if (signal?.aborted) return;
+    const go = await getGoAfricaLatency(url, signal);
     const sameShape = Array.isArray(go.countries) && go.countries.length === node.countries.length &&
       go.countries.every((item, index) => item.countryCode === node.countries[index].countryCode && ['measured', 'unavailable'].includes(item.status));
     if (!sameShape) console.warn('[scan-worker] Go probe shadow structure mismatch');
@@ -289,7 +294,9 @@ async function signedFilmstrip(jobId) {
     return frames;
   } catch (error) { console.warn('[scan-worker] filmstrip signing failed:', String(error?.message || error).slice(0, 160)); return []; }
 }
-async function executeJob(job) {
+async function executeJob(job, signal) {
+  const assertWithinDeadline = () => { if (signal?.aborted) throw new Error('Scan timed out after 110 seconds.'); };
+  const scanStartedAt = Date.now();
   const update = async (fields) => supabase.from('scan_jobs').update({ ...fields, updated_at: new Date().toISOString() }).eq('id', job.id);
   // Keep standard scans to one Lighthouse pass. Serial three-pass audits multiplied
   // browser runtime and caused otherwise healthy sites to time out under load.
@@ -298,7 +305,9 @@ async function executeJob(job) {
   const safeUrl = await validatePublicUrl(job.url);
   await update({ stage: 'lighthouse', progress: 30 });
   const lighthouseStarted = performance.now();
-  const lighthouseResult = await runLighthouse(safeUrl, job.device, runCount);
+  assertWithinDeadline();
+  const lighthouseResult = await runLighthouse(safeUrl, job.device, runCount, { timeoutMs: Math.max(1000, SCAN_TIMEOUT_MS - (Date.now() - scanStartedAt) - 12000) });
+  assertWithinDeadline();
   recordStage('lighthouse', performance.now() - lighthouseStarted);
   const screenshot = await saveScreenshot(job.id, lighthouseResult.screenshotDataUrl).catch(() => null);
   await saveFilmstrip(job.id, lighthouseResult.filmstripFrames).catch(error => console.warn('[scan-worker] filmstrip save failed:', String(error?.message || error).slice(0, 160)));
@@ -317,7 +326,11 @@ async function executeJob(job) {
   };
   await update({ stage: 'africa', progress: 72, screenshot });
   const probeStarted = performance.now();
-  const africaLatency = await getAfricaLatency(safeUrl);
+  const remainingProbeMs = SCAN_TIMEOUT_MS - (Date.now() - scanStartedAt) - 5000;
+  const africaLatency = remainingProbeMs > 1000
+    ? await getAfricaLatency(safeUrl, AbortSignal.any([signal, AbortSignal.timeout(remainingProbeMs)]))
+    : { countries: countries.map(c => ({ country: c.name, countryCode: c.code, status: 'unavailable', rttMs: null, reason: 'Scan time budget exhausted' })), medianRttMs: null, measuredCountries: 0, requestedCountries: countries.length };
+  assertWithinDeadline();
   recordStage('globalping', performance.now() - probeStarted);
   await update({ stage: 'report', progress: 92 });
   const result = {
@@ -343,11 +356,13 @@ async function executeJob(job) {
       testedFrom: process.env.TEST_LOCATION_LABEL || 'Cloud worker'
     }
   };
+  assertWithinDeadline();
   const { error } = await update({ status: 'completed', stage: 'completed', progress: 100, result, completed_at: new Date().toISOString(), error_message: null });
   if (error) throw error;
   recordScanCompleted();
   // Materialize the completed worker result for authenticated report history.
   // The scan_jobs record remains the execution source of truth.
+  assertWithinDeadline();
   const metrics = lighthouseResult.metrics || {};
   const scanRow = {
     scan_job_id: job.id,
@@ -405,7 +420,13 @@ async function processQueue() {
     lastJobAt = Date.now();
     recordScanStarted(Date.now() - new Date(job.created_at || Date.now()).getTime());
     try {
-      await executeJob(job);
+      const controller = new AbortController();
+      let deadlineTimer;
+      const deadline = new Promise((_, reject) => {
+        deadlineTimer = setTimeout(() => { controller.abort(); reject(new Error('Scan timed out after 110 seconds.')); }, SCAN_TIMEOUT_MS);
+      });
+      try { await Promise.race([executeJob(job, controller.signal), deadline]); }
+      finally { clearTimeout(deadlineTimer); }
     } catch (error) {
       const rawMessage = String(error?.message || error || '');
       const message = /timed out/i.test(rawMessage) ? 'Timed out while testing the website.' : /unreachable|ENOTFOUND|hostname could not be resolved/i.test(rawMessage) ? 'Site unreachable. Check that the public URL is correct.' : 'The scan could not be completed. Please try again later.';
