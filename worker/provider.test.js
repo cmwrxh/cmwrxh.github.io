@@ -24,11 +24,11 @@ test('standard worker scans use one Lighthouse pass to avoid serial multi-run ti
   assert.match(worker, /String\(1\)/);
   assert.doesNotMatch(worker, /user \? 3 : 1/);
 });
-test('Lighthouse timeout includes Chrome startup and defaults to 120 seconds with a bounded 180-second limit', async () => {
+test('Lighthouse timeout includes Chrome startup and is capped at 110 seconds', async () => {
   const fs = await import('node:fs');
   const provider = fs.readFileSync(new URL('./provider.js', import.meta.url), 'utf8');
-  assert.match(provider, /Math\.min\(180000/);
-  assert.match(provider, /\|\| 120000/);
+  assert.match(provider, /MAX_SCAN_TIMEOUT_MS = 110000/);
+  assert.match(provider, /Math\.min\(configuredTimeoutMs/);
   assert.match(provider, /const launch = chromeLauncher\.launch/);
   assert.match(provider, /chrome = await Promise\.race\(\[launch, timeout\]\)/);
 });
