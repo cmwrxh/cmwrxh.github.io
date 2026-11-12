@@ -38,10 +38,22 @@ test('expired signed guest proof is rejected', () => {
   assert.equal(readGuestProof({ headers: { cookie } }), null);
 });
 
-test('missing secret does not accept a cookie', () => {
+test('derives a dedicated guest-proof key from the worker secret when no override is set', () => {
+  delete process.env.GUEST_SCAN_COOKIE_SECRET;
+  process.env.SCAN_INTERNAL_TOKEN = 'unit-test-worker-token-with-sufficient-entropy';
+  const proof = issueGuestProof(reportId, newGuestProofNonce());
+  const cookie = proof.setCookie.split(';')[0];
+  const parsed = readGuestProof({ headers: { cookie } });
+  assert.equal(parsed.reportId, reportId);
+  delete process.env.SCAN_INTERNAL_TOKEN;
+});
+
+test('missing dedicated and worker secrets do not accept a cookie', () => {
+  process.env.GUEST_SCAN_COOKIE_SECRET = 'unit-test-secret-that-is-not-a-production-key';
   const proof = issueGuestProof(reportId, newGuestProofNonce());
   const cookie = proof.setCookie.split(';')[0];
   delete process.env.GUEST_SCAN_COOKIE_SECRET;
+  delete process.env.SCAN_INTERNAL_TOKEN;
   assert.equal(readGuestProof({ headers: { cookie } }), null);
 });
 
