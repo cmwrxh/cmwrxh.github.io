@@ -1,4 +1,4 @@
-import { readGuestProof, issueGuestProof, guestProofHash, newGuestProofNonce } from '../lib/guest-scan-proof.js';
+import { readGuestProof, issueGuestProof, guestProofHash, newGuestProofNonce, hasGuestProofSecret } from '../lib/guest-scan-proof.js';
 import { readBearerToken } from '../lib/bearer-token.mjs';
 
 const INTERNAL_TOKEN = process.env.SCAN_INTERNAL_TOKEN;
@@ -64,7 +64,7 @@ export default async function handler(req, res) {
       reportId: guestProof.reportId
     });
   }
-  if (!userToken && !process.env.GUEST_SCAN_COOKIE_SECRET) {
+  if (!userToken && !hasGuestProofSecret()) {
     return res.status(503).json({ error: 'Guest scan proof is not configured yet. Please sign in to continue.' });
   }
   const url = normalizedInput(body.url);
