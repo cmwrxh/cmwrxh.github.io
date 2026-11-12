@@ -267,7 +267,7 @@
       else if (e.code === 'SCAN_STATUS_UNAVAILABLE' && activeJob) { stageTitle.textContent = 'Scan accepted; status temporarily unavailable'; stageCopy.textContent = 'Your original scan is still being tracked. Your website will not be scanned again when you check its status.'; }
       else if (e.code === 'SCAN_START_UNAVAILABLE') { stageTitle.textContent = 'Scan service unavailable'; stageCopy.textContent = 'No scan job was confirmed. The service reported: ' + message; }
       else if (/temporarily unavailable|HTTP 503|worker unavailable/i.test(message)) { stageTitle.textContent = 'Scan service temporarily unavailable'; stageCopy.textContent = 'The scan could not be confirmed. No performance result is being reported. Please try again shortly.'; }
-      else if (/taking longer than expected|reopen the report link/i.test(message)) { stageTitle.textContent = 'Scan timed out'; stageCopy.textContent = 'Polling has stopped. No final result is being claimed; you can retry the scan.'; }
+      else if (/taking longer than expected|reopen the report link/i.test(message)) { stageTitle.textContent = 'Scan timed out'; stageCopy.textContent = 'Polling has stopped. No final result is being claimed. Check this same scan again to resume tracking; this will not start a second scan.'; }
       else if (/Scan failed:/i.test(message)) { stageTitle.textContent = 'Scan failed'; stageCopy.textContent = 'The reason is shown above. No missing measurements or scores are invented.'; }
       else { stageTitle.textContent = 'Scan paused'; stageCopy.textContent = 'Correct the issue above and try again.'; }
       button.disabled = false;
