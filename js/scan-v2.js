@@ -118,7 +118,7 @@
   }
   async function poll(jobId, reportId, initialPosition) {
     let lastStage = 'queued';
-    const maxAttempts = scanTestMode ? 2 : 180;
+    const maxAttempts = scanTestMode ? 6 : 180;
     const pollDelay = scanTestMode ? 500 : 2000;
     let transientFailures = 0;
     for (let attempt = 0; attempt < maxAttempts; attempt++) {
