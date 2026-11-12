@@ -28,14 +28,22 @@ async function runLighthouseOnce(url, device) {
   const safeUrl = await validateRedirectChain(url);
   let chrome = null;
   let timer;
+  const deadline = Date.now() + timeoutMs;
   const timeout = new Promise((_, reject) => {
     timer = setTimeout(() => reject(new Error('Lighthouse timed out after ' + timeoutMs + 'ms.')), timeoutMs);
   });
   try {
-    chrome = await Promise.race([chromeLauncher.launch({
+    const launch = chromeLauncher.launch({
       chromePath: process.env.CHROME_PATH || '/usr/bin/chromium',
       chromeFlags: ['--headless', '--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--disable-gpu']
-    }), timeout]);
+    }).then(instance => {
+      if (Date.now() >= deadline) {
+        instance.kill().catch(() => {});
+        throw new Error('Lighthouse timed out after ' + timeoutMs + 'ms.');
+      }
+      return instance;
+    });
+    chrome = await Promise.race([launch, timeout]);
     const run = lighthouse(safeUrl, {
       port: chrome.port,
       output: 'json',
