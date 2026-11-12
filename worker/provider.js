@@ -3,7 +3,7 @@ import * as chromeLauncher from 'chrome-launcher';
 import { summarizeRun, overallGrade } from './scoring.js';
 import { validateRedirectChain } from './url-safety.js';
 
-const timeoutMs = Math.max(90000, Math.min(120000, Number(process.env.LIGHTHOUSE_TIMEOUT_MS) || 90000));
+const timeoutMs = Math.max(120000, Math.min(180000, Number(process.env.LIGHTHOUSE_TIMEOUT_MS) || 120000));
 
 /**
  * Do not publish a completed report if Lighthouse returned an incomplete payload.
