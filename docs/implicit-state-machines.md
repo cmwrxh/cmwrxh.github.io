@@ -164,7 +164,7 @@ Dashboard data state is effectively `no_site | waiting_for_first_data | receivin
 
 **Sources:** `service-worker.js`, `manifest.json`, `offline.html`.
 
-**Observed lifecycle:** unregistered -> installing -> active shell cache -> network-first navigation/static requests -> offline fallback; a cache-name change removes prior cache versions. API responses, auth pages and reports are intentionally excluded.
+**Observed lifecycle:** unregistered -> installing -> active shell cache -> network-only navigation with offline fallback, plus network-first static assets with cache fallback; a cache-name change removes prior cache versions. API responses, auth pages and reports are intentionally excluded.
 
 **Implicit edges / risks:** cache policy and cache version are encoded in event handlers and a string constant. A stale shell can persist if the cache name is not bumped when required assets change. Offline fallback is not the same as an offline-capable authenticated app.
 
