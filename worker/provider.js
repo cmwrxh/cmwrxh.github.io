@@ -4,7 +4,9 @@ import { summarizeRun, overallGrade } from './scoring.js';
 import { validateRedirectChain } from './url-safety.js';
 
 const MAX_SCAN_TIMEOUT_MS = 110000;
-const configuredTimeoutMs = Math.max(1000, Math.min(MAX_SCAN_TIMEOUT_MS, Number(process.env.LIGHTHOUSE_TIMEOUT_MS) || MAX_SCAN_TIMEOUT_MS));
+// The product contract is a 110-second scan budget. Do not let a stale or
+// accidentally low environment override silently shorten Lighthouse scans.
+const configuredTimeoutMs = MAX_SCAN_TIMEOUT_MS;
 
 /**
  * Do not publish a completed report if Lighthouse returned an incomplete payload.

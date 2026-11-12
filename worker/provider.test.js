@@ -28,7 +28,8 @@ test('Lighthouse timeout includes Chrome startup and is capped at 110 seconds', 
   const fs = await import('node:fs');
   const provider = fs.readFileSync(new URL('./provider.js', import.meta.url), 'utf8');
   assert.match(provider, /MAX_SCAN_TIMEOUT_MS = 110000/);
-  assert.match(provider, /Math\.min\(configuredTimeoutMs/);
+  assert.match(provider, /const configuredTimeoutMs = MAX_SCAN_TIMEOUT_MS/);
+  assert.doesNotMatch(provider, /process\.env\.LIGHTHOUSE_TIMEOUT_MS/);
   assert.match(provider, /const launch = chromeLauncher\.launch/);
   assert.match(provider, /chrome = await Promise\.race\(\[launch, timeout\]\)/);
   const worker = fs.readFileSync(new URL('./index.js', import.meta.url), 'utf8');
