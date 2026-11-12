@@ -14,6 +14,8 @@ WORKDIR /app/worker
 COPY worker/package*.json ./
 RUN npm install --omit=dev
 COPY worker/ ./
+# worker/index.js imports this shared module from ../lib at runtime.
+COPY lib/engine-fallback.js /app/lib/engine-fallback.js
 USER node
 EXPOSE 3100
 CMD ["node", "index.js"]
