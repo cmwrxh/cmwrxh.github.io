@@ -23,7 +23,7 @@ app.use((req, res, next) => (RAW_BODY_PATHS.has(req.path) ? next() : urlencodedP
 const apiDir = path.join(__dirname, 'api');
 if (fs.existsSync(apiDir)) {
   for (const file of fs.readdirSync(apiDir)) {
-    if (!/\.(m?js|cjs)$/.test(file)) continue;
+    if (file === 'crawler-log-ingest.js' || !/\.(m?js|cjs)$/.test(file)) continue;
     const name = file.replace(/\.(m?js|cjs)$/, '');
     try {
       const mod = await import(pathToFileURL(path.join(apiDir, file)).href);
