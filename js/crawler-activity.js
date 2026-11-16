@@ -9,6 +9,11 @@ let projects=[],session=null;
 function node(tag,text){const el=document.createElement(tag);if(text!==undefined)el.textContent=String(text);return el;}
 function say(text,isError){message.textContent=text;message.dataset.state=isError?'error':'ok';}
 async function request(url,options={}){
+ if(!client)throw new Error('Account configuration unavailable.');
+ const authResult=await client.auth.getSession();
+ if(authResult.error)throw authResult.error;
+ session=authResult.data?.session||null;
+ if(!session?.access_token){window.location.href='/login.html';throw new Error('Your session expired.');}
  const response=await fetch(url,{...options,headers:{...(options.headers||{}),Authorization:'Bearer '+session.access_token,...(options.body?{'Content-Type':'application/json'}:{})}});
  const data=await response.json().catch(()=>({}));
  if(response.status===401){window.location.href='/login.html';throw new Error('Your session expired.');}
@@ -42,11 +47,17 @@ async function loadProjects(){
  if(projects.length){projectSelect.value=projects[0].id;await loadActivity();}
  else say('No crawler projects yet. Open Setup to create one.');
 }
+let activityRequestSequence=0,activityController=null;
 async function loadActivity(){
- const id=projectSelect.value;if(!id){say('Choose a project to view crawler activity.');return;}
+ const id=projectSelect.value,range=rangeSelect.value,sequence=++activityRequestSequence;
+ if(activityController)activityController.abort();
+ activityController=new AbortController();
+ const controller=activityController;
+ if(!id){say('Choose a project to view crawler activity.');return;}
  say('Loading crawler activity…');tbody.replaceChildren(node('tr'));
  try{
-  const data=await request('/api/crawler-activity?project_id='+encodeURIComponent(id)+'&range='+encodeURIComponent(rangeSelect.value));
+  const data=await request('/api/crawler-activity?project_id='+encodeURIComponent(id)+'&range='+encodeURIComponent(range),{signal:controller.signal});
+  if(sequence!==activityRequestSequence||controller.signal.aborted||projectSelect.value!==id||rangeSelect.value!==range)return;
   const t=data.totals||{};
   metrics.replaceChildren();
   [['Verified visits',t.verified],['HTTP errors (403/429/5xx)',t.errors],['Spoofed claims',t.spoofed]].forEach(([label,value])=>{const card=node('div');card.append(node('small',label),node('strong',Number(value||0).toLocaleString()));metrics.appendChild(card);});
@@ -54,9 +65,9 @@ async function loadActivity(){
   const rows=data.recent_events||[];
   if(!rows.length){const tr=node('tr');tr.append(node('td','No crawler events received yet.'));tr.firstChild.colSpan=5;tbody.appendChild(tr);}
   for(const event of rows){const tr=node('tr');[new Date(event.observed_at).toLocaleString(),event.bot_name,event.verification_status,event.http_status??'—',event.path].forEach(value=>tr.appendChild(node('td',value)));tbody.appendChild(tr);}
-  const trend=$('crawler-live-error-trend');if(trend){trend.replaceChildren();const buckets=data.error_timeline||[];const max=Math.max(1,...buckets.map(x=>x.count));for(const bucket of buckets){const row=node('div');row.className='crawler-live-trend-row';const label=node('small',new Date(bucket.hour).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}));const bar=node('span');bar.className='crawler-live-trend-bar';bar.style.width=(bucket.count/max*100)+'%';const count=node('strong',bucket.count);row.append(label,bar,count);trend.appendChild(row);}}
+  const trend=$('crawler-live-error-trend');if(trend){trend.replaceChildren();const buckets=data.error_timeline||[];const max=Math.max(1,...buckets.map(x=>x.count));for(const bucket of buckets){const row=node('div');row.className='crawler-live-trend-row';const date=new Date(bucket.hour);const labelText=range==='24h'?date.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}):date.toLocaleDateString([], {month:'short',day:'numeric'});const label=node('small',labelText);const bar=node('span');bar.className='crawler-live-trend-bar';bar.style.width=(bucket.count/max*100)+'%';const count=node('strong',bucket.count);row.append(label,bar,count);trend.appendChild(row);}}
   say('Showing '+rows.length+' recent events for '+data.project.domain+'. Refreshes every 60 seconds while this page is open.');
- }catch(error){say(error.message,true);}
+ }catch(error){if(error.name==='AbortError'||controller.signal.aborted)return;if(sequence===activityRequestSequence)say(error.message,true);}
 }
 $('crawler-live-refresh').addEventListener('click',loadActivity);
 projectSelect.addEventListener('change',loadActivity);rangeSelect.addEventListener('change',loadActivity);
