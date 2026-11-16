@@ -60,7 +60,7 @@ Cloudflare Logpush does not execute a Worker waitUntil callback. Configure Logpu
 
 In Next.js Edge middleware, use the platform execution context's waitUntil. The key must be a server-side environment variable.
 
-    export function middleware(request, event) {
+    import { NextResponse } from 'next/server';\n\nexport function middleware(request, event) {
       const response = NextResponse.next();
       const ua = request.headers.get('user-agent') || '';
       if (/GPTBot|OAI-SearchBot|ClaudeBot|PerplexityBot|Googlebot/i.test(ua)) {
@@ -84,7 +84,7 @@ In Next.js Edge middleware, use the platform execution context's waitUntil. The 
       return response;
     }
 
-For Next.js Node runtimes, use next/server after() or a bounded durable queue. Do not await ingestion on the request path.
+For Next.js Node runtimes, use next/server after() or a bounded durable queue. Do not await ingestion on the request path. The middleware example uses the NextFetchEvent waitUntil contract and should be adapted to the hosting runtime's supported API.
 
 ## Express / Node
 
