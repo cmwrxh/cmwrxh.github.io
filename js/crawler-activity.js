@@ -35,7 +35,7 @@ async function loadProjects(){
   const row=node('div');row.className='crawler-live-project-row';
   const details=node('div');details.append(node('strong',project.project_name),node('small',project.domain+' · '+((project.crawler_project_keys||[]).filter(k=>k.active).length)+' active key(s)'));
   row.append(details);
-  const issueKey=node('button','Issue new key');issueKey.type='button';issueKey.addEventListener('click',async()=>{try{const result=await request('/api/crawler-projects',{method:'POST',body:JSON.stringify({project_id:project.id})});const keyBox=$('crawler-live-key');keyBox.hidden=false;keyBox.textContent='New key for '+result.project.domain+' (shown once):\\n'+result.key.secret+'\\nStore as AFRICALATENCY_CRAWLER_KEY. Revoke the old key after deploying the new one.';await loadProjects();showTab('setup');}catch(error){$('crawler-live-setup-message').textContent=error.message;}});
+  const issueKey=node('button','Issue new key');issueKey.type='button';issueKey.addEventListener('click',async()=>{try{const result=await request('/api/crawler-projects',{method:'POST',body:JSON.stringify({project_id:project.id})});const keyBox=$('crawler-live-key');keyBox.hidden=false;keyBox.textContent='New key for '+result.project.domain+' (shown once):\n'+result.key.secret+'\nStore as AFRICALATENCY_CRAWLER_KEY. Revoke the old key after deploying the new one.';await loadProjects();showTab('setup');}catch(error){$('crawler-live-setup-message').textContent=error.message;}});
   row.append(issueKey);
   for(const key of project.crawler_project_keys||[]){
    if(!key.active)continue;
