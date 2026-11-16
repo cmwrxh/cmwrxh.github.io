@@ -13,5 +13,7 @@ export default async function handler(req,res){
   if(error)return res.status(503).json({error:'Could not load crawler events.'});
   const rows=events||[],verified=rows.filter(x=>x.verification_status==='verified_bot'),errors=rows.filter(x=>[403,429].includes(x.http_status)||(x.http_status>=500&&x.http_status<=599)),byBot={};
   for(const row of verified)byBot[row.bot_name]=(byBot[row.bot_name]||0)+1;
-  return res.status(200).json({project,range,from:since,totals:{events:rows.length,verified:verified.length,spoofed:rows.filter(x=>x.verification_status==='spoofed_bot').length,unverified:rows.filter(x=>x.verification_status==='unverified').length,errors:errors.length},by_bot:byBot,error_events:errors.slice(0,100),recent_events:rows.slice(0,100)});
+  const errorHours=new Map();for(const row of errors){const hour=new Date(row.observed_at);hour.setMinutes(0,0,0);const key=hour.toISOString();errorHours.set(key,(errorHours.get(key)||0)+1);}
+  const errorTimeline=Array.from({length:Math.min(24,HOURS[range])},(_,i)=>{const hour=new Date(Date.now()-(Math.min(24,HOURS[range])-1-i)*3600000);hour.setMinutes(0,0,0);const key=hour.toISOString();return{hour:key,count:errorHours.get(key)||0};});
+  return res.status(200).json({project,range,from:since,error_timeline:errorTimeline,totals:{events:rows.length,verified:verified.length,spoofed:rows.filter(x=>x.verification_status==='spoofed_bot').length,unverified:rows.filter(x=>x.verification_status==='unverified').length,errors:errors.length},by_bot:byBot,error_events:errors.slice(0,100),recent_events:rows.slice(0,100)});
 }
