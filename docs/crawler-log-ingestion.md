@@ -4,7 +4,7 @@ Endpoint: POST https://africalatency.dev/api/v1/ingest/crawler-logs
 Authentication: Authorization: Bearer clg_live_<secret>
 Content-Type: application/json
 
-Send 1–100 events per batch (maximum request body 256 KiB). Each event requires a host, timestamp, user_agent, source_ip, http_status and path. Optional fields: response_time_ms, bytes_served, country_edge_code.
+Send 1–100 events per batch (maximum request body 256 KiB). Each event requires host, timestamp, user_agent, source_ip, http_status and path. Optional fields: response_time_ms, bytes_served, country_edge_code.
 
 Example payload:
 {
@@ -21,11 +21,11 @@ Example payload:
   }]
 }
 
-Never send query strings, cookies, authorization headers, request bodies, full URLs, or end-user identifiers. Source IP is used transiently for verification and is not stored. Project domain/subdomains are checked against the registered project.
+Never send query strings, cookies, authorization headers, request bodies, full URLs, or end-user identifiers. Source IP is used transiently for verification and is not stored. The event host must match the registered project domain or a subdomain.
 
 ## Cloudflare Worker
 
-The following is a Worker wrapper pattern. Bind the origin as an environment service binding named ORIGIN and store the key as a Worker secret named AFRICALATENCY_CRAWLER_KEY.
+Bind the origin as an environment service binding named ORIGIN. Store the key as a Worker secret named AFRICALATENCY_CRAWLER_KEY. The example observes the response and schedules ingestion with waitUntil, so the client response is not delayed by AfricaLatency.
 
     export default {
       async fetch(request, env, ctx) {
@@ -54,13 +54,15 @@ The following is a Worker wrapper pattern. Bind the origin as an environment ser
       }
     };
 
-Cloudflare Logpush does not execute a Worker waitUntil callback. Configure Logpush to a customer-owned queue or collector, then map ClientIP, ClientRequestUserAgent, EdgeResponseStatus, ClientRequestPath, EdgeResponseBytes and EdgeStartTimestamp into the same schema. Batch 25–100 records before forwarding.
+Cloudflare Logpush does not execute a Worker waitUntil callback. Configure Logpush to a customer-owned queue or collector, then map ClientIP, ClientRequestUserAgent, EdgeResponseStatus, ClientRequestPath, EdgeResponseBytes and EdgeStartTimestamp into the event schema. Batch 25–100 records before forwarding.
 
 ## Next.js middleware
 
-In Next.js Edge middleware, use the platform execution context's waitUntil. The key must be a server-side environment variable.
+In Next.js Edge middleware, use the NextFetchEvent waitUntil contract. The key must be a server-side environment variable. Adapt source IP and country fields to the trusted platform headers available in your deployment.
 
-    import { NextResponse } from 'next/server';\n\nexport function middleware(request, event) {
+    import { NextResponse } from 'next/server';
+
+    export function middleware(request, event) {
       const response = NextResponse.next();
       const ua = request.headers.get('user-agent') || '';
       if (/GPTBot|OAI-SearchBot|ClaudeBot|PerplexityBot|Googlebot/i.test(ua)) {
@@ -71,7 +73,7 @@ In Next.js Edge middleware, use the platform execution context's waitUntil. The 
           source_ip: request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || '',
           http_status: response.status,
           path: request.nextUrl.pathname,
-          response_time_ms: 0,
+          response_time_ms: null,
           bytes_served: null,
           country_edge_code: request.headers.get('cf-ipcountry') || null
         };
@@ -84,22 +86,69 @@ In Next.js Edge middleware, use the platform execution context's waitUntil. The 
       return response;
     }
 
-For Next.js Node runtimes, use next/server after() or a bounded durable queue. Do not await ingestion on the request path. The middleware example uses the NextFetchEvent waitUntil contract and should be adapted to the hosting runtime's supported API.
+For Next.js Node runtimes, use next/server after() or a bounded durable queue. Do not await ingestion on the request path. Do not trust arbitrary forwarded IP headers; configure the hosting proxy to overwrite them.
 
 ## Express / Node
 
-Place a middleware after response status and byte count are known. Capture only bot-like requests and enqueue a compact event into a bounded queue (for example, 1000 entries). A background worker flushes batches of up to 100 and retries with capped exponential backoff. Drop oldest records once the queue is full rather than delaying the origin response. Do not use unbounded promises.
+Install after trusted proxy configuration. It sends after the response finishes and never awaits the ingestion request. Configure the actual trusted proxy count; do not blindly trust arbitrary X-Forwarded-For values.
+
+    app.set('trust proxy', 1);
+    app.use((req, res, next) => {
+      const started = process.hrtime.bigint();
+      res.once('finish', () => {
+        const ua = String(req.headers['user-agent'] || '');
+        if (!/GPTBot|OAI-SearchBot|ClaudeBot|PerplexityBot|Googlebot/i.test(ua)) return;
+        const event = {
+          host: req.hostname,
+          timestamp: new Date().toISOString(),
+          user_agent: ua,
+          source_ip: req.ip,
+          http_status: res.statusCode,
+          path: req.path,
+          response_time_ms: Number((process.hrtime.bigint() - started) / 1000000n),
+          bytes_served: Number(res.getHeader('content-length') || 0) || null,
+          country_edge_code: req.headers['cf-ipcountry'] || null
+        };
+        void fetch('https://africalatency.dev/api/v1/ingest/crawler-logs', {
+          method: 'POST',
+          headers: { authorization: 'Bearer ' + process.env.AFRICALATENCY_CRAWLER_KEY, 'content-type': 'application/json' },
+          body: JSON.stringify({ events: [event] })
+        }).catch(() => {});
+      });
+      next();
+    });
+
+This fire-and-forget approach can lose an event if the process exits immediately after responding. At higher volume, replace it with a bounded queue or durable queue, batch up to 100 events and retry with capped exponential backoff. Never use unbounded promises.
 
 ## Nginx / Caddy
 
-Prefer a local Fluent Bit or Vector tailer over shelling out from the request path. Emit structured JSON access logs with timestamp, host, request path without query string, status, request time, body bytes sent, user agent and the real client IP as established by trusted proxy configuration. Tailer batches 25–100 records, retries with capped exponential backoff and caps its disk buffer. For Caddy, use structured JSON access logs and a Vector/Fluent Bit transform.
+Nginx example (configure real_ip only for trusted proxy CIDRs; otherwise remote_addr may be your CDN):
 
-## Verification
+    log_format crawler_json escape=json
+      '{ "host":"$host","timestamp":"$time_iso8601","user_agent":"$http_user_agent",'
+      '"source_ip":"$remote_addr","http_status":$status,"path":"$uri",'
+      '"response_time_ms":"$request_time","bytes_served":$body_bytes_sent,'
+      '"country_edge_code":"$http_cf_ipcountry" }';
+    access_log /var/log/nginx/crawler-access.json crawler_json;
+
+Caddy example:
+
+    example.com {
+      log {
+        output file /var/log/caddy/access.json
+        format json
+      }
+    }
+
+Use Vector or Fluent Bit to tail structured logs, filter supported bot user agents, map the fields to the event schema, strip query strings, convert Nginx request_time seconds to integer milliseconds, and batch 25–100 events. Retry with capped exponential backoff and cap the disk buffer. Do not run shell commands or synchronous HTTP calls from the request path.
+
+## Verification limits
 
 - GPTBot and OAI-SearchBot: OpenAI official IP feeds.
 - ClaudeBot: Anthropic's official crawler IP feed.
 - PerplexityBot: Perplexity's published IP feed.
 - Googlebot: Google's published crawler IP ranges, with forward-confirmed reverse DNS fallback.
-- Google-Extended is a robots.txt control token, not a distinct HTTP crawler identity; it cannot be counted as a separate visit in access logs.
+- Google-Extended is a robots.txt control token, not a distinct HTTP crawler identity. It cannot be counted as a separate visit in access logs.
+- ChatGPT-User is a user-triggered fetcher, not an automatic crawler; it is intentionally excluded from crawler totals.
 
-A published-range match establishes that the source address is in the operator's published crawler network. It is not a cryptographic signature. Feed data is cached for six hours. Events from claimed bots that have an authoritative feed but do not match are marked spoofed_bot. If no authoritative source can establish identity, they remain unverified.
+A published-range match establishes that the source address is in the operator's published crawler network. It is not a cryptographic signature. Feed data is cached for six hours. Claimed bots with authoritative feeds that do not match are marked spoofed_bot. When no authoritative source can establish identity, events remain unverified.
