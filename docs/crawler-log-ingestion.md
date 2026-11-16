@@ -91,7 +91,7 @@ In Next.js Edge middleware, use the NextFetchEvent waitUntil contract. The key m
       return response;
     }
 
-For Next.js Node runtimes, use next/server after() or a bounded durable queue. Do not await ingestion on the request path. Do not trust arbitrary forwarded IP headers; configure the hosting proxy to overwrite them.
+This middleware example records request metadata only; Next.js middleware cannot see the final downstream response status, so http_status remains null. Use CDN/access logs when 403/429/5xx visibility is required. This sends one event per matching request and is intended for lower-volume sites; use Cloudflare Queues or a log collector with batching for high-volume sites. Do not trust arbitrary forwarded IP headers; configure the hosting proxy to overwrite them. For Next.js Node runtimes, use next/server after() or a bounded durable queue. Do not await ingestion on the request path.
 
 ## Express / Node
 
