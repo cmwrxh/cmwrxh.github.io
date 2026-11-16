@@ -64,3 +64,52 @@ begin
 end; $$;
 revoke all on function public.crawler_allow_ingest(uuid,integer,integer,integer) from public,anon,authenticated;
 grant execute on function public.crawler_allow_ingest(uuid,integer,integer,integer) to service_role;
+
+grant all on table public.crawler_projects, public.crawler_project_keys,
+  public.crawler_log_events, public.crawler_ingest_rate_limits to service_role;
+grant usage, select on sequence public.crawler_log_events_id_seq to service_role;
+
+create or replace function public.crawler_activity_summary(p_project_id uuid, p_since timestamptz)
+returns jsonb
+language sql
+security definer
+set search_path = pg_catalog, public
+as $$
+with filtered as (
+  select bot_name, verification_status, http_status, observed_at
+  from public.crawler_log_events
+  where project_id = p_project_id and observed_at >= p_since
+),
+totals as (
+  select count(*) as events,
+    count(*) filter (where verification_status = 'verified_bot') as verified,
+    count(*) filter (where verification_status = 'spoofed_bot') as spoofed,
+    count(*) filter (where verification_status = 'unverified') as unverified,
+    count(*) filter (where http_status in (403,429) or http_status between 500 and 599) as errors
+  from filtered
+),
+bots as (
+  select bot_name, count(*) as n from filtered
+  where verification_status = 'verified_bot' group by bot_name
+),
+hours as (
+  select generate_series(date_trunc('hour', now()) - interval '23 hours',
+                         date_trunc('hour', now()), interval '1 hour') as hour
+),
+hourly_errors as (
+  select date_trunc('hour', observed_at) as hour, count(*) as n
+  from filtered
+  where http_status in (403,429) or http_status between 500 and 599
+  group by 1
+)
+select jsonb_build_object(
+  'totals', (select to_jsonb(totals) from totals),
+  'by_bot', coalesce((select jsonb_object_agg(bot_name,n) from bots), '{}'::jsonb),
+  'error_timeline', coalesce((
+    select jsonb_agg(jsonb_build_object('hour',hours.hour,'count',coalesce(hourly_errors.n,0)) order by hours.hour)
+    from hours left join hourly_errors using(hour)
+  ), '[]'::jsonb)
+);
+$$;
+revoke all on function public.crawler_activity_summary(uuid,timestamptz) from public, anon, authenticated;
+grant execute on function public.crawler_activity_summary(uuid,timestamptz) to service_role;
