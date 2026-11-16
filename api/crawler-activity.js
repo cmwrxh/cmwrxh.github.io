@@ -11,5 +11,7 @@ export default async function handler(req,res){
   const since=new Date(Date.now()-HOURS[range]*3600000).toISOString();
   const {data:events,error}=await admin.from('crawler_log_events').select('observed_at,bot_name,verification_status,http_status,path,response_time_ms,bytes_served,country_edge_code').eq('project_id',projectId).gte('observed_at',since).order('observed_at',{ascending:false}).limit(1000);
   if(error)return res.status(503).json({error:'Could not load crawler events.'});
-  const {data:summary,error:summaryError}=await admin.rpc('crawler_activity_summary',{p_project_id:projectId,p_since:since});\n  if(summaryError||!summary)return res.status(503).json({error:'Crawler activity aggregation is unavailable.'});\n  return res.status(200).json({project,range,from:since,...summary,recent_events:events||[]});
+  const {data:summary,error:summaryError}=await admin.rpc('crawler_activity_summary',{p_project_id:projectId,p_since:since});
+  if(summaryError||!summary)return res.status(503).json({error:'Crawler activity aggregation is unavailable.'});
+  return res.status(200).json({project,range,from:since,...summary,recent_events:events||[]});
 }
