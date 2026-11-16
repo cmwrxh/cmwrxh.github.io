@@ -40,7 +40,7 @@ export default async function handler(req,res){
       p_key_id:key.id,p_request_limit:key.requests_per_hour,p_event_limit:key.requests_per_hour*100,p_event_count:events.length
     });
     if(rateError){console.error('[crawler-ingest] rate limiter failed:',rateError.code||'database error');return res.status(503).json({error:'Crawler ingestion rate limiter is unavailable.'});}
-    if(allowed!==true)return res.status(429).json({error:'Crawler ingestion rate limit reached.'});
+    if(allowed!==true){res.setHeader('Retry-After',String(Math.max(1,Math.ceil((3600000-(Date.now()%3600000))/1000))));return res.status(429).json({error:'Crawler ingestion rate limit reached.'});}
 
     const projectDomain=String(key.crawler_projects.domain||'').toLowerCase();
     const candidates=events.filter(event=>{
