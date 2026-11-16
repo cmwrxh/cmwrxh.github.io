@@ -4,7 +4,7 @@ import { verifyCrawler } from '../lib/crawler-bot-verification.js';
 const MAX_EVENTS=100,MAX_BODY_BYTES=256*1024,KEY_RE=/^clg_live_[a-f0-9]{64}$/;
 const hashKey=key=>crypto.createHash('sha256').update(key).digest('hex');
 const intOrNull=(value,min,max)=>value===null||value===undefined||value===''?null:Number.isInteger(Number(value))&&Number(value)>=min&&Number(value)<=max?Number(value):null;
-function validateEvent(event){
+export function validateCrawlerEvent(event){
   if(!event||typeof event!=='object'||Array.isArray(event))return 'Each event must be an object.';
   if(typeof event.timestamp!=='string'||!event.timestamp.trim()||!Number.isFinite(Date.parse(event.timestamp)))return 'Every event requires a valid timestamp.';
   const time=Date.parse(event.timestamp),now=Date.now();
@@ -28,7 +28,7 @@ export default async function handler(req,res){
   if(!match||!KEY_RE.test(match[1]))return res.status(401).json({error:'Invalid crawler ingestion key.'});
   const events=req.body?.events;
   if(!Array.isArray(events)||events.length<1||events.length>MAX_EVENTS)return res.status(400).json({error:'Send between 1 and 100 events per batch.'});
-  for(let i=0;i<events.length;i++){const error=validateEvent(events[i]);if(error)return res.status(400).json({error,index:i});}
+  for(let i=0;i<events.length;i++){const error=validateCrawlerEvent(events[i]);if(error)return res.status(400).json({error,index:i});}
   let admin;try{admin=getRumAdminClient();}catch{return res.status(503).json({error:'Crawler ingestion storage is unavailable.'});}
   try{
     const {data:key,error:keyError}=await admin.from('crawler_project_keys')
