@@ -164,7 +164,7 @@ Use Vector or Fluent Bit to tail structured logs, filter supported bot user agen
 ## Verification limits
 
 - GPTBot and OAI-SearchBot: OpenAI official IP feeds.
-- ClaudeBot: Anthropic's official crawler IP feed.
+- ClaudeBot: Anthropic currently says it does not publish crawler IP ranges; classify these requests as unverified unless a trusted CDN/provider supplies an independent verified-bot signal.
 - PerplexityBot: Perplexity's published IP feed.
 - Googlebot: Google's published crawler IP ranges, with forward-confirmed reverse DNS fallback.
 - Google-Extended is a robots.txt control token, not a distinct HTTP crawler identity. It cannot be counted as a separate visit in access logs.
