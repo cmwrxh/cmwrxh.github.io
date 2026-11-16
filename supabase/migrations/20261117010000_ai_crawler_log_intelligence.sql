@@ -67,7 +67,8 @@ grant execute on function public.crawler_allow_ingest(uuid,integer,integer,integ
 
 grant all on table public.crawler_projects, public.crawler_project_keys,
   public.crawler_log_events, public.crawler_ingest_rate_limits to service_role;
-revoke all on sequence public.crawler_log_events_id_seq from public, anon, authenticated;\ngrant usage, select on sequence public.crawler_log_events_id_seq to service_role;
+revoke all on sequence public.crawler_log_events_id_seq from public, anon, authenticated;
+grant usage, select on sequence public.crawler_log_events_id_seq to service_role;
 
 create or replace function public.crawler_activity_summary(p_project_id uuid, p_since timestamptz)
 returns jsonb
