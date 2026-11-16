@@ -47,11 +47,12 @@ async function loadActivity(){
   const data=await request('/api/crawler-activity?project_id='+encodeURIComponent(id)+'&range='+encodeURIComponent(rangeSelect.value));
   const t=data.totals||{};
   metrics.replaceChildren();
-  [['Verified visits',t.verified],['HTTP errors',t.errors],['Spoofed claims',t.spoofed]].forEach(([label,value])=>{const card=node('div');card.append(node('small',label),node('strong',Number(value||0).toLocaleString()));metrics.appendChild(card);});
+  [['Verified visits',t.verified],['HTTP errors (403/429/5xx)',t.errors],['Spoofed claims',t.spoofed]].forEach(([label,value])=>{const card=node('div');card.append(node('small',label),node('strong',Number(value||0).toLocaleString()));metrics.appendChild(card);});
   tbody.replaceChildren();
   const rows=data.recent_events||[];
   if(!rows.length){const tr=node('tr');tr.append(node('td','No crawler events received yet.'));tr.firstChild.colSpan=5;tbody.appendChild(tr);}
   for(const event of rows){const tr=node('tr');[new Date(event.observed_at).toLocaleString(),event.bot_name,event.verification_status,event.http_status??'—',event.path].forEach(value=>tr.appendChild(node('td',value)));tbody.appendChild(tr);}
+  const trend=$('crawler-live-error-trend');if(trend){trend.replaceChildren();const buckets=data.error_timeline||[];const max=Math.max(1,...buckets.map(x=>x.count));for(const bucket of buckets){const row=node('div');row.className='crawler-live-trend-row';const label=node('small',new Date(bucket.hour).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}));const bar=node('span');bar.className='crawler-live-trend-bar';bar.style.width=(bucket.count/max*100)+'%';const count=node('strong',bucket.count);row.append(label,bar,count);trend.appendChild(row);}}
   say('Showing '+rows.length+' recent events for '+data.project.domain+'. Refreshes every 60 seconds while this page is open.');
  }catch(error){say(error.message,true);}
 }
