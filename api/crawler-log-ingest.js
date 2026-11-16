@@ -8,7 +8,7 @@ export function validateCrawlerEvent(event){
   if(!event||typeof event!=='object'||Array.isArray(event))return 'Each event must be an object.';
   if(typeof event.timestamp!=='string'||!/^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\.[0-9]+)?(?:Z|[+-][0-9]{2}:[0-9]{2})$/.test(event.timestamp)||!Number.isFinite(Date.parse(event.timestamp)))return 'Every event requires a valid timestamp.';
   const time=Date.parse(event.timestamp),now=Date.now();
-  if(time>now+300000||time<now-90*86400000)return 'Event timestamp is outside the accepted 90-day window.';
+  if(time>now+300000||time<now-30*86400000)return 'Event timestamp is outside the accepted 30-day retention window.';
   if(!Number.isInteger(event.http_status)||event.http_status<100||event.http_status>599)return 'Every event requires an integer http_status between 100 and 599.';
   if(typeof event.path!=='string'||!event.path.startsWith('/')||event.path.length>512||/[?#]/.test(event.path))return 'Every event requires a path beginning with / and without a query string or fragment.';
   if(typeof event.host!=='string'||!event.host.trim())return 'Every event requires a host.';
