@@ -8,6 +8,7 @@ test('identifies named crawler user agents without trusting them',()=>{assert.eq
 test('normalizes equivalent IPv6 spellings before FCrDNS comparison',()=>{
   assert.equal(normalizeIp('2001:0db8:0000:0000:0000:0000:0000:0001'),normalizeIp('2001:db8::1'));
   assert.equal(normalizeIp('::ffff:192.0.2.1'),normalizeIp('192.0.2.1'));
+  assert.equal(normalizeIp('::ffff:c000:201'),normalizeIp('192.0.2.1'));
 });
 
 import {validateCrawlerEvent} from '../api/crawler-log-ingest.js';
