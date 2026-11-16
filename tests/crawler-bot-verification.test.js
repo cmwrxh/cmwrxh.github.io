@@ -12,7 +12,7 @@ test('normalizes equivalent IPv6 spellings before FCrDNS comparison',()=>{
 
 import {validateCrawlerEvent} from '../api/crawler-log-ingest.js';
 const validCrawlerEvent={
-  idempotency_key:'event-12345678',host:'example.com',timestamp:'2026-11-17T00:00:00.000Z',
+  idempotency_key:'event-12345678',host:'example.com',timestamp:new Date(Date.now()-1000).toISOString(),
   user_agent:'GPTBot/1.0',source_ip:'192.0.2.1',http_status:200,path:'/pricing'
 };
 test('requires timestamp, HTTP status, path and stable idempotency key',()=>{
