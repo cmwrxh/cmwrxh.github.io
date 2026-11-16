@@ -178,6 +178,10 @@
   ],
   "rewrites": [
     {
+      "source": "/api/v1/ingest/crawler-logs",
+      "destination": "/api/crawler-log-ingest"
+    },
+    {
       "source": "/about",
       "destination": "/about.html"
     },
