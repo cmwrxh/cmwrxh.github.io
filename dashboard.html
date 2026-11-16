@@ -15,6 +15,7 @@
     <link rel="preload" href="/fonts/plus-jakarta-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="/fonts/plus-jakarta-sans-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/crawler-activity.css">
 
     <style>
         * {
@@ -641,6 +642,39 @@
                 <p id="crawler-audit-message" role="status" aria-live="polite">Audits are limited to five requests per account per minute.</p>
                 <div id="crawler-audit-results" aria-live="polite"></div>
             </div>
+
+            <div class="crawler-live-card" id="crawler-live-activity">
+                <div class="crawler-live-heading">
+                    <div><span class="crawler-live-kicker">New · Log-based monitoring</span><h3>Live Crawler Activity</h3>
+                    <p>Verify real crawler visits from your own edge or access logs. This is separate from the read-only audit above.</p></div>
+                    <span class="crawler-live-state">Opt-in</span>
+                </div>
+                <div class="crawler-live-tabs" role="tablist" aria-label="Crawler intelligence views">
+                    <button type="button" class="crawler-live-tab is-active" data-crawler-view="activity" aria-selected="true">Activity</button>
+                    <button type="button" class="crawler-live-tab" data-crawler-view="setup" aria-selected="false">Setup</button>
+                </div>
+                <div id="crawler-live-activity-view">
+                    <div class="crawler-live-controls">
+                        <select id="crawler-live-project" aria-label="Crawler project"><option value="">Choose a project</option></select>
+                        <select id="crawler-live-range" aria-label="Activity period"><option value="24h">24 hours</option><option value="7d">7 days</option><option value="30d">30 days</option></select>
+                        <button type="button" id="crawler-live-refresh">Refresh</button>
+                    </div>
+                    <div class="crawler-live-metrics" id="crawler-live-metrics"><div><small>Verified visits</small><strong>—</strong></div><div><small>HTTP errors</small><strong>—</strong></div><div><small>Spoofed claims</small><strong>—</strong></div></div>
+                    <p id="crawler-live-message" role="status" aria-live="polite">Create a project in Setup to begin receiving crawler logs.</p>
+                    <div class="crawler-live-table-wrap"><table class="crawler-live-table"><thead><tr><th>Time</th><th>Bot</th><th>Verification</th><th>HTTP</th><th>Path</th></tr></thead><tbody id="crawler-live-events"><tr><td colspan="5">No events loaded.</td></tr></tbody></table></div>
+                </div>
+                <div id="crawler-live-setup-view" hidden>
+                    <form id="crawler-live-project-form" class="crawler-live-project-form">
+                        <label>Project name<input name="project_name" maxlength="120" required placeholder="Production website"></label>
+                        <label>Domain<input name="domain" type="text" required placeholder="example.com"></label>
+                        <button type="submit" id="crawler-live-create">Create project &amp; API key</button>
+                    </form>
+                    <p id="crawler-live-setup-message" role="status" aria-live="polite">The secret is shown once. Store it as a server-side environment variable, never in browser code.</p>
+                    <pre id="crawler-live-key" hidden></pre>
+                    <div id="crawler-live-project-list"></div>
+                    <p class="crawler-live-privacy">Only timestamp, bot, verification result, HTTP status, path, timing, bytes and edge country are stored. Source IP is used transiently for verification and is not retained.</p>
+                </div>
+            </div>
         </section>
 
         <section class="section" id="reports-history" aria-labelledby="reports-heading">
@@ -1234,6 +1268,7 @@
 </script>
 
   <script src="/js/rum-beta-dashboard.js?v=1" defer></script>
+  <script src="/js/crawler-activity.js?v=1" defer></script>
   <script src="/js/sitewide-africa-dot-matrix.js?v=1" defer></script>
   <script src="/js/site-header.js" defer></script>
 </body>
