@@ -29,4 +29,4 @@ jobs:
         with:
           node-version: 22
       - run: npm install --ignore-scripts
-      - run: node --test tests/crawler-bot-verification.test.js
+      - run: node --check api/crawler-log-ingest.js && node --check api/crawler-projects.js && node --check api/crawler-activity.js && node --check lib/crawler-bot-verification.js && node --check js/crawler-activity.js && node --test tests/crawler-bot-verification.test.js
