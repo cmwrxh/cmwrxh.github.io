@@ -6,7 +6,7 @@ const hashKey=key=>crypto.createHash('sha256').update(key).digest('hex');
 const intOrNull=(value,min,max)=>value===null||value===undefined||value===''?null:Number.isInteger(Number(value))&&Number(value)>=min&&Number(value)<=max?Number(value):null;
 export function validateCrawlerEvent(event){
   if(!event||typeof event!=='object'||Array.isArray(event))return 'Each event must be an object.';
-  if(typeof event.timestamp!=='string'||!event.timestamp.trim()||!Number.isFinite(Date.parse(event.timestamp)))return 'Every event requires a valid timestamp.';
+  if(typeof event.timestamp!=='string'||!/^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\\.[0-9]+)?(?:Z|[+-][0-9]{2}:[0-9]{2})$/.test(event.timestamp)||!Number.isFinite(Date.parse(event.timestamp)))return 'Every event requires a valid timestamp.';
   const time=Date.parse(event.timestamp),now=Date.now();
   if(time>now+300000||time<now-90*86400000)return 'Event timestamp is outside the accepted 90-day window.';
   if(!Number.isInteger(event.http_status)||event.http_status<100||event.http_status>599)return 'Every event requires an integer http_status between 100 and 599.';
