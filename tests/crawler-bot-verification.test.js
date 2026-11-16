@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
 import {cidrMatch,identifyBot,normalizeIp} from '../lib/crawler-bot-verification.js';
 test('matches IPv4 CIDR ranges',()=>{assert.equal(cidrMatch('192.0.2.44','192.0.2.0/24'),true);assert.equal(cidrMatch('192.0.3.1','192.0.2.0/24'),false);});
 test('matches IPv6 CIDR ranges',()=>{assert.equal(cidrMatch('2001:db8::1','2001:db8::/32'),true);assert.equal(cidrMatch('2001:db9::1','2001:db8::/32'),false);});
@@ -26,4 +27,11 @@ test('requires timestamp, HTTP status, path and stable idempotency key',()=>{
 test('rejects invalid HTTP status and query-bearing paths',()=>{
   assert.match(validateCrawlerEvent({...validCrawlerEvent,http_status:99}),/http_status/);
   assert.match(validateCrawlerEvent({...validCrawlerEvent,path:'/pricing?token=secret'}),/path/);
+});
+
+test('versioned crawler ingestion route resolves on Express and Vercel',()=>{
+  const vercel=JSON.parse(readFileSync(new URL('../vercel.json',import.meta.url),'utf8'));
+  const server=readFileSync(new URL('../server.js',import.meta.url),'utf8');
+  assert.ok(vercel.rewrites.some(rule=>rule.source==='/api/v1/ingest/crawler-logs'&&rule.destination==='/api/crawler-log-ingest'));
+  assert.ok(server.includes("app.all('/api/v1/ingest/crawler-logs'"));
 });
