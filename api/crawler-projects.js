@@ -18,6 +18,16 @@ export default async function handler(req,res){
     const {data,error}=await admin.from('crawler_projects').select('id,project_name,domain,is_active,created_at,crawler_project_keys(id,key_prefix,label,active,created_at,last_used_at)').eq('owner_id',auth.user.id).order('created_at',{ascending:false});
     if(error)return res.status(503).json({error:'Could not load crawler projects.'});return res.status(200).json({projects:data||[]});
   }
+  const requestedProjectId=String(req.body?.project_id||'');
+  if(requestedProjectId){
+    if(!/^[0-9a-f-]{36}$/i.test(requestedProjectId))return res.status(400).json({error:'A valid project_id is required.'});
+    const {data:owned,error:ownedError}=await admin.from('crawler_projects').select('id,project_name,domain').eq('id',requestedProjectId).eq('owner_id',auth.user.id).maybeSingle();
+    if(ownedError||!owned)return res.status(404).json({error:'Crawler project not found.'});
+    const secret='clg_live_'+crypto.randomBytes(32).toString('hex'),keyHash=crypto.createHash('sha256').update(secret).digest('hex');
+    const {data:key,error:keyError}=await admin.from('crawler_project_keys').insert({project_id:owned.id,key_hash:keyHash,key_prefix:secret.slice(0,18)}).select('id,key_prefix,label,active').single();
+    if(keyError||!key)return res.status(503).json({error:'Could not issue a new crawler key.'});
+    return res.status(201).json({project:owned,key:{...key,secret},warning:'Copy this key now. It cannot be retrieved later.'});
+  }
   const projectName=String(req.body?.project_name||'').trim().slice(0,120),domain=normalizedHostname(req.body?.domain);
   if(!projectName||!domain)return res.status(400).json({error:'Enter a project name and valid domain.'});
   const {data:project,error:projectError}=await admin.from('crawler_projects').insert({owner_id:auth.user.id,project_name:projectName,domain}).select('id,project_name,domain').single();
