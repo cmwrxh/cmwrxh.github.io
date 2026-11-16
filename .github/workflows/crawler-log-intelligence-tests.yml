@@ -7,6 +7,10 @@ on:
       - 'docs/crawler-log-ingestion.md'
       - 'js/crawler-activity.js'
       - 'vercel.json'
+      - 'supabase/migrations/20261117010000_ai_crawler_log_intelligence.sql'
+      - 'docs/crawler-log-ingestion.md'
+      - 'js/crawler-activity.js'
+      - 'vercel.json'
       - 'api/crawler-projects.js'
       - 'api/crawler-activity.js'
       - 'lib/crawler-bot-verification.js'
@@ -17,6 +21,10 @@ on:
     branches: [main]
     paths:
       - 'api/crawler-log-ingest.js'
+      - 'supabase/migrations/20261117010000_ai_crawler_log_intelligence.sql'
+      - 'docs/crawler-log-ingestion.md'
+      - 'js/crawler-activity.js'
+      - 'vercel.json'
       - 'api/crawler-projects.js'
       - 'api/crawler-activity.js'
       - 'lib/crawler-bot-verification.js'
