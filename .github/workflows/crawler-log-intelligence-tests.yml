@@ -3,6 +3,10 @@ on:
   pull_request:
     paths:
       - 'api/crawler-log-ingest.js'
+      - 'supabase/migrations/20261117010000_ai_crawler_log_intelligence.sql'
+      - 'docs/crawler-log-ingestion.md'
+      - 'js/crawler-activity.js'
+      - 'vercel.json'
       - 'api/crawler-projects.js'
       - 'api/crawler-activity.js'
       - 'lib/crawler-bot-verification.js'
@@ -29,4 +33,4 @@ jobs:
         with:
           node-version: 22
       - run: npm install --ignore-scripts
-      - run: node --check api/crawler-log-ingest.js && node --check api/crawler-projects.js && node --check api/crawler-activity.js && node --check lib/crawler-bot-verification.js && node --check js/crawler-activity.js && node --check server.js && node --test tests/crawler-bot-verification.test.js
+      - run: node --check api/crawler-log-ingest.js && node --check api/crawler-projects.js && node --check api/crawler-activity.js && node --check lib/crawler-bot-verification.js && node --check js/crawler-activity.js && node --check server.js && node -e "JSON.parse(require('fs').readFileSync('vercel.json','utf8'))" && node --test tests/crawler-bot-verification.test.js
