@@ -27,6 +27,9 @@ export default async function handler(req,res){
       if(!event||typeof event!=='object')continue;
       const observed=new Date(event.timestamp||Date.now());
       if(!Number.isFinite(observed.getTime())||observed.getTime()>Date.now()+300000||observed.getTime()<Date.now()-90*86400000)continue;
+      const host=String(event.host||'').toLowerCase().replace(/\\.$/,'');
+      const projectDomain=String(key.crawler_projects.domain||'').toLowerCase();
+      if(!host || (host!==projectDomain && !host.endsWith('.'+projectDomain)))continue;
       const ua=String(event.user_agent||'').slice(0,1024),sourceIp=String(event.source_ip||'').trim();
       const verified=await verifyCrawler({userAgent:ua,sourceIp});
       if(verified.botName==='other')continue;
