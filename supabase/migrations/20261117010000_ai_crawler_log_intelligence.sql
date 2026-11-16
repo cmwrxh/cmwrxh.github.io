@@ -46,7 +46,7 @@ alter table public.crawler_projects enable row level security;
 alter table public.crawler_project_keys enable row level security;
 alter table public.crawler_log_events enable row level security;
 alter table public.crawler_ingest_rate_limits enable row level security;
-revoke all on public.crawler_projects, public.crawler_project_keys, public.crawler_log_events, public.crawler_ingest_rate_limits from anon, authenticated;
+revoke all on public.crawler_projects, public.crawler_project_keys, public.crawler_log_events, public.crawler_ingest_rate_limits from public, anon, authenticated;
 create or replace function public.crawler_allow_ingest(p_key_id uuid, p_request_limit integer default 1200, p_event_limit integer default 120000, p_event_count integer default 1)
 returns boolean language plpgsql security definer set search_path = pg_catalog, public as $$
 declare allowed boolean; hour_start timestamptz := date_trunc('hour', now());
@@ -67,7 +67,7 @@ grant execute on function public.crawler_allow_ingest(uuid,integer,integer,integ
 
 grant all on table public.crawler_projects, public.crawler_project_keys,
   public.crawler_log_events, public.crawler_ingest_rate_limits to service_role;
-grant usage, select on sequence public.crawler_log_events_id_seq to service_role;
+revoke all on sequence public.crawler_log_events_id_seq from public, anon, authenticated;\ngrant usage, select on sequence public.crawler_log_events_id_seq to service_role;
 
 create or replace function public.crawler_activity_summary(p_project_id uuid, p_since timestamptz)
 returns jsonb
