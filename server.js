@@ -11,15 +11,19 @@ app.set('trust proxy', true); // behind Coolify's Traefik proxy
 // handler reads the stream itself. Body parsers must not consume it first.
 const RAW_BODY_PATHS = new Set(['/api/paystack-webhook']);
 const jsonParser = express.json();
+const crawlerLogParser = express.json({ limit: '256kb' });
 const urlencodedParser = express.urlencoded({ extended: true });
-app.use((req, res, next) => (RAW_BODY_PATHS.has(req.path) ? next() : jsonParser(req, res, next)));
+app.use((req, res, next) => {
+  if (RAW_BODY_PATHS.has(req.path)) return next();
+  return (req.path === '/api/v1/ingest/crawler-logs' ? crawlerLogParser : jsonParser)(req, res, next);
+});
 app.use((req, res, next) => (RAW_BODY_PATHS.has(req.path) ? next() : urlencodedParser(req, res, next)));
 
 // 1. Auto-mount api/*.js as /api/<name> (Vercel-style handlers)
 const apiDir = path.join(__dirname, 'api');
 if (fs.existsSync(apiDir)) {
   for (const file of fs.readdirSync(apiDir)) {
-    if (!/\.(m?js|cjs)$/.test(file)) continue;
+    if (file === 'crawler-log-ingest.js' || !/\.(m?js|cjs)$/.test(file)) continue;
     const name = file.replace(/\.(m?js|cjs)$/, '');
     try {
       const mod = await import(pathToFileURL(path.join(apiDir, file)).href);
@@ -38,6 +42,17 @@ if (fs.existsSync(apiDir)) {
     }
   }
 }
+
+// Dedicated versioned crawler-log ingestion route. Kept separate from the read-only audit.
+app.all('/api/v1/ingest/crawler-logs', async (req, res) => {
+  try {
+    const mod = await import(pathToFileURL(path.join(__dirname, 'api', 'crawler-log-ingest.js')).href);
+    await (mod.default || mod)(req, res);
+  } catch (e) {
+    console.error('Error in /api/v1/ingest/crawler-logs:', e);
+    if (!res.headersSent) res.status(500).json({ error: 'Crawler ingestion failed.' });
+  }
+});
 
 // Dynamic Scan V2 status route and versioned Lighthouse API alias.
 app.all('/api/scan/:jobId', async (req, res) => {
