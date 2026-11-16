@@ -44,17 +44,22 @@ Bind the origin as an environment service binding named ORIGIN. Store the key as
             bytes_served: Number(response.headers.get('content-length') || 0) || null,
             country_edge_code: request.cf?.country || null
           };
-          ctx.waitUntil(fetch('https://africalatency.dev/api/v1/ingest/crawler-logs', {
-            method: 'POST',
-            headers: { authorization: 'Bearer ' + env.AFRICALATENCY_CRAWLER_KEY, 'content-type': 'application/json' },
-            body: JSON.stringify({ events: [event] })
-          }).catch(() => {}));
+          ctx.waitUntil(env.CRAWLER_EVENTS.send(event).catch(() => {}));
         }
         return response;
+      },
+      async queue(batch, env) {
+        const events = batch.messages.slice(0, 100).map(message => message.body);
+        const response = await fetch('https://africalatency.dev/api/v1/ingest/crawler-logs', {
+          method: 'POST',
+          headers: { authorization: 'Bearer ' + env.AFRICALATENCY_CRAWLER_KEY, 'content-type': 'application/json' },
+          body: JSON.stringify({ events })
+        });
+        if (!response.ok) throw new Error('AfricaLatency ingestion failed: ' + response.status);
       }
     };
 
-Cloudflare Logpush does not execute a Worker waitUntil callback. Configure Logpush to a customer-owned queue or collector, then map ClientIP, ClientRequestUserAgent, EdgeResponseStatus, ClientRequestPath, EdgeResponseBytes and EdgeStartTimestamp into the event schema. Batch 25–100 records before forwarding.
+Configure a Cloudflare Queue binding named CRAWLER_EVENTS and a consumer batch size of 100 (with a short max wait). The request handler enqueues without waiting for ingestion; the queue consumer sends batches and Cloudflare retries a failed batch. Cloudflare Logpush does not execute a Worker waitUntil callback. Configure Logpush to a customer-owned queue or collector, then map ClientIP, ClientRequestUserAgent, EdgeResponseStatus, ClientRequestPath, EdgeResponseBytes and EdgeStartTimestamp into the event schema. Batch 25–100 records before forwarding.
 
 ## Next.js middleware
 
@@ -71,7 +76,7 @@ In Next.js Edge middleware, use the NextFetchEvent waitUntil contract. The key m
           timestamp: new Date().toISOString(),
           user_agent: ua,
           source_ip: request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || '',
-          http_status: response.status,
+          http_status: null,
           path: request.nextUrl.pathname,
           response_time_ms: null,
           bytes_served: null,
@@ -90,8 +95,25 @@ For Next.js Node runtimes, use next/server after() or a bounded durable queue. D
 
 ## Express / Node
 
-Install after trusted proxy configuration. It sends after the response finishes and never awaits the ingestion request. Configure the actual trusted proxy count; do not blindly trust arbitrary X-Forwarded-For values.
+Install after trusted proxy configuration. It sends after the response finishes and never awaits the ingestion request. Configure the actual trusted proxy count; do not blindly trust arbitrary X-Forwarded-For values. The in-memory queue below batches 100 events, flushes every five seconds, and caps pending events at 1,000.
 
+    const crawlerPending = [];
+    let crawlerFlushRunning = false;
+    async function flushCrawlerEvents() {
+      if (crawlerFlushRunning || !crawlerPending.length) return;
+      crawlerFlushRunning = true;
+      const batch = crawlerPending.splice(0, 100);
+      try {
+        const response = await fetch('https://africalatency.dev/api/v1/ingest/crawler-logs', {
+          method: 'POST',
+          headers: { authorization: 'Bearer ' + process.env.AFRICALATENCY_CRAWLER_KEY, 'content-type': 'application/json' },
+          body: JSON.stringify({ events: batch })
+        });
+        if (!response.ok) crawlerPending.unshift(...batch);
+      } catch { crawlerPending.unshift(...batch); }
+      finally { crawlerFlushRunning = false; }
+    }
+    setInterval(flushCrawlerEvents, 5000).unref?.();
     app.set('trust proxy', 1);
     app.use((req, res, next) => {
       const started = process.hrtime.bigint();
@@ -109,16 +131,13 @@ Install after trusted proxy configuration. It sends after the response finishes 
           bytes_served: Number(res.getHeader('content-length') || 0) || null,
           country_edge_code: req.headers['cf-ipcountry'] || null
         };
-        void fetch('https://africalatency.dev/api/v1/ingest/crawler-logs', {
-          method: 'POST',
-          headers: { authorization: 'Bearer ' + process.env.AFRICALATENCY_CRAWLER_KEY, 'content-type': 'application/json' },
-          body: JSON.stringify({ events: [event] })
-        }).catch(() => {});
+        if (crawlerPending.length < 1000) crawlerPending.push(event);
+        if (crawlerPending.length >= 100) void flushCrawlerEvents();
       });
       next();
     });
 
-This fire-and-forget approach can lose an event if the process exits immediately after responding. At higher volume, replace it with a bounded queue or durable queue, batch up to 100 events and retry with capped exponential backoff. Never use unbounded promises.
+The in-memory queue is bounded and non-blocking, but queued records can be lost on process restart. For durable delivery, use a persistent queue. In either case, keep retries bounded and avoid unbounded promises.
 
 ## Nginx / Caddy
 
