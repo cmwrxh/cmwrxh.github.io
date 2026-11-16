@@ -15,7 +15,7 @@ export default async function handler(req,res){
   if(req.method==='DELETE'){
     const keyId=String(req.body?.key_id||'');
     if(!/^[0-9a-f-]{36}$/i.test(keyId))return res.status(400).json({error:'A valid key_id is required.'});
-    const {data:key,error}=await admin.from('crawler_project_keys').select('id').eq('id',keyId).eq('crawler_projects.owner_id',auth.user.id).not('project_id','is',null).maybeSingle();
+    const {data:key,error}=await admin.from('crawler_project_keys').select('id,crawler_projects!inner(owner_id)').eq('id',keyId).eq('crawler_projects.owner_id',auth.user.id).not('project_id','is',null).maybeSingle();
     if(error){console.error('[crawler-projects] key ownership lookup failed:',error.code||'database error');return res.status(503).json({error:'Crawler key storage is unavailable.'});}
     if(!key)return res.status(404).json({error:'Crawler key not found.'});
     const {data:revoked,error:updateError}=await admin.from('crawler_project_keys').update({active:false}).eq('id',keyId).eq('active',true).select('id').maybeSingle();
