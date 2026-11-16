@@ -4,7 +4,7 @@ import { verifyCrawler } from '../lib/crawler-bot-verification.js';
 const MAX_EVENTS=100,MAX_BODY_BYTES=256*1024,KEY_RE=/^clg_live_[a-f0-9]{64}$/;
 const hashKey=key=>crypto.createHash('sha256').update(key).digest('hex');
 const cleanPath=value=>typeof value==='string'&&value.startsWith('/')?value.split(/[?#]/,1)[0].slice(0,512)||'/':'/';
-const intOrNull=(value,min,max)=>Number.isInteger(Number(value))&&Number(value)>=min&&Number(value)<=max?Number(value):null;
+const intOrNull=(value,min,max)=>value===null||value===undefined||value===''?null:Number.isInteger(Number(value))&&Number(value)>=min&&Number(value)<=max?Number(value):null;
 export default async function handler(req,res){
   setNoStore(res);
   if(req.method!=='POST'){res.setHeader('Allow','POST');return res.status(405).json({error:'Method not allowed'});}
@@ -27,7 +27,7 @@ export default async function handler(req,res){
       if(!event||typeof event!=='object')continue;
       const observed=new Date(event.timestamp||Date.now());
       if(!Number.isFinite(observed.getTime())||observed.getTime()>Date.now()+300000||observed.getTime()<Date.now()-90*86400000)continue;
-      const host=String(event.host||'').toLowerCase().replace(/\\.$/,'');
+      const host=String(event.host||'').toLowerCase().replace(/\.$/,'');
       const projectDomain=String(key.crawler_projects.domain||'').toLowerCase();
       if(!host || (host!==projectDomain && !host.endsWith('.'+projectDomain)))continue;
       const ua=String(event.user_agent||'').slice(0,1024),sourceIp=String(event.source_ip||'').trim();
