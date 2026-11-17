@@ -188,7 +188,7 @@ export default async function handler(req, res) {
 
     const rows = await dbResponse.json();
     const lead = Array.isArray(rows) ? rows[0] : null;
-    if (parsed.value.lead_type === 'full_report' && isCorporateEmail(parsed.value.email)) {
+    if (parsed.value.lead_type === 'full_report' && parsed.value.scan_id && isCorporateEmail(parsed.value.email)) {
       void notifyLeadWebhook(parsed.value, lead?.id || null, lead?.created_at || null);
     }
     return json(res, 201, { success: true, lead_id: lead?.id || null });
