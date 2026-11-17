@@ -99,13 +99,13 @@ export default async function handler(req, res) {
       return json(res, 429, { success: false, error: 'Too many submissions. Please try again later.' });
     }
 
-    const dbResponse = await fetch(`${supabaseUrl.replace(/\/$/, '')}/rest/v1/scan_leads`, {
+    const dbResponse = await fetch(`${supabaseUrl.replace(/\/$/, '')}/rest/v1/scan_leads?on_conflict=scan_id,email,lead_type`, {
       method: 'POST',
       headers: {
         apikey: serviceKey,
         Authorization: `Bearer ${serviceKey}`,
         'Content-Type': 'application/json',
-        Prefer: 'return=representation'
+        Prefer: 'resolution=merge-duplicates,return=representation'
       },
       body: JSON.stringify(parsed.value)
     });

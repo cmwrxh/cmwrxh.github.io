@@ -20,6 +20,11 @@ create index if not exists scan_leads_email_created_at_idx
 create index if not exists scan_leads_scan_id_idx
   on public.scan_leads (scan_id) where scan_id is not null;
 
+-- Repeated unlock attempts for one report and email must not create duplicate leads.
+-- NULL scan IDs remain distinct for non-report enquiries.
+create unique index if not exists scan_leads_scan_email_type_uidx
+  on public.scan_leads (scan_id, email, lead_type);
+
 alter table public.scan_leads enable row level security;
 revoke all on public.scan_leads from public, anon, authenticated;
 grant all on public.scan_leads to service_role;

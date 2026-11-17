@@ -77,13 +77,131 @@
       "name": "Core Web Vitals thresholds and methodology",
       "publisher": "Google web.dev",
       "url": "https://web.dev/articles/defining-core-web-vitals-thresholds",
-      "supports": ["lcp", "inp", "cls", "percentile"]
+      "supports": [
+        "lcp",
+        "inp",
+        "cls",
+        "percentile"
+      ]
     },
     {
       "name": "PageSpeed Insights metric thresholds",
       "publisher": "Google for Developers",
       "url": "https://developers.google.com/speed/docs/insights/v5/about",
-      "supports": ["fcp", "ttfb"]
+      "supports": [
+        "fcp",
+        "ttfb"
+      ]
     }
-  ]
+  ],
+  "leaderboard_template": {
+    "status": "sample_only",
+    "notice": "Illustrative template rows only. No company performance values or crawler observations have been measured or published. Replace these entries only with verified point-in-time scans.",
+    "categories": [
+      {
+        "id": "kenyan-fintech-banks",
+        "label": "Kenyan Fintech & Banks"
+      },
+      {
+        "id": "african-ecommerce",
+        "label": "African E-Commerce"
+      },
+      {
+        "id": "saas-media",
+        "label": "SaaS & Media"
+      }
+    ],
+    "rows": [
+      {
+        "id": "sample-bank",
+        "category": "kenyan-fintech-banks",
+        "company": "Sample digital bank",
+        "domain": "sample-bank.example",
+        "rank": null,
+        "nairobi_mobile_lcp_ms": null,
+        "regional_avg_ttfb_ms": null,
+        "ai_crawler_access": {
+          "gptbot": "not_measured",
+          "claudebot": "not_measured",
+          "perplexitybot": "not_measured"
+        },
+        "sample": true
+      },
+      {
+        "id": "sample-payments",
+        "category": "kenyan-fintech-banks",
+        "company": "Sample payments platform",
+        "domain": "sample-payments.example",
+        "rank": null,
+        "nairobi_mobile_lcp_ms": null,
+        "regional_avg_ttfb_ms": null,
+        "ai_crawler_access": {
+          "gptbot": "not_measured",
+          "claudebot": "not_measured",
+          "perplexitybot": "not_measured"
+        },
+        "sample": true
+      },
+      {
+        "id": "sample-retailer",
+        "category": "african-ecommerce",
+        "company": "Sample online retailer",
+        "domain": "sample-retailer.example",
+        "rank": null,
+        "nairobi_mobile_lcp_ms": null,
+        "regional_avg_ttfb_ms": null,
+        "ai_crawler_access": {
+          "gptbot": "not_measured",
+          "claudebot": "not_measured",
+          "perplexitybot": "not_measured"
+        },
+        "sample": true
+      },
+      {
+        "id": "sample-marketplace",
+        "category": "african-ecommerce",
+        "company": "Sample marketplace",
+        "domain": "sample-marketplace.example",
+        "rank": null,
+        "nairobi_mobile_lcp_ms": null,
+        "regional_avg_ttfb_ms": null,
+        "ai_crawler_access": {
+          "gptbot": "not_measured",
+          "claudebot": "not_measured",
+          "perplexitybot": "not_measured"
+        },
+        "sample": true
+      },
+      {
+        "id": "sample-saas",
+        "category": "saas-media",
+        "company": "Sample B2B SaaS",
+        "domain": "sample-saas.example",
+        "rank": null,
+        "nairobi_mobile_lcp_ms": null,
+        "regional_avg_ttfb_ms": null,
+        "ai_crawler_access": {
+          "gptbot": "not_measured",
+          "claudebot": "not_measured",
+          "perplexitybot": "not_measured"
+        },
+        "sample": true
+      },
+      {
+        "id": "sample-publisher",
+        "category": "saas-media",
+        "company": "Sample digital publisher",
+        "domain": "sample-publisher.example",
+        "rank": null,
+        "nairobi_mobile_lcp_ms": null,
+        "regional_avg_ttfb_ms": null,
+        "ai_crawler_access": {
+          "gptbot": "not_measured",
+          "claudebot": "not_measured",
+          "perplexitybot": "not_measured"
+        },
+        "sample": true
+      }
+    ]
+  }
 }
