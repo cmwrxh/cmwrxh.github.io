@@ -56,7 +56,8 @@
     if (scores.length) scores.forEach((score) => lines.push('• ' + score));
     else lines.push('• Performance scores are not available in the report payload.');
     if (vitals && !/not available|no data/i.test(vitals)) lines.push('• Core Web Vitals: ' + vitals.slice(0, 700));
-    if (priorityFindings.length) lines.push('• Priority findings: ' + priorityFindings.join('; ').slice(0, 700));\n    else if (issues && !/not available|no data/i.test(issues)) lines.push('• Priority findings: ' + issues.slice(0, 700));
+    if (priorityFindings.length) lines.push('• Priority findings: ' + priorityFindings.join('; ').slice(0, 700));
+    else if (issues && !/not available|no data/i.test(issues)) lines.push('• Priority findings: ' + issues.slice(0, 700));
     lines.push('', 'AI crawler access:');
     if (crawler) {
       const totalVerified = Number(crawler.totals.verified || 0);
