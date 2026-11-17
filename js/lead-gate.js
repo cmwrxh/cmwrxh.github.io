@@ -1,7 +1,7 @@
 (()=>{'use strict';
 const app=document.getElementById('rd-app');
 const params=new URLSearchParams(location.search);
-const match=location.pathname.match(/^\\/reports\\/([a-f0-9-]{36})\\/?$/i);
+const match=location.pathname.match(/^\/reports\/([a-f0-9-]{36})\/?$/i);
 const scanId=match?match[1]:params.get('id');
 if(!app||!scanId||!/^[a-f0-9-]{36}$/i.test(scanId))return;
 const key='africalatency:report-unlocked:'+scanId;
