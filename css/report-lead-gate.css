@@ -1,0 +1,49 @@
+.rd-topline-heading{margin:22px 0 10px}
+.rd-topline-heading h2{margin:0;color:#15243a;font-size:1.25rem}
+.rd-topline-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:14px 0 22px}
+.rd-topline-card{min-width:0;padding:16px;border:1px solid #d2dce8;border-radius:12px;background:#fff;color:#172033}
+.rd-topline-card>span{display:block;margin-bottom:8px;color:#53647a;font-size:.78rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+.rd-topline-card>strong{display:block;color:#0b3558;font-size:1.12rem;line-height:1.4;overflow-wrap:anywhere}
+.rd-topline-ai ul{display:grid;gap:4px;margin:10px 0;padding:0;list-style:none}
+.rd-topline-ai li{font-size:.86rem;line-height:1.45}
+.rd-topline-ai li.is-allowed{color:#166534}
+.rd-topline-ai li.is-blocked{color:#b42318}
+.rd-topline-ai li.is-unknown{color:#596579}
+.rd-topline-ai small{display:block;color:#64748b;line-height:1.5}
+.rd-full-report-gate{margin:22px 0 28px;padding:clamp(18px,3vw,28px);border:1px solid #b8c9df;border-radius:14px;background:#f2f7fc;color:#172033;box-shadow:0 8px 24px rgba(15,35,60,.06)}
+.rd-full-report-gate h2{margin:0 0 8px;color:#102b46;font-size:clamp(1.25rem,2.5vw,1.65rem)}
+.rd-full-report-gate>p:not(.rd-eyebrow){max-width:680px;margin:0 0 16px;color:#42536a;line-height:1.6}
+.rd-full-report-gate form{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:end;gap:10px 12px;max-width:760px}
+.rd-full-report-gate label{grid-column:1/-1;margin-bottom:-6px;color:#23354a;font-size:.9rem;font-weight:700}
+.rd-full-report-gate input[type=email]{width:100%;min-height:46px;padding:10px 12px;border:1px solid #aebfd2;border-radius:8px;background:#fff;color:#172033;font:inherit}
+.rd-full-report-gate input[type=email]:focus{outline:3px solid rgba(7,89,133,.22);border-color:#075985}
+.rd-full-report-gate .rd-button{min-height:46px;padding:10px 18px;border:1px solid #075985;border-radius:8px;background:#075985;color:#fff;font:inherit;font-weight:700;cursor:pointer}
+.rd-full-report-gate .rd-button:disabled{opacity:.65;cursor:wait}
+#rd-full-report-status{grid-column:1/-1;min-height:1.3em;margin:0;color:#334155;font-size:.9rem}
+.rd-full-report-gate>small{display:block;margin-top:12px;color:#64748b;line-height:1.5}
+.rd-lead-honeypot{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
+.rd-full-report-content[hidden],.rd-report-upsell[hidden]{display:none!important}
+.rd-report-upsell{margin:22px 0;padding:18px;border:1px solid #b8c9df;border-radius:12px;background:#f2f7fc;color:#172033}
+.rd-report-upsell>strong{display:block;color:#102b46;font-size:1.1rem}
+.rd-report-upsell p{margin:7px 0 12px;color:#42536a;line-height:1.55}
+.rd-report-upsell>div{display:flex;gap:10px;flex-wrap:wrap}
+.rd-report-upsell .rd-button{display:inline-flex;align-items:center;justify-content:center;min-height:42px;padding:9px 14px;border:1px solid #075985;border-radius:8px;background:#075985;color:#fff;text-decoration:none;font-weight:700}
+.rd-report-upsell .rd-button.secondary{background:#fff;color:#075985}
+.rd-report-upsell small{display:block;margin-top:12px;color:#64748b;line-height:1.5}
+.rd-ai-bot-audit{margin:22px 0;padding:18px;border:1px solid #d2dce8;border-radius:12px;background:#fff}
+.rd-ai-bot-audit h2{margin:0 0 8px;color:#15243a}
+.rd-ai-bot-audit>p:not(.rd-eyebrow){color:#53647a;line-height:1.6}
+.rd-ai-audit-table-wrap{width:100%;overflow-x:auto}
+.rd-ai-audit-table{width:100%;min-width:480px;border-collapse:collapse}
+.rd-ai-audit-table th,.rd-ai-audit-table td{padding:10px 12px;border-bottom:1px solid #e1e8f0;text-align:left}
+.rd-ai-audit-table th{color:#23354a;font-size:.88rem}
+.rd-ai-audit-table td{color:#42536a;font-size:.9rem}
+.rd-ai-audit-table .is-allowed{color:#166534;font-weight:700}
+.rd-ai-audit-table .is-blocked{color:#b42318;font-weight:700}
+.rd-ai-audit-table .is-unknown{color:#596579;font-weight:700}
+@media(max-width:760px){
+  .rd-topline-summary{grid-template-columns:1fr}
+  .rd-full-report-gate form{grid-template-columns:1fr}
+  .rd-full-report-gate label{grid-column:1}
+  .rd-full-report-gate .rd-button{width:100%}
+}
