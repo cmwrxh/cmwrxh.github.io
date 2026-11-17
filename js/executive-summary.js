@@ -36,7 +36,8 @@
       if (!activityResponse.ok) return null;
       const activity = await activityResponse.json();
       const events = activity.recent_events || [];
-      const verified = events.filter((event) => event.verification_status === 'verified_bot');\n      const statuses = verified.map((event) => Number(event.http_status));
+      const verified = events.filter((event) => event.verification_status === 'verified_bot');
+      const statuses = verified.map((event) => Number(event.http_status));
       return {
         project,
         totals: activity.totals || {},
@@ -51,7 +52,9 @@
     const url = metricText('rd-url') || 'the scanned website';
     const scores = [...document.querySelectorAll('#rd-scores .rd-score')].map((node) => node.textContent.trim().replace(/\s+/g, ' '));
     const vitals = metricText('rd-vitals');
-    const issues = metricText('rd-issues');\n    const priorityFindings = [...document.querySelectorAll('#rd-issues [data-severity], #rd-issues .rd-issue-title, #rd-structure [data-severity]')]\n      .map((node) => node.textContent.trim().replace(/\\s+/g, ' ')).filter(Boolean).slice(0, 8);
+    const issues = metricText('rd-issues');
+    const priorityFindings = [...document.querySelectorAll('#rd-issues [data-severity], #rd-issues .rd-issue-title, #rd-structure [data-severity]')]
+      .map((node) => node.textContent.trim().replace(/\s+/g, ' ')).filter(Boolean).slice(0, 8);
     const lines = ['Executive summary', 'Website: ' + url, '', 'What the scan tells us:'];
     if (scores.length) scores.forEach((score) => lines.push('• ' + score));
     else lines.push('• Performance scores are not available in the report payload.');
