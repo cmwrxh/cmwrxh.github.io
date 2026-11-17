@@ -9,7 +9,7 @@
     : null;
   let activeProject = '';
   let activeKey = '';
-  let refreshTimer = null;
+  let refreshTimer = null;\n  let activityRequestId = 0;\n  let projectsRequestId = 0;
   const say = (message, error) => { $('intelligence-crawler-message').textContent = message; $('intelligence-crawler-message').dataset.state = error ? 'error' : 'ok'; };
   const request = async (url, options = {}) => {
     if (!client) throw new Error('Account configuration is unavailable.');
@@ -43,11 +43,22 @@
     });
   }
   async function loadActivity() {
-    if (!activeProject) return;
+    const requestId = ++activityRequestId;
+    const projectId = activeProject;
+    const range = $('intelligence-crawler-range').value;
+    if (!projectId) {
+      renderMetrics({});
+      $('intelligence-crawler-events').replaceChildren();
+      const tr = document.createElement('tr'), td = document.createElement('td');
+      td.colSpan = 5; td.textContent = 'Choose a crawler project to view activity.';
+      tr.appendChild(td); $('intelligence-crawler-events').appendChild(tr);
+      say('No crawler project selected.');
+      return;
+    }
     say('Loading verified crawler events…');
     try {
-      const range = $('intelligence-crawler-range').value;
-      const data = await request('/api/crawler-activity?project_id=' + encodeURIComponent(activeProject) + '&range=' + encodeURIComponent(range));
+      const data = await request('/api/crawler-activity?project_id=' + encodeURIComponent(projectId) + '&range=' + encodeURIComponent(range));
+      if (requestId !== activityRequestId || projectId !== activeProject || range !== $('intelligence-crawler-range').value) return;
       renderMetrics(data.totals || {});
       const body = $('intelligence-crawler-events'); body.replaceChildren();
       const rows = data.recent_events || [];
