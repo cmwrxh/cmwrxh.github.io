@@ -77,13 +77,148 @@
       "name": "Core Web Vitals thresholds and methodology",
       "publisher": "Google web.dev",
       "url": "https://web.dev/articles/defining-core-web-vitals-thresholds",
-      "supports": ["lcp", "inp", "cls", "percentile"]
+      "supports": [
+        "lcp",
+        "inp",
+        "cls",
+        "percentile"
+      ]
     },
     {
       "name": "PageSpeed Insights metric thresholds",
       "publisher": "Google for Developers",
       "url": "https://developers.google.com/speed/docs/insights/v5/about",
-      "supports": ["fcp", "ttfb"]
+      "supports": [
+        "fcp",
+        "ttfb"
+      ]
     }
-  ]
+  ],
+  "industry_leaderboard": {
+    "status": "template_only",
+    "last_updated": null,
+    "methodology": {
+      "summary": "Point-in-time public endpoint scans. Numeric entries are published only after a verified scan has been reviewed.",
+      "nairobi_mobile_lcp": "Lighthouse mobile lab measurement for the scanned endpoint; not field data from real visitors.",
+      "regional_avg_ttfb": "Average of valid regional probe TTFB measurements returned by the same scan. Unavailable probes are excluded; no values are estimated.",
+      "ai_crawler_access": "robots.txt permission checks for GPTBot, ClaudeBot and PerplexityBot. Permission does not prove that a crawler visited the origin.",
+      "ranking": "Rank is assigned only to verified entries with comparable measurements. Placeholder entries are not ranked."
+    },
+    "categories": [
+      {
+        "id": "kenyan-fintech",
+        "label": "Kenyan Fintech & Banks",
+        "entries": [
+          {
+            "id": "example-bank",
+            "company": "Example Bank (placeholder)",
+            "domain": "example.com",
+            "status": "placeholder",
+            "rank": null,
+            "nairobi_mobile_lcp_ms": null,
+            "regional_avg_ttfb_ms": null,
+            "ai_crawler_access": {
+              "GPTBot": null,
+              "ClaudeBot": null,
+              "PerplexityBot": null
+            },
+            "last_scanned_at": null,
+            "run_scan_url": "/scan"
+          },
+          {
+            "id": "example-wallet",
+            "company": "Example Wallet (placeholder)",
+            "domain": "example.org",
+            "status": "placeholder",
+            "rank": null,
+            "nairobi_mobile_lcp_ms": null,
+            "regional_avg_ttfb_ms": null,
+            "ai_crawler_access": {
+              "GPTBot": null,
+              "ClaudeBot": null,
+              "PerplexityBot": null
+            },
+            "last_scanned_at": null,
+            "run_scan_url": "/scan"
+          }
+        ]
+      },
+      {
+        "id": "african-ecommerce",
+        "label": "African E-Commerce",
+        "entries": [
+          {
+            "id": "example-marketplace",
+            "company": "Example Marketplace (placeholder)",
+            "domain": "example.net",
+            "status": "placeholder",
+            "rank": null,
+            "nairobi_mobile_lcp_ms": null,
+            "regional_avg_ttfb_ms": null,
+            "ai_crawler_access": {
+              "GPTBot": null,
+              "ClaudeBot": null,
+              "PerplexityBot": null
+            },
+            "last_scanned_at": null,
+            "run_scan_url": "/scan"
+          },
+          {
+            "id": "example-retailer",
+            "company": "Example Retailer (placeholder)",
+            "domain": "example.com",
+            "status": "placeholder",
+            "rank": null,
+            "nairobi_mobile_lcp_ms": null,
+            "regional_avg_ttfb_ms": null,
+            "ai_crawler_access": {
+              "GPTBot": null,
+              "ClaudeBot": null,
+              "PerplexityBot": null
+            },
+            "last_scanned_at": null,
+            "run_scan_url": "/scan"
+          }
+        ]
+      },
+      {
+        "id": "saas-media",
+        "label": "SaaS & Media",
+        "entries": [
+          {
+            "id": "example-saas",
+            "company": "Example SaaS Platform (placeholder)",
+            "domain": "example.org",
+            "status": "placeholder",
+            "rank": null,
+            "nairobi_mobile_lcp_ms": null,
+            "regional_avg_ttfb_ms": null,
+            "ai_crawler_access": {
+              "GPTBot": null,
+              "ClaudeBot": null,
+              "PerplexityBot": null
+            },
+            "last_scanned_at": null,
+            "run_scan_url": "/scan"
+          },
+          {
+            "id": "example-media",
+            "company": "Example Media Publisher (placeholder)",
+            "domain": "example.net",
+            "status": "placeholder",
+            "rank": null,
+            "nairobi_mobile_lcp_ms": null,
+            "regional_avg_ttfb_ms": null,
+            "ai_crawler_access": {
+              "GPTBot": null,
+              "ClaudeBot": null,
+              "PerplexityBot": null
+            },
+            "last_scanned_at": null,
+            "run_scan_url": "/scan"
+          }
+        ]
+      }
+    ]
+  }
 }
