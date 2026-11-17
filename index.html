@@ -44,6 +44,31 @@
 .home-page .al-mobile-toggle{display:none;align-items:center;justify-content:center;flex-direction:column;gap:5px;width:44px;height:44px;border:1px solid rgba(255,255,255,.2);border-radius:9px;background:transparent;color:#fff;padding:0;cursor:pointer}
 .home-page .al-mobile-toggle span{display:block;width:18px;height:2px;background:#fff;margin:0}
 @media(max-width:899px){.home-page .al-mobile-toggle{display:flex;margin-left:auto}.home-page .al-header-actions{display:none}.home-page .al-header-inner{min-height:78px;padding:0 18px;gap:12px}.home-page .al-brand img{width:158px}.home-page .al-mobile-menu:not([hidden]){display:flex;flex-direction:column;gap:14px;padding:16px 20px 24px;background:#171619;border-top:1px solid #333}.home-page .al-mobile-menu[hidden]{display:none}.home-page .al-mobile-menu>a:not(.al-try):not(.al-login){color:#fff;text-decoration:none;padding:5px 0}.home-page .al-mobile-menu details>a{display:block;color:#c2cfde;padding:8px 12px}.home-page .al-mobile-menu .al-try,.home-page .al-mobile-menu .al-login{width:100%;box-sizing:border-box}}
+
+.home-page .al-hero-pilot-link{display:inline-flex;gap:8px;align-items:center;margin-top:14px;color:#b9d9ff;font-weight:650;text-decoration:none}
+.home-page .al-hero-pilot-link:hover,.home-page .al-conversion-link:hover{text-decoration:underline}
+.home-page .al-conversion-section{padding:54px 0 64px;background:#101116;color:#f5f7fb}
+.home-page .al-conversion-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.home-page .al-conversion-card,.home-page .al-pilot-form{border:1px solid rgba(255,255,255,.13);border-radius:16px;background:#191b22;padding:24px}
+.home-page .al-conversion-card h2,.home-page .al-pilot-form h2{font-size:1.3rem;line-height:1.25;margin:8px 0 12px;color:#fff}
+.home-page .al-conversion-card p,.home-page .al-pilot-form p{color:#b8c0ce;line-height:1.65}
+.home-page .al-conversion-kicker{font-size:.72rem;letter-spacing:.12em;font-weight:750;color:#8bc6ff!important;margin:0}
+.home-page .al-conversion-link,.home-page .al-unlocked-report a{display:inline-flex;margin-top:12px;color:#a9d4ff;font-weight:700;text-decoration:none}
+.home-page .al-report-card .al-lead-form{display:grid;gap:9px;margin-top:18px}
+.home-page .al-lead-form label,.home-page .al-pilot-fields label{display:grid;gap:6px;color:#dce4ef;font-size:.86rem}
+.home-page .al-lead-form input,.home-page .al-pilot-fields input:not([type=checkbox]){width:100%;min-width:0;box-sizing:border-box;border:1px solid #424957;border-radius:8px;background:#101319;color:#fff;padding:12px;font:inherit}
+.home-page .al-lead-form button,.home-page .al-pilot-fields button{border:0;border-radius:8px;background:#8bc6ff;color:#10151c;padding:12px 16px;font:inherit;font-weight:750;cursor:pointer}
+.home-page .al-lead-form button:disabled,.home-page .al-pilot-fields button:disabled{opacity:.6;cursor:wait}
+.home-page .al-lead-status{min-height:1.2em;margin:2px 0 0;font-size:.82rem}
+.home-page .al-unlocked-report{margin-top:16px;padding:14px;border-radius:10px;background:#202b38;border:1px solid #426487}
+.home-page .al-unlocked-report p{margin:6px 0}
+.home-page .al-pilot-form{display:grid;grid-template-columns:.8fr 1.2fr;gap:28px;margin-top:18px;scroll-margin-top:24px}
+.home-page .al-pilot-fields{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.home-page .al-pilot-fields .al-consent{grid-column:1/-1;display:flex;align-items:center;gap:9px}
+.home-page .al-pilot-fields .al-consent input{width:auto}
+.home-page .al-pilot-fields button,.home-page .al-pilot-fields .al-lead-status{grid-column:1/-1}
+.home-page .al-honeypot{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}
+@media(max-width:899px){.home-page .al-conversion-grid{grid-template-columns:1fr}.home-page .al-pilot-form{grid-template-columns:1fr}.home-page .al-pilot-fields{grid-template-columns:1fr}}
 </style>
 </head>
 <body class="home-page">
@@ -66,18 +91,70 @@
     <section class="al-hero" aria-labelledby="hero-title">
       <canvas class="al-dot-field" data-dot-field aria-hidden="true"></canvas>
       <div class="al-wrap al-hero-content">
-        <h1 id="hero-title">Find out why your website is slow<span class="al-hero-accent">Then fix it</span></h1>
-        <p class="al-lede">AfricaLatency tests your <span class="al-rotating-word" data-rotating-word aria-label="AI-Built">AI-Built</span> website and helps you understand performance across African networks.</p>
+        <h1 id="hero-title">See how your website, API and digital product perform across African networks<span class="al-hero-accent">Find the bottlenecks. Fix what matters.</span></h1>
+        <p class="al-lede">Run Lighthouse tests and request live HTTP measurements from available community probes across African countries. Get clearer evidence for what to improve next.</p>
         <form class="al-url-form" data-url-form>
           <label class="al-visually-hidden" for="homepage-url">Website or API URL</label>
           <input id="homepage-url" name="url" type="text" inputmode="url" autocomplete="url" placeholder="Enter URL" required maxlength="2048" aria-describedby="url-help">
           <button class="al-test-button" type="submit">Test Now</button>
         </form>
         <p id="url-help" class="al-form-help" data-form-help role="status" aria-live="polite">Enter a public website or API URL to start a free scan.</p>
+        <a class="al-hero-pilot-link" href="#founding-pilot">Apply for the Founding Pilot <span aria-hidden="true">↗</span></a>
         <div class="al-analysis-options" aria-label="Scan information">
           <strong>Analysis Options:</strong>
           <span class="al-analysis-item"><svg class="al-region-globe" viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="10" fill="none" stroke="#8bc6ff" stroke-width="1.7"/><path d="M4.5 14h19M14 4c3.8 4.1 3.8 15.9 0 20M14 4c-3.8 4.1-3.8 15.9 0 20M6.6 8.5h14.8M6.6 19.5h14.8" fill="none" stroke="#8bc6ff" stroke-width="1.2"/></svg>9 African countries</span>
         </div>
+      </div>
+    </section>
+
+    <section class="al-conversion-section" aria-label="Ways to work with AfricaLatency">
+      <div class="al-wrap">
+        <div class="al-conversion-grid">
+          <article class="al-conversion-card al-pilot-card">
+            <p class="al-conversion-kicker">FOUNDING PILOT</p>
+            <h2>Make your product work better for users across Africa.</h2>
+            <p>Work directly with AfricaLatency to understand real performance constraints and prioritize practical improvements.</p>
+            <a class="al-conversion-link" href="#founding-pilot">Apply for the Founding Pilot <span aria-hidden="true">↗</span></a>
+          </article>
+          <article class="al-conversion-card">
+            <p class="al-conversion-kicker">DONE-FOR-YOU SETUP</p>
+            <h2>Get from first scan to a clear action plan.</h2>
+            <p>We help you set up the assessment, interpret the available measurements and turn findings into prioritized next steps.</p>
+            <a class="al-conversion-link" href="#founding-pilot">Request setup help <span aria-hidden="true">↗</span></a>
+          </article>
+          <article class="al-conversion-card al-report-card">
+            <p class="al-conversion-kicker">FULL REPORT PREVIEW</p>
+            <h2>See what a deeper performance report includes.</h2>
+            <p>Enter your email to unlock an expanded sample report preview. The sample is illustrative, not a measurement of your own site.</p>
+            <form class="al-lead-form" data-lead-form data-lead-type="full_report">
+              <label for="report-unlock-email">Work email</label>
+              <input id="report-unlock-email" name="email" type="email" autocomplete="email" maxlength="254" placeholder="you@company.com" required>
+              <label class="al-honeypot" aria-hidden="true">Leave this field empty<input name="website" type="text" tabindex="-1" autocomplete="off"></label>
+              <input name="source" type="hidden" value="homepage-full-report">
+              <button type="submit">Unlock the full report preview</button>
+              <p class="al-lead-status" data-lead-status role="status" aria-live="polite"></p>
+            </form>
+            <div class="al-unlocked-report" data-unlocked-report hidden>
+              <strong>Preview unlocked.</strong>
+              <p>Explore the sample structure, measurement context and prioritized recommendations.</p>
+              <a href="/sample-report">View the sample report <span aria-hidden="true">↗</span></a>
+            </div>
+          </article>
+        </div>
+        <form class="al-pilot-form" id="founding-pilot" data-lead-form data-lead-type="founding_pilot">
+          <div><p class="al-conversion-kicker">LET'S TALK</p><h2>Apply for the Founding Pilot</h2><p>Tell us where to reach you. We'll follow up about fit and next steps.</p></div>
+          <div class="al-pilot-fields">
+            <label>Name<input name="full_name" type="text" autocomplete="name" maxlength="120" placeholder="Your name"></label>
+            <label>Email<input name="email" type="email" autocomplete="email" maxlength="254" placeholder="you@company.com" required></label>
+            <label>Company<input name="company_name" type="text" autocomplete="organization" maxlength="150" placeholder="Company name"></label>
+            <label>Website or API domain<input name="domain" type="text" inputmode="url" maxlength="253" placeholder="example.com"></label>
+            <label class="al-honeypot" aria-hidden="true">Leave this field empty<input name="website" type="text" tabindex="-1" autocomplete="off"></label>
+            <input name="source" type="hidden" value="homepage-founding-pilot">
+            <label class="al-consent"><input name="email_updates_opt_in" type="checkbox" value="true"> Send me occasional AfricaLatency product updates.</label>
+            <button type="submit">Submit pilot enquiry</button>
+            <p class="al-lead-status" data-lead-status role="status" aria-live="polite"></p>
+          </div>
+        </form>
       </div>
     </section>
 
@@ -302,5 +379,47 @@
   <script src="/js/regional-sample.js?v=1" defer></script>
   <script src="/js/homepage-reference-redesign.js?v=4" defer></script>
   <script src="/js/site-header.js" defer></script>
+
+  <script>
+  (function () {
+    document.querySelectorAll('[data-lead-form]').forEach(function (form) {
+      form.addEventListener('submit', async function (event) {
+        event.preventDefault();
+        var button = form.querySelector('button[type="submit"]');
+        var status = form.querySelector('[data-lead-status]');
+        var data = Object.fromEntries(new FormData(form).entries());
+        data.lead_type = form.getAttribute('data-lead-type');
+        data.email_updates_opt_in = form.querySelector('[name="email_updates_opt_in"]')?.checked === true;
+        if (status) status.textContent = 'Submitting…';
+        if (button) { button.disabled = true; button.textContent = 'Submitting…'; }
+        try {
+          var response = await fetch('/api/leads', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+          });
+          var result = await response.json().catch(function () { return {}; });
+          if (!response.ok || !result.success) throw new Error(result.error || 'Could not submit. Please try again.');
+          if (status) status.textContent = data.lead_type === 'full_report'
+            ? 'Your email is saved. The sample report preview is now unlocked.'
+            : 'Thanks. Your pilot enquiry has been received.';
+          if (data.lead_type === 'full_report') {
+            var unlocked = form.parentElement.querySelector('[data-unlocked-report]');
+            if (unlocked) unlocked.hidden = false;
+            form.reset();
+          }
+        } catch (error) {
+          if (status) status.textContent = error.message || 'Something went wrong. Please try again.';
+        } finally {
+          if (button) {
+            button.disabled = false;
+            button.textContent = data.lead_type === 'full_report' ? 'Unlock the full report preview' : 'Submit pilot enquiry';
+          }
+        }
+      });
+    });
+  }());
+  </script>
+
 </body>
 </html>
