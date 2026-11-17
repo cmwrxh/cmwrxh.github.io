@@ -9,6 +9,11 @@
   },
   "redirects": [
     {
+      "source": "/benchmarks.html",
+      "destination": "/benchmarks",
+      "permanent": true
+    },
+    {
       "source": "/index",
       "destination": "/performance-index",
       "permanent": true
@@ -180,6 +185,10 @@
     }
   ],
   "rewrites": [
+    {
+      "source": "/benchmarks",
+      "destination": "/benchmarks.html"
+    },
     {
       "source": "/about",
       "destination": "/about.html"
