@@ -48,10 +48,13 @@
     const range = $('intelligence-crawler-range').value;
     if (!projectId) {
       renderMetrics({});
-      $('intelligence-crawler-events').replaceChildren();
+      const body = $('intelligence-crawler-events');
+      body.replaceChildren();
       const tr = document.createElement('tr'), td = document.createElement('td');
-      td.colSpan = 5; td.textContent = 'Choose a crawler project to view activity.';
-      tr.appendChild(td); $('intelligence-crawler-events').appendChild(tr);
+      td.colSpan = 5;
+      td.textContent = 'Choose a crawler project to view activity.';
+      tr.appendChild(td);
+      body.appendChild(tr);
       say('No crawler project selected.');
       return;
     }
@@ -60,35 +63,54 @@
       const data = await request('/api/crawler-activity?project_id=' + encodeURIComponent(projectId) + '&range=' + encodeURIComponent(range));
       if (requestId !== activityRequestId || projectId !== activeProject || range !== $('intelligence-crawler-range').value) return;
       renderMetrics(data.totals || {});
-      const body = $('intelligence-crawler-events'); body.replaceChildren();
+      const body = $('intelligence-crawler-events');
+      body.replaceChildren();
       const rows = data.recent_events || [];
       if (!rows.length) {
         const tr = document.createElement('tr'), td = document.createElement('td');
-        td.colSpan = 5; td.textContent = 'No verified crawler events have been received for this period.';
-        tr.appendChild(td); body.appendChild(tr);
+        td.colSpan = 5;
+        td.textContent = 'No verified crawler events have been received for this period.';
+        tr.appendChild(td);
+        body.appendChild(tr);
       }
       rows.forEach((event) => {
         const tr = document.createElement('tr');
         [new Date(event.observed_at).toLocaleString(), event.bot_name, event.verification_status, event.http_status, event.path].forEach((value) => {
-          const td = document.createElement('td'); td.textContent = String(value ?? '—'); tr.appendChild(td);
+          const td = document.createElement('td');
+          td.textContent = String(value ?? '—');
+          tr.appendChild(td);
         });
         body.appendChild(tr);
       });
       say('Showing ' + rows.length + ' recent events for ' + (data.project?.domain || 'the selected domain') + '.');
-    } catch (error) { say(error.message, true); }
+    } catch (error) {
+      if (requestId === activityRequestId) say(error.message, true);
+    }
   }
   async function loadProjects() {
+    const requestId = ++projectsRequestId;
+    const selectedAtStart = activeProject;
     try {
       const data = await request('/api/crawler-projects');
+      if (requestId !== projectsRequestId) return;
       const projects = data.projects || [];
       const select = $('intelligence-crawler-project');
       select.replaceChildren(new Option('Choose a project', ''));
       projects.forEach((project) => select.add(new Option(project.project_name + ' · ' + project.domain, project.id)));
-      if (activeProject && projects.some((project) => project.id === activeProject)) select.value = activeProject;
-      else if (projects.length) { activeProject = projects[0].id; select.value = activeProject; }
-      if (activeProject) await loadActivity();
-      else say('No crawler project yet. Open Setup to create one.');
+      const preferredProject = activeProject !== selectedAtStart ? activeProject : selectedAtStart;
+      if (preferredProject && projects.some((project) => project.id === preferredProject)) {
+        activeProject = preferredProject;
+        select.value = activeProject;
+      } else if (projects.length) {
+        activeProject = projects[0].id;
+        select.value = activeProject;
+      } else {
+        activeProject = '';
+      }
+      await loadActivity();
+      if (!activeProject) say('No crawler project yet. Open Setup to create one.');
     } catch (error) {
+      if (requestId !== projectsRequestId) return;
       say('Crawler project services are not available on this deployment yet. The live-log foundation (PR #194) and its database migration must be merged and deployed first. ' + error.message, true);
     }
   }
