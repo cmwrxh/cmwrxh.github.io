@@ -115,7 +115,7 @@ function evaluateRules(text, agent) {
     })
     .filter(Boolean);
   if (!rootMatches.length) return true;
-  const specificity = (path) => path.replace(/[*$]/g, '').length;
+  const specificity = (path) => path.replace(/\*/g, '').length;
   const longest = Math.max(...rootMatches.map((rule) => specificity(rule.path)));
   const winners = rootMatches.filter((rule) => specificity(rule.path) === longest);
   return winners.some((rule) => rule.key === 'allow');
