@@ -36,11 +36,11 @@
       if (!activityResponse.ok) return null;
       const activity = await activityResponse.json();
       const events = activity.recent_events || [];
-      const statuses = events.map((event) => Number(event.http_status));
+      const verified = events.filter((event) => event.verification_status === 'verified_bot');\n      const statuses = verified.map((event) => Number(event.http_status));
       return {
         project,
         totals: activity.totals || {},
-        verifiedEvents: events.filter((event) => event.verification_status === 'verified_bot').length,
+        verifiedEvents: verified.length,
         forbidden: statuses.filter((status) => status === 403).length,
         rateLimited: statuses.filter((status) => status === 429).length,
         serverErrors: statuses.filter((status) => status >= 500 && status <= 599).length
@@ -51,12 +51,12 @@
     const url = metricText('rd-url') || 'the scanned website';
     const scores = [...document.querySelectorAll('#rd-scores .rd-score')].map((node) => node.textContent.trim().replace(/\s+/g, ' '));
     const vitals = metricText('rd-vitals');
-    const issues = metricText('rd-issues');
+    const issues = metricText('rd-issues');\n    const priorityFindings = [...document.querySelectorAll('#rd-issues [data-severity], #rd-issues .rd-issue-title, #rd-structure [data-severity]')]\n      .map((node) => node.textContent.trim().replace(/\\s+/g, ' ')).filter(Boolean).slice(0, 8);
     const lines = ['Executive summary', 'Website: ' + url, '', 'What the scan tells us:'];
     if (scores.length) scores.forEach((score) => lines.push('• ' + score));
     else lines.push('• Performance scores are not available in the report payload.');
     if (vitals && !/not available|no data/i.test(vitals)) lines.push('• Core Web Vitals: ' + vitals.slice(0, 700));
-    if (issues && !/not available|no data/i.test(issues)) lines.push('• Priority findings: ' + issues.slice(0, 700));
+    if (priorityFindings.length) lines.push('• Priority findings: ' + priorityFindings.join('; ').slice(0, 700));\n    else if (issues && !/not available|no data/i.test(issues)) lines.push('• Priority findings: ' + issues.slice(0, 700));
     lines.push('', 'AI crawler access:');
     if (crawler) {
       const totalVerified = Number(crawler.totals.verified || 0);
