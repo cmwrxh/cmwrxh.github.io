@@ -43,7 +43,7 @@ function renderSummary(){
  });
 }
 function setLocked(locked){
- document.querySelectorAll('.rd-tabs,.rd-panel,#rd-score-breakdown-trigger,#rd-score-breakdown,#rd-executive-summary,#rd-executive-dialog').forEach(el=>{
+ document.querySelectorAll('.rd-tabs,.rd-panel,#rd-score-breakdown-trigger,#rd-score-breakdown,#rd-executive-summary,#rd-exec-summary-trigger,#rd-executive-dialog').forEach(el=>{
   el.classList.toggle('lg-locked',locked);
   if(locked){el.setAttribute('aria-hidden','true');if('inert'in el)el.inert=true;}
   else{el.removeAttribute('aria-hidden');if('inert'in el)el.inert=false;}
@@ -112,6 +112,6 @@ const observer=new MutationObserver(records=>{
 });
 observer.observe(app,{attributes:true,attributeFilter:['hidden'],childList:true,subtree:true,characterData:true});
 const teaser=document.getElementById('rd-ai-crawler-teaser');
-if(teaser)new MutationObserver(renderSummary).observe(teaser,{attributes:true,attributeFilter:['hidden']});
+if(teaser)new MutationObserver(renderSummary).observe(teaser,{attributes:true,attributeFilter:['hidden','data-robots-status']});
 if(!app.hidden)mount();
 })();
