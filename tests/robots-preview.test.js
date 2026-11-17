@@ -17,3 +17,13 @@ test('AI crawler rules allow when robots.txt has no matching restriction', () =>
   assert.equal(evaluateRules('', 'GPTBot'), true);
   assert.equal(evaluateRules('User-agent: Googlebot\nDisallow: /', 'ClaudeBot'), true);
 });
+ 
+test('AI crawler rules respect end-anchored homepage blocks', () => {
+  assert.equal(evaluateRules('User-agent: GPTBot\\nDisallow: /$', 'GPTBot'), false);
+  assert.equal(evaluateRules('User-agent: GPTBot\\nDisallow: /$\\nAllow: /', 'GPTBot'), true);
+});
+
+test('AI crawler rules choose the most specific homepage directive', () => {
+  assert.equal(evaluateRules('User-agent: *\\nDisallow: /\\nAllow: /$', 'ClaudeBot'), true);
+  assert.equal(evaluateRules('User-agent: *\\nAllow: /\\nDisallow: /$', 'ClaudeBot'), false);
+});
