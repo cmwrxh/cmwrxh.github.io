@@ -122,7 +122,7 @@ h1, h2, h3, h4 { line-height: 1.2 !important; }
   --neutral-highlight: rgba(255,255,255,.06);
 }
 
-main a:not(.btn):not(.btn-primary):not(.plan-cta):not(.plan-select):not(.al-primary-cta):not(.al-panel-link):not(.visibility-report-cta):not(.get-started-primary):not(.al-try):not(.al-mobile-cta):not(.al-login):not(.btn-secondary):not(.rd-button),
+main a:not(.btn):not(.btn-primary):not(.plan-cta):not(.plan-select):not(.al-primary-cta):not(.al-panel-link):not(.visibility-report-cta):not(.get-started-primary):not(.al-try):not(.al-mobile-cta):not(.al-login):not(.btn-secondary):not(.rd-button):not(.al-price-link),
 footer a:not(.btn):not(.btn-primary):not(.plan-cta):not(.plan-select):not(.al-primary-cta):not(.al-panel-link):not(.visibility-report-cta):not(.get-started-primary):not(.al-try):not(.al-mobile-cta):not(.al-login):not(.btn-secondary):not(.rd-button),
 .legal-content a,
 .help-content a { color: var(--text-muted); }
