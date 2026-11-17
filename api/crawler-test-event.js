@@ -2,11 +2,26 @@ import crypto from 'node:crypto';
 import { getRumAdminClient, setNoStore } from '../lib/rum-beta-client.js';
 
 const KEY_RE = /^clg_live_[a-f0-9]{64}$/;
+const RATE_LIMIT = new Map();
+function allowAttempt(ip) {
+  const now = Date.now();
+  const key = String(ip || 'unknown').slice(0, 128);
+  const current = RATE_LIMIT.get(key);
+  if (current && now - current.startedAt < 60000 && current.count >= 10) return false;
+  if (!current || now - current.startedAt >= 60000) {
+    if (!RATE_LIMIT.has(key) && RATE_LIMIT.size >= 1200) RATE_LIMIT.delete(RATE_LIMIT.keys().next().value);
+    RATE_LIMIT.set(key, { startedAt: now, count: 1 });
+  } else current.count += 1;
+  return true;
+}
 export default async function handler(req, res) {
   setNoStore(res);
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
     return res.status(405).json({ success: false, error: 'Method not allowed' });
+  }
+  if (!allowAttempt(req.ip || req.socket?.remoteAddress)) {
+    return res.status(429).json({ success: false, error: 'Too many key verification attempts. Please wait a minute.' });
   }
   const match = String(req.headers.authorization || '').match(/^Bearer\s+(clg_live_[a-f0-9]{64})$/i);
   if (!match || !KEY_RE.test(match[1])) return res.status(401).json({ success: false, error: 'Invalid crawler ingestion key.' });
