@@ -167,13 +167,16 @@
       if (!categories.length) throw new Error('Industry leaderboard data is not configured.');
       activeCategory = categories[0].id;
       categories.forEach((category) => {
-        const button = document.createElement('button');
-        button.type = 'button';
-        button.role = 'tab';
-        button.dataset.category = category.id;
+        let button = Array.from(tabs.querySelectorAll('[data-category]')).find((tab) => tab.dataset.category === category.id);
+        if (!button) {
+          button = document.createElement('button');
+          button.type = 'button';
+          button.role = 'tab';
+          button.dataset.category = category.id;
+          tabs.appendChild(button);
+        }
         button.setAttribute('aria-selected', category.id === activeCategory ? 'true' : 'false');
         button.textContent = category.label;
-        tabs.appendChild(button);
       });
       render();
     })
