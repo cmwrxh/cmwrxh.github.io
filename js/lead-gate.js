@@ -16,7 +16,7 @@ const measuredCountries=()=>{
   const label=cells[0].textContent.trim(),raw=cells[1].textContent.trim();
   const n=Number.parseFloat(raw.replace(/,/g,''));
   if(!label||!Number.isFinite(n))return null;
-  return {label,ms:/\\bs\\b/i.test(raw)?n*1000:n};
+  return {label,ms:/\bs\b/i.test(raw)?n*1000:n};
  }).filter(Boolean);
 };
 const formatMs=n=>n>=1000?(n/1000).toFixed(2)+' s':Math.round(n)+' ms';
