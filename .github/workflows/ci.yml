@@ -61,7 +61,7 @@ jobs:
           find api -type f -name '*.js' -print0 2>/dev/null | xargs -0 -r -n1 node --check
           node --check server.js
           node --check js/report-lead-gate.js
-          node --check js/benchmarks.js
+          node --check js/industry-benchmarks.js
   go:
     runs-on: ubuntu-latest
     steps:
