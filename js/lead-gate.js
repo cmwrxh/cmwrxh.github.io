@@ -53,7 +53,10 @@ function setLocked(locked){
 }
 function unlock(){
  unlocked=true;
- try{localStorage.setItem(key,JSON.stringify({unlocked:true,unlocked_at:new Date().toISOString()}));}catch{}
+ try{
+  localStorage.setItem(key,JSON.stringify({unlocked:true,unlocked_at:new Date().toISOString()}));
+  if(!readUnlock())throw new Error('Your email was saved, but this browser could not save report access. Enable site storage and try again.');
+ }catch(error){throw error instanceof Error&&error.message.includes('could not save report access')?error:new Error('Your email was saved, but this browser could not save report access. Enable site storage and try again.');}
  setLocked(false);
 }
 function mount(){
