@@ -2,9 +2,17 @@
   "functions": {
     "api/paystack-webhook.js": {
       "maxDuration": 60
+    },
+    "api/leads.js": {
+      "maxDuration": 10
     }
   },
   "redirects": [
+    {
+      "source": "/benchmarks.html",
+      "destination": "/benchmarks",
+      "permanent": true
+    },
     {
       "source": "/index",
       "destination": "/performance-index",
@@ -177,6 +185,10 @@
     }
   ],
   "rewrites": [
+    {
+      "source": "/benchmarks",
+      "destination": "/benchmarks.html"
+    },
     {
       "source": "/about",
       "destination": "/about.html"

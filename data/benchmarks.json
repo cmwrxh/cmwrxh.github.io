@@ -1,0 +1,89 @@
+{
+  "schema_version": 1,
+  "dataset_type": "published_reference_thresholds",
+  "title": "Web performance reference thresholds",
+  "region": "Global reference standards",
+  "last_reviewed": "2026-11-17",
+  "methodology": {
+    "core_web_vitals_percentile": 75,
+    "classification": "Good, needs improvement, or poor thresholds are applied to the 75th percentile of field visits, segmented by device where field data supports it.",
+    "note": "These are published reference thresholds. They are not AfricaLatency measurements, African country averages, or carrier rankings."
+  },
+  "core_web_vitals": [
+    {
+      "id": "lcp",
+      "name": "Largest Contentful Paint (LCP)",
+      "unit": "ms",
+      "good_max": 2500,
+      "needs_improvement_max": 4000,
+      "poor_above": 4000,
+      "good_label": "≤ 2,500 ms",
+      "needs_improvement_label": "> 2,500 to 4,000 ms",
+      "poor_label": "> 4,000 ms",
+      "description": "Measures loading performance by tracking when the largest visible content element is rendered."
+    },
+    {
+      "id": "inp",
+      "name": "Interaction to Next Paint (INP)",
+      "unit": "ms",
+      "good_max": 200,
+      "needs_improvement_max": 500,
+      "poor_above": 500,
+      "good_label": "≤ 200 ms",
+      "needs_improvement_label": "> 200 to 500 ms",
+      "poor_label": "> 500 ms",
+      "description": "Measures responsiveness across user interactions during a page visit."
+    },
+    {
+      "id": "cls",
+      "name": "Cumulative Layout Shift (CLS)",
+      "unit": "score",
+      "good_max": 0.1,
+      "needs_improvement_max": 0.25,
+      "poor_above": 0.25,
+      "good_label": "≤ 0.10",
+      "needs_improvement_label": "> 0.10 to 0.25",
+      "poor_label": "> 0.25",
+      "description": "Measures unexpected visual movement of page content."
+    }
+  ],
+  "supporting_metrics": [
+    {
+      "id": "fcp",
+      "name": "First Contentful Paint (FCP)",
+      "unit": "ms",
+      "good_label": "≤ 1,800 ms",
+      "needs_improvement_label": "> 1,800 to 3,000 ms",
+      "poor_label": "> 3,000 ms",
+      "description": "A supporting loading metric; it is not one of the three Core Web Vitals."
+    },
+    {
+      "id": "ttfb",
+      "name": "Time to First Byte (TTFB)",
+      "unit": "ms",
+      "good_label": "≤ 800 ms",
+      "needs_improvement_label": "> 800 to 1,800 ms",
+      "poor_label": "> 1,800 ms",
+      "description": "A diagnostic server-response metric. Google PageSpeed Insights labels these TTFB thresholds experimental."
+    }
+  ],
+  "africa_latency_benchmarks": {
+    "status": "not_published",
+    "reason": "No representative, validated dataset is currently published for country-wide or carrier-wide performance rankings.",
+    "policy": "Do not infer country or carrier rankings from isolated scan results or probe availability."
+  },
+  "sources": [
+    {
+      "name": "Core Web Vitals thresholds and methodology",
+      "publisher": "Google web.dev",
+      "url": "https://web.dev/articles/defining-core-web-vitals-thresholds",
+      "supports": ["lcp", "inp", "cls", "percentile"]
+    },
+    {
+      "name": "PageSpeed Insights metric thresholds",
+      "publisher": "Google for Developers",
+      "url": "https://developers.google.com/speed/docs/insights/v5/about",
+      "supports": ["fcp", "ttfb"]
+    }
+  ]
+}
