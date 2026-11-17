@@ -645,6 +645,30 @@
             </div>
         </section>
 
+        <section class="section" id="reports-history" aria-labelledby="reports-heading">
+            <div class="section-header">
+                <h2 id="reports-heading">Reports History</h2>
+                <a href="/scan" style="font-size:13px;">Run another scan →</a>
+            </div>
+            <p style="color:var(--muted);font-size:14px;line-height:1.6;margin:0;">
+                Reopen saved Lighthouse reports and review earlier African network diagnostic scans. Report metrics and network measurements are kept distinct.
+            </p>
+            <div class="report-toolbar">
+                <div class="report-tabs" role="group" aria-label="Filter report history">
+                    <button type="button" class="report-tab" data-report-filter="all" aria-pressed="true">All</button>
+                    <button type="button" class="report-tab" data-report-filter="good" aria-pressed="false">Good (A–B)</button>
+                    <button type="button" class="report-tab" data-report-filter="needs-work" aria-pressed="false">Needs work (C–D)</button>
+                    <button type="button" class="report-tab" data-report-filter="poor" aria-pressed="false">Poor (E–F)</button>
+                    <button type="button" class="report-tab" data-report-filter="network" aria-pressed="false">African probe scans</button>
+                </div>
+                <input id="report-search" class="report-search" type="search" placeholder="Search reports by URL…" aria-label="Search report history by URL">
+            </div>
+            <div id="scan-history" class="report-list" aria-live="polite">
+                <div class="empty">Loading saved reports…</div>
+            </div>
+            <p class="report-history-note">Use the time period selector above to change the history window. Only completed scans saved to your account are listed here.</p>
+        </section>
+
         <section class="section" id="intelligence-crawler-setup" aria-labelledby="intelligence-crawler-heading">
           <div class="section-header"><h2 id="intelligence-crawler-heading">Live Crawler Activity</h2><span class="status">Verified log events</span></div>
           <p class="rum-beta-intro">Connect origin or CDN access logs to verify GPTBot, OAI-SearchBot, ClaudeBot and PerplexityBot requests. robots.txt checks alone do not prove that a crawler reached your server.</p>
@@ -678,30 +702,6 @@
             </div>
             <p id="intelligence-crawler-message" role="status" aria-live="polite">Loading crawler project setup…</p>
           </div>
-        </section>
-
-        <section class="section" id="reports-history" aria-labelledby="reports-heading">
-            <div class="section-header">
-                <h2 id="reports-heading">Reports History</h2>
-                <a href="/scan" style="font-size:13px;">Run another scan →</a>
-            </div>
-            <p style="color:var(--muted);font-size:14px;line-height:1.6;margin:0;">
-                Reopen saved Lighthouse reports and review earlier African network diagnostic scans. Report metrics and network measurements are kept distinct.
-            </p>
-            <div class="report-toolbar">
-                <div class="report-tabs" role="group" aria-label="Filter report history">
-                    <button type="button" class="report-tab" data-report-filter="all" aria-pressed="true">All</button>
-                    <button type="button" class="report-tab" data-report-filter="good" aria-pressed="false">Good (A–B)</button>
-                    <button type="button" class="report-tab" data-report-filter="needs-work" aria-pressed="false">Needs work (C–D)</button>
-                    <button type="button" class="report-tab" data-report-filter="poor" aria-pressed="false">Poor (E–F)</button>
-                    <button type="button" class="report-tab" data-report-filter="network" aria-pressed="false">African probe scans</button>
-                </div>
-                <input id="report-search" class="report-search" type="search" placeholder="Search reports by URL…" aria-label="Search report history by URL">
-            </div>
-            <div id="scan-history" class="report-list" aria-live="polite">
-                <div class="empty">Loading saved reports…</div>
-            </div>
-            <p class="report-history-note">Use the time period selector above to change the history window. Only completed scans saved to your account are listed here.</p>
         </section>
 
     </section>
