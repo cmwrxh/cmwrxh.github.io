@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Website Performance Benchmarks | AfricaLatency</title>
-  <meta name="description" content="Understand published Core Web Vitals reference thresholds and how AfricaLatency distinguishes standards from measured African network data.">
+  <title>African Industry Performance Benchmarks | AfricaLatency</title>
+  <meta name="description" content="Compare verified African fintech, e-commerce, SaaS and media website performance. Placeholder entries stay clearly marked until real scans are published.">
   <meta name="theme-color" content="#101116">
   <link rel="canonical" href="https://africalatency.dev/benchmarks">
   <link rel="icon" type="image/svg+xml" href="/images/favicon.svg">
@@ -52,6 +52,28 @@
     .footer{padding:28px 0 40px;border-top:1px solid var(--line);color:var(--muted);font-size:.85rem}
     .footer a{margin-right:16px}
     @media(max-width:700px){.nav{align-items:flex-start;flex-direction:column;padding:16px 0}.nav-links{gap:12px 16px}.hero{padding:54px 0 36px}.sources{grid-template-columns:1fr}.section{padding:26px 0 38px}}
+  
+    .category-tabs{display:flex;gap:10px;flex-wrap:wrap;margin:0 0 16px}
+    .category-tabs button{min-height:42px;padding:9px 14px;border:1px solid #48576b;border-radius:9px;background:#20242d;color:#f4f7fb;font:inherit;font-size:.9rem;font-weight:700;cursor:pointer}
+    .category-tabs button[aria-selected="true"]{background:var(--blue);border-color:var(--blue);color:#101116}
+    .sort-button{padding:0;border:0;background:transparent;color:inherit;font:inherit;font-weight:800;text-align:left;cursor:pointer;text-decoration:underline;text-decoration-color:#65758a;text-underline-offset:4px}
+    .placeholder-badge{display:inline-flex;align-items:center;padding:4px 8px;border:1px solid #64748b;border-radius:999px;color:#e2e8f0;font-size:.72rem;font-weight:700;white-space:nowrap}
+    .ai-status-list{display:flex;flex-wrap:wrap;gap:5px;max-width:300px}
+    .ai-status{display:inline-flex;padding:3px 6px;border-radius:6px;background:#252b35;color:#d7e0ec;font-size:.7rem;white-space:nowrap}
+    .ai-status.allowed{background:#163d2b;color:#a8edc2}.ai-status.blocked{background:#4b2027;color:#ffc1c1}
+    .industry-table{min-width:1040px}
+    .industry-table td{vertical-align:middle}
+    .industry-company{display:block;color:#fff;font-weight:750}
+    .industry-domain{display:block;margin-top:3px;color:var(--muted);font-size:.78rem}
+    .industry-action{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:8px 12px;border:1px solid #8bc6ff;border-radius:8px;background:#17324d;color:#fff;text-decoration:none;font-size:.85rem;font-weight:750;white-space:nowrap}
+    .industry-status{margin:12px 0 0;font-size:.86rem}
+    .industry-cta{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;padding:24px;border:1px solid #3d536b;border-radius:16px;background:#172332;margin:10px 0 44px}
+    .industry-cta h2{margin:0 0 6px}.industry-cta p{margin:0}
+    .industry-cta-actions{display:flex;gap:10px;flex-wrap:wrap}
+    .industry-cta-actions a{display:inline-flex;align-items:center;justify-content:center;min-height:42px;padding:9px 14px;border:1px solid #8bc6ff;border-radius:8px;background:#8bc6ff;color:#101116;text-decoration:none;font-weight:800}
+    .industry-cta-actions a.secondary{background:transparent;color:#f4f7fb}
+    @media(max-width:700px){.industry-cta{align-items:flex-start}.industry-cta-actions{width:100%}.industry-cta-actions a{flex:1}}
+
   </style>
 </head>
 <body>
@@ -62,7 +84,9 @@
         <a href="/scan">Free scan</a>
         <a href="/pricing">Pricing</a>
         <a href="/sample-report">Sample report</a>
+        <a href="/intelligence">Intelligence</a>
         <a href="/methodology">Methodology</a>
+        <a href="/contact">Contact</a>
         <a href="/about">About</a>
       </nav>
     </div>
@@ -74,6 +98,37 @@
       <p>Use published web performance thresholds to understand what good looks like. AfricaLatency does not present isolated scans as country-wide or carrier-wide averages.</p>
     </section>
 
+    <section class="section" aria-labelledby="industry-title">
+      <div class="section-intro">
+        <span class="eyebrow">African industry leaderboard</span>
+        <h2 id="industry-title">Compare website performance by sector.</h2>
+        <p>Numeric rankings will appear only after comparable, verified point-in-time scans. Until then, clearly labelled placeholder entries show how the leaderboard will be structured.</p>
+      </div>
+      <div class="category-tabs" id="industry-category-tabs" role="tablist" aria-label="Industry benchmark categories">
+        <button type="button" role="tab" data-category="kenyan-fintech" aria-selected="true">Kenyan Fintech &amp; Banks</button>
+        <button type="button" role="tab" data-category="african-ecommerce" aria-selected="false">African E-Commerce</button>
+        <button type="button" role="tab" data-category="saas-media" aria-selected="false">SaaS &amp; Media</button>
+      </div>
+      <div class="panel table-wrap">
+        <table class="industry-table" id="industry-leaderboard-table">
+          <thead><tr>
+            <th scope="col"><button class="sort-button" type="button" data-sort="rank">Rank</button></th>
+            <th scope="col"><button class="sort-button" type="button" data-sort="company">Company / Domain</button></th>
+            <th scope="col"><button class="sort-button" type="button" data-sort="nairobi_mobile_lcp_ms">Nairobi Mobile LCP</button></th>
+            <th scope="col"><button class="sort-button" type="button" data-sort="regional_avg_ttfb_ms">Regional Avg TTFB</button></th>
+            <th scope="col">AI Crawler Access (GPTBot / ClaudeBot / PerplexityBot)</th>
+            <th scope="col">Action</th>
+          </tr></thead>
+          <tbody id="industry-leaderboard-body"><tr><td colspan="6">Loading industry benchmark entries…</td></tr></tbody>
+        </table>
+      </div>
+      <p id="industry-leaderboard-status" class="industry-status" role="status" aria-live="polite">Loading the public leaderboard data.</p>
+      <div class="note"><strong>Methodology</strong><p>These are point-in-time public endpoint scans. Nairobi Mobile LCP is a Lighthouse mobile lab measurement, not field data. Regional Avg TTFB is calculated only from valid regional probe measurements returned by the scan. AI crawler access reflects robots.txt permissions, not proof of actual crawler visits. Missing probe results are excluded, never estimated.</p></div>
+    </section>
+    <section class="industry-cta" aria-label="Request a benchmark scan">
+      <div><h2>Is your company missing or ranking low?</h2><p>Claim your free detailed report or request a re-scan.</p></div>
+      <div class="industry-cta-actions"><a href="/scan">Claim your free detailed report</a><a class="secondary" href="/contact">Request a re-scan</a></div>
+    </section>
     <section class="section" aria-labelledby="core-title">
       <div class="section-intro">
         <span class="eyebrow">Google's published thresholds</span>
@@ -177,5 +232,6 @@
         });
     }());
   </script>
+<script src="/js/industry-benchmarks.js?v=1" defer></script>
 </body>
 </html>
