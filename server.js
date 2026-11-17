@@ -75,7 +75,7 @@ app.all('/api/v1/lighthouse', async (req, res) => {
   }
 });
 
-// 2. Block server-side files and folders from being served as static
+app.get('/intelligence', (_req, res) => res.sendFile(path.join(__dirname, 'intelligence.html')));\n\n// 2. Block server-side files and folders from being served as static
 const blockedFiles = [
   '/server.js',
   '/package.json',
