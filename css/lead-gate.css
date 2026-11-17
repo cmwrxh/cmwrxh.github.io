@@ -1,0 +1,23 @@
+.lg-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:18px 0 22px}
+.lg-summary-card{min-width:0;padding:16px;border:1px solid var(--rd-border,#303744);border-radius:12px;background:var(--rd-card,#191c24)}
+.lg-summary-label{display:block;margin-bottom:6px;color:var(--rd-muted,#aab5c4);font-size:.72rem;font-weight:750;letter-spacing:.08em;text-transform:uppercase}
+.lg-summary-value{display:block;color:var(--rd-text,#f4f7fb);font-size:1rem;font-weight:750;overflow-wrap:anywhere}
+.lg-summary-note{display:block;margin-top:5px;color:var(--rd-muted,#aab5c4);font-size:.78rem;line-height:1.45}
+.lg-gate{position:relative;z-index:2;margin:8px 0 24px;padding:24px;border:1px solid #42638a;border-radius:16px;background:linear-gradient(135deg,#182536,#171b25);box-shadow:0 14px 36px #0003}
+.lg-gate h2{margin:0 0 8px;color:#f7faff;font-size:clamp(1.25rem,3vw,1.7rem)}
+.lg-gate p{max-width:760px;color:#c0ccda;line-height:1.6}
+.lg-gate-form{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+.lg-gate-form label{flex:1 1 260px;min-width:0}
+.lg-gate-form input{width:100%;min-height:48px;padding:12px 14px;border:1px solid #596a80;border-radius:9px;background:#0f141c;color:#fff;font:inherit}
+.lg-gate-form button,.lg-upsell a{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:11px 18px;border:1px solid #69b6f5;border-radius:9px;background:#1769a8;color:#fff;font:inherit;font-weight:750;text-decoration:none;cursor:pointer}
+.lg-gate-form button:disabled{opacity:.65;cursor:wait}
+.lg-gate-status{width:100%;min-height:1.3em;margin:0;color:#c0ccda;font-size:.88rem}
+.lg-gate-status[data-state="error"]{color:#ffaaaa}
+.lg-locked{filter:blur(7px);opacity:.42;pointer-events:none;user-select:none;transition:filter .2s ease,opacity .2s ease}
+.lg-upsell{margin:18px 0 26px;padding:18px 20px;border:1px solid #3f745e;border-radius:13px;background:#14251f}
+.lg-upsell p{margin:0 0 12px;color:#d4e9df;line-height:1.55}
+.lg-upsell-actions{display:flex;flex-wrap:wrap;gap:10px}
+.lg-upsell a.secondary{border-color:#667789;background:transparent}
+@media(max-width:760px){.lg-summary{grid-template-columns:repeat(2,minmax(0,1fr))}.lg-gate{padding:18px}.lg-gate-form{display:grid}.lg-gate-form button{width:100%}}
+@media(max-width:420px){.lg-summary{grid-template-columns:1fr 1fr;gap:8px}.lg-summary-card{padding:12px}.lg-summary-value{font-size:.92rem}}
+@media(prefers-reduced-motion:reduce){.lg-locked{transition:none}}
