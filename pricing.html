@@ -21,6 +21,7 @@
   <link rel="stylesheet" href="/css/gtmetrix-color-system.css?v=2">
   <link rel="stylesheet" href="/css/site-header.css">
   <link rel="stylesheet" href="/css/gtmetrix-system.css">
+  <link rel="stylesheet" href="/css/intelligence-pricing.css?v=1">
 </head>
 <body class="pricing-page">
   <!-- site-header:start -->
@@ -39,54 +40,59 @@
       
       <h1>Pick the plan that’s right for you.</h1>
       <p class="pricing-intro">Start with a public endpoint scan, then add monitoring, regional coverage and API capacity as your needs grow.</p>
-      <div class="billing-control" aria-label="Billing frequency">
-        <span id="monthly-label" class="billing-label is-active">Monthly</span>
-        <button id="billing-toggle" class="billing-switch" type="button" role="switch" aria-checked="false" aria-label="Switch to yearly billing"><span class="billing-switch-knob"></span></button>
-        <span id="yearly-label" class="billing-label">Yearly</span>
-        <span class="billing-savings">2 months free!</span>
+      <div class="al-currency-control" role="group" aria-label="Display currency">
+        <span>Currency</span><button type="button" data-currency="KES" aria-pressed="true">KES</button><button type="button" data-currency="USD" aria-pressed="false">USD</button>
       </div>
-      <p class="billing-note">All prices billed in KES or USD equivalent</p>
+      <p class="billing-note">Monthly subscription prices. The Africa Latency Audit is a separate one-time purchase.</p>
     </header>
 
-    <section class="pricing-comparison-section" aria-label="Subscription plan comparison"><div class="pricing-comparison-scroll" tabindex="0" role="region" aria-label="Scrollable pricing plan comparison"><table class="pricing-comparison"><thead><tr>
-<th scope="col">Plan</th>
-<th scope="col" class="plan-free"><span>Free</span><p>Essential point-in-time public endpoint testing.</p><div class="plan-price"><span class="price-primary">KES 0</span><span class="price-secondary">$0</span><span class="price-period">forever</span></div><a class="plan-select" style="--plan-color:#646464" href="/signup">Select Free</a></th>
-<th scope="col" class="plan-developer"><span>Developer</span><p>For individual developers and small projects.</p><div class="plan-price" data-month-kes="650" data-month-usd="4.99"><span class="price-primary">KES 650</span><span class="price-secondary">$4.99</span><span class="price-period">/ month</span><span class="yearly-total" hidden></span></div><a class="plan-select" style="--plan-color:#5cb9b1" href="/signup?plan=developer">Select Developer</a></th>
-<th scope="col" class="plan-business"><span>Business</span><p>For teams operating customer-facing services.</p><div class="plan-price" data-month-kes="3500" data-month-usd="24.99"><span class="price-primary">KES 3,500</span><span class="price-secondary">$24.99</span><span class="price-period">/ month</span><span class="yearly-total" hidden></span></div><a class="plan-select" style="--plan-color:#67a7d5" href="/signup?plan=business">Select Business</a></th>
-<th scope="col" class="plan-enterprise"><span>Enterprise</span><p>For advanced monitoring and larger teams.</p><div class="plan-price" data-month-kes="7500" data-month-usd="49.99"><span class="price-primary">KES 7,500</span><span class="price-secondary">$49.99</span><span class="price-period">/ month</span><span class="yearly-total" hidden></span></div><a class="plan-select" style="--plan-color:#a17ed2" href="/contact?subject=Enterprise%20pricing">Select Enterprise</a></th>
-</tr></thead><tbody>
-<tr><th scope="row">On-demand scans</th><td>5 / month</td><td>50 / month</td><td>250 / month</td><td>Unlimited</td></tr>
-<tr><th scope="row"><a href="/monitoring">Monitored slots <span class="coming-soon">Planned</span></a></th><td><a href="/monitoring">Planned</a></td><td><a href="/monitoring">Planned</a></td><td><a href="/monitoring">Planned</a></td><td><a href="/monitoring">Planned</a></td></tr>
-<tr><th scope="row"><a href="/locations">Requested African probe countries</a></th><td colspan="4">Nine countries requested; actual results depend on available Globalping community probes</td></tr>
-<tr><th scope="row"><a href="/api">API credits <span class="coming-soon">Planned</span></a></th><td>Not enabled</td><td>Not enabled</td><td>Not enabled</td><td><a href="/api">Not enabled</a></td></tr>
-<tr><th scope="row">Data retention</th><td>7 days</td><td>1 month</td><td>6 months</td><td>12 months</td></tr>
-<tr><th scope="row">Downloadable audit report</th><td>—</td><td>—</td><td>1 per quarter</td><td>Custom scope</td></tr>
-<tr><th scope="row"><a href="/teams">Team seats <span class="coming-soon">Planned</span></a></th><td>Not enabled</td><td>Not enabled</td><td>Not enabled</td><td>Not enabled</td></tr>
-<tr><th scope="row"><a href="/monitoring#sub-hourly">Sub-hourly monitoring <span class="coming-soon">Planned</span></a></th><td colspan="4"><a href="/monitoring#sub-hourly">Not enabled on any plan</a></td></tr>
-<tr><th scope="row"><a href="/api#webhooks">Webhook access <span class="coming-soon">Planned</span></a></th><td colspan="4"><a href="/api#webhooks">Not enabled on any plan</a></td></tr>
-</tbody></table></div></section>
-
-    <section class="included-section" aria-labelledby="included-title">
-      <div class="included-heading"><h2 id="included-title">Included in all plans</h2></div>
-      <ul class="included-grid"><li>Higher Queue Priority</li><li>Full Telemetry PDF Export</li><li>Non-Invasive Public Probes</li><li>Historical Latency Graphs</li><li><a href="/monitoring#alerts">Email alerts <span class="coming-soon">Planned</span></a></li></ul>
+    <section class="al-intelligence-pricing" aria-label="AfricaLatency Intelligence plans">
+      <article class="al-price-card al-price-tripwire">
+        <p class="al-price-kicker">START HERE · ONE-TIME</p><h2>Africa Latency Audit</h2>
+        <p class="al-price-value" data-kes="KES 3,500" data-usd="$27">KES 3,500</p><p class="al-price-period">one-time</p>
+        <p>Evidence-led regional performance diagnostic with prioritized findings. Includes a 14-day trial of Continuous Monitoring, subject to activation during onboarding.</p>
+        <a class="al-price-link" href="/audit-checkout">Get the one-time audit</a>
+      </article>
+      <article class="al-price-card">
+        <p class="al-price-kicker">FOR INDIVIDUAL TEAMS</p><h2>Starter Monitor</h2>
+        <p class="al-price-value" data-kes="KES 2,500" data-usd="$19">KES 2,500</p><p class="al-price-period">/ month</p>
+        <ul><li>1 domain</li><li>Daily African speed and SEO checks</li><li>Threshold email alerts</li><li>30-day retention</li></ul>
+        <a class="al-price-link" href="/audit-intake?interest=starter-monitor">Join the Starter waitlist</a>
+      </article>
+      <article class="al-price-card al-price-featured">
+        <p class="al-price-kicker">FOR GROWING TEAMS</p><h2>Growth Intelligence</h2>
+        <p class="al-price-value" data-kes="KES 6,500" data-usd="$49">KES 6,500</p><p class="al-price-period">/ month</p>
+        <ul><li>3 domains</li><li>Verified AI crawler log ingestion, up to 100k events/month</li><li>Slack and webhook threshold alerts</li><li>30-day retention</li></ul>
+        <a class="al-price-link" href="/audit-intake?interest=growth-intelligence">Join the Growth waitlist</a>
+      </article>
+      <article class="al-price-card">
+        <p class="al-price-kicker">CUSTOM REQUIREMENTS</p><h2>Enterprise Custom</h2>
+        <p class="al-price-value" data-kes="KES 25,000+" data-usd="$199+">KES 25,000+</p><p class="al-price-period">/ month · scoped</p>
+        <ul><li>Unlimited domains</li><li>High-volume ingestion</li><li>Custom African city probes</li><li>90-day retention</li></ul>
+        <a class="al-price-link" href="/audit-intake?interest=enterprise-custom">Discuss an enterprise scope</a>
+      </article>
     </section>
+    <p class="al-pricing-disclaimer">Subscription plans are offered through the existing intake route while recurring billing, plan enforcement, alert delivery and retention provisioning are completed. The intake form is unchanged, so mention the selected tier in your scope details. Listed features describe the intended tier, not an assertion that every capability is active today.</p>
+
+    <section class="included-section" aria-labelledby="included-title"><div class="included-heading"><h2 id="included-title">Built around three evidence layers</h2></div><ul class="included-grid"><li>Regional HTTP measurements</li><li>Core Web Vitals diagnostics</li><li>robots.txt crawler checks</li><li>Verified crawler log events when configured</li><li>Clear measurement limitations</li></ul></section>
+
     <section class="pricing-enterprise" aria-labelledby="enterprise-title">
       <div><h2 id="enterprise-title">Enterprise performance intelligence</h2><p>For organisations that need tailored coverage, integration support, or a custom measurement programme.</p></div>
-      <a class="plan-cta plan-cta-primary" href="/contact?subject=Enterprise%20pricing">Talk to our team</a>
+      <a class="plan-cta plan-cta-primary" href="/audit-intake?interest=enterprise-custom">Talk to our team</a>
     </section>
     <section class="pricing-faq" aria-labelledby="pricing-faq-title">
       <div class="pricing-faq-heading"><h2 id="pricing-faq-title">Questions before you start?</h2><p>Choose a starting point and expand as your measurement needs grow.</p></div>
       <div class="pricing-faq-list">
-        <details><summary>Can I start without paying?</summary><p>Yes. The Free plan is listed at KES 0 and is intended for point-in-time public endpoint testing.</p></details>
+        <details><summary>Can I start without paying?</summary><p>Yes. You can run a free point-in-time public endpoint scan before choosing a paid audit or an onboarding-led monitoring plan.</p></details>
         <details><summary>What does AfricaLatency measure?</summary><p>It separates browser-based performance measurements from live network measurements, and reports regional results only where probe results are available.</p></details>
-        <details><summary>Are subscription plans and limits fully active?</summary><p>Plan features and limits are shown for comparison. Subscription checkout, plan enforcement and trial provisioning must be connected before these offers are treated as active paid subscriptions.</p></details>
+        <details><summary>Are subscription plans and limits fully active?</summary><p>Plan features and limits are shown for comparison. Subscriptions are provisioned through onboarding while recurring billing, feature enforcement and alert delivery are being completed.</p></details>
       </div>
       <aside class="pricing-faq-contact"><h3>Still have questions?</h3><p>Tell us about your stack and the regions you need to understand.</p><a href="/contact">Contact AfricaLatency →</a></aside>
     </section>
     <section class="pricing-cta-band" aria-labelledby="pricing-cta-title"><div><h2 id="pricing-cta-title">See how your service performs across African networks.</h2><p>Run a free scan before deciding what to monitor next.</p></div><a class="plan-cta plan-cta-primary" href="/scan">Run a free scan</a></section>
-    <p class="pricing-footnote">Plan features and limits are shown for comparison. Subscription checkout, plan enforcement and trial provisioning must be connected before these offers are treated as active paid subscriptions.</p>
+    <p class="pricing-footnote">Subscription features are provisioned through onboarding. Availability depends on completed billing, monitoring and log-delivery setup.</p>
   
-<section id="africa-latency-audit" class="al-audit-offer" style="max-width:1100px;margin:48px auto;padding:28px;border:1px solid #2c2c2e;border-radius:16px;background:#111318;color:#fff"><p style="color:#c2cfde;text-transform:uppercase;letter-spacing:.12em;font-size:.8rem">One-off expert audit</p><h2>Africa Latency Audit</h2><p style="color:#c2cfde;line-height:1.7">A focused review of your website or API performance across African networks, with evidence-led findings and prioritized recommendations.</p><a class="plan-cta" href="https://africalatency.dev/audit-checkout" style="display:inline-flex;padding:13px 20px;border-radius:9px;text-decoration:none;font-weight:700">Get an Africa Latency Audit</a></section>
+
 </main>
   <!-- site-footer:start -->
 <footer class="al-site-footer" data-site-footer><div class="al-footer-inner">
@@ -99,37 +105,13 @@
 <!-- site-footer:end -->
   <script>
   (() => {
-    const toggle = document.getElementById('billing-toggle');
-    const monthly = document.getElementById('monthly-label');
-    const yearly = document.getElementById('yearly-label');
-    const setBilling = (annual) => {
-      toggle.setAttribute('aria-checked', String(annual));
-      toggle.setAttribute('aria-label', annual ? 'Switch to monthly billing' : 'Switch to yearly billing');
-      monthly.classList.toggle('is-active', !annual);
-      yearly.classList.toggle('is-active', annual);
-      document.querySelectorAll('.plan-price[data-month-kes]').forEach((price) => {
-        const kes = Number(price.dataset.monthKes);
-        const usd = Number(price.dataset.monthUsd);
-        const primary = price.querySelector('.price-primary');
-        const secondary = price.querySelector('.price-secondary');
-        const period = price.querySelector('.price-period');
-        const total = price.querySelector('.yearly-total');
-        if (annual) {
-          primary.textContent = 'KES ' + (kes * 10).toLocaleString('en-KE');
-          secondary.textContent = '$' + (usd * 10).toFixed(2);
-          period.textContent = '/ year';
-          total.textContent = 'Equivalent to KES ' + kes.toLocaleString('en-KE') + ' / $' + usd.toFixed(2) + ' per month';
-          total.hidden = false;
-        } else {
-          primary.textContent = 'KES ' + kes.toLocaleString('en-KE');
-          secondary.textContent = '$' + usd.toFixed(2);
-          period.textContent = '/ month';
-          total.hidden = true;
-        }
-      });
+    const buttons = document.querySelectorAll('[data-currency]');
+    const update = (currency) => {
+      buttons.forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.currency === currency)));
+      document.querySelectorAll('.al-price-value[data-kes]').forEach((price) => { price.textContent = price.dataset[currency.toLowerCase()]; });
     };
-    toggle.addEventListener('click', () => setBilling(toggle.getAttribute('aria-checked') !== 'true'));
-    setBilling(false);
+    buttons.forEach((button) => button.addEventListener('click', () => update(button.dataset.currency)));
+    update('KES');
   })();
   </script>
   
