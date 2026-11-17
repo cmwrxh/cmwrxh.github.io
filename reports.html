@@ -7,7 +7,7 @@
 <meta name="description" content="Website performance and African network scan results from AfricaLatency.">
 <link rel="icon" type="image/svg+xml" href="/images/favicon.svg">
 <link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/brand.css?v=6">
-<link rel="stylesheet" href="/css/report-dashboard.css"><link rel="stylesheet" href="/css/report-dashboard-v2.css">
+<link rel="stylesheet" href="/css/report-dashboard.css"><link rel="stylesheet" href="/css/report-dashboard-v2.css"><link rel="stylesheet" href="/css/report-lead-gate.css?v=1">
   <link rel="stylesheet" href="/css/site-header.css">
 <style>
 .report-dashboard-body a.rd-button{background:#075985!important;color:#fff!important;border:1px solid #075985!important}
@@ -23,11 +23,34 @@
 <div id="rd-app" hidden>
 <header class="rd-header">
 <div><p class="rd-eyebrow">AFRICALATENCY / PERFORMANCE REPORT</p><h1>Latest Performance Report for: <span id="rd-url">—</span></h1><p class="rd-meta" id="rd-meta"></p></div>
-<div class="rd-actions" role="toolbar" aria-label="Report actions"><a class="rd-button" href="/scan" aria-label="Run another scan" title="Run another scan"><span aria-hidden="true">↻</span><span>Re-test</span></a><button class="rd-button secondary" id="rd-compare" type="button" aria-label="Compare reports" title="Compare reports"><span aria-hidden="true">▥</span><span>Compare</span></button><button class="rd-button secondary" id="rd-page-settings" type="button" aria-label="Page settings" title="Page settings"><span aria-hidden="true">⚙</span><span>Settings</span></button><button class="rd-button secondary" id="rd-monitor" type="button" aria-label="Monitoring status" title="Monitoring status"><span aria-hidden="true">◷</span><span>Monitor</span></button><button class="rd-button secondary" id="rd-alert-setup" type="button" aria-label="Alert setup" title="Alert setup"><span aria-hidden="true">♧</span><span>Alerts</span></button><button class="rd-button secondary" id="rd-tags" type="button" aria-label="Report tags" title="Report tags"><span aria-hidden="true">⌑</span><span>Tags</span></button><button class="rd-button secondary" id="rd-executive-summary" type="button" aria-label="Share executive summary" title="Share executive summary"><span aria-hidden="true">▤</span><span>Share Executive Summary</span></button><button class="rd-button secondary" id="rd-share" type="button" aria-label="Share report" title="Share report"><span aria-hidden="true">↗</span><span>Share</span></button><button class="rd-button secondary" id="rd-pdf" type="button" aria-label="Print or save as PDF" title="Print or save as PDF"><span aria-hidden="true">⎙</span><span>Print / Save as PDF</span></button></div>
+<div class="rd-actions" role="toolbar" aria-label="Report actions"><a class="rd-button" href="/scan" aria-label="Run another scan" title="Run another scan"><span aria-hidden="true">↻</span><span>Re-test</span></a><button class="rd-button secondary" id="rd-compare" data-gated-action hidden type="button" aria-label="Compare reports" title="Compare reports"><span aria-hidden="true">▥</span><span>Compare</span></button><button class="rd-button secondary" id="rd-page-settings" data-gated-action hidden type="button" aria-label="Page settings" title="Page settings"><span aria-hidden="true">⚙</span><span>Settings</span></button><button class="rd-button secondary" id="rd-monitor" data-gated-action hidden type="button" aria-label="Monitoring status" title="Monitoring status"><span aria-hidden="true">◷</span><span>Monitor</span></button><button class="rd-button secondary" id="rd-alert-setup" data-gated-action hidden type="button" aria-label="Alert setup" title="Alert setup"><span aria-hidden="true">♧</span><span>Alerts</span></button><button class="rd-button secondary" id="rd-tags" data-gated-action hidden type="button" aria-label="Report tags" title="Report tags"><span aria-hidden="true">⌑</span><span>Tags</span></button><button class="rd-button secondary" id="rd-executive-summary" data-gated-action hidden type="button" aria-label="Share executive summary" title="Share executive summary"><span aria-hidden="true">▤</span><span>Share Executive Summary</span></button><button class="rd-button secondary" id="rd-share" data-gated-action hidden type="button" aria-label="Share report" title="Share report"><span aria-hidden="true">↗</span><span>Share</span></button><button class="rd-button secondary" id="rd-pdf" data-gated-action hidden type="button" aria-label="Print or save as PDF" title="Print or save as PDF"><span aria-hidden="true">⎙</span><span>Print / Save as PDF</span></button></div>
 </header>
 <aside id="rd-ai-crawler-teaser" class="rd-ai-crawler-teaser" hidden><strong>Live crawler activity is the next step.</strong><p>Your robots.txt permits AI crawlers, but point-in-time scans cannot verify if bots are actually reaching your origin without Live Crawler Activity.</p><a href="/intelligence">Explore AfricaLatency Intelligence</a></aside>
 <div class="rd-parameters"><span><b>Test location</b><em id="rd-location">Not reported</em></span><span><b>Device</b><em id="rd-device">Not reported</em></span><span><b>Connection profile</b><em id="rd-profile">Not reported</em></span><span><b>Browser</b><em id="rd-browser">Not reported</em></span></div>
-<section class="rd-score-grid" id="rd-scores"></section><button type="button" id="rd-score-breakdown-trigger" class="rd-score-breakdown-trigger" aria-expanded="false" aria-controls="rd-score-breakdown"><span aria-hidden="true">▾</span> View score breakdown</button><section id="rd-score-breakdown" class="rd-score-breakdown" hidden></section>
+<div class="rd-topline-heading"><p class="rd-eyebrow">YOUR SCAN AT A GLANCE</p><h2>Top-line summary</h2></div>
+<section class="rd-score-grid" id="rd-scores"></section>
+<section class="rd-topline-summary" aria-label="Fastest and slowest African probe results">
+  <article class="rd-topline-card"><span>Fastest measured country</span><strong id="rd-fastest-country">Calculating…</strong></article>
+  <article class="rd-topline-card"><span>Slowest measured country</span><strong id="rd-slowest-country">Calculating…</strong></article>
+  <article class="rd-topline-card rd-topline-ai"><span>AI crawler access</span><strong id="rd-ai-access-status">Checking robots.txt…</strong><ul id="rd-ai-access-list" aria-live="polite"><li>Checking GPTBot, ClaudeBot and PerplexityBot</li></ul><small id="rd-ai-access-note">robots.txt permissions do not prove that a crawler visited your site.</small></article>
+</section>
+<section class="rd-full-report-gate" id="rd-full-report-gate" aria-labelledby="rd-full-report-title">
+  <p class="rd-eyebrow">UNLOCK YOUR FULL REPORT</p>
+  <h2 id="rd-full-report-title">Get the complete picture.</h2>
+  <p>Enter your work email to unlock the full 9-country breakdown and prioritized fix guide.</p>
+  <form id="rd-full-report-form" novalidate>
+    <label for="rd-lead-email">Work email</label>
+    <input id="rd-lead-email" name="email" type="email" autocomplete="email" maxlength="254" placeholder="you@company.com" required>
+    <input type="hidden" name="scan_id" id="rd-gate-scan-id">
+    <input type="hidden" name="scanned_url" id="rd-gate-scanned-url">
+    <input type="hidden" name="source" value="free-scan-report">
+    <label class="rd-lead-honeypot" aria-hidden="true">Leave this field empty<input name="website" type="text" tabindex="-1" autocomplete="off"></label>
+    <button class="rd-button" type="submit" id="rd-lead-submit">Unlock full report</button>
+    <p id="rd-full-report-status" role="status" aria-live="polite"></p>
+  </form>
+  <small>We use your email to unlock this report and follow up only where you have requested contact.</small>
+</section>
+<div id="rd-full-report-content" hidden><div class="rd-full-report-content" id="rd-full-report-content" hidden><button type="button" id="rd-score-breakdown-trigger" class="rd-score-breakdown-trigger" aria-expanded="false" aria-controls="rd-score-breakdown"><span aria-hidden="true">▾</span> View score breakdown</button><section id="rd-score-breakdown" class="rd-score-breakdown" hidden></section>
 <nav class="rd-tabs" aria-label="Report sections" role="tablist">
 <button role="tab" aria-selected="true" data-tab="summary">Summary</button><button role="tab" aria-selected="false" data-tab="performance">Performance</button><button role="tab" aria-selected="false" data-tab="structure">Structure</button><button role="tab" aria-selected="false" data-tab="waterfall">Waterfall Chart</button><button role="tab" aria-selected="false" data-tab="video">Video</button><button role="tab" aria-selected="false" data-tab="crux">CrUX Field Data</button><button role="tab" aria-selected="false" data-tab="history">History</button><button role="tab" aria-selected="false" data-tab="alerts">Alerts</button>
 </nav>
@@ -36,6 +59,13 @@
 <div id="rd-vitals" class="rd-vitals"></div><section class="rd-page-details"><div class="rd-section-head"><div><p class="rd-eyebrow">REQUEST ANALYSIS</p><h2>Page Details</h2></div><p>Page size and request counts are calculated only from resource data returned by this scan.</p></div><div id="rd-page-details" class="rd-page-detail-grid"></div><p id="rd-page-details-note" class="rd-muted"></p></section>
 <div class="rd-two-col"><section><h2>Page load filmstrip</h2><div id="rd-filmstrip" class="rd-empty">No filmstrip frames were returned for this scan.</div></section><section><h2>Top issues</h2><div id="rd-issues" class="rd-empty">Prioritized issue details are not available in this report payload.</div></section></div>
 <section class="rd-regional"><p class="rd-eyebrow">AFRICALATENCY REGIONAL INTELLIGENCE</p><h2>African network health</h2><div id="rd-hubs" class="rd-hub-grid"></div><div id="rd-country-table" aria-label="Requested African probe country measurements"><p class="rd-empty">Country measurements will appear here.</p></div><div class="rd-two-col"><div><h3>ISP carrier routing & peering matrix</h3><div class="rd-empty">Carrier-by-carrier comparison requires separate measurements from identified carrier probes. This scan does not include those measurements.</div></div><div><h3>Regional route & submarine cable path</h3><div class="rd-empty">AS-path and traceroute telemetry was not returned by the current scanner.</div></div></div><div class="rd-two-col"><div><h3>Mobile throttling & data-cost emulator</h3><div id="rd-data-cost" class="rd-empty">Data payload is unavailable or no verified country-specific airtime tariff is configured. No cost estimate is shown.</div></div><div><h3>Multi-hub regional health grid</h3><p class="rd-muted">Only returned probe results are shown. Unavailable hubs are never assigned synthetic timings.</p><div id="rd-grid" class="rd-hub-grid"></div></div></div></section>
+<section class="rd-ai-bot-audit" aria-labelledby="rd-ai-bot-audit-title">
+  <p class="rd-eyebrow">AI CRAWLER READINESS</p>
+  <h2 id="rd-ai-bot-audit-title">AI Bot Path Audit</h2>
+  <p>These results reflect robots.txt permission rules only. They do not confirm that GPTBot, ClaudeBot or PerplexityBot actually reached your server.</p>
+  <div class="rd-ai-audit-table-wrap"><table class="rd-ai-audit-table"><thead><tr><th scope="col">Crawler</th><th scope="col">robots.txt access</th><th scope="col">Evidence</th></tr></thead><tbody id="rd-ai-bot-audit-rows"><tr><td colspan="3">Checking robots.txt…</td></tr></tbody></table></div>
+  <p id="rd-ai-bot-audit-note" class="rd-muted"></p>
+</section>
 </section>
 <section class="rd-panel" data-panel="performance" hidden><div class="rd-section-head"><div><p class="rd-eyebrow">LAB DETAIL</p><h2>Performance metrics</h2></div><p>Values and scores are displayed only when supplied by the completed scan.</p></div><div id="rd-performance"></div></section>
 <section class="rd-panel" data-panel="structure" hidden><h2>Structure audits</h2><p class="rd-muted">Audit findings from the actual Lighthouse run, when present. No audit rules are inferred from the grade.</p><div id="rd-structure"></div></section>
@@ -47,9 +77,11 @@
 <dialog id="rd-executive-dialog" class="rd-executive-dialog" aria-labelledby="rd-executive-title">
   <div class="rd-executive-dialog-inner"><p class="rd-eyebrow">AFRICALATENCY / BUSINESS SUMMARY</p><h2 id="rd-executive-title">Executive Summary</h2><p class="rd-muted">A plain-language summary of the measurements available in this report.</p><pre data-executive-summary></pre><div class="rd-executive-actions"><button class="rd-button" type="button" data-executive-copy>Copy summary</button><button class="rd-button secondary" type="button" data-executive-close>Close</button></div></div>
 </dialog>
+</div>
+<aside id="rd-report-upsell" class="rd-report-upsell" hidden><strong>Want 24/7 alerts when your site slows down or blocks AI bots?</strong><p>Claim a Founding Pilot spot or book a KES 3,500 Audit.</p><div><a class="rd-button" href="/#founding-pilot">Claim a Founding Pilot spot</a><a class="rd-button secondary" href="/audit-checkout">Book a KES 3,500 Audit</a></div><small>Continuous monitoring and alert delivery are being developed; pilot onboarding helps shape the workflow.</small></aside>
 <footer class="rd-footer"><span>Point-in-time measurements, not a guarantee of every visitor’s experience.</span>
 <span>A <a href="https://brilliantunicorn.com" target="_blank" rel="noopener">Brilliant Unicorn Ltd</a> product</span><a href="/methodology">Measurement methodology</a></footer>
 </div></main>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="/js/auth-next.js"></script><script src="/js/report-filmstrip.js"></script><script src="/js/report-dashboard.js"></script><script src="/js/robots-preview-teaser.js?v=1" defer></script><script src="/js/executive-summary.js?v=1" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="/js/auth-next.js"></script><script src="/js/report-filmstrip.js"></script><script src="/js/report-dashboard.js"></script><script src="/js/report-lead-gate.js?v=1" defer></script><script src="/js/robots-preview-teaser.js?v=1" defer></script><script src="/js/executive-summary.js?v=1" defer></script>
   <script src="/js/site-header.js" defer></script>
 </body></html>
