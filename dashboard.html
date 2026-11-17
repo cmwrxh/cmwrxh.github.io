@@ -348,7 +348,8 @@
         .rum-beta-table-wrap{overflow-x:auto}
         .rum-beta-breakdown{overflow-x:auto}
         @media(max-width:720px){.rum-beta-layout,.rum-beta-setup form{grid-template-columns:1fr}.rum-beta-setup button{grid-column:auto}.rum-beta-site-row{align-items:flex-start}.rum-beta-site-row button{flex-shrink:0}}
-</style>
+.intelligence-crawler-card{padding:20px}.intelligence-crawler-tabs{display:flex;gap:8px;border-bottom:1px solid var(--border);margin-bottom:16px}.intelligence-crawler-tabs button{border:0;border-bottom:2px solid transparent;background:transparent;color:var(--muted);padding:10px 14px;cursor:pointer}.intelligence-crawler-tabs button[aria-selected="true"]{color:var(--text);border-color:#8bc6ff}.intelligence-crawler-toolbar{display:flex;align-items:end;gap:12px;flex-wrap:wrap;margin:12px 0 16px}.intelligence-crawler-toolbar label,.intelligence-crawler-form label{display:grid;gap:6px;color:var(--muted);font-size:13px}.intelligence-crawler-toolbar button,.intelligence-crawler-form button,.intelligence-crawler-key-panel button{min-height:40px;padding:9px 13px;border:1px solid #365b87;border-radius:8px;background:#17385d;color:#fff;font:inherit;font-weight:600;cursor:pointer}.intelligence-crawler-toolbar select,.intelligence-crawler-form input{min-height:40px}.intelligence-crawler-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:14px 0}.intelligence-crawler-metric{padding:14px;border:1px solid var(--border);border-radius:9px;background:#111720}.intelligence-crawler-metric small,.intelligence-crawler-metric strong{display:block}.intelligence-crawler-metric small{color:var(--muted)}.intelligence-crawler-metric strong{font-size:22px;margin-top:5px}.intelligence-crawler-table{min-width:640px}.intelligence-crawler-form{display:grid;grid-template-columns:1fr 1fr auto;align-items:end;gap:12px}.intelligence-crawler-form input{width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;background:#0e131a;color:var(--text);font:inherit}.intelligence-crawler-key-panel{margin-top:16px;padding:16px;border:1px solid var(--border);border-radius:10px;background:#111720}.intelligence-crawler-key-panel pre{white-space:pre-wrap;overflow-wrap:anywhere;padding:12px;background:#080c12;border:1px solid var(--border);border-radius:8px;color:#cfe4ff}.intelligence-crawler-key-panel p{color:var(--muted);font-size:13px}.intelligence-crawler-key-panel button{margin-right:8px}#intelligence-crawler-message{min-height:1.4em;color:var(--muted);font-size:13px}#intelligence-crawler-message[data-state="error"]{color:#fda29b}@media(max-width:720px){.intelligence-crawler-form{grid-template-columns:1fr}.intelligence-crawler-metrics{grid-template-columns:1fr}.intelligence-crawler-toolbar{align-items:stretch;flex-direction:column}.intelligence-crawler-toolbar label{width:100%}}
+    </style>
 <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
 <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
@@ -367,6 +368,7 @@
       line-height: 1.7 !important;
     }
   </style>
+  <script src="/js/intelligence-crawler-setup.js?v=1" defer></script>
 </head>
 
 <body class="dashboard-page">
@@ -641,6 +643,41 @@
                 <p id="crawler-audit-message" role="status" aria-live="polite">Audits are limited to five requests per account per minute.</p>
                 <div id="crawler-audit-results" aria-live="polite"></div>
             </div>
+        </section>
+
+        <section class="section" id="intelligence-crawler-setup" aria-labelledby="intelligence-crawler-heading">
+          <div class="section-header"><h2 id="intelligence-crawler-heading">Live Crawler Activity</h2><span class="status">Verified log events</span></div>
+          <p class="rum-beta-intro">Connect origin or CDN access logs to verify GPTBot, OAI-SearchBot, ClaudeBot and PerplexityBot requests. robots.txt checks alone do not prove that a crawler reached your server.</p>
+          <div class="card intelligence-crawler-card">
+            <div class="intelligence-crawler-tabs" role="tablist" aria-label="Crawler activity views">
+              <button type="button" data-intelligence-crawler-tab="activity" role="tab" aria-selected="true">Activity</button>
+              <button type="button" data-intelligence-crawler-tab="setup" role="tab" aria-selected="false">Setup</button>
+            </div>
+            <div id="intelligence-crawler-activity-view">
+              <div class="intelligence-crawler-toolbar">
+                <label>Project <select id="intelligence-crawler-project"><option value="">Loading projects…</option></select></label>
+                <label>Period <select id="intelligence-crawler-range"><option value="24h">24 hours</option><option value="7d" selected>7 days</option><option value="30d">30 days</option></select></label>
+                <button type="button" id="intelligence-crawler-refresh">Refresh activity</button>
+              </div>
+              <div class="intelligence-crawler-metrics" id="intelligence-crawler-metrics"></div>
+              <div class="table-wrapper"><table class="intelligence-crawler-table"><thead><tr><th>Observed</th><th>Bot</th><th>Verification</th><th>HTTP</th><th>Path</th></tr></thead><tbody id="intelligence-crawler-events"><tr><td colspan="5">Select a project to view received events.</td></tr></tbody></table></div>
+            </div>
+            <div id="intelligence-crawler-setup-view" hidden>
+              <form id="intelligence-crawler-create" class="intelligence-crawler-form">
+                <label>Project name<input id="intelligence-crawler-name" maxlength="120" required placeholder="Production website"></label>
+                <label>Domain<input id="intelligence-crawler-domain" maxlength="253" required placeholder="example.com"></label>
+                <button id="intelligence-crawler-create-submit" type="submit">Create crawler project</button>
+              </form>
+              <div id="intelligence-crawler-key-panel" class="intelligence-crawler-key-panel" hidden>
+                <p><strong>Copy this key now.</strong> It is displayed only once and should be stored as a secret in your log forwarder.</p>
+                <pre id="intelligence-crawler-key"></pre>
+                <button type="button" id="intelligence-crawler-copy">Copy key</button>
+                <button type="button" id="intelligence-crawler-test" disabled>Send Test Event</button>
+                <p class="rum-beta-muted">The test validates the key and project domain without writing synthetic activity to your live crawler log.</p>
+              </div>
+            </div>
+            <p id="intelligence-crawler-message" role="status" aria-live="polite">Loading crawler project setup…</p>
+          </div>
         </section>
 
         <section class="section" id="reports-history" aria-labelledby="reports-heading">
