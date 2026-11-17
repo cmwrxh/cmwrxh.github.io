@@ -79,9 +79,9 @@ function mount(){
  unlocked=readUnlock();
  setLocked(!unlocked);
 }
-const observer=new MutationObserver(()=>{
+const observer=new MutationObserver(records=>{
  if(!app.hidden)mount();
- renderSummary();
+ if(records.some(record=>!summary||!summary.contains(record.target)))renderSummary();
 });
 observer.observe(app,{attributes:true,attributeFilter:['hidden'],childList:true,subtree:true,characterData:true});
 const teaser=document.getElementById('rd-ai-crawler-teaser');
