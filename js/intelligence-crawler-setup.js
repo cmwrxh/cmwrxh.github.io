@@ -9,7 +9,9 @@
     : null;
   let activeProject = '';
   let activeKey = '';
-  let refreshTimer = null;\n  let activityRequestId = 0;\n  let projectsRequestId = 0;
+  let refreshTimer = null;
+  let activityRequestId = 0;
+  let projectsRequestId = 0;
   const say = (message, error) => { $('intelligence-crawler-message').textContent = message; $('intelligence-crawler-message').dataset.state = error ? 'error' : 'ok'; };
   const request = async (url, options = {}) => {
     if (!client) throw new Error('Account configuration is unavailable.');
