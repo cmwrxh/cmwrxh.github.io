@@ -19,12 +19,12 @@
     if (node) node.textContent = value;
   };
 
-  function storageHasUnlock(storage) {
-    try { return storage.getItem(storageKey) === '1'; } catch { return false; }
+  function storageHasUnlock(storageName) {
+    try { return window[storageName].getItem(storageKey) === '1'; } catch { return false; }
   }
 
   function isUnlocked() {
-    return storageHasUnlock(window.localStorage) || storageHasUnlock(window.sessionStorage);
+    return storageHasUnlock('localStorage') || storageHasUnlock('sessionStorage');
   }
 
   function saveUnlock() {
