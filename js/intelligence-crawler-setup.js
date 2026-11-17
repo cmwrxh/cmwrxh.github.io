@@ -101,7 +101,6 @@
   });
   $('intelligence-crawler-project').addEventListener('change', (event) => { activeProject = event.target.value; loadActivity(); });
   $('intelligence-crawler-range').addEventListener('change', loadActivity);
-  $('intelligence-crawler-refresh').addEventListener('click', loadActivity);
   $('intelligence-crawler-test').addEventListener('click', async () => {
     const button = $('intelligence-crawler-test'); button.disabled = true; say('Verifying the project key…');
     try {
