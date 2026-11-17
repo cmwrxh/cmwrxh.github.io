@@ -58,12 +58,30 @@ export default async function handler(req, res) {
   const body = req.body || {};
   const userToken = readBearerToken(req.headers.authorization);
   const guestProof = readGuestProof(req);
+  let retryingFailedGuestScan = false;
   if (!userToken && guestProof) {
-    return res.status(429).json({
-      code: 'guest_scan_used',
-      error: 'Your free scan is used. Create a free account to keep testing, save this report and compare changes.',
-      reportId: guestProof.reportId
+    const prior = await sendToWorker('/internal/guest-scan/' + encodeURIComponent(guestProof.reportId), req, undefined, {
+      'x-guest-proof-nonce': guestProof.nonce
     });
+    if (prior.status === 200 && prior.payload?.status === 'completed') {
+      return res.status(429).json({
+        code: 'guest_scan_used',
+        error: 'Your free scan is used. Create a free account to keep testing, save this report and compare changes.',
+        reportId: guestProof.reportId
+      });
+    }
+    if (prior.status === 200 && ['queued', 'processing'].includes(prior.payload?.status)) {
+      return res.status(202).json({
+        jobId: prior.payload.jobId, reportId: guestProof.reportId,
+        queuePosition: prior.payload.queuePosition || 1, cacheHit: false, reusedActiveJob: true
+      });
+    }
+    if (prior.status === 200 && prior.payload?.status === 'failed') {
+      retryingFailedGuestScan = true;
+      res.setHeader('Set-Cookie', 'al_guest_scan=; Path=/; Max-Age=0; HttpOnly; Secure; SameSite=Lax');
+    } else if (prior.status !== 404 && prior.status !== 403) {
+      return res.status(503).json({ error: 'Could not verify your previous guest scan. Please retry shortly.' });
+    }
   }
   if (!userToken && !hasGuestProofSecret()) {
     return res.status(503).json({ error: 'Guest scan proof is not configured yet. Please sign in to continue.' });
@@ -94,7 +112,7 @@ export default async function handler(req, res) {
   }
   const guestNonce = !userToken ? newGuestProofNonce() : null;
   const result = await sendToWorker('/internal/jobs', req, {
-    url: parsed.toString(), device, deviceId: body.deviceId, turnstileVerified: verified,
+    url: parsed.toString(), device, deviceId: body.deviceId, turnstileVerified: verified, resetGuestDeviceLimit: retryingFailedGuestScan,
     ...(guestNonce ? { guestProofHash: guestProofHash(guestNonce), firstGuestScan: true } : {})
   });
   if (!userToken && result.status === 202 && result.payload?.guestProofStored === true && result.payload?.reportId) {
