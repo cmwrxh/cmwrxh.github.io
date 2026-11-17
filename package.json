@@ -12,7 +12,8 @@
     "test:guest-scan-proof": "node --test tests/guest-scan-proof.test.js",
     "test:scanner-retry": "node --test tests/scanner-retry-recovery.test.js",
     "test:scan-bearer-token": "node --test tests/scan-bearer-token.test.cjs",
-    "test:leads": "node --test tests/leads.test.cjs"
+    "test:leads": "node --test tests/leads.test.cjs",
+    "test:industry-benchmarks": "node --test tests/industry-benchmarks-data.test.cjs"
   },
   "dependencies": {
     "@sparticuz/chromium": "^138.0.0",
